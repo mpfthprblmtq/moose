@@ -1,6 +1,22 @@
 package moose;
 
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.table.DefaultTableModel;
 
 public class Frame extends javax.swing.JFrame {
@@ -12,24 +28,49 @@ public class Frame extends javax.swing.JFrame {
         initComponents();
 
         // taken from the FileDrop example
-        new FileDrop(System.out, dragArea, (java.io.File[] files) -> {
+        FileDrop fileDrop = new FileDrop(System.out, tableSP, (java.io.File[] files) -> {
             for (File file : files) {
-                //try {
-                    //dragArea.append(file.getCanonicalPath() + "\n");
-                    //System.out.println(file.getCanonicalPath());
-                    addFileToTable(file);
-                //} // end try
-                //catch (java.io.IOException e) {
-                    //System.err.println(e);
-                //}
-            } // end for: through each dropped file
-        } // end filesDropped
-        ); // end FileDrop.Listener
+                addFileToTable(file);
+            }
+        });
+        
+        String url="https://www.youtube.com/watch?v=iu1arvwNRxo";
+        String path="";
+        
     }
-    
+
     public void addFileToTable(File file) {
+        
+        Mp3File mp3file = null;
+        try {
+            mp3file = new Mp3File(file.getAbsolutePath());
+            //System.out.println("Length of this mp3 is: " + mp3file.getLengthInSeconds() + " seconds");
+            //System.out.println("Bitrate: " + mp3file.getBitrate() + " kbps " + (mp3file.isVbr() ? "(VBR)" : "(CBR)"));
+            //System.out.println("Sample rate: " + mp3file.getSampleRate() + " Hz");
+            //System.out.println("Has ID3v1 tag?: " + (mp3file.hasId3v1Tag() ? "YES" : "NO"));
+            //System.out.println("Has ID3v2 tag?: " + (mp3file.hasId3v2Tag() ? "YES" : "NO"));
+            //System.out.println("Has custom tag?: " + (mp3file.hasCustomTag() ? "YES" : "NO"));
+            //System.out.println(mp3file.getId3v2Tag().getAlbumArtist());
+        } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        String filename = file.getName();
+        String title = mp3file.getId3v2Tag().getTitle();
+        String artist = mp3file.getId3v2Tag().getArtist();
+        String album = mp3file.getId3v2Tag().getAlbum();
+        String albumartist = mp3file.getId3v2Tag().getAlbumArtist();
+        String genre = mp3file.getId3v2Tag().getGenreDescription();
+        String track = mp3file.getId3v2Tag().getTrack();
+        String disk = mp3file.getId3v2Tag().getPartOfSet();
+        ImageIcon artwork = new ImageIcon(mp3file.getId3v2Tag().getAlbumImage());
+        Image img = artwork.getImage();
+        Image img_scaled = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+        Icon newIcon = new ImageIcon(img_scaled);
+        
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.addRow(new Object[]{file.getName()});
+        
+        model.addRow(new Object[]{filename, title, artist, album, albumartist, genre, track, disk, newIcon});
     }
 
     /**
@@ -48,6 +89,7 @@ public class Frame extends javax.swing.JFrame {
         table = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         dragArea = new javax.swing.JTextArea();
+        jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -60,15 +102,31 @@ public class Frame extends javax.swing.JFrame {
 
         jButton1.setText("jButton1");
 
-        table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Filename", "Title", "Artist", "Album", "Album Artist", "Genre", "Track", "Disk", "Artwork"
+        DefaultTableModel tableModel = new DefaultTableModel()
+        {
+            @Override
+            public Class getColumnClass(int column)
+            {
+                if (column == 8) return ImageIcon.class;
+                return Object.class;
             }
-        ));
+        };
+        table.setModel(tableModel);
         table.setRowHeight(20);
+        tableModel.addColumn("Filename");
+        tableModel.addColumn("Title");
+        tableModel.addColumn("Artist");
+        tableModel.addColumn("Album");
+        tableModel.addColumn("Album Artist");
+        tableModel.addColumn("Genre");
+        tableModel.addColumn("Track");
+        tableModel.addColumn("Disk");
+        tableModel.addColumn("Artwork");
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
+        });
         tableSP.setViewportView(table);
 
         dragArea.setEditable(false);
@@ -82,17 +140,20 @@ public class Frame extends javax.swing.JFrame {
         container.setLayout(containerLayout);
         containerLayout.setHorizontalGroup(
             containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(containerLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1))
+                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(tableSP, javax.swing.GroupLayout.DEFAULT_SIZE, 1380, Short.MAX_VALUE)
                     .addGroup(containerLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
                         .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(containerLayout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -104,7 +165,9 @@ public class Frame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableSP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -138,15 +201,54 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+
+        // check if right click
+        if (evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+
+            int row = table.rowAtPoint(evt.getPoint());
+            int col = table.columnAtPoint(evt.getPoint());
+            if (row >= 0 && col >= 0) {
+                System.out.println("row: " + row + ", col: " + col);
+                table.setRowSelectionInterval(row, row);
+                if (col == 8) {
+                    showPopup(evt);
+                }
+            } else {
+                table.clearSelection();
+            }
+        }
+    }//GEN-LAST:event_tableMouseClicked
+
+    void showPopup(MouseEvent e) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem item;
+        popup.add(item = new JMenuItem("Add"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Remove"));
+        item.addActionListener(menuListener);
+
+        popup.show(e.getComponent(), e.getX(), e.getY());
+    }
+
+    ActionListener menuListener = (ActionEvent event) -> {
+        if (event.getActionCommand().equals("Add")) {
+
+        } else if (event.getActionCommand().equals("Remove")) {
+
+        }
+    };
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+        /* look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+ /*
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -154,16 +256,10 @@ public class Frame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+         */
         //</editor-fold>
 
         /* Create and display the form */
@@ -180,6 +276,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JTextArea dragArea;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;

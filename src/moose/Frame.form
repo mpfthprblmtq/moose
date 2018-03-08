@@ -64,18 +64,22 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="tableSP" pref="1380" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="tableSP" pref="1380" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel1" min="-2" pref="100" max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" min="-2" pref="301" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jScrollPane2" min="-2" pref="301" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jLabel2" min="-2" pref="81" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
@@ -92,7 +96,10 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="tableSP" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jScrollPane2" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel2" min="-2" pref="81" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -123,21 +130,18 @@
           <SubComponents>
             <Component class="javax.swing.JTable" name="table">
               <Properties>
-                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="9" rowCount="0">
-                    <Column editable="true" title="Filename" type="java.lang.Object"/>
-                    <Column editable="true" title="Title" type="java.lang.Object"/>
-                    <Column editable="true" title="Artist" type="java.lang.Object"/>
-                    <Column editable="true" title="Album" type="java.lang.Object"/>
-                    <Column editable="true" title="Album Artist" type="java.lang.Object"/>
-                    <Column editable="true" title="Genre" type="java.lang.Object"/>
-                    <Column editable="true" title="Track" type="java.lang.Object"/>
-                    <Column editable="true" title="Disk" type="java.lang.Object"/>
-                    <Column editable="true" title="Artwork" type="java.lang.Object"/>
-                  </Table>
+                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="tableModel" type="code"/>
                 </Property>
                 <Property name="rowHeight" type="int" value="20"/>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMouseClicked"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="tableModel.addColumn(&quot;Filename&quot;);&#xa;tableModel.addColumn(&quot;Title&quot;);&#xa;tableModel.addColumn(&quot;Artist&quot;);&#xa;tableModel.addColumn(&quot;Album&quot;);&#xa;tableModel.addColumn(&quot;Album Artist&quot;);&#xa;tableModel.addColumn(&quot;Genre&quot;);&#xa;tableModel.addColumn(&quot;Track&quot;);&#xa;tableModel.addColumn(&quot;Disk&quot;);&#xa;tableModel.addColumn(&quot;Artwork&quot;);"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultTableModel tableModel = new DefaultTableModel()&#xa;        {&#xa;            @Override&#xa;            public Class getColumnClass(int column)&#xa;            {&#xa;                if (column == 8) return ImageIcon.class; &#xa;                return Object.class;&#xa;            }&#xa;        };"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -161,6 +165,8 @@
             </Component>
           </SubComponents>
         </Container>
+        <Component class="javax.swing.JLabel" name="jLabel2">
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>
