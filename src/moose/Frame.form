@@ -66,19 +66,23 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="tableSP" pref="1579" max="32767" attributes="0"/>
-                      <Component id="jLabel1" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="consoleSP" min="-2" pref="500" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="saveButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="jLabel1" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="consoleSP" min="-2" pref="500" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="saveButton" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
+                          <EmptySpace min="-2" pref="1004" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="tableSP" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -94,8 +98,6 @@
                       <Component id="consoleSP" pref="124" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Component id="saveButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -139,8 +141,8 @@
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMouseClicked"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="tableModel.addColumn(&quot;Filename&quot;);&#xa;tableModel.addColumn(&quot;Title&quot;);&#xa;tableModel.addColumn(&quot;Artist&quot;);&#xa;tableModel.addColumn(&quot;Album&quot;);&#xa;tableModel.addColumn(&quot;Album Artist&quot;);&#xa;tableModel.addColumn(&quot;Genre&quot;);&#xa;tableModel.addColumn(&quot;Track&quot;);&#xa;tableModel.addColumn(&quot;Disk&quot;);&#xa;tableModel.addColumn(&quot;Artwork&quot;);&#xa;table.setAutoCreateRowSorter(true);&#xa;"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultTableModel tableModel = new DefaultTableModel()&#xa;        {&#xa;            @Override&#xa;            public Class getColumnClass(int column)&#xa;            {&#xa;                if (column == 8) return ImageIcon.class;&#xa;                if (column == 0) return File.class;&#xa;                return Object.class;&#xa;            }&#xa;        };"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="tableModel.addColumn(&quot;Filename&quot;);&#xa;tableModel.addColumn(&quot;Title&quot;);&#xa;tableModel.addColumn(&quot;Artist&quot;);&#xa;tableModel.addColumn(&quot;Album&quot;);&#xa;tableModel.addColumn(&quot;Album Artist&quot;);&#xa;tableModel.addColumn(&quot;Genre&quot;);&#xa;tableModel.addColumn(&quot;Track&quot;);&#xa;tableModel.addColumn(&quot;Disk&quot;);&#xa;tableModel.addColumn(&quot;Artwork&quot;);&#xa;table.setAutoCreateRowSorter(true);&#xa;setColumnWidth(6, 50);&#xa;setColumnWidth(7, 50);&#xa;setColumnWidth(8, 110);"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultTableModel tableModel = new DefaultTableModel()&#xa;        {&#xa;            @Override&#xa;            public Class getColumnClass(int column)&#xa;            {&#xa;                if (column == 8) { return ImageIcon.class; }&#xa;                else if (column == 0) { return File.class; }&#xa;                else { return Object.class; }&#xa;            }&#xa;&#xa;&#xa;            @Override&#xa;            public boolean isCellEditable(int row, int column) {&#xa;                return column != 8;&#xa;            }   &#xa;        };"/>
               </AuxValues>
             </Component>
           </SubComponents>
@@ -164,14 +166,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="jButton1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jButton1"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
-          </Events>
-        </Component>
       </SubComponents>
     </Container>
   </SubComponents>
