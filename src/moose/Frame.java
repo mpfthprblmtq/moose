@@ -61,28 +61,28 @@ public class Frame extends javax.swing.JFrame {
 
         model = (DefaultTableModel) table.getModel();
 
-        table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
-
-            @Override
-            protected void setValue(Object value) {
-                Object result = value;
-                if ((value != null) && (value instanceof File)) {
-                    File file = (File) value;
-                    result = file.getName();
-                    super.setValue(result);
-                    super.setToolTipText(file.toString());
-                }
-            }
-        });
+//        table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
+//
+//            @Override
+//            protected void setValue(Object value) {
+//                Object result = value;
+//                if ((value != null) && (value instanceof File)) {
+//                    File file = (File) value;
+//                    result = file.getName();
+//                    super.setValue(result);
+//                    super.setToolTipText(file.toString());
+//                }
+//            }
+//        });
 
         Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TableCellListener tcl = (TableCellListener) e.getSource();
-                System.out.println("Row   : " + tcl.getRow());
-                System.out.println("Column: " + tcl.getColumn());
-                System.out.println("Old   : " + tcl.getOldValue());
-                System.out.println("New   : " + tcl.getNewValue());
+                updateConsole("Row   : " + tcl.getRow());
+                updateConsole("Column: " + tcl.getColumn());
+                updateConsole("Old   : " + tcl.getOldValue());
+                updateConsole("New   : " + tcl.getNewValue());
             }
         };
 
@@ -123,8 +123,11 @@ public class Frame extends javax.swing.JFrame {
             String disk = mp3file.getId3v2Tag().getPartOfSet();
             byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
 
+            // create a Phile object
+            Phile phile = new Phile(file);
+            
             // create a song object
-            Song s = new Song(file, title, artist, album, albumartist, genre, track, disk, artwork_bytes);
+            Song s = new Song(phile, title, artist, album, albumartist, genre, track, disk, artwork_bytes);
 
             // add the song to the list
             songs.add(s);
@@ -147,7 +150,7 @@ public class Frame extends javax.swing.JFrame {
                 s.getFullDiskString(),
                 s.getArtwork()
             });
-            File f = (File) model.getValueAt(model.getRowCount() - 1, 0);
+            //File f = (File) model.getValueAt(model.getRowCount() - 1, 0);
             //model.setValueAt(f.getName(), model.getRowCount() - 1, 0);
 
         }
@@ -298,31 +301,47 @@ public class Frame extends javax.swing.JFrame {
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
 
-        // check if right click
-        if (evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+        // check what type of click
+        switch (evt.getButton()) {
 
-            int row = table.rowAtPoint(evt.getPoint());
-            int col = table.columnAtPoint(evt.getPoint());
-            if (row >= 0 && col >= 0) {
-                table.setRowSelectionInterval(row, row);
-                if (col == 8) {
-                    showArtworkPopup(evt);
+            // if it's a right click
+            case java.awt.event.MouseEvent.BUTTON3:
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                if (row >= 0 && col >= 0) {
+                    table.setRowSelectionInterval(row, row);
+                    if (col == 8) {
+                        showArtworkPopup(evt);
+                    } else {
+                        showRegularPopup(evt);
+                    }
                 } else {
-                    showRegularPopup(evt);
+                    table.clearSelection();
                 }
-            } else {
-                table.clearSelection();
-            }
-        }
+                break;
 
-        // check if double click
-        if (evt.getClickCount() == 2) {
-            if (table.getSelectedColumn() == 8) {
-                showArtworkPopup(evt);
-            } else if (table.getSelectedColumn() == 0) {
-                File f = (File) model.getValueAt(table.getSelectedRow(), 0);
-                model.setValueAt(f.getName(), table.getSelectedRow(), 0);
-            }
+            // if it's a left click
+            case java.awt.event.MouseEvent.BUTTON1:
+
+                // check if double click
+                if (evt.getClickCount() == 2) {
+                    if (table.getSelectedColumn() == 8) {
+                        showArtworkPopup(evt);
+                    } else if (table.getSelectedColumn() == 0) {
+                        File f = (File) model.getValueAt(table.getSelectedRow(), 0);
+                        //model.setValueAt(f.getName(), table.getSelectedRow(), 0);
+                    }
+                }
+
+                break;
+
+            // if it's a scroll click
+            case java.awt.event.MouseEvent.BUTTON2:
+                System.out.println("Scroll click");
+                break;
+
+            default:
+                break;
         }
 
 
@@ -332,7 +351,8 @@ public class Frame extends javax.swing.JFrame {
         for (int i = 0; i < model.getRowCount(); i++) {
 
             //File f = (File) model.getValueAt(i, 0);
-            File f = (File) model.getValueAt(model.getRowCount() - 1, 0);
+            //File f = (File) model.getValueAt(model.getRowCount() - 1, 0);
+            Phile phile = (Phile) model.getValueAt(i, 0);
             String title = model.getValueAt(i, 1).toString();
             String artist = model.getValueAt(i, 2).toString();
             String album = model.getValueAt(i, 3).toString();
@@ -355,29 +375,29 @@ public class Frame extends javax.swing.JFrame {
 //                System.err.println(ex);
 //            }
             //File f = new File(songs.get(i).getFile().getAbsolutePath().replace(songs.get(i).getFile().getName(), "") + filename);
-            edited_songs.add(new Song(f, title, artist, album, albumartist, genre, track, disk, artwork));
+            edited_songs.add(new Song(phile, title, artist, album, albumartist, genre, track, disk, artwork));
 
         }
         removeUnchanged();
 
 
     }//GEN-LAST:event_saveButtonActionPerformed
-
-    public static BufferedImage getBufferedImage(Image img) {
-        if (img instanceof BufferedImage) {
-            return (BufferedImage) img;
-        }
-
-        BufferedImage bimage = new BufferedImage(img.getWidth(null),
-                img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
-    }
+//
+//    public static BufferedImage getBufferedImage(Image img) {
+//        if (img instanceof BufferedImage) {
+//            return (BufferedImage) img;
+//        }
+//
+//        BufferedImage bimage = new BufferedImage(img.getWidth(null),
+//                img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+//
+//        Graphics2D bGr = bimage.createGraphics();
+//        bGr.drawImage(img, 0, 0, null);
+//        bGr.dispose();
+//
+//        // Return the buffered image
+//        return bimage;
+//    }
 
     void showArtworkPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();

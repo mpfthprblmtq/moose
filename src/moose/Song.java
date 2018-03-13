@@ -15,7 +15,7 @@ public class Song {
 
     //private String filepath;
     //private String filename;
-    private File file;
+    private Phile file;
     private String title;
     private String artist;
     private String album;
@@ -31,7 +31,7 @@ public class Song {
 
     }
 
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, byte[] artwork_bytes) {
+    public Song(Phile file, String title, String artist, String album, String albumartist, String genre, String track, String disk, byte[] artwork_bytes) {
 
         // standard string stuff
         this.file = file;
@@ -70,7 +70,7 @@ public class Song {
         }
     }
     
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
+    public Song(Phile file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
 
         // standard string stuff
         this.file = file;
@@ -266,21 +266,21 @@ public class Song {
     /**
      * @return the file
      */
-    public File getFile() {
+    public Phile getFile() {
         return file;
     }
 
     /**
      * @param file the file to set
      */
-    public void setFile(File file) {
+    public void setFile(Phile file) {
         this.file = file;
     }
 
     @Override
     public String toString() {
-        //return "Song{" + "title=" + title + ", artist=" + artist + ", album=" + album + ", albumartist=" + albumartist + ", genre=" + genre + ", track=" + track + ", totaltracks=" + totaltracks + ", disk=" + disk + ", totaldisks=" + totaldisks + ", artwork=" + artwork + '}';
-        return this.file.getName();
+        return "Song{" + "title=" + title + ", artist=" + artist + ", album=" + album + ", albumartist=" + albumartist + ", genre=" + genre + ", track=" + track + ", totaltracks=" + totaltracks + ", disk=" + disk + ", totaldisks=" + totaldisks + ", artwork=" + artwork + '}';
+        //return this.file.getName();
     }
     
     public boolean equals(Song s) {
