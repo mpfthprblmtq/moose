@@ -69,6 +69,37 @@ public class Song {
 
         }
     }
+    
+    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
+
+        // standard string stuff
+        this.file = file;
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.albumartist = albumartist;
+        this.genre = genre;
+
+        // parsing track and disk for total tracks/disks
+        if (track != null && track.contains("/")) {
+            String[] t = track.split("/");
+            this.track = t[0];
+            this.totaltracks = t[1];
+        } else {
+            this.track = "0";
+            this.totaltracks = "0";
+        }
+        if (disk != null && disk.contains("/")) {
+            String[] d = disk.split("/");
+            this.disk = d[0];
+            this.totaldisks = d[1];
+        } else {
+            this.disk = "0";
+            this.totaldisks = "0";
+        }
+        
+        this.artwork = artwork;
+    }
 
     /**
      * @return the full track string
