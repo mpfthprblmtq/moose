@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -28,8 +30,10 @@ import javax.swing.table.TableColumn;
 
 public class Frame extends javax.swing.JFrame {
 
-    ArrayList<Song> songs = new ArrayList<>();
-    ArrayList<Song> edited_songs = new ArrayList<>();
+    //ArrayList<Song> songs = new ArrayList<>();
+    //ArrayList<Song> edited_songs = new ArrayList<>();
+    HashMap<Integer, Song> songs = new HashMap<>();
+    HashMap<Integer, Song> edited_songs = new HashMap<>();
 
     ArrayList<File> files = new ArrayList<>();
     ArrayList<Icon> covers = new ArrayList<>();
@@ -130,7 +134,7 @@ public class Frame extends javax.swing.JFrame {
             Song s = new Song(phile, title, artist, album, albumartist, genre, track, disk, artwork_bytes);
 
             // add the song to the list
-            songs.add(s);
+            songs.put(songs.size()-1, s);
 
             // add the file to the files list and the artwork to the artwork list
             files.add(file);
@@ -199,13 +203,19 @@ public class Frame extends javax.swing.JFrame {
             public Class getColumnClass(int column)
             {
                 if (column == 8) { return ImageIcon.class; }
-                else if (column == 0) { return File.class; }
+                else if (column == 0) { return Phile.class; }
                 else { return Object.class; }
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column != 8;
+                if(column == 8) {
+                    return false;
+                } else if (column == 0) {
+                    System.out.println("column 0 is in fact editable");
+                    return true;
+                }
+                return true;
             }
         };
         table.setModel(tableModel);
@@ -327,11 +337,9 @@ public class Frame extends javax.swing.JFrame {
                 if (evt.getClickCount() == 2) {
                     if (table.getSelectedColumn() == 8) {
                         showArtworkPopup(evt);
-                    } else if (table.getSelectedColumn() == 0) {
-                        File f = (File) model.getValueAt(table.getSelectedRow(), 0);
-                        //model.setValueAt(f.getName(), table.getSelectedRow(), 0);
-                    }
+                    } 
                 }
+                
 
                 break;
 
@@ -350,6 +358,8 @@ public class Frame extends javax.swing.JFrame {
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         for (int i = 0; i < model.getRowCount(); i++) {
 
+            System.out.println("Column 0 class: " + model.getColumnClass(0));
+            
             //File f = (File) model.getValueAt(i, 0);
             //File f = (File) model.getValueAt(model.getRowCount() - 1, 0);
             Phile phile = (Phile) model.getValueAt(i, 0);
@@ -375,10 +385,12 @@ public class Frame extends javax.swing.JFrame {
 //                System.err.println(ex);
 //            }
             //File f = new File(songs.get(i).getFile().getAbsolutePath().replace(songs.get(i).getFile().getName(), "") + filename);
-            edited_songs.add(new Song(phile, title, artist, album, albumartist, genre, track, disk, artwork));
+            edited_songs.put(i, new Song(phile, title, artist, album, albumartist, genre, track, disk, artwork));
 
         }
         removeUnchanged();
+        
+        submitChanges();
 
 
     }//GEN-LAST:event_saveButtonActionPerformed
@@ -447,6 +459,20 @@ public class Frame extends javax.swing.JFrame {
                 updateConsole(songs.get(i).getTitle() + " wasn't modified. Removing.");
                 songs.remove(i);
                 edited_songs.remove(i);
+            }
+        }
+    }
+    
+    public void submitChanges() {
+        
+        Set<Integer> keys = songs.keySet();
+        for (int key : keys) {
+            File old_file = songs.get(key).getFile().getFile();
+            File new_file = edited_songs.get(key).getFile().getFile();
+            if(new_file.exists()) {
+                updateConsole("ERROR: " + new_file + " already exists!");
+            } else {
+                old_file.renameTo(new_file);
             }
         }
     }
