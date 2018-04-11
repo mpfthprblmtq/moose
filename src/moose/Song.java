@@ -15,7 +15,7 @@ public class Song {
 
     //private String filepath;
     //private String filename;
-    private Phile file;
+    private File file;
     private String title;
     private String artist;
     private String album;
@@ -26,12 +26,13 @@ public class Song {
     private String disk;
     private String totaldisks;
     private Icon artwork;
+    private byte[] artwork_bytes;
 
     public Song() {
 
     }
 
-    public Song(Phile file, String title, String artist, String album, String albumartist, String genre, String track, String disk, byte[] artwork_bytes) {
+    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, byte[] artwork_bytes) {
 
         // standard string stuff
         this.file = file;
@@ -59,6 +60,8 @@ public class Song {
             this.totaldisks = "0";
         }
 
+        this.artwork_bytes = artwork_bytes;
+        
         try {
             // getting the image from the byte array
             ImageIcon icon = new ImageIcon(artwork_bytes);
@@ -70,7 +73,7 @@ public class Song {
         }
     }
     
-    public Song(Phile file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
+    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
 
         // standard string stuff
         this.file = file;
@@ -120,6 +123,23 @@ public class Song {
             return "";
         } else {
             return disk + "/" + totaldisks;
+        }
+    }
+    
+    /**
+     * @param bytes
+     * @return the imageIcon
+     */
+    public static ImageIcon getIcon(byte[] bytes) {
+        try {
+            // getting the image from the byte array
+            ImageIcon icon = new ImageIcon(bytes);
+            Image img = icon.getImage();
+            Image img_scaled = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
+            return new ImageIcon(img_scaled);
+        } catch (NullPointerException e) {
+            System.err.println(e);
+            return null;
         }
     }
 
@@ -266,15 +286,29 @@ public class Song {
     /**
      * @return the file
      */
-    public Phile getFile() {
+    public File getFile() {
         return file;
     }
 
     /**
      * @param file the file to set
      */
-    public void setFile(Phile file) {
+    public void setFile(File file) {
         this.file = file;
+    }
+    
+    /**
+     * @return the artwork_bytes
+     */
+    public byte[] getArtwork_bytes() {
+        return artwork_bytes;
+    }
+
+    /**
+     * @param artwork_bytes the artwork_bytes to set
+     */
+    public void setArtwork_bytes(byte[] artwork_bytes) {
+        this.artwork_bytes = artwork_bytes;
     }
 
     @Override
@@ -284,7 +318,7 @@ public class Song {
     }
     
     public boolean equals(Song s) {
-        if(s.getFile() == this.file
+        return s.getFile() == this.file
                 && s.getTitle().equals(this.title)
                 && s.getArtist().equals(this.artist)
                 && s.getAlbum().equals(this.album)
@@ -292,11 +326,7 @@ public class Song {
                 && s.getGenre().equals(this.genre)
                 && s.getFullTrackString().equals(this.getFullTrackString())
                 && s.getFullDiskString().equals(this.getFullDiskString())
-                && s.getArtwork() == this.getArtwork()) {
-            return true;
-        } else {
-            return false;
-        }
+                && s.getArtwork() == this.getArtwork();
     }
 
 }
