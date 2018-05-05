@@ -1,14 +1,12 @@
 /**
- *
+ * Song.java
  */
+
 // package
 package moose;
 
 // imports
-import java.awt.Image;
 import java.io.File;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 // class Song
 public class Song {
@@ -62,39 +60,7 @@ public class Song {
 
         this.artwork_bytes = artwork_bytes;
         
-        
     }
-    
-//    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk) {
-//
-//        // standard string stuff
-//        this.file = file;
-//        this.title = title;
-//        this.artist = artist;
-//        this.album = album;
-//        this.albumartist = albumartist;
-//        this.genre = genre;
-//
-//        // parsing track and disk for total tracks/disks
-//        if (track != null && track.contains("/")) {
-//            String[] t = track.split("/");
-//            this.track = t[0];
-//            this.totaltracks = t[1];
-//        } else {
-//            this.track = "0";
-//            this.totaltracks = "0";
-//        }
-//        if (disk != null && disk.contains("/")) {
-//            String[] d = disk.split("/");
-//            this.disk = d[0];
-//            this.totaldisks = d[1];
-//        } else {
-//            this.disk = "0";
-//            this.totaldisks = "0";
-//        }
-//        
-//        this.artwork = artwork;
-//    }
 
     /**
      * @return the full track string
@@ -115,23 +81,6 @@ public class Song {
             return "";
         } else {
             return disk + "/" + totaldisks;
-        }
-    }
-    
-    /**
-     * @param bytes
-     * @return the imageIcon
-     */
-    public static ImageIcon getIcon(byte[] bytes) {
-        try {
-            // getting the image from the byte array
-            ImageIcon icon = new ImageIcon(bytes);
-            Image img = icon.getImage();
-            Image img_scaled = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
-            return new ImageIcon(img_scaled);
-        } catch (NullPointerException e) {
-            System.err.println(e);
-            return null;
         }
     }
 
@@ -261,20 +210,6 @@ public class Song {
         this.totaldisks = totaldisks;
     }
 
-//    /**
-//     * @return the artwork
-//     */
-//    public Icon getArtwork() {
-//        return artwork;
-//    }
-//
-//    /**
-//     * @param artwork the artwork to set
-//     */
-//    public void setArtwork(Icon artwork) {
-//        this.artwork = artwork;
-//    }
-
     /**
      * @return the file
      */
@@ -320,17 +255,4 @@ public class Song {
         return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
         //return this.file.getName();
     }
-    
-    public boolean equals(Song s) {
-        return s.getFile() == this.file
-                && s.getTitle().equals(this.title)
-                && s.getArtist().equals(this.artist)
-                && s.getAlbum().equals(this.album)
-                && s.getAlbumartist().equals(this.albumartist)
-                && s.getGenre().equals(this.genre)
-                && s.getFullTrackString().equals(this.getFullTrackString())
-                && s.getFullDiskString().equals(this.getFullDiskString());
-                //&& s.getArtwork() == this.getArtwork();
-    }
-
 }
