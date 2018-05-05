@@ -25,7 +25,7 @@ public class Song {
     private String totaltracks;
     private String disk;
     private String totaldisks;
-    private Icon artwork;
+    //private Icon artwork;
     private byte[] artwork_bytes;
 
     public Song() {
@@ -62,47 +62,39 @@ public class Song {
 
         this.artwork_bytes = artwork_bytes;
         
-        try {
-            // getting the image from the byte array
-            ImageIcon icon = new ImageIcon(artwork_bytes);
-            Image img = icon.getImage();
-            Image img_scaled = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
-            this.artwork = new ImageIcon(img_scaled);
-        } catch (NullPointerException e) {
-
-        }
+        
     }
     
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, ImageIcon artwork) {
-
-        // standard string stuff
-        this.file = file;
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.albumartist = albumartist;
-        this.genre = genre;
-
-        // parsing track and disk for total tracks/disks
-        if (track != null && track.contains("/")) {
-            String[] t = track.split("/");
-            this.track = t[0];
-            this.totaltracks = t[1];
-        } else {
-            this.track = "0";
-            this.totaltracks = "0";
-        }
-        if (disk != null && disk.contains("/")) {
-            String[] d = disk.split("/");
-            this.disk = d[0];
-            this.totaldisks = d[1];
-        } else {
-            this.disk = "0";
-            this.totaldisks = "0";
-        }
-        
-        this.artwork = artwork;
-    }
+//    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk) {
+//
+//        // standard string stuff
+//        this.file = file;
+//        this.title = title;
+//        this.artist = artist;
+//        this.album = album;
+//        this.albumartist = albumartist;
+//        this.genre = genre;
+//
+//        // parsing track and disk for total tracks/disks
+//        if (track != null && track.contains("/")) {
+//            String[] t = track.split("/");
+//            this.track = t[0];
+//            this.totaltracks = t[1];
+//        } else {
+//            this.track = "0";
+//            this.totaltracks = "0";
+//        }
+//        if (disk != null && disk.contains("/")) {
+//            String[] d = disk.split("/");
+//            this.disk = d[0];
+//            this.totaldisks = d[1];
+//        } else {
+//            this.disk = "0";
+//            this.totaldisks = "0";
+//        }
+//        
+//        this.artwork = artwork;
+//    }
 
     /**
      * @return the full track string
@@ -269,19 +261,19 @@ public class Song {
         this.totaldisks = totaldisks;
     }
 
-    /**
-     * @return the artwork
-     */
-    public Icon getArtwork() {
-        return artwork;
-    }
-
-    /**
-     * @param artwork the artwork to set
-     */
-    public void setArtwork(Icon artwork) {
-        this.artwork = artwork;
-    }
+//    /**
+//     * @return the artwork
+//     */
+//    public Icon getArtwork() {
+//        return artwork;
+//    }
+//
+//    /**
+//     * @param artwork the artwork to set
+//     */
+//    public void setArtwork(Icon artwork) {
+//        this.artwork = artwork;
+//    }
 
     /**
      * @return the file
@@ -310,10 +302,22 @@ public class Song {
     public void setArtwork_bytes(byte[] artwork_bytes) {
         this.artwork_bytes = artwork_bytes;
     }
+    
+    public void setFullTrack(String t) {
+        String[] arr = t.split("/");
+        this.track = arr[0];
+        this.totaltracks = arr[1];
+    }
+    
+    public void setFullDisk(String d) {
+        String[] arr = d.split("/");
+        this.disk = arr[0];
+        this.totaldisks = arr[1];
+    }
 
     @Override
     public String toString() {
-        return "Song{" + "title=" + title + ", artist=" + artist + ", album=" + album + ", albumartist=" + albumartist + ", genre=" + genre + ", track=" + track + ", totaltracks=" + totaltracks + ", disk=" + disk + ", totaldisks=" + totaldisks + ", artwork=" + artwork + '}';
+        return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
         //return this.file.getName();
     }
     
@@ -325,8 +329,8 @@ public class Song {
                 && s.getAlbumartist().equals(this.albumartist)
                 && s.getGenre().equals(this.genre)
                 && s.getFullTrackString().equals(this.getFullTrackString())
-                && s.getFullDiskString().equals(this.getFullDiskString())
-                && s.getArtwork() == this.getArtwork();
+                && s.getFullDiskString().equals(this.getFullDiskString());
+                //&& s.getArtwork() == this.getArtwork();
     }
 
 }
