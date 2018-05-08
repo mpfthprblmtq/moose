@@ -892,6 +892,8 @@ public class Frame extends javax.swing.JFrame {
 
                 try {
                     mp3file = new Mp3File(file.getAbsolutePath());
+                    ID3v2 tag = new ID3v24Tag();
+                    mp3file.setId3v2Tag(tag);
                 } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
                     System.err.println(ex);
                 }
@@ -924,7 +926,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     public int getRow(int index) {
-        for (int i = 1; i < table.getRowCount(); i++) {
+        for (int i = 1; i <= table.getRowCount(); i++) {
             if (i == index) {
                 return i - 1;
             }
