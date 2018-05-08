@@ -19,6 +19,7 @@ public class Song {
     private String album;
     private String albumartist;
     private String genre;
+    private String year;
     private String track;
     private String totaltracks;
     private String disk;
@@ -30,7 +31,7 @@ public class Song {
 
     }
 
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String track, String disk, byte[] artwork_bytes) {
+    public Song(File file, String title, String artist, String album, String albumartist, String genre, String year, String track, String disk, byte[] artwork_bytes) {
 
         // standard string stuff
         this.file = file;
@@ -39,6 +40,7 @@ public class Song {
         this.album = album;
         this.albumartist = albumartist;
         this.genre = genre;
+        this.year = year;
 
         // parsing track and disk for total tracks/disks
         if (track != null && track.contains("/")) {
@@ -254,5 +256,19 @@ public class Song {
     public String toString() {
         return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
         //return this.file.getName();
+    }
+
+    /**
+     * @return the year
+     */
+    public String getYear() {
+        return year;
+    }
+
+    /**
+     * @param year the year to set
+     */
+    public void setYear(String year) {
+        this.year = year;
     }
 }
