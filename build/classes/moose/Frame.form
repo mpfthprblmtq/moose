@@ -8,6 +8,19 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="openMenuItem">
+              <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Meta+O"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
@@ -42,9 +55,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="container" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
+              <Component id="container" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -53,7 +65,6 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="container" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -68,24 +79,20 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="tableSP" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jLabel1" min="-2" pref="200" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="saveButton" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel1" min="-2" pref="100" max="-2" attributes="0"/>
-                          <EmptySpace min="22" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="consoleSP" min="-2" pref="500" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="saveButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton1" pref="115" max="32767" attributes="0"/>
-                              <Component id="jButton2" alignment="0" max="32767" attributes="0"/>
+                      <Group type="103" alignment="1" groupAlignment="1" attributes="0">
+                          <Component id="tableSP" alignment="1" min="-2" pref="1400" max="-2" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="consoleSP" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="multPanel" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="965" max="32767" attributes="0"/>
                       </Group>
                   </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -93,20 +100,16 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="jLabel1" max="32767" attributes="0"/>
+                      <Component id="saveButton" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="tableSP" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="consoleSP" pref="124" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Component id="saveButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="multPanel" max="32767" attributes="0"/>
+                      <Component id="consoleSP" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -117,7 +120,7 @@
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Tahoma" size="14" style="1"/>
+              <Font name="Tahoma" size="36" style="1"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Moose"/>
           </Properties>
@@ -125,6 +128,7 @@
         <Component class="javax.swing.JButton" name="saveButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Save"/>
+            <Property name="focusable" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveButtonActionPerformed"/>
@@ -139,17 +143,23 @@
           <SubComponents>
             <Component class="javax.swing.JTable" name="table">
               <Properties>
+                <Property name="autoCreateRowSorter" type="boolean" value="true"/>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="tableModel" type="code"/>
                 </Property>
+                <Property name="requestFocusEnabled" type="boolean" value="false"/>
                 <Property name="rowHeight" type="int" value="20"/>
+                <Property name="selectionMode" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="ListSelectionModel.MULTIPLE_INTERVAL_SELECTION" type="code"/>
+                </Property>
+                <Property name="showGrid" type="boolean" value="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMouseClicked"/>
+                <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMousePressed"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="tableModel.addColumn(&quot;Filename&quot;);&#xa;tableModel.addColumn(&quot;File&quot;);&#xa;tableModel.addColumn(&quot;Title&quot;);&#xa;tableModel.addColumn(&quot;Artist&quot;);&#xa;tableModel.addColumn(&quot;Album&quot;);&#xa;tableModel.addColumn(&quot;Album Artist&quot;);&#xa;tableModel.addColumn(&quot;Genre&quot;);&#xa;tableModel.addColumn(&quot;Track&quot;);&#xa;tableModel.addColumn(&quot;Disk&quot;);&#xa;tableModel.addColumn(&quot;Artwork&quot;);&#xa;table.setAutoCreateRowSorter(true);&#xa;table.removeColumn(table.getColumnModel().getColumn(1));&#xa;setColumnWidth(6, 50);&#xa;setColumnWidth(7, 50);&#xa;setColumnWidth(8, 110);"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultTableModel tableModel = new DefaultTableModel()&#xa;        {&#xa;            @Override&#xa;            public Class getColumnClass(int column)&#xa;            {&#xa;                if (column == 9) { return ImageIcon.class; }&#xa;                //else if (column == 0) { return Phile.class; }&#xa;                else { return Object.class; }&#xa;            }&#xa;&#xa;&#xa;            @Override&#xa;            public boolean isCellEditable(int row, int column) {&#xa;                if(column == 9) {&#xa;                    return false;&#xa;                } else {&#xa;                    return true;&#xa;                }&#xa;            }   &#xa;        };"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JTable() {&#xa;&#xa;    public void changeSelection(final int row, final int column, boolean toggle, boolean extend)  {&#xa;        super.changeSelection(row, column, toggle, extend);&#xa;&#xa;        if (editCellAt(row, column)) {&#xa;            getEditorComponent().requestFocusInWindow();&#xa;        } else {&#xa;            if(row &lt; table.getRowCount()) {&#xa;                changeSelection(row+1, 1, toggle, extend);&#xa;            } else {&#xa;                changeSelection(0, 1, toggle, extend);&#xa;            }&#xa;        }&#xa;    }&#xa;&#xa;}"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="tableModel.addColumn(&quot;&quot;);&#xa;tableModel.addColumn(&quot;File&quot;); &#xa;tableModel.addColumn(&quot;Filename&quot;); &#xa;tableModel.addColumn(&quot;Title&quot;); &#xa;tableModel.addColumn(&quot;Artist&quot;); &#xa;tableModel.addColumn(&quot;Album&quot;); &#xa;tableModel.addColumn(&quot;Album Artist&quot;); &#xa;tableModel.addColumn(&quot;Year&quot;);&#xa;tableModel.addColumn(&quot;Genre&quot;); &#xa;tableModel.addColumn(&quot;Track&quot;); &#xa;tableModel.addColumn(&quot;Disk&quot;); &#xa;tableModel.addColumn(&quot;Artwork&quot;); &#xa;tableModel.addColumn(&quot;Index&quot;);&#xa;table.setAutoCreateRowSorter(true); &#xa;table.removeColumn(table.getColumnModel().getColumn(1)); &#xa;table.removeColumn(table.getColumnModel().getColumn(11));&#xa;setColumnWidth(0, 12); &#xa;setColumnWidth(3, 150);&#xa;setColumnWidth(4, 150);&#xa;setColumnWidth(5, 150);&#xa;setColumnWidth(6, 80);&#xa;setColumnWidth(7, 150);&#xa;setColumnWidth(8, 50); &#xa;setColumnWidth(9, 50); &#xa;setColumnWidth(10, 110);"/>
               </AuxValues>
             </Component>
           </SubComponents>
@@ -173,22 +183,223 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Container class="javax.swing.JPanel" name="multPanel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jButton1"/>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                <EtchetBorder/>
+              </Border>
+            </Property>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="jButton2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jButton2"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
-          </Events>
-        </Component>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                          <Component id="L2" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L3" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L4" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L5" alignment="0" max="32767" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="multTitle" pref="250" max="32767" attributes="0"/>
+                                          <Component id="multArtist" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="multAlbum" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="multAlbumArtist" alignment="0" max="32767" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                          <Component id="L8" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L6" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L7" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="L9" min="-2" pref="50" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="multGenre" min="-2" pref="150" max="-2" attributes="0"/>
+                                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                              <Component id="multTrack" alignment="0" max="32767" attributes="0"/>
+                                              <Component id="multDisk" alignment="0" min="-2" pref="50" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="multYear" alignment="0" min="-2" pref="90" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Component id="L1" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="multImage" min="-2" pref="120" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="multUpdateButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="0" pref="36" max="32767" attributes="0"/>
+                              <Component id="multImage" min="-2" pref="120" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="multUpdateButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="L1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multTitle" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="L3" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                              <Component id="multArtist" min="-2" pref="26" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L4" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multAlbum" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L6" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multGenre" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L7" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multYear" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L8" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multTrack" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="L9" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multDisk" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="multAlbumArtist" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="L5" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                          </Group>
+                      </Group>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="L1">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="SansSerif" size="13" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Edit Multiple Items:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Title:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L3">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Artist:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L4">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Album:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L5">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Album Artist:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L6">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Genre:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L7">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Year:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L8">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Track:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="L9">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Disk:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="multTitle">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multArtist">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multAlbum">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multAlbumArtist">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multGenre">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multYear">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multTrack">
+            </Component>
+            <Component class="javax.swing.JTextField" name="multDisk">
+            </Component>
+            <Component class="javax.swing.JLabel" name="multImage">
+              <Properties>
+                <Property name="text" type="java.lang.String" value=" "/>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                    <EtchetBorder/>
+                  </Border>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="multUpdateButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Update Fields"/>
+                <Property name="focusable" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="multUpdateButtonActionPerformed"/>
+              </Events>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
   </SubComponents>
