@@ -37,6 +37,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -69,6 +70,9 @@ public class Frame extends javax.swing.JFrame {
     private static final int EDITED = 1;
     private static final int SAVED = 2;
 
+    int row;
+    int col;
+
     /**
      * Creates new form Frame
      */
@@ -89,6 +93,21 @@ public class Frame extends javax.swing.JFrame {
                     }
                 } catch (IOException ex) {
                     System.err.println(ex);
+                }
+            } else if (event.getActionCommand().equals("Move File...")) {
+                JFileChooser jfc = new JFileChooser();
+                File library = new File("/Users/pat/Music/Library");
+                jfc.setCurrentDirectory(library);
+                jfc.setDialogTitle("Choose the destination folder...");
+                jfc.setMultiSelectionEnabled(false);
+                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int returnVal = jfc.showDialog(this, "Select");
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File directory = jfc.getSelectedFile();
+                    System.out.println(directory.getPath());
+                } else {
+                    return;
                 }
             }
 
@@ -188,7 +207,7 @@ public class Frame extends javax.swing.JFrame {
                         setDisk(index, tcl.getNewValue().toString());
                         break;
                     case 11:    // artwork was changed
-                        //setAlbumImage(index, tcl.getNewValue().toString());
+                    //setAlbumImage(index, tcl.getNewValue().toString());
                     default:    // not accounted for
                         break;
                 }
@@ -196,6 +215,8 @@ public class Frame extends javax.swing.JFrame {
         };
         TableCellListener tcl2 = new TableCellListener(table, action);
 
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+        
         // temporary code to add files to table
         //File temp = new File("/Users/pat/Music/Library/Kasbo/Umbrella Club");
         File temp = new File("/Users/pat/Music/Library/Kasbo/Places We Don't Know");
@@ -206,39 +227,39 @@ public class Frame extends javax.swing.JFrame {
         // end temporary code
 
     }
-    
+
     public void setTitle(int index, String title) {
         songs.get(index).setTitle(title);
     }
-    
+
     public void setArtist(int index, String artist) {
         songs.get(index).setArtist(artist);
     }
-    
+
     public void setAlbum(int index, String album) {
         songs.get(index).setAlbum(album);
     }
-    
+
     public void setAlbumArtist(int index, String albumartist) {
         songs.get(index).setAlbumartist(albumartist);
     }
-    
+
     public void setGenre(int index, String genre) {
         songs.get(index).setGenre(genre);
     }
-    
+
     public void setYear(int index, String year) {
         songs.get(index).setYear(year);
     }
-    
+
     public void setTrack(int index, String track) {
         songs.get(index).setTrack(track);
     }
-    
+
     public void setDisk(int index, String disk) {
         songs.get(index).setDisk(disk);
     }
-    
+
     public void setAlbumImage(int index, byte[] bytes) {
         songs.get(index).setArtwork_bytes(bytes);
     }
@@ -404,8 +425,23 @@ public class Frame extends javax.swing.JFrame {
             }
         }
     };
-    
-    
+
+    public void changeSelection(final int row, final int column, boolean toggle, boolean extend) {
+        //super.changeSelection(row, column, toggle, extend);
+
+        this.row = row;
+        this.col = column;
+
+        if (table.editCellAt(row, column)) {
+            table.getEditorComponent().requestFocusInWindow();
+        } else {
+            if (row < table.getRowCount()) {
+                changeSelection(row + 1, 1, toggle, extend);
+            } else {
+                changeSelection(0, 1, toggle, extend);
+            }
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -421,20 +457,6 @@ public class Frame extends javax.swing.JFrame {
         saveButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
         table = new javax.swing.JTable() {
-
-            public void changeSelection(final int row, final int column, boolean toggle, boolean extend)  {
-                super.changeSelection(row, column, toggle, extend);
-
-                if (editCellAt(row, column)) {
-                    getEditorComponent().requestFocusInWindow();
-                } else {
-                    if(row < table.getRowCount()) {
-                        changeSelection(row+1, 1, toggle, extend);
-                    } else {
-                        changeSelection(0, 1, toggle, extend);
-                    }
-                }
-            }
 
         };
         consoleSP = new javax.swing.JScrollPane();
@@ -497,7 +519,7 @@ public class Frame extends javax.swing.JFrame {
         tableModel.addColumn("Disk");
         tableModel.addColumn("Artwork");
         tableModel.addColumn("Index");
-        table.setAutoCreateRowSorter(true);
+        //table.setAutoCreateRowSorter(true);
         table.removeColumn(table.getColumnModel().getColumn(1));
         table.removeColumn(table.getColumnModel().getColumn(11));
         setColumnWidth(0, 12);
@@ -512,6 +534,17 @@ public class Frame extends javax.swing.JFrame {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
+            }
+        });
+        table.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tableKeyTyped(evt);
+            }
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tableKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tableKeyReleased(evt);
             }
         });
         tableSP.setViewportView(table);
@@ -762,6 +795,8 @@ public class Frame extends javax.swing.JFrame {
                 if (row >= 0 && col >= 0) {
                     if (col == 10) {
                         showArtworkPopup(evt);
+                    } else if (col == 1) {
+                        showFilePopup(evt);
                     } else {
                         showRegularPopup(evt);
                     }
@@ -777,6 +812,8 @@ public class Frame extends javax.swing.JFrame {
                 if (evt.getClickCount() == 2) {
                     if (table.getSelectedColumn() == 10) {
                         showArtworkPopup(evt);
+                    } else {
+                        changeSelection(table.getSelectedRow(), table.getSelectedColumn(), true, false);
                     }
                 }
 
@@ -811,6 +848,33 @@ public class Frame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_tableMousePressed
+
+    private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
+        //System.out.println("in pressed");
+    }//GEN-LAST:event_tableKeyPressed
+
+    private void tableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyReleased
+        //System.out.println("in released");
+
+        if (evt.getKeyCode() != KeyEvent.VK_SHIFT) {
+            if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+                col++;
+            } else if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                row++;
+            } else if (evt.getKeyCode() == KeyEvent.VK_TAB && evt.isShiftDown()) {
+                col--;
+            } else if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.isShiftDown()) {
+                row--;
+            }
+            changeSelection(row, col, true, false);
+            table.setRowSelectionInterval(row, row);
+        }
+
+    }//GEN-LAST:event_tableKeyReleased
+
+    private void tableKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyTyped
+        //System.out.println("in typed");
+    }//GEN-LAST:event_tableKeyTyped
 
     public void setMultiplePanelFields() {
 
@@ -895,7 +959,7 @@ public class Frame extends javax.swing.JFrame {
 
         String title = multTitle.getText();
         String artist = multArtist.getText();
-        String album = multArtist.getText();
+        String album = multAlbum.getText();
         String albumArtist = multAlbumArtist.getText();
         String genre = multGenre.getText();
         String year = multYear.getText();
@@ -904,142 +968,142 @@ public class Frame extends javax.swing.JFrame {
 
         if (!title.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(title, selectedRows[i], 2);
-                
+
                 // set the value in the songs array
                 setTitle(index, title);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!artist.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(artist, selectedRows[i], 3);
-                
+
                 // set the value in the songs array
                 setArtist(index, artist);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!album.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(album, selectedRows[i], 4);
-                
+
                 // set the value in the songs array
                 setAlbum(index, album);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!albumArtist.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(albumArtist, selectedRows[i], 5);
-                
+
                 // set the value in the songs array
                 setAlbumArtist(index, albumArtist);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!year.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(year, selectedRows[i], 6);
-                
+
                 // set the value in the songs array
                 setYear(index, year);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!genre.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(genre, selectedRows[i], 7);
-                
+
                 // set the value in the songs array
                 setGenre(index, genre);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!track.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(track, selectedRows[i], 8);
-                
+
                 // set the value in the songs array
                 setTrack(index, track);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
             }
         }
-        
+
         if (!disk.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
-                
+
                 // get the index of the song in the table
                 int index = getIndex(selectedRows[i]);
-                
+
                 // set the value in the table to the new value
                 table.setValueAt(disk, selectedRows[i], 9);
-                
+
                 // set the value in the songs array
                 setDisk(index, disk);
-                
+
                 // add the song to edited_songs and update the row icon
                 edited_songs.add(index);
                 setRowIcon(EDITED, selectedRows[i]);
@@ -1145,7 +1209,7 @@ public class Frame extends javax.swing.JFrame {
         }
         return -1;
     }
-    
+
     public int getIndex(int row) {
         return Integer.valueOf(model.getValueAt(row, 12).toString());
     }
@@ -1270,6 +1334,20 @@ public class Frame extends javax.swing.JFrame {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
+    void showFilePopup(MouseEvent e) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem item;
+        popup.add(item = new JMenuItem("Remove from list"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Play"));
+        item.addActionListener(menuListener);
+        popup.addSeparator();
+        popup.add(item = new JMenuItem("Move File..."));
+        item.addActionListener(menuListener);
+
+        popup.show(e.getComponent(), e.getX(), e.getY());
+    }
+
     public int getRow(String filename) {
         for (int i = 0; i < table.getRowCount(); i++) {
             if (model.getValueAt(i, 0).equals(filename)) {
@@ -1365,45 +1443,4 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JScrollPane tableSP;
     // End of variables declaration//GEN-END:variables
 
-//    public class MyCellEditor extends AbstractCellEditor implements TableCellEditor {
-//
-//        private static final long serialVersionUID = 1L;
-//
-//        JTextField textField = new JTextField("");
-//
-//        @Override
-//        public boolean isCellEditable(EventObject e) {
-//            if (super.isCellEditable(e)) {
-//                if (e instanceof MouseEvent) {
-//                    MouseEvent me = (MouseEvent) e;
-//                    return me.getClickCount() >= 2;
-//                }
-//                if (e instanceof KeyEvent) {
-//                    KeyEvent ke = (KeyEvent) e;
-//                    return ke.getKeyCode() == KeyEvent.VK_F2;
-//                }
-//            }
-//            return false;
-//        }
-//
-//        @Override
-//        public Object getCellEditorValue() {
-//            return this.textField.getText();
-//        }
-//
-//        @Override
-//        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-//            //this.textField.setFont(table.getFont());
-//            this.textField.setText(value.toString());
-////            SwingUtilities.invokeLater(new Runnable() {
-////                public void run() {
-////                    this.textField.selectAll();
-////                }
-////            });
-//            this.textField.selectAll();
-//            return this.textField;
-//        }
-//
-////return false;
-//    }
 }
