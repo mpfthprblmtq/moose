@@ -1,62 +1,40 @@
 package moose;
 
+import com.apple.eawt.Application;
 import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.ID3v22Tag;
 import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import com.mpatric.mp3agic.NotSupportedException;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.JTextComponent;
 
 public class Frame extends javax.swing.JFrame {
 
@@ -77,6 +55,11 @@ public class Frame extends javax.swing.JFrame {
      * Creates new form Frame
      */
     public Frame() {
+
+        this.setIconImage(new ImageIcon("img/moose.png").getImage());
+        Application.getApplication().setDockIconImage(
+            new ImageIcon("img/moose.png").getImage());
+        
         this.menuListener = (ActionEvent event) -> {
             if (event.getActionCommand().equals("Add")) {
                 addAlbumArt();
@@ -95,20 +78,9 @@ public class Frame extends javax.swing.JFrame {
                     System.err.println(ex);
                 }
             } else if (event.getActionCommand().equals("Move File...")) {
-                JFileChooser jfc = new JFileChooser();
-                File library = new File("/Users/pat/Music/Library");
-                jfc.setCurrentDirectory(library);
-                jfc.setDialogTitle("Choose the destination folder...");
-                jfc.setMultiSelectionEnabled(false);
-                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int returnVal = jfc.showDialog(this, "Select");
 
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File directory = jfc.getSelectedFile();
-                    System.out.println(directory.getPath());
-                } else {
-                    return;
-                }
+                int[] selectedRows = table.getSelectedRows();
+                moveFiles(selectedRows);
             }
 
         };
@@ -215,8 +187,7 @@ public class Frame extends javax.swing.JFrame {
         };
         TableCellListener tcl2 = new TableCellListener(table, action);
 
-        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
-        
+        //table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
         // temporary code to add files to table
         //File temp = new File("/Users/pat/Music/Library/Kasbo/Umbrella Club");
         File temp = new File("/Users/pat/Music/Library/Kasbo/Places We Don't Know");
@@ -225,6 +196,39 @@ public class Frame extends javax.swing.JFrame {
             addFileToTable(directoryFile);
         }
         // end temporary code
+    }
+
+    public void moveFiles(int[] selectedRows) {
+
+        for (int i = 0; i < selectedRows.length; i++) {
+            System.out.println(selectedRows[i]);
+        }
+        
+        JFileChooser jfc = new JFileChooser();
+        File library = new File("/Users/pat/Music/Library");
+        jfc.setCurrentDirectory(library);
+        jfc.setDialogTitle("Choose the destination folder...");
+        jfc.setMultiSelectionEnabled(false);
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = jfc.showDialog(this, "Select");
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+            for (int i = 0; i < selectedRows.length; i++) {
+                File file = (File) model.getValueAt(selectedRows[i], 1);
+
+                File directory = jfc.getSelectedFile();
+                File new_file = new File(directory.getPath() + "/" + file.getName());
+                file.renameTo(new_file);
+
+                int index = getIndex(selectedRows[i]);
+                songs.get(index).setFile(file);
+                model.setValueAt(new_file, selectedRows[i], 1);
+
+            }
+        } else {
+            return;
+        }
 
     }
 
@@ -485,6 +489,10 @@ public class Frame extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moose");
@@ -691,12 +699,11 @@ public class Frame extends javax.swing.JFrame {
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(tableSP, javax.swing.GroupLayout.PREFERRED_SIZE, 1400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(containerLayout.createSequentialGroup()
-                            .addComponent(consoleSP)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(tableSP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 1400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
+                        .addComponent(consoleSP)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         containerLayout.setVerticalGroup(
@@ -730,6 +737,24 @@ public class Frame extends javax.swing.JFrame {
 
         jMenu2.setText("Edit");
         jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Macros");
+
+        jMenuItem1.setText("Add Covers");
+        jMenu3.add(jMenuItem1);
+
+        jMenuItem2.setText("Add Track Numbers");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Help");
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -875,6 +900,10 @@ public class Frame extends javax.swing.JFrame {
     private void tableKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyTyped
         //System.out.println("in typed");
     }//GEN-LAST:event_tableKeyTyped
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     public void setMultiplePanelFields() {
 
@@ -1384,7 +1413,7 @@ public class Frame extends javax.swing.JFrame {
         /* look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
  /*
         try {
@@ -1425,7 +1454,11 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;
     private javax.swing.JTextField multArtist;
