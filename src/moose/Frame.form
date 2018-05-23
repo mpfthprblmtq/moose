@@ -36,6 +36,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Add Covers"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
               <Properties>
@@ -395,6 +398,9 @@
                   <ComponentRef name="multArtist"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multTitleKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multArtist">
               <Properties>
@@ -402,6 +408,9 @@
                   <ComponentRef name="multAlbum"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multArtistKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multAlbum">
               <Properties>
@@ -409,6 +418,9 @@
                   <ComponentRef name="multAlbumArtist"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multAlbumKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multAlbumArtist">
               <Properties>
@@ -416,6 +428,9 @@
                   <ComponentRef name="multGenre"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multAlbumArtistKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multGenre">
               <Properties>
@@ -423,6 +438,9 @@
                   <ComponentRef name="multYear"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multGenreKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multYear">
               <Properties>
@@ -430,6 +448,9 @@
                   <ComponentRef name="multTrack"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multYearKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multTrack">
               <Properties>
@@ -437,6 +458,9 @@
                   <ComponentRef name="multDisk"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multTrackKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multDisk">
               <Properties>
@@ -444,6 +468,9 @@
                   <ComponentRef name="multTitle"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multDiskKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="multImage">
               <Properties>
