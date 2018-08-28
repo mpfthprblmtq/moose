@@ -20,12 +20,30 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem5">
+              <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Meta+Q"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Exit"/>
+              </Properties>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Edit"/>
+            <Property name="text" type="java.lang.String" value="View"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
+              <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Meta+R"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Refresh"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu3">
           <Properties>
@@ -34,6 +52,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Shift+Meta+A"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Add Covers"/>
               </Properties>
               <Events>
@@ -105,6 +126,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="container" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -142,7 +164,7 @@
                       <Component id="jLabel1" max="32767" attributes="0"/>
                       <Component id="saveButton" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="15" max="32767" attributes="0"/>
                   <Component id="tableSP" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -200,7 +222,6 @@
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JTable() {&#xa;&#xa;}"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="model.addColumn(&quot;&quot;);&#xa;model.addColumn(&quot;File&quot;); &#xa;model.addColumn(&quot;Filename&quot;); &#xa;model.addColumn(&quot;Title&quot;); &#xa;model.addColumn(&quot;Artist&quot;); &#xa;model.addColumn(&quot;Album&quot;); &#xa;model.addColumn(&quot;Album Artist&quot;); &#xa;model.addColumn(&quot;Year&quot;);&#xa;model.addColumn(&quot;Genre&quot;); &#xa;model.addColumn(&quot;Track&quot;); &#xa;model.addColumn(&quot;Disk&quot;); &#xa;model.addColumn(&quot;Artwork&quot;); &#xa;model.addColumn(&quot;Index&quot;);&#xa;//table.setAutoCreateRowSorter(true); &#xa;table.removeColumn(table.getColumnModel().getColumn(1)); &#xa;table.removeColumn(table.getColumnModel().getColumn(11));&#xa;setColumnWidth(0, 12); &#xa;setColumnWidth(3, 150);&#xa;setColumnWidth(4, 150);&#xa;setColumnWidth(5, 150);&#xa;setColumnWidth(6, 80);&#xa;setColumnWidth(7, 150);&#xa;setColumnWidth(8, 50); &#xa;setColumnWidth(9, 50); &#xa;setColumnWidth(10, 110);"/>
               </AuxValues>
             </Component>
           </SubComponents>
@@ -481,6 +502,7 @@
                     <EtchetBorder/>
                   </Border>
                 </Property>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[156, 156]"/>
                 </Property>
