@@ -477,20 +477,19 @@ public class FileDrop
         }   // end catch
         
         // Listen for hierarchy changes and remove the drop target when the parent gets cleared out.
-        c.addHierarchyListener( new java.awt.event.HierarchyListener()
-        {   public void hierarchyChanged( java.awt.event.HierarchyEvent evt )
-            {   log( out, "FileDrop: Hierarchy changed." );
-                java.awt.Component parent = c.getParent();
-                if( parent == null )
-                {   c.setDropTarget( null );
-                    log( out, "FileDrop: Drop target cleared from component." );
-                }   // end if: null parent
-                else
-                {   new java.awt.dnd.DropTarget(c, dropListener);
-                    log( out, "FileDrop: Drop target added to component." );
-                }   // end else: parent not null
-            }   // end hierarchyChanged
-        }); // end hierarchy listener
+        c.addHierarchyListener((java.awt.event.HierarchyEvent evt) -> {
+            log( out, "FileDrop: Hierarchy changed." );
+            java.awt.Component parent = c.getParent();
+            if( parent == null )
+            {   c.setDropTarget( null );
+            log( out, "FileDrop: Drop target cleared from component." );
+            }   // end if: null parent
+            else
+            {   new java.awt.dnd.DropTarget(c, dropListener);
+            log( out, "FileDrop: Drop target added to component." );
+            }   // end else: parent not null
+        } // end hierarchyChanged
+        ); // end hierarchy listener
         if( c.getParent() != null )
             new java.awt.dnd.DropTarget(c, dropListener);
         
