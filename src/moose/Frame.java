@@ -107,14 +107,16 @@ public class Frame extends javax.swing.JFrame {
                 case "Move File...":
                     moveFiles(selectedRows);
                     break;
+                case "Save":
+                    saveTracks(selectedRows);
                 default:
                     break;
             }
         }; // end menuListener
-        
+
         // init the components
         initComponents();
-        
+
         // manual init'ing of components
         // set the model to the table's model
         model = (DefaultTableModel) table.getModel();
@@ -133,11 +135,11 @@ public class Frame extends javax.swing.JFrame {
         model.addColumn("Disk");
         model.addColumn("Artwork");
         model.addColumn("Index");
-        
+
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
-        table.removeColumn(table.getColumnModel().getColumn(11));
-        
+        //table.removeColumn(table.getColumnModel().getColumn(11));
+
         // set the widths of the columns
         // file name and title are left out so they can take the remainder of the space dynamically
         setColumnWidth(0, 12);      // row icon
@@ -149,6 +151,7 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
+        setColumnWidth(11, 20);
 
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (java.io.File[] files) -> {
@@ -174,7 +177,7 @@ public class Frame extends javax.swing.JFrame {
                     unsucc_mp3Count++;
                 }
             }
-            
+
             // update the log table when you're done with the file iteration
             if (succ_mp3Count == 0) {
                 updateConsole("No mp3 files found!");
@@ -201,6 +204,7 @@ public class Frame extends javax.swing.JFrame {
 
                 int r = tcl.getRow();
                 int c = tcl.getColumn();
+                
                 int index = Integer.valueOf(model.getValueAt(r, 12).toString());
 
                 // switch to see what column changed, and do a task based on that
@@ -208,7 +212,7 @@ public class Frame extends javax.swing.JFrame {
                     case 2:     // filename was changed
                         // with the filename changing, this changes automatically without hitting save
                         // this functionality might change
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             File old_file = (File) model.getValueAt(r, 1);
                             String path = old_file.getPath().replace(old_file.getName(), "");
                             String fileName = model.getValueAt(r, c).toString();
@@ -221,79 +225,79 @@ public class Frame extends javax.swing.JFrame {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 3:     // title was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setTitle(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 4:     // artist was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setArtist(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 5:     // album was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setAlbum(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 6:     // album artist was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setAlbumArtist(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 7:     // year was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setYear(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 8:     // genre was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setGenre(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 9:     // tracks was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setTrack(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 10:     // disks was changed
-                        if(!tcl.getNewValue().equals(tcl.getOldValue())) {
+                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             setDisk(index, tcl.getNewValue().toString());
                             songEdited(index);
                         } else {
                             // do nothing, nothing was changed
                         }
                         break;
-                        
+
                     case 11:    // artwork was changed
                     //setAlbumImage(index, tcl.getNewValue().toString());
                     default:    // not accounted for
@@ -301,24 +305,28 @@ public class Frame extends javax.swing.JFrame {
                 }
             }
         };
-        
+
         // declare the TCL for use
         TableCellListener tcl2 = new TableCellListener(table, action);
     }
 
+    // TODO When editing a single cell, the row icon doesn't update correctly
+    
     /**
      * Adds the song index to edited_songs to save, and updates the row icon
+     *
      * @param index, the index to add to edited_songs
      */
     public void songEdited(int index) {
-        if(!edited_songs.contains(index)) {
+        if (!edited_songs.contains(index)) {
             edited_songs.add(index);
-            setRowIcon(EDITED, getRow(index));
+            int row = getRow(index);
+            setRowIcon(EDITED, row);
         } else {
             // do nothing, index is already added
         }
     }
-    
+
     // TODO Make sure this works and document it
     public void moveFiles(int[] selectedRows) {
 
@@ -351,6 +359,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Removes the rows from the table
+     *
      * @param selectedRows the rows to remove
      */
     public void removeRows(int[] selectedRows) {
@@ -365,6 +374,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Plays the files using the default mp3 player
+     *
      * @param selectedRows the rows of files to play
      */
     public void playFiles(int[] selectedRows) {
@@ -384,17 +394,19 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Adds the album art for each song if there exists a cover.* file in the same dir
+     * Adds the album art for each song if there exists a cover.* file in the
+     * same dir
+     *
      * @param selectedRows the rows of songs to update
      */
     public void autoAddCovers(int[] selectedRows) {
         // traverse the array of rows and add each image
         for (int i = 0; i < selectedRows.length; i++) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
-            
+
             // get the parent directory of the song
             File dir = songs.get(getIndex(row)).getFile().getParentFile();
-            
+
             // check if the parent directory has a cover.* file
             File cover = folderContainsCover(dir);
             if (cover != null) {
@@ -406,6 +418,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to check and see if a directory has a cover image file
+     *
      * @param folder, the folder to check
      * @return the cover file, or null if it doesn't exist
      */
@@ -424,40 +437,36 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Function to add an album cover for just one row
+     *
      * @param row
      * @param cover
      */
     public void addIndividualCover(int row, File cover) {
 
         try {
+            // get the index of the track
             int index = Integer.valueOf(model.getValueAt(row, 12).toString());
-            File file = songs.get(index).getFile();
-            Mp3File mp3file = new Mp3File(file.getAbsolutePath());
-            ID3v2 id3v2Tag = null;
 
-            if (mp3file.hasId3v2Tag()) {
-                id3v2Tag = mp3file.getId3v2Tag();
-            } else {
-                // do nothing
-            }
-
+            // convert file to byte array
             RandomAccessFile ra_file = new RandomAccessFile(cover.getAbsolutePath(), "r");
             byte[] bytes = new byte[(int) ra_file.length()];
             ra_file.read(bytes);
             ra_file.close();
 
+            // update the track in the songs array
             songs.get(index).setArtwork_bytes(bytes);
 
+            // update graphics
             Icon thumbnail_icon = null;
             try {
                 // getting the image from the byte array
                 ImageIcon icon = new ImageIcon(bytes);
                 Image img = icon.getImage();
-                
+
                 // scaling down the image to put on the row
                 Image thumbnail = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
                 thumbnail_icon = new ImageIcon(thumbnail);
-                
+
             } catch (NullPointerException e) {
                 System.err.println(e);
             }
@@ -473,20 +482,127 @@ public class Frame extends javax.swing.JFrame {
                 // getting the image from the byte array
                 ImageIcon icon = new ImageIcon(bytes);
                 Image img = icon.getImage();
-                
+
                 // scaling down the image to put on the panel
-                Image thumbnail = img.getScaledInstance(166, 166, java.awt.Image.SCALE_SMOOTH);
+                Image thumbnail = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
                 ImageIcon artwork_icon = new ImageIcon(thumbnail);
                 multImage.setIcon(artwork_icon);
             }
 
-        } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     /**
+     * Method for adding album art for songs manually This method is called when
+     * the "Add" selection is pressed in the context menu
+     *
+     * @param selectedRows
+     */
+    public void addAlbumArt(int[] selectedRows) {
+
+        // need this for some reason
+        File img_file = null;
+
+        for (int i = 0; i < selectedRows.length; i++) {
+
+            try {
+                // get the row and index of the track
+                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int index = Integer.valueOf(model.getValueAt(row, 12).toString());
+
+                // get the file to use as the starting point for choosing an image
+                File file = songs.get(index).getFile();
+
+                // only show the JFileChooser on the first go
+                if (i == 0) {
+                    JFileChooser fc = new JFileChooser(new File(file.getAbsolutePath()));
+                    fc.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif"));
+
+                    // result of the file choosing
+                    int returnVal = fc.showOpenDialog(null);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        img_file = fc.getSelectedFile();
+                    } else {
+                        return;
+                    }
+                }
+
+                // convert that file to a byte array
+                byte[] bytes;
+                try (RandomAccessFile ra_file = new RandomAccessFile(img_file.getAbsolutePath(), "r")) {
+                    bytes = new byte[(int) ra_file.length()];
+                    ra_file.read(bytes);
+                }
+
+                // set the artwork in the songs array
+                songs.get(index).setArtwork_bytes(bytes);
+
+                // update graphics
+                Icon thumbnail_icon = null;
+                try {
+                    // getting the image from the byte array
+                    ImageIcon icon = new ImageIcon(bytes);
+                    Image img = icon.getImage();
+                    Image thumbnail = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+                    thumbnail_icon = new ImageIcon(thumbnail);
+                } catch (NullPointerException e) {
+                    System.err.println(e);
+                }
+                model.setValueAt(thumbnail_icon, row, 11);
+
+                // send the track to the edited_songs array
+                songEdited(index);
+
+                // if there's multiple images, update the multPanel
+                if (table.getSelectedRowCount() > 1) {
+                    // getting the image from the byte array
+                    ImageIcon icon = new ImageIcon(bytes);
+                    Image img = icon.getImage();
+
+                    // scaling down image to use in multPanel
+                    Image thumbnail = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
+                    ImageIcon artwork_icon = new ImageIcon(thumbnail);
+                    multImage.setIcon(artwork_icon);
+                }
+
+            } catch (IOException ex) {
+                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    /**
+     * Method for removing album art for songs manually This method is called
+     * when the "Remove" selection is pressed in the context menu
+     *
+     * @param selectedRows
+     */
+    public void removeAlbumArt(int[] selectedRows) {
+
+        for (int i = 0; i < selectedRows.length; i++) {
+
+            // get the row and index of the track
+            int row = table.convertRowIndexToModel(selectedRows[i]);
+            int index = getIndex(row);
+
+            // update the songs array
+            songs.get(index).setArtwork_bytes(null);
+
+            // send the track to the edited_songs array
+            songEdited(index);
+
+            // update graphics
+            model.setValueAt(null, row, 11);
+            multImage.setIcon(null);
+        }
+
+    }
+
+    /**
      * Helper function to set the title of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param title, the title to set
      */
@@ -496,6 +612,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the artist of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param artist, the artist to set
      */
@@ -505,6 +622,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the album of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param album, the album to set
      */
@@ -515,6 +633,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Helper function to set the album artist of the song in the songs
      * arraylist.
+     *
      * @param index, the index of the song
      * @param albumartist, the albumartist to set
      */
@@ -524,6 +643,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the genre of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param genre, the genre to set
      */
@@ -533,6 +653,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the year of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param year, the year to set
      */
@@ -542,6 +663,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the track of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param track, the track to set
      */
@@ -551,6 +673,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the disk of the song in the songs arraylist.
+     *
      * @param index, the index of the song
      * @param disk, the disk to set
      */
@@ -561,6 +684,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Helper function to set the album image of the song in the songs
      * arraylist.
+     *
      * @param index, the index of the song
      * @param bytes, the byte array of the album image to set
      */
@@ -570,12 +694,13 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to set the row icon based on the action of the row.
+     *
      * @param icon, the icon to set
      * @param row, the row to set
      */
     public void setRowIcon(int icon, int row) {
-        
-        //int model_row = table.convertRowIndexToModel(row);
+
+        row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
                 model.setValueAt(new ImageIcon("img//default.png"), row, 0);
@@ -590,8 +715,8 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Adds the file and all of its pertinent information to the table as a row.
-     * Works with the fileDrop functionality.
+     * Adds the file and all of its pertinent information to the table as a row
+     * Works with the fileDrop functionality
      *
      * @param file, the file to add
      * @return
@@ -679,9 +804,7 @@ public class Frame extends javax.swing.JFrame {
                 Image thumbnail = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
                 thumbnail_icon = new ImageIcon(thumbnail);
             } catch (NullPointerException ex) {
-                // things borked
-                // there was no album image or something
-                System.err.println(ex + "at line " + ex.getStackTrace()[0].getLineNumber());
+                System.err.println(ex);
             }
 
             // add the row to the table
@@ -822,17 +945,19 @@ public class Frame extends javax.swing.JFrame {
         multImage = new javax.swing.JLabel();
         multUpdateButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem6 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        saveTrackMenuItem = new javax.swing.JMenuItem();
+        saveAllMenuItem = new javax.swing.JMenuItem();
+        exitMenuItem = new javax.swing.JMenuItem();
+        viewMenu = new javax.swing.JMenu();
+        refreshMenuItem = new javax.swing.JMenuItem();
+        macroMenu = new javax.swing.JMenu();
+        addCoversMenuItem = new javax.swing.JMenuItem();
+        addTrackNumbersMenuItem = new javax.swing.JMenuItem();
+        formatFilenamesMenuItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moose");
@@ -840,7 +965,7 @@ public class Frame extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel1.setText("Moose");
 
-        saveButton.setText("Save");
+        saveButton.setText("Save All");
         saveButton.setFocusable(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -860,9 +985,6 @@ public class Frame extends javax.swing.JFrame {
             }
         });
         table.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                tableKeyTyped(evt);
-            }
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tableKeyPressed(evt);
             }
@@ -1097,7 +1219,7 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jMenu1.setText("File");
+        fileMenu.setText("File");
 
         openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_MASK));
         openMenuItem.setText("Open...");
@@ -1106,52 +1228,65 @@ public class Frame extends javax.swing.JFrame {
                 openMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(openMenuItem);
+        fileMenu.add(openMenuItem);
 
-        jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_MASK));
-        jMenuItem5.setText("Exit");
-        jMenu1.add(jMenuItem5);
-
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("View");
-
-        jMenuItem6.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.META_MASK));
-        jMenuItem6.setText("Refresh");
-        jMenu2.add(jMenuItem6);
-
-        jMenuBar1.add(jMenu2);
-
-        jMenu3.setText("Macros");
-
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
-        jMenuItem1.setText("Add Covers");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        saveTrackMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_MASK));
+        saveTrackMenuItem.setText("Save Track");
+        saveTrackMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                saveTrackMenuItemActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem1);
+        fileMenu.add(saveTrackMenuItem);
 
-        jMenuItem2.setText("Add Track Numbers");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        saveAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        saveAllMenuItem.setText("Save All");
+        fileMenu.add(saveAllMenuItem);
+
+        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_MASK));
+        exitMenuItem.setText("Exit");
+        fileMenu.add(exitMenuItem);
+
+        jMenuBar1.add(fileMenu);
+
+        viewMenu.setText("View");
+
+        refreshMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.META_MASK));
+        refreshMenuItem.setText("Refresh");
+        viewMenu.add(refreshMenuItem);
+
+        jMenuBar1.add(viewMenu);
+
+        macroMenu.setText("Macros");
+
+        addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        addCoversMenuItem.setText("Add Covers");
+        addCoversMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                addCoversMenuItemActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem2);
+        macroMenu.add(addCoversMenuItem);
 
-        jMenuItem3.setText("Format Filenames");
-        jMenu3.add(jMenuItem3);
+        addTrackNumbersMenuItem.setText("Add Track Numbers");
+        addTrackNumbersMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addTrackNumbersMenuItemActionPerformed(evt);
+            }
+        });
+        macroMenu.add(addTrackNumbersMenuItem);
 
-        jMenuBar1.add(jMenu3);
+        formatFilenamesMenuItem.setText("Format Filenames");
+        macroMenu.add(formatFilenamesMenuItem);
 
-        jMenu4.setText("Help");
+        jMenuBar1.add(macroMenu);
 
-        jMenuItem4.setText("About");
-        jMenu4.add(jMenuItem4);
+        helpMenu.setText("Help");
 
-        jMenuBar1.add(jMenu4);
+        aboutMenuItem.setText("About");
+        helpMenu.add(aboutMenuItem);
+
+        jMenuBar1.add(helpMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -1174,34 +1309,68 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Action for the save button press
+     *
+     * @param evt
+     */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         saveAll();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
+
+        // TODO create a importFiles method that takes a File[] and does this stuff
+        // use a filechooser to open the folder full of stuff
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setAcceptAllFileFilterUsed(false);
 
+        // result of filechoosing
         int returnVal = fc.showOpenDialog(this);
-
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             ArrayList<File> files = new ArrayList<>();
             files = listFiles(fc.getSelectedFile(), files);
 
+            int succ_mp3Count = 0;   // lets count the number of successful files imported
+            int unsucc_mp3Count = 0; // lets count the number of all files attempted to import
+
+            // iterate through the files and try to add them
             for (File file : files) {
                 if (file.getName().endsWith(".mp3")) {
+                    succ_mp3Count++;
                     addFileToTable(file);
+                } else {
+                    unsucc_mp3Count++;
                 }
+            }
 
+            // update the log table when you're done with the file iteration
+            if (succ_mp3Count == 0) {
+                updateConsole("No mp3 files found!");
+            } else if (succ_mp3Count > 1 && unsucc_mp3Count == 0) {
+                updateConsole(succ_mp3Count + " mp3 files loaded!");
+            } else if (succ_mp3Count == 1) {
+                updateConsole("1 mp3 file imported.");
+            } else if (succ_mp3Count > 1 && unsucc_mp3Count == 1) {
+                updateConsole(succ_mp3Count + " mp3 files loaded, 1 file wasn't an mp3!");
+            } else if (succ_mp3Count > 1 && unsucc_mp3Count > 1) {
+                updateConsole(succ_mp3Count + " mp3 files loaded, " + unsucc_mp3Count + " unknown files not loaded!");
+            } else {
+                // I don't think this should happen
             }
         } else {
+            // no files chose, update console
             updateConsole("No file(s) chosen!");
         }
 
-
     }//GEN-LAST:event_openMenuItemActionPerformed
 
+    /**
+     * What happens when the multPanel update button is clicked
+     *
+     * @param evt
+     */
     private void multUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multUpdateButtonActionPerformed
         updateMultPanelFields();
     }//GEN-LAST:event_multUpdateButtonActionPerformed
@@ -1216,17 +1385,17 @@ public class Frame extends javax.swing.JFrame {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (row >= 0 && col >= 0) {
-            switch (col) {
-                case 10:
-                    showArtworkPopup(evt);
-                    break;
-                case 1:
-                    showFilePopup(evt);
-                    break;
-                default:
-                    showRegularPopup(evt);
-                    break;
-            }
+                    switch (col) {
+                        case 10:
+                            showArtworkPopup(evt);
+                            break;
+                        case 1:
+                            showFilePopup(evt);
+                            break;
+                        default:
+                            showRegularPopup(evt);
+                            break;
+                    }
                 } else {
                     table.clearSelection();
                 }
@@ -1243,14 +1412,24 @@ public class Frame extends javax.swing.JFrame {
                         changeSelection(table.getSelectedRow(), table.getSelectedColumn(), -1);
                     }
                 }
-
                 break;
 
             // if it's a scroll click
             case java.awt.event.MouseEvent.BUTTON2:
-                System.out.println("Scroll click");
-                //File f = (File) model.getValueAt(table.getSelectedRow(), 1);
-                //updateConsole(f.getPath());
+                row = table.rowAtPoint(evt.getPoint());
+                table.setRowSelectionInterval(row, row);
+
+                int index = getIndex(table.convertRowIndexToModel(row));
+                File file = songs.get(index).getFile();
+
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (file.exists()) {
+                        desktop.open(file);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 break;
 
             default:
@@ -1258,18 +1437,7 @@ public class Frame extends javax.swing.JFrame {
         }
 
         // find out what to do when row(s) are selected
-        if (table.getSelectedRowCount() > 1) {
-            //System.out.println("multiple rows selected");
-            enableMultPanel(true);
-            setMultiplePanelFields();
-            //table.editCellAt();
-//            if (table.isEditing()) {
-//                table.getCellEditor().stopCellEditing();
-//            }
-            //multTitle.requestFocus();
-        } else if (table.getSelectedRowCount() == 1) {
-            //System.out.println("only one row selected");
-            //enableMultPanel(false);
+        if (table.getSelectedRowCount() >= 1) {
             enableMultPanel(true);
             setMultiplePanelFields();
         } else if (table.getSelectedRowCount() < 1) {
@@ -1278,10 +1446,13 @@ public class Frame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_tableMousePressed
 
-    private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
-        //System.out.println("in pressed");
-    }//GEN-LAST:event_tableKeyPressed
-
+    /**
+     * Determines where to go based on the key press Looks at if the shift key
+     * is pressed down on tabbing or not Sends information to changeSelection()
+     * to determine where to go
+     *
+     * @param evt
+     */
     private void tableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyReleased
 
         if (evt.getKeyCode() == KeyEvent.VK_TAB && !evt.isShiftDown()) {
@@ -1304,76 +1475,115 @@ public class Frame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_tableKeyReleased
 
-    private void tableKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyTyped
-        //System.out.println("in typed");
-    }//GEN-LAST:event_tableKeyTyped
-
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_addTrackNumbersMenuItemActionPerformed
 
+    /**
+     * Opens the context menu for album art
+     *
+     * @param evt
+     */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
         showArtworkPopup(evt);
     }//GEN-LAST:event_multImageMousePressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multTitleKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTitleKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multTitleKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multArtistKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multArtistKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multAlbumKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multAlbumKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multAlbumArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumArtistKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multAlbumArtistKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multGenreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multGenreKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multGenreKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multYearKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multYearKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multYearKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multTrackKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTrackKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multTrackKeyPressed
 
+    /**
+     * If enter is pressed while field is in focus
+     */
     private void multDiskKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multDiskKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multDiskKeyPressed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void addCoversMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCoversMenuItemActionPerformed
         autoAddCovers(table.getSelectedRows());
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_addCoversMenuItemActionPerformed
 
+    private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_saveTrackMenuItemActionPerformed
+
+    private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_A && evt.isMetaDown()) {
+            table.selectAll();
+            setMultiplePanelFields();
+        }
+    }//GEN-LAST:event_tableKeyPressed
+
+    /**
+     * Sets the multiple fields panel based on the data selected
+     */
     public void setMultiplePanelFields() {
 
         // get the indices of the selected rows
-        int[] selectedrows = table.getSelectedRows();
+        int[] selectedRows = table.getSelectedRows();
         int rows = table.getSelectedRowCount();
-
+        
         // make the arrays of values
         String[] titles = new String[rows];
         String[] artists = new String[rows];
@@ -1386,16 +1596,17 @@ public class Frame extends javax.swing.JFrame {
         byte[][] images = new byte[rows][];
 
         // fill the arrays
-        for (int i = 0; i < selectedrows.length; i++) {
-            titles[i] = table.getValueAt(selectedrows[i], 2).toString();
-            artists[i] = table.getValueAt(selectedrows[i], 3).toString();
-            albums[i] = table.getValueAt(selectedrows[i], 4).toString();
-            albumartists[i] = table.getValueAt(selectedrows[i], 5).toString();
-            years[i] = table.getValueAt(selectedrows[i], 6).toString();
-            genres[i] = table.getValueAt(selectedrows[i], 7).toString();
-            tracks[i] = table.getValueAt(selectedrows[i], 8).toString();
-            disks[i] = table.getValueAt(selectedrows[i], 9).toString();
-            images[i] = songs.get(getIndex(selectedrows[i])).getArtwork_bytes();
+        for (int i = 0; i < selectedRows.length; i++) {
+
+            titles[i] = table.getValueAt(selectedRows[i], 2).toString();
+            artists[i] = table.getValueAt(selectedRows[i], 3).toString();
+            albums[i] = table.getValueAt(selectedRows[i], 4).toString();
+            albumartists[i] = table.getValueAt(selectedRows[i], 5).toString();
+            years[i] = table.getValueAt(selectedRows[i], 6).toString();
+            genres[i] = table.getValueAt(selectedRows[i], 7).toString();
+            tracks[i] = table.getValueAt(selectedRows[i], 8).toString();
+            disks[i] = table.getValueAt(selectedRows[i], 9).toString();
+            images[i] = songs.get(getIndex(selectedRows[i])).getArtwork_bytes();
         }
 
         // fill the fields
@@ -1455,15 +1666,22 @@ public class Frame extends javax.swing.JFrame {
             Image thumbnail = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
             ImageIcon artwork_icon = new ImageIcon(thumbnail);
             multImage.setIcon(artwork_icon);
-            
+
         } else {
             multImage.setIcon(null);
         }
     }
 
+    /**
+     * Updates the fields in the table with the fields in the mult panel Gets
+     * called when the update button is pressed
+     */
     public void updateMultPanelFields() {
+
+        // get the selected rows
         int[] selectedRows = table.getSelectedRows();
 
+        // get the fields in the mult panel
         String title = multTitle.getText();
         String artist = multArtist.getText();
         String album = multAlbum.getText();
@@ -1473,6 +1691,7 @@ public class Frame extends javax.swing.JFrame {
         String track = multTrack.getText();
         String disk = multDisk.getText();
 
+        // check if the title field needs updated
         if (!title.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1487,11 +1706,11 @@ public class Frame extends javax.swing.JFrame {
                 setTitle(index, title);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the artist field needs updated
         if (!artist.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1506,11 +1725,11 @@ public class Frame extends javax.swing.JFrame {
                 setArtist(index, artist);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the album field needs updated
         if (!album.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1525,11 +1744,11 @@ public class Frame extends javax.swing.JFrame {
                 setAlbum(index, album);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the album artist field needs updated
         if (!albumArtist.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1544,11 +1763,11 @@ public class Frame extends javax.swing.JFrame {
                 setAlbumArtist(index, albumArtist);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the year field needs updated
         if (!year.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1563,11 +1782,11 @@ public class Frame extends javax.swing.JFrame {
                 setYear(index, year);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the genre field needs updated
         if (!genre.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1582,11 +1801,11 @@ public class Frame extends javax.swing.JFrame {
                 setGenre(index, genre);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the track field needs updated
         if (!track.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1601,11 +1820,11 @@ public class Frame extends javax.swing.JFrame {
                 setTrack(index, track);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
 
+        // check if the disk field needs updated
         if (!disk.equals("-")) {
             for (int i = 0; i < selectedRows.length; i++) {
 
@@ -1620,26 +1839,37 @@ public class Frame extends javax.swing.JFrame {
                 setDisk(index, disk);
 
                 // add the song to edited_songs and update the row icon
-                //edited_songs.add(index);
                 songEdited(index);
             }
         }
     }
 
+    /**
+     * Helper Function Lists and stores all of the files in a directory and
+     * subdirectories
+     *
+     * @param directory
+     * @param files
+     * @return
+     */
     public ArrayList<File> listFiles(File directory, ArrayList<File> files) {
-
         // get all the files from a directory
         File[] fList = directory.listFiles();
         for (File file : fList) {
             if (file.isFile()) {
                 files.add(file);
             } else if (file.isDirectory()) {
-                listFiles(file, files);
+                listFiles(file, files);     // this file is a directory, recursively call itself
             }
         }
         return files;
     }
 
+    /**
+     * Enables/Disables the mult panel
+     *
+     * @param bool
+     */
     public void enableMultPanel(boolean bool) {
 
         multTitle.setText("");
@@ -1663,6 +1893,13 @@ public class Frame extends javax.swing.JFrame {
         multUpdateButton.setEnabled(bool);
     }
 
+    /**
+     * Helper Function Checks if a string is the same throughout an array
+     *
+     * @param str, the string to check
+     * @param arr, the array of strings
+     * @return the result of the check
+     */
     public boolean checkIfSame(String str, String[] arr) {
         for (int i = 1; i < arr.length; i++) {
             if (!arr[i].equals(str)) {
@@ -1672,6 +1909,13 @@ public class Frame extends javax.swing.JFrame {
         return true;
     }
 
+    /**
+     * Helper Function Checks if a byte array is the same throughout an array
+     *
+     * @param bytes, the byte array to check
+     * @param arr, the array of byte arrays
+     * @return the result of the check
+     */
     public boolean checkIfSame(byte[] bytes, byte[][] arr) {
         for (int i = 1; i < arr.length; i++) {
             if (!Arrays.equals(arr[i], bytes)) {
@@ -1681,21 +1925,15 @@ public class Frame extends javax.swing.JFrame {
         return true;
     }
 
-    public int getHighestIndex() {
-        int index = -1;
-        for (int i = 0; i < model.getRowCount(); i++) {
-            int index_to_compare = getIndex(i);
-            if (index_to_compare > index) {
-                index = index_to_compare;
-            }
-        }
-        return index;
-    }
-
+    /**
+     * Goes through the edited_songs array and saves each one
+     */
     public void saveAll() {
 
+        // traverse the array of songs
         for (int i = 0; i < songs.size(); i++) {
 
+            // if the song at i is in edited_songs, update it
             if (edited_songs.contains(i)) {
                 Song s = songs.get(i);
                 File file = s.getFile();
@@ -1709,6 +1947,7 @@ public class Frame extends javax.swing.JFrame {
                     System.err.println(ex);
                 }
 
+                // set all the text based items
                 try {
                     mp3file.getId3v2Tag().setTitle(s.getTitle());
                     mp3file.getId3v2Tag().setArtist(s.getArtist());
@@ -1723,140 +1962,130 @@ public class Frame extends javax.swing.JFrame {
                     // this only happens if you save a track with no genre
                 }
 
+                // set album art
                 String type = "image/jpeg";
                 mp3file.getId3v2Tag().clearAlbumImage();
                 mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
 
                 save(mp3file, file);
 
+                // update the row graphic
                 setRowIcon(SAVED, getRow(i));
             } else {
                 // skip it, no changes
             }
         }
 
+        // done with the saving, clear the edited_songs list
+        edited_songs.clear();
     }
 
-    public int getRow(int index) {
-        int highest = getHighestIndex();
-        for (int i = 0; i <= highest; i++) {
-            if (i == index) {
-                return i;
-            }
+    public void saveTracks(int[] selectedRows) {
+        // traverse the array of rows and play each file sequentially
+        for (int i = 0; i < selectedRows.length; i++) {
+            int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
+            int index = getIndex(row);
+            save(index);
         }
-        return -1;
     }
     
-    public int getIndex(int row) {
-        return Integer.valueOf(model.getValueAt(row, 12).toString());
-    }
-
-    public void removeAlbumArt(int[] selectedRows) {
-
-        for (int i = 0; i < selectedRows.length; i++) {
-
-            int row = table.convertRowIndexToModel(selectedRows[i]);
-            int index = getIndex(row);
-            File file = songs.get(index).getFile();
+    public void save(int index) {
+        if (edited_songs.contains(index)) {
+            Song s = songs.get(index);
+            File file = s.getFile();
             Mp3File mp3file = null;
+
             try {
                 mp3file = new Mp3File(file.getAbsolutePath());
+                ID3v2 tag = new ID3v24Tag();
+                mp3file.setId3v2Tag(tag);
             } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
                 System.err.println(ex);
             }
 
-            ID3v2 id3v2Tag;
-            if (mp3file.hasId3v2Tag()) {
-                id3v2Tag = mp3file.getId3v2Tag();
-            } else {
-                id3v2Tag = null;
-            }
-
-            id3v2Tag.clearAlbumImage();
-
-            songs.get(index).setArtwork_bytes(null);
-            //edited_songs.add(index);
-            songEdited(index);
-
-            model.setValueAt(null, row, 11);
-
-            multImage.setIcon(null);
-        }
-
-    }
-
-    public void addAlbumArt(int[] selectedRows) {
-
-        File img_file = null;
-
-        for (int i = 0; i < selectedRows.length; i++) {
-
+            // set all the text based items
             try {
-                int index = Integer.valueOf(model.getValueAt(selectedRows[i], 12).toString());
-                File file = songs.get(index).getFile();
-                Mp3File mp3file = new Mp3File(file.getAbsolutePath());
-                ID3v2 id3v2Tag = null;
-
-                if (mp3file.hasId3v2Tag()) {
-                    id3v2Tag = mp3file.getId3v2Tag();
-                } else {
-                    // do nothing
-                }
-
-                // only show the JFileChooser on the first go
-                if (i == 0) {
-                    JFileChooser fc = new JFileChooser(new File(file.getAbsolutePath()));
-                    fc.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif"));
-                    int returnVal = fc.showOpenDialog(null);
-
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        img_file = fc.getSelectedFile();
-                    } else {
-                        return;
-                    }
-                }
-
-                RandomAccessFile ra_file = new RandomAccessFile(img_file.getAbsolutePath(), "r");
-                byte[] bytes = new byte[(int) ra_file.length()];
-                ra_file.read(bytes);
-                ra_file.close();
-
-                songs.get(index).setArtwork_bytes(bytes);
-
-                Icon thumbnail_icon = null;
-                try {
-                    // getting the image from the byte array
-                    ImageIcon icon = new ImageIcon(bytes);
-                    Image img = icon.getImage();
-                    Image thumbnail = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
-                    thumbnail_icon = new ImageIcon(thumbnail);
-                    //this.artwork = new ImageIcon(img_scaled);
-
-                    //iipreview.setIcon(thumbnail_icon);
-                } catch (NullPointerException e) {
-                    System.err.println(e);
-                }
-
-                model.setValueAt(thumbnail_icon, selectedRows[i], 11);
-
-                //edited_songs.add(index);
-                songEdited(index);
-
-                if (table.getSelectedRowCount() > 1) {
-                    // getting the image from the byte array
-                    ImageIcon icon = new ImageIcon(bytes);
-                    Image img = icon.getImage();
-                    Image thumbnail = img.getScaledInstance(166, 166, java.awt.Image.SCALE_SMOOTH);
-                    ImageIcon artwork_icon = new ImageIcon(thumbnail);
-                    multImage.setIcon(artwork_icon);
-                }
-
-            } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                mp3file.getId3v2Tag().setTitle(s.getTitle());
+                mp3file.getId3v2Tag().setArtist(s.getArtist());
+                mp3file.getId3v2Tag().setAlbum(s.getAlbum());
+                mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumartist());
+                mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
+                mp3file.getId3v2Tag().setYear(s.getYear());
+                mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
+                mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
+            } catch (IllegalArgumentException ex) {
+                // this exception doesn't really matter
+                // this only happens if you save a track with no genre
             }
+
+            // set album art
+            String type = "image/jpeg";
+            mp3file.getId3v2Tag().clearAlbumImage();
+            mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
+
+            save(mp3file, file);
+
+            // update the row graphic
+            setRowIcon(SAVED, getRow(index));
+            
+            // done saving, remove it
+            // gives an IndexOutOfBoundsException when trying to remove() with one element in it
+            if(edited_songs.size() == 1) {
+                edited_songs.clear();
+            } else if (edited_songs.size() > 1) {
+                edited_songs.remove(index);
+            }
+        } else {
+            // song doesn't need to be saved
         }
     }
 
+    /**
+     * Helper Function Gets row from an index
+     *
+     * @param index, the index of the song
+     * @return the row where the index matches
+     */
+    public int getRow(int index) {
+        String[] indices = getIndices();
+        for (int i = 0; i < indices.length; i++) {
+            String[] arr = indices[i].split("_");
+            if (Integer.valueOf(arr[1]) == index) {
+                return Integer.valueOf(arr[0]);
+            }
+        }
+        return -1;
+    }
+
+    public String[] getIndices() {
+//        int[] indices = new int[table.getRowCount()];
+//        for (int i = 0; i < table.getRowCount(); i++) {
+//            indices[i] = getIndex(i);
+//        }
+        String[] indices = new String[table.getRowCount()];
+        for (int i = 0; i < indices.length; i++) {
+            int row = table.convertRowIndexToModel(i);
+            indices[i] = i + "_" + getIndex(row);
+        }
+        return indices;
+    }
+
+    /**
+     * Helper Function Gets the index at the specified row
+     *
+     * @param row
+     * @return
+     */
+    public int getIndex(int row) {
+        return Integer.valueOf(model.getValueAt(row, 12).toString());
+    }
+
+    /**
+     * Saves an individual file
+     *
+     * @param mp3file
+     * @param file
+     */
     public void save(Mp3File mp3file, File file) {
         try {
             // save the new mp3file
@@ -1874,6 +2103,11 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Shows the popup when you click on an album image
+     *
+     * @param e
+     */
     void showArtworkPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
@@ -1885,6 +2119,11 @@ public class Frame extends javax.swing.JFrame {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
+    /**
+     * Shows the normal popup
+     *
+     * @param e
+     */
     void showRegularPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
@@ -1892,18 +2131,25 @@ public class Frame extends javax.swing.JFrame {
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
         item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Show Index"));
+        popup.add(item = new JMenuItem("Save"));
         item.addActionListener(menuListener);
 
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
+    /**
+     * Shows the normal popup with some file options too
+     *
+     * @param e
+     */
     void showFilePopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         popup.add(item = new JMenuItem("Remove from list"));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Save"));
         item.addActionListener(menuListener);
         popup.addSeparator();
         popup.add(item = new JMenuItem("Move File..."));
@@ -1974,21 +2220,19 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JLabel L7;
     private javax.swing.JLabel L8;
     private javax.swing.JLabel L9;
+    private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem addCoversMenuItem;
+    private javax.swing.JMenuItem addTrackNumbersMenuItem;
     private javax.swing.JTextArea console;
     private javax.swing.JScrollPane consoleSP;
     private javax.swing.JPanel container;
+    private javax.swing.JMenuItem exitMenuItem;
+    private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem formatFilenamesMenuItem;
+    private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;
     private javax.swing.JTextField multArtist;
@@ -2001,9 +2245,13 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JButton multUpdateButton;
     private javax.swing.JTextField multYear;
     private javax.swing.JMenuItem openMenuItem;
+    private javax.swing.JMenuItem refreshMenuItem;
+    private javax.swing.JMenuItem saveAllMenuItem;
     private javax.swing.JButton saveButton;
+    private javax.swing.JMenuItem saveTrackMenuItem;
     private javax.swing.JTable table;
     private javax.swing.JScrollPane tableSP;
+    private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables
 
 }
