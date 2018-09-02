@@ -1,0 +1,16 @@
+# To start process, ensure that you have the compiled package-for-store .jar file and the .icns image file in the same folder
+# Then paste the commands below
+
+cp git/moose/src/resources/moose.icns git/moose/deploy
+cd git/moose/deploy
+mkdir -p package/macosx
+cp moose.icns package/macosx
+jdk=$(/usr/libexec/java_home)
+$jdk/bin/javapackager -version
+$jdk/bin/javapackager -deploy -native pkg -name Moose \
+   -BappVersion=1.0.0 -Bicon=package/macosx/moose.icns \
+   -srcdir . -srcfiles moose.jar -appclass moose.Frame \
+   -outdir out -v
+cp out/Moose-*.pkg moose-installer.pkg
+ls -l
+echo done

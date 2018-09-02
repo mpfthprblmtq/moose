@@ -8,7 +8,6 @@
 package moose;
 
 // imports
-import com.apple.eawt.Application;
 import com.mpatric.mp3agic.*;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -32,6 +31,9 @@ import javax.swing.table.*;
 // class Frame
 public class Frame extends javax.swing.JFrame {
 
+    // version
+    String version = "1.0.0";
+
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
@@ -41,6 +43,7 @@ public class Frame extends javax.swing.JFrame {
 
     int curr_row;   // keeps track of the current row
     int curr_col;   // keeps track of the current column
+    int nav_status = -1;  // keeps track of the navigation status
 
     // table model used, with some customizations and overrides
     DefaultTableModel model = new DefaultTableModel() {
@@ -73,15 +76,13 @@ public class Frame extends javax.swing.JFrame {
     private static final int TAB = 2;
     private static final int ENTER = 3;
 
+    private static final int FROM_DIALOG = 1;
+    private static final int NORMAL_NAV = 2;
+
     /**
      * Creates new form Frame
      */
     public Frame() {
-
-        // set the moose icon in the app and in the dock (OS X)
-        this.setIconImage(new ImageIcon("img/moose.png").getImage());
-        Application.getApplication().setDockIconImage(
-                new ImageIcon("img/moose.png").getImage());
 
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -138,7 +139,7 @@ public class Frame extends javax.swing.JFrame {
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
-        //table.removeColumn(table.getColumnModel().getColumn(11));
+        table.removeColumn(table.getColumnModel().getColumn(11));
 
         // set the widths of the columns
         // file name and title are left out so they can take the remainder of the space dynamically
@@ -151,7 +152,6 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
-        setColumnWidth(11, 20);
 
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (java.io.File[] files) -> {
@@ -204,7 +204,7 @@ public class Frame extends javax.swing.JFrame {
 
                 int r = tcl.getRow();
                 int c = tcl.getColumn();
-                
+
                 int index = Integer.valueOf(model.getValueAt(r, 12).toString());
 
                 // switch to see what column changed, and do a task based on that
@@ -311,7 +311,6 @@ public class Frame extends javax.swing.JFrame {
     }
 
     // TODO When editing a single cell, the row icon doesn't update correctly
-    
     /**
      * Adds the song index to edited_songs to save, and updates the row icon
      *
@@ -703,13 +702,13 @@ public class Frame extends javax.swing.JFrame {
         row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon("img//default.png"), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon("img//edit.png"), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon("img//check.png"), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
                 break;
         }
     }
@@ -809,9 +808,9 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon("img//default.png"), // adds the default status icon
+                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
-                s.getFile().getName(), // actual editable file name
+                s.getFile().getName().replace(".mp3", ""), // actual editable file name
                 s.getTitle(),
                 s.getArtist(),
                 s.getAlbum(),
@@ -858,6 +857,11 @@ public class Frame extends javax.swing.JFrame {
         // set the globals to the params
         this.curr_row = row;
         this.curr_col = column;
+
+        // check nav_status and see if we should move
+        if (nav_status == FROM_DIALOG) {
+            return;
+        }
 
         // check if the cell can be edited
         if (table.editCellAt(row, column)) {
@@ -954,13 +958,16 @@ public class Frame extends javax.swing.JFrame {
         refreshMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
         addCoversMenuItem = new javax.swing.JMenuItem();
+        findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
         formatFilenamesMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
+        creditsMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moose");
+        setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel1.setText("Moose");
@@ -1268,6 +1275,15 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addCoversMenuItem);
 
+        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.META_MASK));
+        findAndReplaceMenuItem.setText("Find and Replace");
+        findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findAndReplaceMenuItemActionPerformed(evt);
+            }
+        });
+        macroMenu.add(findAndReplaceMenuItem);
+
         addTrackNumbersMenuItem.setText("Add Track Numbers");
         addTrackNumbersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1284,7 +1300,20 @@ public class Frame extends javax.swing.JFrame {
         helpMenu.setText("Help");
 
         aboutMenuItem.setText("About");
+        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutMenuItemActionPerformed(evt);
+            }
+        });
         helpMenu.add(aboutMenuItem);
+
+        creditsMenuItem.setText("Credits");
+        creditsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                creditsMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(creditsMenuItem);
 
         jMenuBar1.add(helpMenu);
 
@@ -1569,11 +1598,80 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_saveTrackMenuItemActionPerformed
 
     private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_A && evt.isMetaDown()) {
+        if (evt.getKeyCode() == KeyEvent.VK_A && evt.isMetaDown()) {
             table.selectAll();
             setMultiplePanelFields();
         }
     }//GEN-LAST:event_tableKeyPressed
+
+    private void findAndReplaceMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findAndReplaceMenuItemActionPerformed
+        showFindAndReplaceDialog();
+    }//GEN-LAST:event_findAndReplaceMenuItemActionPerformed
+
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+        showAboutDialog();
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
+
+    private void creditsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_creditsMenuItemActionPerformed
+        showCreditsDialog();
+    }//GEN-LAST:event_creditsMenuItemActionPerformed
+
+    /**
+     * Show the about dialog, includes name, version, and copyright
+     */
+    public void showAboutDialog() {
+        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
+        JOptionPane.showMessageDialog(null,
+                "Moose\nVersion: " + version + "\n" + "© Pat Ripley 2018",
+                "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
+    }
+
+    /**
+     * Show the totally legit credits
+     */
+    public void showCreditsDialog() {
+        JOptionPane.showMessageDialog(null,
+                "Wi not trei a holiday in Sweeden this yer ?\n"
+                + "\n"
+                + "See the loveli lakes\n"
+                + "\n"
+                + "The wonderful telephone system\n"
+                + "\n"
+                + "And mani interesting furry animals\n"
+                + "\n"
+                + "Including the majestic moose\n"
+                + "\n"
+                + "A moose once bit my sister...\n"
+                + "\n"
+                + "No realli! She was Karving her initials on the moose with the sharpened end\n"
+                + "of an interspace toothbrush given her by Svenge - her brother-in-law - an\n"
+                + "Oslo dentist and star of many Norwegian movies: \"The Hot Hands of an Oslo\n"
+                + "Dentist\", \"Fillings of Passion\", \"The Huge Molars of Horst Nordfink\"...\n"
+                + "\n"
+                + "Mynd you, moose bites Kan be pretti nasti..."
+                + "\n\n"
+                + "\nMoose Trained by Yutte Hermsgervordenbroti\n"
+                + "\n"
+                + "Special Moose Effects Olaf Prot\n"
+                + "\n"
+                + "Moose Costumes Siggi Churchill\n"
+                + "\n"
+                + "Moose choerographed by Horst Prot III\n"
+                + "\n"
+                + "Miss Taylor's Mooses by Hengst Douglas-Home\n"
+                + "\n"
+                + "Moose trained to mix concrete and sign complicated insurance forms by Jurgan Wigg\n"
+                + "\n"
+                + "Mooses noses wiped by Bjorn Irkestom-Slater\n"
+                + "\n"
+                + "Large moose on the left hand side of the screen in the third scene from the end, given"
+                        + "\na therough grounding in Latin, French, and 'O' level geography by Bo Benn\n"
+                + "\n"
+                + "Suggestive poses for the moose suggested by Vic Rotter\n"
+                + "\n"
+                + "Antler-care by Liv Thatcher",
+                "Credits", JOptionPane.PLAIN_MESSAGE);
+    }
 
     /**
      * Sets the multiple fields panel based on the data selected
@@ -1583,7 +1681,7 @@ public class Frame extends javax.swing.JFrame {
         // get the indices of the selected rows
         int[] selectedRows = table.getSelectedRows();
         int rows = table.getSelectedRowCount();
-        
+
         // make the arrays of values
         String[] titles = new String[rows];
         String[] artists = new String[rows];
@@ -1845,6 +1943,51 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
+     * Shows a dialog with a find input and replace input
+     */
+    public void showFindAndReplaceDialog() {
+        JTextField find = new JTextField();
+        JTextField replace = new JTextField();
+        Object[] message = {"Find:", find, "Replace:", replace};
+        int option = JOptionPane.showConfirmDialog(null, message, "Find and Replace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option == JOptionPane.OK_OPTION) {
+            String findStr = find.getText();
+            String replStr = replace.getText();
+            int result = findAndReplace(findStr, replStr);
+            if (result == 0) {   // nothing to replace
+                JOptionPane.showMessageDialog(null, "Nothing to replace!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
+            } else if (result > 0) {
+                JOptionPane.showMessageDialog(null, "Successfully made " + result + " replacements!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
+            }
+        } else {
+            // user changed their mind
+        }
+        nav_status = FROM_DIALOG;
+    }
+
+    /**
+     * Does the finding and replacing from showFindAndReplaceDialog()
+     *
+     * @param find, the string to find
+     * @param replace, the string to replace
+     * @return the results of the replace, true if there was something to
+     * replace, false if not
+     */
+    public int findAndReplace(String find, String replace) {
+        int count = 0;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                if (table.getValueAt(i, j).toString().contains(find)) {
+                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
+                    table.setValueAt(toReplace, i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
      * Helper Function Lists and stores all of the files in a directory and
      * subdirectories
      *
@@ -1988,7 +2131,7 @@ public class Frame extends javax.swing.JFrame {
             save(index);
         }
     }
-    
+
     public void save(int index) {
         if (edited_songs.contains(index)) {
             Song s = songs.get(index);
@@ -2027,10 +2170,10 @@ public class Frame extends javax.swing.JFrame {
 
             // update the row graphic
             setRowIcon(SAVED, getRow(index));
-            
+
             // done saving, remove it
             // gives an IndexOutOfBoundsException when trying to remove() with one element in it
-            if(edited_songs.size() == 1) {
+            if (edited_songs.size() == 1) {
                 edited_songs.clear();
             } else if (edited_songs.size() > 1) {
                 edited_songs.remove(index);
@@ -2226,8 +2369,10 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JTextArea console;
     private javax.swing.JScrollPane consoleSP;
     private javax.swing.JPanel container;
+    private javax.swing.JMenuItem creditsMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem findAndReplaceMenuItem;
     private javax.swing.JMenuItem formatFilenamesMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;

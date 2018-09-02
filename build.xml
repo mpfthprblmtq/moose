@@ -76,12 +76,12 @@
            minus the .jar extension. It should not have spaces.
            <property name="store.jar.name" value="MyJarName"/>
       -->
-      <property name="store.jar.name" value="hiparser"/>
+      <property name="store.jar.name" value="moose"/>
 
 
       <!-- don't edit below this line -->
 
-      <property name="store.dir" value="store"/>
+      <property name="store.dir" value="deploy"/>
       <property name="store.jar" value="${store.dir}/${store.jar.name}.jar"/>
 
       <echo message="Packaging ${application.title} into a single JAR at ${store.jar}"/>
