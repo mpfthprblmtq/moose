@@ -4,6 +4,7 @@
  *
  *  Copyright Pat Ripley 2018
  */
+
 // package
 package moose;
 
@@ -22,8 +23,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
@@ -33,6 +32,9 @@ public class Frame extends javax.swing.JFrame {
 
     // version
     String version = "1.0.0";
+    
+    // logger object
+    Logger logger = new Logger();
 
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
@@ -489,7 +491,7 @@ public class Frame extends javax.swing.JFrame {
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -567,7 +569,7 @@ public class Frame extends javax.swing.JFrame {
                 }
 
             } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1457,7 +1459,7 @@ public class Frame extends javax.swing.JFrame {
                         desktop.open(file);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
 
