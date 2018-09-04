@@ -23,6 +23,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
@@ -31,7 +32,7 @@ import javax.swing.table.*;
 public class Frame extends javax.swing.JFrame {
 
     // version
-    String version = "1.0.0";
+    String version = "1.0.1";
     
     // logger object
     Logger logger = new Logger();
@@ -60,11 +61,7 @@ public class Frame extends javax.swing.JFrame {
 
         @Override   // returns if the cell is editable based on the column index
         public boolean isCellEditable(int row, int column) {
-            if (column == 11 || column == 0) {
-                return false;
-            } else {
-                return true;
-            }
+            return !(column == 11 || column == 0);
         }
     };
 
@@ -163,11 +160,11 @@ public class Frame extends javax.swing.JFrame {
 
             // create an arraylist of files and traverse it
             ArrayList<File> fileList = new ArrayList<>();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    fileList = listFiles(files[i], fileList);
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    fileList = listFiles(file, fileList);
                 } else {
-                    fileList.add(files[i]);
+                    fileList.add(file);
                 }
             }
 
@@ -353,7 +350,7 @@ public class Frame extends javax.swing.JFrame {
                 model.setValueAt(new_file, selectedRows[i], 1);
             }
         } else {
-            return;
+            // do nothing, user exited or pressed cancel
         }
 
     }
@@ -425,11 +422,9 @@ public class Frame extends javax.swing.JFrame {
      */
     public File folderContainsCover(File folder) {
         File[] files = folder.listFiles();      // get all the files
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].getName().equals("cover.png")
-                    || files[i].getName().equals("cover.jpg")
-                    || files[i].getName().equals("cover.jpeg")) {
-                return files[i];
+        for (File file : files) {
+            if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
+                return file;
             }
         }
         // no cover files were found, returning null
@@ -449,10 +444,11 @@ public class Frame extends javax.swing.JFrame {
             int index = Integer.valueOf(model.getValueAt(row, 12).toString());
 
             // convert file to byte array
-            RandomAccessFile ra_file = new RandomAccessFile(cover.getAbsolutePath(), "r");
-            byte[] bytes = new byte[(int) ra_file.length()];
-            ra_file.read(bytes);
-            ra_file.close();
+            byte[] bytes;
+            try (RandomAccessFile ra_file = new RandomAccessFile(cover.getAbsolutePath(), "r")) {
+                bytes = new byte[(int) ra_file.length()];
+                ra_file.read(bytes);
+            }
 
             // update the track in the songs array
             songs.get(index).setArtwork_bytes(bytes);
@@ -921,6 +917,7 @@ public class Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel2 = new javax.swing.JLabel();
         container = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
@@ -950,6 +947,7 @@ public class Frame extends javax.swing.JFrame {
         multDisk = new javax.swing.JTextField();
         multImage = new javax.swing.JLabel();
         multUpdateButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -966,6 +964,8 @@ public class Frame extends javax.swing.JFrame {
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
         creditsMenuItem = new javax.swing.JMenuItem();
+
+        jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moose");
@@ -1194,20 +1194,24 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/moose64.png"))); // NOI18N
+
         javax.swing.GroupLayout containerLayout = new javax.swing.GroupLayout(container);
         container.setLayout(containerLayout);
         containerLayout.setHorizontalGroup(
             containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(containerLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
+                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tableSP)
                     .addGroup(containerLayout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(19, 19, 19)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveButton))
-                    .addComponent(tableSP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 1400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
-                        .addComponent(consoleSP)
+                    .addGroup(containerLayout.createSequentialGroup()
+                        .addComponent(consoleSP, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -1217,10 +1221,11 @@ public class Frame extends javax.swing.JFrame {
             .addGroup(containerLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
                     .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-                .addComponent(tableSP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tableSP, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(multPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1326,7 +1331,7 @@ public class Frame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(container, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
@@ -2193,8 +2198,8 @@ public class Frame extends javax.swing.JFrame {
      */
     public int getRow(int index) {
         String[] indices = getIndices();
-        for (int i = 0; i < indices.length; i++) {
-            String[] arr = indices[i].split("_");
+        for (String i : indices) {
+            String[] arr = i.split("_");
             if (Integer.valueOf(arr[1]) == index) {
                 return Integer.valueOf(arr[0]);
             }
@@ -2378,6 +2383,8 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem formatFilenamesMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
