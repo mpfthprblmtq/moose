@@ -71,6 +71,7 @@ public class Logger {
 
         // by default, setting the System.out to the errorStream just in case I missed catches
         System.setOut(errorStream);
+        System.setErr(errorStream);
     }
 
     /**
