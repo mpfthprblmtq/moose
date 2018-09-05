@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: moose.Frame
+Main-Class: moose.Main
 Class-Path: lib/mp3agic-0.9.0.jar

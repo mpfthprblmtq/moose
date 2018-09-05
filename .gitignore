@@ -14,3 +14,9 @@ nb-configuration.xml
 # *.jar
 *.war
 *.ear
+lib/nblibraries.properties
+lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/project.properties
+nbproject/project.xml

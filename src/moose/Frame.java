@@ -23,7 +23,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
@@ -964,6 +963,7 @@ public class Frame extends javax.swing.JFrame {
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
         creditsMenuItem = new javax.swing.JMenuItem();
+        settingsMenuItem = new javax.swing.JMenuItem();
 
         jLabel2.setText("jLabel2");
 
@@ -1090,6 +1090,7 @@ public class Frame extends javax.swing.JFrame {
         multImage.setText(" ");
         multImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         multImage.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        multImage.setIconTextGap(0);
         multImage.setMaximumSize(new java.awt.Dimension(156, 156));
         multImage.setMinimumSize(new java.awt.Dimension(156, 156));
         multImage.setPreferredSize(new java.awt.Dimension(156, 156));
@@ -1321,6 +1322,15 @@ public class Frame extends javax.swing.JFrame {
             }
         });
         helpMenu.add(creditsMenuItem);
+
+        settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_MASK));
+        settingsMenuItem.setText("Preferences");
+        settingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                settingsMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(settingsMenuItem);
 
         jMenuBar1.add(helpMenu);
 
@@ -1622,6 +1632,10 @@ public class Frame extends javax.swing.JFrame {
     private void creditsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_creditsMenuItemActionPerformed
         showCreditsDialog();
     }//GEN-LAST:event_creditsMenuItemActionPerformed
+
+    private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
+        Main.launchSettingsFrame();
+    }//GEN-LAST:event_settingsMenuItemActionPerformed
 
     /**
      * Show the about dialog, includes name, version, and copyright
@@ -2353,10 +2367,7 @@ public class Frame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            //new Frame().setVisible(true);
-            Frame frame = new Frame();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            new Frame().setVisible(true);
         });
     }
 
@@ -2403,6 +2414,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveAllMenuItem;
     private javax.swing.JButton saveButton;
     private javax.swing.JMenuItem saveTrackMenuItem;
+    private javax.swing.JMenuItem settingsMenuItem;
     private javax.swing.JTable table;
     private javax.swing.JScrollPane tableSP;
     private javax.swing.JMenu viewMenu;

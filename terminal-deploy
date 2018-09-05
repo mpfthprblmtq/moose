@@ -9,7 +9,7 @@ jdk=$(/usr/libexec/java_home)
 $jdk/bin/javapackager -version
 $jdk/bin/javapackager -deploy -native pkg -name Moose \
    -BappVersion=1.0.0 -Bicon=package/macosx/moose.icns \
-   -srcdir . -srcfiles moose.jar -appclass moose.Frame \
+   -srcdir . -srcfiles moose.jar -appclass moose.Main \
    -outdir out -v
 cp out/Moose-*.pkg moose-installer.pkg
 ls -l
