@@ -32,7 +32,7 @@ public class Frame extends javax.swing.JFrame {
 
     // version
     String version = "1.0.1";
-    
+
     // logger object
     Logger logger = new Logger();
 
@@ -150,7 +150,7 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
-
+        
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (java.io.File[] files) -> {
 
@@ -802,7 +802,7 @@ public class Frame extends javax.swing.JFrame {
             } catch (NullPointerException ex) {
                 System.err.println(ex);
             }
-
+            
             // add the row to the table
             model.addRow(new Object[]{
                 new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
@@ -824,11 +824,11 @@ public class Frame extends javax.swing.JFrame {
         // sorts the table on the filename, then the album by default
         DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
         ArrayList list = new ArrayList();
-        
+
         list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
         sorter.setSortKeys(list);
         sorter.sort();
-        
+
         list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
         sorter.setSortKeys(list);
         sorter.sort();
@@ -1691,7 +1691,7 @@ public class Frame extends javax.swing.JFrame {
                 + "Mooses noses wiped by Bjorn Irkestom-Slater\n"
                 + "\n"
                 + "Large moose on the left hand side of the screen in the third scene from the end, given"
-                        + "\na therough grounding in Latin, French, and 'O' level geography by Bo Benn\n"
+                + "\na therough grounding in Latin, French, and 'O' level geography by Bo Benn\n"
                 + "\n"
                 + "Suggestive poses for the moose suggested by Vic Rotter\n"
                 + "\n"
@@ -1721,7 +1721,7 @@ public class Frame extends javax.swing.JFrame {
 
         // fill the arrays
         for (int i = 0; i < selectedRows.length; i++) {
-            
+
             int row = table.convertRowIndexToModel(selectedRows[i]);
 
             titles[i] = table.getValueAt(selectedRows[i], 2).toString();

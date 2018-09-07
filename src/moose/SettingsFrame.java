@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class SettingsFrame extends javax.swing.JFrame {
@@ -22,6 +21,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     // variables
     boolean debugMode;
     ArrayList<String> genres = new ArrayList<>();
+    String libraryLocation;
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
@@ -88,6 +88,10 @@ public class SettingsFrame extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         clearEventLogButton = new javax.swing.JButton();
         clearErrorLogButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        browseButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
 
@@ -135,7 +139,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(genreTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 66, Short.MAX_VALUE)
+                        .addGap(0, 67, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
@@ -225,7 +229,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(openEventLogButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
                         .addComponent(clearEventLogButton))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -268,6 +272,50 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Logging", jPanel2);
 
+        jLabel6.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        jLabel6.setText("Music Library Location:");
+
+        jLabel7.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel7.setText(getLibraryLocation());
+        jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        browseButton.setText("Browse...");
+        browseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                browseButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(0, 185, Short.MAX_VALUE))
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(browseButton))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(browseButton)
+                .addContainerGap(318, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Files", jPanel3);
+
         saveButton.setText("Save");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -290,13 +338,13 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jButton4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(saveButton)))
+                        .addComponent(saveButton))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -356,7 +404,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        writeSettingsFile(debugMode, genres);
+        writeSettingsFile(debugMode, genres, libraryLocation);
     }//GEN-LAST:event_saveButtonActionPerformed
 
     /**
@@ -418,6 +466,26 @@ public class SettingsFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_clearErrorLogButtonActionPerformed
 
     /**
+     * Event for the browse button on the files tab
+     * @param evt 
+     */
+    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+        // create a jfc, configure it, and launch it
+        JFileChooser jfc = new JFileChooser();
+        jfc.setDialogTitle("Choose the directory you want to store music in...");
+        jfc.setMultiSelectionEnabled(false);
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jfc.showOpenDialog(null);
+        
+        // get the selected file
+        File dir = jfc.getSelectedFile();
+        if(dir != null) {
+            setLibraryLocation(dir.getAbsolutePath());
+            jLabel7.setText(libraryLocation);
+        }
+    }//GEN-LAST:event_browseButtonActionPerformed
+
+    /**
      * Gets the list of genres and fill a DefaultListModel for the view
      * @return the listModel for the JList
      */
@@ -441,8 +509,9 @@ public class SettingsFrame extends javax.swing.JFrame {
         genres.add("Indie Electronic");
         genres.add("Rock");
         genres.add("Electronic/Rock");
+        libraryLocation = "Library location not set";
 
-        writeSettingsFile(debugMode, genres);
+        writeSettingsFile(debugMode, genres, libraryLocation);
     }
 
     /**
@@ -577,6 +646,11 @@ public class SettingsFrame extends javax.swing.JFrame {
                 if (line.contains("GENRES=")) {
                     setGenres(line);
                 }
+                
+                // get the library location
+                if(line.contains("LIBRARYLOCATION=")) {
+                    setLibraryLocation(line.replace("LIBRARYLOCATION=", ""));
+                }
             }
 
         } catch (FileNotFoundException ex) {
@@ -590,14 +664,17 @@ public class SettingsFrame extends javax.swing.JFrame {
      * Writes the settings file from the ivars that were set in the program
      * @param debugMode
      * @param genres 
+     * @param libraryLocation 
      */
-    public void writeSettingsFile(boolean debugMode, ArrayList<String> genres) {
+    public void writeSettingsFile(boolean debugMode, ArrayList<String> genres, String libraryLocation) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
 
             bufferedWriter.write("DEBUGMODE=" + debugMode);
             bufferedWriter.write("\n");
             bufferedWriter.write("GENRES=" + listGenres(genres));
+            bufferedWriter.write("\n");
+            bufferedWriter.write("LIBRARYLOCATION=" + libraryLocation);
             bufferedWriter.flush();
 
         } catch (FileNotFoundException ex) {
@@ -656,6 +733,22 @@ public class SettingsFrame extends javax.swing.JFrame {
     public ArrayList<String> getGenres() {
         return genres;
     }
+    
+    /**
+     * Sets the library location
+     * @param libraryLocation 
+     */
+    public void setLibraryLocation(String libraryLocation) {
+        this.libraryLocation = libraryLocation;
+    }
+
+    /**
+     * Returns the library location
+     * @return 
+     */
+    public String getLibraryLocation() {
+        return libraryLocation;
+    }
 
     /**
      * Sets the Genres arraylist from a String
@@ -713,6 +806,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addGenreButton;
+    private javax.swing.JButton browseButton;
     private javax.swing.JButton clearErrorLogButton;
     private javax.swing.JButton clearEventLogButton;
     private javax.swing.JCheckBox debugCheckBox;
@@ -725,8 +819,11 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
