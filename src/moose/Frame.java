@@ -821,10 +821,15 @@ public class Frame extends javax.swing.JFrame {
             });
         }
 
-        // sorts the table on the filename by default
+        // sorts the table on the filename, then the album by default
         DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
         ArrayList list = new ArrayList();
-        list.add(new RowSorter.SortKey(2, SortOrder.ASCENDING));
+        
+        list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sorter.setSortKeys(list);
+        sorter.sort();
+        
+        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
         sorter.setSortKeys(list);
         sorter.sort();
 
@@ -1716,6 +1721,8 @@ public class Frame extends javax.swing.JFrame {
 
         // fill the arrays
         for (int i = 0; i < selectedRows.length; i++) {
+            
+            int row = table.convertRowIndexToModel(selectedRows[i]);
 
             titles[i] = table.getValueAt(selectedRows[i], 2).toString();
             artists[i] = table.getValueAt(selectedRows[i], 3).toString();
@@ -1725,7 +1732,7 @@ public class Frame extends javax.swing.JFrame {
             genres[i] = table.getValueAt(selectedRows[i], 7).toString();
             tracks[i] = table.getValueAt(selectedRows[i], 8).toString();
             disks[i] = table.getValueAt(selectedRows[i], 9).toString();
-            images[i] = songs.get(getIndex(selectedRows[i])).getArtwork_bytes();
+            images[i] = songs.get(getIndex(row)).getArtwork_bytes();
         }
 
         // fill the fields
@@ -2367,7 +2374,7 @@ public class Frame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new Frame().setVisible(true);
+            //new Frame().setVisible(true);
         });
     }
 
