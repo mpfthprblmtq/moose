@@ -3,8 +3,11 @@ package moose;
 
 public class Main {
     
-    static Frame frame;
-    static SettingsFrame settings;
+    // create and instantiate the frames and controllers
+    static Frame frame = new Frame();
+    static Logger logger = new Logger();
+    static SettingsFrame settings = new SettingsFrame();
+    
     
     public static void main(String args[]) {
         launchFrame();
@@ -15,7 +18,6 @@ public class Main {
      * Controls the Frame opening
      */
     public static void launchFrame() {
-        frame = new Frame();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -25,7 +27,6 @@ public class Main {
      * Controls the SettingsFrame opening and closing
      */
     public static void launchSettingsFrame() {
-        settings = new SettingsFrame();
         settings.setLocationRelativeTo(null);
         settings.setVisible(true);
     }
@@ -34,5 +35,8 @@ public class Main {
         settings.dispose();
     }
     
-    
+//    public ArrayList<String> getGenreList() {
+//        //ArrayList<String> list = new ArrayList<>();
+//        return settings.getGenreList();
+//    }
 }

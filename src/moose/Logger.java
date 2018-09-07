@@ -24,6 +24,9 @@ public class Logger {
     PrintStream errorStream;
     PrintStream eventStream;
     PrintStream console = System.out;   // store current System.out before assigning a new value
+    
+    File errorLog;
+    File eventLog;
 
     // current date
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -32,15 +35,15 @@ public class Logger {
     public Logger() {
 
         // create the logging directory if it doesn't already exist
-        String logsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/";
+        String logsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/Logs/";
         File logsDir = new File(logsDir_path);
         if (!logsDir.exists()) {
-            System.out.println(logsDir.mkdirs());
+            logsDir.mkdirs();
         }
 
         // create the error log
         String errorLog_path = logsDir_path + "errorLog.log";
-        File errorLog = new File(errorLog_path);
+        errorLog = new File(errorLog_path);
         if (!errorLog.exists()) {
             try {
                 errorLog.createNewFile();
@@ -51,7 +54,7 @@ public class Logger {
 
         // create the event log
         String eventLog_path = logsDir_path + "eventLog.log";
-        File eventLog = new File(eventLog_path);
+        eventLog = new File(eventLog_path);
         if (!eventLog.exists()) {
             try {
                 eventLog.createNewFile();
@@ -109,6 +112,9 @@ public class Logger {
         // output the statement
         System.out.printf("%-22s", dateStr);
         System.out.printf(str + "\n");
+        
+        // put it back to errorstream by default
+        System.setOut(errorStream);
     }
 
 }

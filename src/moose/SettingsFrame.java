@@ -1,21 +1,63 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package moose;
 
-/**
- *
- * @author pat
- */
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 public class SettingsFrame extends javax.swing.JFrame {
+
+    File settings;      // main settings file
+
+    // variables
+    boolean debugMode;
+    ArrayList<String> genres = new ArrayList<>();
+
+    // JList model
+    DefaultListModel<String> genreListModel = new DefaultListModel<>();
 
     /**
      * Creates new form SettingsFrame
      */
     public SettingsFrame() {
+
+        // create the logging directory if it doesn't already exist
+        String settingsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/";
+        File settingsDir = new File(settingsDir_path);
+        if (!settingsDir.exists()) {
+            settingsDir.mkdirs();
+        }
+
+        // create the settings file if it doesn't already exist
+        String settings_path = settingsDir_path + "moose.conf";
+        settings = new File(settings_path);
+        if (!settings.exists()) {
+            try {
+                settings.createNewFile();
+
+                // since we've created a brand new file, fill it with some default values
+                fillDefaults();
+            } catch (IOException ex) {
+                Main.logger.logError("Couldn't create settings file!", ex);
+            }
+        }
+
+        // initially load the settings
+        readSettingsFile();
+
+        // init the components
         initComponents();
+
     }
 
     /**
@@ -27,28 +69,45 @@ public class SettingsFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        debugCheckBox = new javax.swing.JCheckBox();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        genreTextField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         genreList = new javax.swing.JList<>();
+        genreTextField = new javax.swing.JTextField();
         addGenreButton = new javax.swing.JButton();
         deleteGenreButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        openErrorLogButton = new javax.swing.JButton();
+        openEventLogButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        debugCheckBox = new javax.swing.JCheckBox();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        clearEventLogButton = new javax.swing.JButton();
+        clearErrorLogButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
         setResizable(false);
 
-        debugCheckBox.setText("Debug Mode");
-
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         jLabel1.setText("Genres:");
 
-        genreList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        genreList.setModel(getGenreListModel());
+        genreList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        genreList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                genreListMouseClicked(evt);
+            }
         });
         jScrollPane1.setViewportView(genreList);
+
+        genreTextField.setMaximumSize(new java.awt.Dimension(10, 26));
 
         addGenreButton.setText("Add");
         addGenreButton.addActionListener(new java.awt.event.ActionListener() {
@@ -64,6 +123,165 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(genreTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 66, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(addGenreButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteGenreButton)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Genres", jPanel1);
+
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        jLabel2.setText("Debugging");
+
+        openErrorLogButton.setText("Open Error Log");
+        openErrorLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openErrorLogButtonActionPerformed(evt);
+            }
+        });
+
+        openEventLogButton.setText("Open Event Log");
+        openEventLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openEventLogButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        jLabel3.setText("Logging");
+
+        debugCheckBox.setSelected(getDebugMode());
+        debugCheckBox.setText("Enable Enhanced Debugging");
+        debugCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                debugCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel4.setText(System.getProperty("user.home") + "/Library/Application Support/Moose/Logs/errorLog.log");
+        jLabel4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        jLabel5.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel5.setText(System.getProperty("user.home") + "/Library/Application Support/Moose/Logs/eventLog.log");
+        jLabel5.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        clearEventLogButton.setText("Clear Event Log");
+        clearEventLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearEventLogButtonActionPerformed(evt);
+            }
+        });
+
+        clearErrorLogButton.setText("Clear Error Log");
+        clearErrorLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearErrorLogButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(openEventLogButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                        .addComponent(clearEventLogButton))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(debugCheckBox, javax.swing.GroupLayout.Alignment.LEADING))
+                            .addComponent(jLabel3))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(clearErrorLogButton)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(debugCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(openEventLogButton)
+                    .addComponent(clearEventLogButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(openErrorLogButton)
+                    .addComponent(clearErrorLogButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addContainerGap(177, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Logging", jPanel2);
+
+        saveButton.setText("Save");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Set Defaults");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -71,47 +289,394 @@ public class SettingsFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(debugCheckBox)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(addGenreButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(deleteGenreButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(saveButton)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(75, 75, 75)
-                .addComponent(debugCheckBox)
-                .addGap(87, 87, 87)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(addGenreButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteGenreButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveButton)
+                    .addComponent(jButton4))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Event for addButton 
+     * Checks if you're adding a new value or editing an existing value
+     * @param evt
+     */
     private void addGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGenreButtonActionPerformed
-        // TODO add your handling code here:
+        if (addGenreButton.getText().equals("Add")) {
+            addGenreToList(genreTextField.getText());
+        } else if (addGenreButton.getText().equals("Submit")) {
+            submitGenreChange(genreList.getSelectedValue(), genreTextField.getText());
+        }
     }//GEN-LAST:event_addGenreButtonActionPerformed
 
+    /**
+     * Event for deleteButton
+     * @param evt 
+     */
     private void deleteGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteGenreButtonActionPerformed
-        // TODO add your handling code here:
+        removeGenreFromList(genreTextField.getText());
     }//GEN-LAST:event_deleteGenreButtonActionPerformed
+
+    /**
+     * Event for the debuggingmode checkbox
+     * @param evt 
+     */
+    private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
+        setDebugMode(debugCheckBox.isSelected());
+    }//GEN-LAST:event_debugCheckBoxActionPerformed
+
+    /**
+     * Event for the default button
+     * @param evt 
+     */
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        setDefaults();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    /**
+     * Event for the save button
+     * @param evt 
+     */
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        writeSettingsFile(debugMode, genres);
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    /**
+     * Event for the JList click
+     * Sets the value of the text field and changes the button text to reflect the current action
+     * @param evt 
+     */
+    private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
+        addGenreButton.setText("Submit");
+        genreTextField.setText(genreList.getSelectedValue());
+    }//GEN-LAST:event_genreListMouseClicked
+
+    /**
+     * Event for the open eventlog button
+     * @param evt 
+     */
+    private void openEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openEventLogButtonActionPerformed
+        openEventLog();
+    }//GEN-LAST:event_openEventLogButtonActionPerformed
+
+    /**
+     * Event for the open errorlog button
+     * @param evt 
+     */
+    private void openErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openErrorLogButtonActionPerformed
+        openErrorLog();
+    }//GEN-LAST:event_openErrorLogButtonActionPerformed
+
+    /**
+     * Event for the clear eventlog button
+     * @param evt 
+     */
+    private void clearEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearEventLogButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to clear the event log?", 
+                "Confirm Clear", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        if(returnVal == 0) {
+            clearEventLog();
+        }
+    }//GEN-LAST:event_clearEventLogButtonActionPerformed
+
+    /**
+     * Event for the clear errorlog button
+     * @param evt 
+     */
+    private void clearErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearErrorLogButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to clear the error log?", 
+                "Confirm Clear", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        if(returnVal == 0) {
+            clearErrorLog();
+        }
+    }//GEN-LAST:event_clearErrorLogButtonActionPerformed
+
+    /**
+     * Gets the list of genres and fill a DefaultListModel for the view
+     * @return the listModel for the JList
+     */
+    public DefaultListModel getGenreListModel() {
+        if (genres != null) {
+            for (int i = 0; i < genres.size(); i++) {
+                genreListModel.add(i, genres.get(i));
+            }
+            return genreListModel;
+        } else {
+            return new DefaultListModel();
+        }
+    }
+    
+    /**
+     * Sets the settings.conf file to default values
+     */
+    public void setDefaults() {
+        debugMode = false;
+        genres = new ArrayList<>();
+        genres.add("Indie Electronic");
+        genres.add("Rock");
+        genres.add("Electronic/Rock");
+
+        writeSettingsFile(debugMode, genres);
+    }
+
+    /**
+     * Opens the event log
+     */
+    public void openEventLog() {
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            if (Main.logger.eventLog.exists()) {
+                desktop.open(Main.logger.eventLog);
+            }
+        } catch (IOException ex) {
+            Main.logger.logError("Couldn't open the event log!", ex);
+        }
+    }
+
+    /**
+     * Opens the error log
+     */
+    public void openErrorLog() {
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            if (Main.logger.errorLog.exists()) {
+                desktop.open(Main.logger.errorLog);
+            }
+        } catch (IOException ex) {
+            Main.logger.logError("Couldn't open the event log!", ex);
+        }
+    }
+
+    /**
+     * Clears the event log
+     */
+    public void clearEventLog() {
+        if (Main.logger.eventLog.exists()) {
+            Main.logger.eventLog.delete();
+        }
+        try {
+            Main.logger.eventLog.createNewFile();
+        } catch (IOException e) {
+            Main.logger.logError("Couldn't clear the event log!", e);
+        }
+    }
+
+    /**
+     * Clears the error log
+     */
+    public void clearErrorLog() {
+        if (Main.logger.errorLog.exists()) {
+            Main.logger.errorLog.delete();
+        }
+        try {
+            Main.logger.errorLog.createNewFile();
+        } catch (IOException e) {
+            Main.logger.logError("Couldn't clear the error log!", e);
+        }
+    }
+
+    /**
+     * Adds the genre to the ivar list and the JList model
+     * @param genre the genre to add
+     */
+    public void addGenreToList(String genre) {
+        genres.add(genre);
+        genreListModel.add(genreListModel.size(), genre);
+    }
+
+    /**
+     * Removes the genre from the ivar list and the JList model
+     * @param genre 
+     */
+    public void removeGenreFromList(String genre) {
+
+        // check if that element is actually in the list
+        boolean result = genreListModel.removeElement(genre);
+        if (!result) {
+            JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            genres.remove(genre);
+            genreTextField.setText("");
+        }
+    }
+
+    /**
+     * Submits the change in the list and in the arraylist
+     * @param oldGenre
+     * @param newGenre 
+     */
+    public void submitGenreChange(String oldGenre, String newGenre) {
+        genres.set(genres.indexOf(oldGenre), newGenre);
+        genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
+        genreTextField.setText("");
+        addGenreButton.setText("Add");
+    }
+
+    /**
+     * Fills the settings file with some default values
+     */
+    public void fillDefaults() {
+        String defDebug = "DEBUGMODE=false";
+        String defGenres = "GENRES={Indie Electronic,Rock,Electronic/Rock}";
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
+
+            bufferedWriter.write(defDebug);
+            bufferedWriter.write("\n");
+            bufferedWriter.write(defGenres);
+
+        } catch (FileNotFoundException ex) {
+            Main.logger.logError("Couldn't find settings file!", ex);
+        } catch (IOException ex) {
+            Main.logger.logError("Error reading settings file!", ex);
+        }
+    }
+
+    /**
+     * Reads the settings from the file and sets the ivars
+     */
+    public void readSettingsFile() {
+        String line;
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(settings));
+
+            while ((line = bufferedReader.readLine()) != null) {
+
+                // get the debugmode field
+                if (line.contains("DEBUGMODE=")) {
+                    setDebugMode((line.contains("true")));
+                }
+
+                // get the genres
+                if (line.contains("GENRES=")) {
+                    setGenres(line);
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Main.logger.logError("Couldn't find settings file!", ex);
+        } catch (IOException ex) {
+            Main.logger.logError("Error reading settings file!", ex);
+        }
+    }
+
+    /**
+     * Writes the settings file from the ivars that were set in the program
+     * @param debugMode
+     * @param genres 
+     */
+    public void writeSettingsFile(boolean debugMode, ArrayList<String> genres) {
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
+
+            bufferedWriter.write("DEBUGMODE=" + debugMode);
+            bufferedWriter.write("\n");
+            bufferedWriter.write("GENRES=" + listGenres(genres));
+            bufferedWriter.flush();
+
+        } catch (FileNotFoundException ex) {
+            Main.logger.logError("Couldn't find settings file!", ex);
+        } catch (IOException ex) {
+            Main.logger.logError("Error reading settings file!", ex);
+        }
+    }
+
+    /**
+     * Lists the genres in a string form
+     * @param genres
+     * @return 
+     */
+    public String listGenres(ArrayList<String> genres) {
+        String str = "{";
+        for (int i = 0; i < genres.size(); i++) {
+            str = str + genres.get(i);
+            if (i < genres.size() - 1) {
+                str = str + ",";
+            } else {
+                str = str + "}";
+            }
+        }
+        return str;
+    }
+
+    /**
+     * Sets the debugmode
+     * @param bool 
+     */
+    public void setDebugMode(boolean bool) {
+        this.debugMode = bool;
+    }
+
+    /**
+     * Returns the debugmode
+     * @return 
+     */
+    public boolean getDebugMode() {
+        return debugMode;
+    }
+
+    /**
+     * Sets the genre arraylist
+     * @param arr 
+     */
+    public void setGenres(ArrayList<String> arr) {
+        this.genres = arr;
+    }
+
+    /**
+     * Returns the genre arraylist
+     * @return 
+     */
+    public ArrayList<String> getGenres() {
+        return genres;
+    }
+
+    /**
+     * Sets the Genres arraylist from a String
+     * @param line 
+     */
+    public void setGenres(String line) {
+
+        // remove the garbage from the string
+        line = line.replace("GENRES=", "");
+        line = line.replace("{", "");
+        line = line.replace("}", "");
+
+        // split the string based on a comma
+        String[] genresArray = line.split(",");
+
+        // clear the genres arraylist
+        genres.clear();
+
+        // convert that array to an arraylist
+        genres.addAll(Arrays.asList(genresArray));
+    }
 
     /**
      * @param args the command line arguments
@@ -142,17 +707,31 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new SettingsFrame().setVisible(true);
+            //new SettingsFrame().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addGenreButton;
+    private javax.swing.JButton clearErrorLogButton;
+    private javax.swing.JButton clearEventLogButton;
     private javax.swing.JCheckBox debugCheckBox;
     private javax.swing.JButton deleteGenreButton;
     private javax.swing.JList<String> genreList;
     private javax.swing.JTextField genreTextField;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton openErrorLogButton;
+    private javax.swing.JButton openEventLogButton;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 }
