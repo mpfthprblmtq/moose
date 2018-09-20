@@ -2008,6 +2008,7 @@ public class Frame extends javax.swing.JFrame {
                 if (table.getValueAt(i, j).toString().contains(find)) {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
                     table.setValueAt(toReplace, i, j);
+                    songEdited(table.convertRowIndexToModel(i));
                     count++;
                 }
             }
