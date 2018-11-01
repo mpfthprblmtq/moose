@@ -613,12 +613,15 @@ public class SettingsFrame extends javax.swing.JFrame {
     public void fillDefaults() {
         String defDebug = "DEBUGMODE=false";
         String defGenres = "GENRES={Indie Electronic,Rock,Electronic/Rock}";
+        String defLibraryLocation = "LIBRARYLOCATION=";
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
 
             bufferedWriter.write(defDebug);
             bufferedWriter.write("\n");
             bufferedWriter.write(defGenres);
+            bufferedWriter.write("\n");
+            bufferedWriter.write(defLibraryLocation);
 
         } catch (FileNotFoundException ex) {
             Main.logger.logError("Couldn't find settings file!", ex);
@@ -649,7 +652,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 
                 // get the library location
                 if(line.contains("LIBRARYLOCATION=")) {
-                    setLibraryLocation(line.replace("LIBRARYLOCATION=", ""));
+                    setLibraryLocation(line.replace("LIBRARYLOCATION=", "") + "/");
                 }
             }
 
