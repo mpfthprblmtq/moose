@@ -4,7 +4,6 @@
  *
  *  Copyright Pat Ripley 2018
  */
-
 // package
 package moose;
 
@@ -81,6 +80,48 @@ public class Frame extends javax.swing.JFrame {
      * Creates new form Frame
      */
     public Frame() {
+        // init the components
+        // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
+        if (SwingUtilities.isEventDispatchThread()) {
+            initComponents();
+            init();
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                initComponents();
+                init();
+            });
+        }
+    }
+
+    /**
+     * Creates new form Frame with a
+     * @param folder, the folder we want to start with
+     */
+    public Frame(File folder) {
+        // init the components
+        // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
+        if (SwingUtilities.isEventDispatchThread()) {
+            initComponents();
+            init();
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                initComponents();
+                init();
+            });
+        }
+        
+        
+        ArrayList<File> files = new ArrayList<>();
+        files = listFiles(folder, files);
+        for (File file : files) {
+            addFileToTable(file);
+        }
+    }
+
+    public void init() {
+        
+        // set the table's model to the custom model
+        table.setModel(model);
 
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -112,14 +153,7 @@ public class Frame extends javax.swing.JFrame {
                     break;
             }
         }; // end menuListener
-
-        // init the components
-        initComponents();
-
-        // manual init'ing of components
-        // set the model to the table's model
-        model = (DefaultTableModel) table.getModel();
-
+        
         // create the columns
         model.addColumn("");
         model.addColumn("File");
@@ -150,7 +184,7 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
-        
+
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (java.io.File[] files) -> {
 
@@ -802,7 +836,7 @@ public class Frame extends javax.swing.JFrame {
             } catch (NullPointerException ex) {
                 System.err.println(ex);
             }
-            
+
             // add the row to the table
             model.addRow(new Object[]{
                 new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
@@ -921,7 +955,6 @@ public class Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
         container = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
@@ -961,16 +994,14 @@ public class Frame extends javax.swing.JFrame {
         viewMenu = new javax.swing.JMenu();
         refreshMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
         addCoversMenuItem = new javax.swing.JMenuItem();
         findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
         formatFilenamesMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
-        creditsMenuItem = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
-
-        jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Moose");
@@ -1098,7 +1129,6 @@ public class Frame extends javax.swing.JFrame {
         multImage.setIconTextGap(0);
         multImage.setMaximumSize(new java.awt.Dimension(156, 156));
         multImage.setMinimumSize(new java.awt.Dimension(156, 156));
-        multImage.setPreferredSize(new java.awt.Dimension(156, 156));
         multImage.setRequestFocusEnabled(false);
         multImage.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -1231,7 +1261,7 @@ public class Frame extends javax.swing.JFrame {
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
                     .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableSP, javax.swing.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+                .addComponent(tableSP)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(multPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1277,7 +1307,15 @@ public class Frame extends javax.swing.JFrame {
 
         jMenuBar1.add(viewMenu);
 
-        macroMenu.setText("Macros");
+        macroMenu.setText("Actions");
+
+        jMenuItem2.setText("Audit...");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        macroMenu.add(jMenuItem2);
 
         addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         addCoversMenuItem.setText("Add Covers");
@@ -1319,14 +1357,6 @@ public class Frame extends javax.swing.JFrame {
             }
         });
         helpMenu.add(aboutMenuItem);
-
-        creditsMenuItem.setText("Credits");
-        creditsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                creditsMenuItemActionPerformed(evt);
-            }
-        });
-        helpMenu.add(creditsMenuItem);
 
         settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_MASK));
         settingsMenuItem.setText("Preferences");
@@ -1634,13 +1664,13 @@ public class Frame extends javax.swing.JFrame {
         showAboutDialog();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
-    private void creditsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_creditsMenuItemActionPerformed
-        showCreditsDialog();
-    }//GEN-LAST:event_creditsMenuItemActionPerformed
-
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
         Main.launchSettingsFrame();
     }//GEN-LAST:event_settingsMenuItemActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        Main.launchAuditFrame();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * Show the about dialog, includes name, version, and copyright
@@ -1650,53 +1680,6 @@ public class Frame extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null,
                 "Moose\nVersion: " + version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
-    }
-
-    /**
-     * Show the totally legit credits
-     */
-    public void showCreditsDialog() {
-        JOptionPane.showMessageDialog(null,
-                "Wi not trei a holiday in Sweeden this yer ?\n"
-                + "\n"
-                + "See the loveli lakes\n"
-                + "\n"
-                + "The wonderful telephone system\n"
-                + "\n"
-                + "And mani interesting furry animals\n"
-                + "\n"
-                + "Including the majestic moose\n"
-                + "\n"
-                + "A moose once bit my sister...\n"
-                + "\n"
-                + "No realli! She was Karving her initials on the moose with the sharpened end\n"
-                + "of an interspace toothbrush given her by Svenge - her brother-in-law - an\n"
-                + "Oslo dentist and star of many Norwegian movies: \"The Hot Hands of an Oslo\n"
-                + "Dentist\", \"Fillings of Passion\", \"The Huge Molars of Horst Nordfink\"...\n"
-                + "\n"
-                + "Mynd you, moose bites Kan be pretti nasti..."
-                + "\n\n"
-                + "\nMoose Trained by Yutte Hermsgervordenbroti\n"
-                + "\n"
-                + "Special Moose Effects Olaf Prot\n"
-                + "\n"
-                + "Moose Costumes Siggi Churchill\n"
-                + "\n"
-                + "Moose choerographed by Horst Prot III\n"
-                + "\n"
-                + "Miss Taylor's Mooses by Hengst Douglas-Home\n"
-                + "\n"
-                + "Moose trained to mix concrete and sign complicated insurance forms by Jurgan Wigg\n"
-                + "\n"
-                + "Mooses noses wiped by Bjorn Irkestom-Slater\n"
-                + "\n"
-                + "Large moose on the left hand side of the screen in the third scene from the end, given"
-                + "\na therough grounding in Latin, French, and 'O' level geography by Bo Benn\n"
-                + "\n"
-                + "Suggestive poses for the moose suggested by Vic Rotter\n"
-                + "\n"
-                + "Antler-care by Liv Thatcher",
-                "Credits", JOptionPane.PLAIN_MESSAGE);
     }
 
     /**
@@ -2375,7 +2358,10 @@ public class Frame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            //new Frame().setVisible(true);
+//            //new Frame().setVisible(true);
+//            Frame frame = new Frame();
+//            frame.setLocationRelativeTo(null);
+//            frame.setVisible(true);
         });
     }
 
@@ -2395,16 +2381,15 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JTextArea console;
     private javax.swing.JScrollPane consoleSP;
     private javax.swing.JPanel container;
-    private javax.swing.JMenuItem creditsMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem findAndReplaceMenuItem;
     private javax.swing.JMenuItem formatFilenamesMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;

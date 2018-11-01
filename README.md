@@ -27,12 +27,16 @@ Once built, you can run the terminal-commands file to package the app into a .pk
 
 ## Changelog
 
-### 1.0.2 or 1.1.0
+### 1.0.2 (The logging update)
 
 **Release Date:** UPCOMING
 
 - Settings menu
-  - Minor code improvements
+  - Log Files interaction ability
+  - Setting library location
+  - Genres list (functionality slated for future release)
+- Better logging on front end
+- Minor code improvements
 
 ## 1.0.1
 
