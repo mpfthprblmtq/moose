@@ -608,11 +608,19 @@ public class AuditFrame extends javax.swing.JFrame {
         }
 
         // sort them alphabetically
-        Collections.sort(albums, (File o1, File o2) -> {
-            String filename1 = o1.getPath().replace("/Users/pat/Music/Library/", "");
-            String filename2 = o2.getPath().replace("/Users/pat/Music/Library/", "");
-            return filename1.compareToIgnoreCase(filename2);
-        });
+        if (!logger.libraryLocation.equals("") || logger.libraryLocation != null) {
+            Collections.sort(albums, (File o1, File o2) -> {
+                //String filename1 = o1.getPath().replace("/Users/pat/Music/Library/", "");
+                //String filename2 = o2.getPath().replace("/Users/pat/Music/Library/", "");
+                //String filename1 = o1.getPath().replace(logger.libraryLocation, "");
+                //String filename2 = o2.getPath().replace(logger.libraryLocation, "");
+                String filename1 = o1.getPath().replace(auditFolder.getPath(), "");
+                String filename2 = o2.getPath().replace(auditFolder.getPath(), "");
+                return filename1.compareToIgnoreCase(filename2);
+            });
+        } else {
+
+        }
     }
 
     /**
