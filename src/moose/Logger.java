@@ -27,15 +27,19 @@ public class Logger {
     
     File errorLog;
     File eventLog;
+    
+    public String appSupportPath;
 
     // current date
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     Date date;
 
     public Logger() {
+        
+        this.appSupportPath = System.getProperty("user.home") + "/Library/Application Support/Moose/";
 
         // create the logging directory if it doesn't already exist
-        String logsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/Logs/";
+        String logsDir_path = appSupportPath + "Logs/";
         File logsDir = new File(logsDir_path);
         if (!logsDir.exists()) {
             logsDir.mkdirs();
@@ -94,6 +98,23 @@ public class Logger {
         // output the statement
         System.out.printf("%-21s %s", dateStr, str + "\n");
         System.out.printf("%-21s %s", "", "Exception details:  " + ex.toString() + ", " + ex.getStackTrace()[0] + "\n");
+    }
+    
+    /**
+     * Method that actually does the logging for errors
+     * @param str the localized string
+     */
+    public void logError(String str) {
+
+        // get the date to format it
+        date = new Date();
+        String dateStr = "[" + sdf.format(date) + "]";
+        
+        // set the System.out stream to error
+        System.setOut(errorStream);
+        
+        // output the statement
+        System.out.printf("%-21s %s", dateStr, str + "\n");
     }
     
     /**
