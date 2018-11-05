@@ -485,11 +485,11 @@ public class AuditFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_analyzeButtonActionPerformed
 
     private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
-        // TODO add your handling code here:
+        deleteAll();
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
     private void deleteSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSelectedButtonActionPerformed
-        // TODO add your handling code here:
+        deleteSelected();
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
     private void viewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewResultsButtonActionPerformed
@@ -686,6 +686,49 @@ public class AuditFrame extends javax.swing.JFrame {
         startButton.setEnabled(false);
         stopButton.setEnabled(false);
         this.requestFocus();
+    }
+
+    public void deleteAll() {
+        for (ArrayList list : filePathList) {
+            deleteAllFilesInList(list);
+        }
+        analyze();
+    }
+
+    public void deleteSelected() {
+        if(mp3asdCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(0));
+        }
+        if(flacCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(1));
+        }
+        if(wavCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(2));
+        }
+        if(zipCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(3));
+        }
+        if(imagesCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(4));
+        }
+        if(windowsCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(5));
+        }
+        if(everythingElseCheckBox.isSelected()) {
+            deleteAllFilesInList(filePathList.get(6));
+        }
+        analyze();
+    }
+
+    public void deleteAllFilesInList(ArrayList<String> list) {
+        for (String path : list) {
+            File file = new File(path);
+            if(file.exists()) {
+                file.delete();
+            } else {
+                logger.logError("Tried to delete file in cleanup, but couldn't!");
+            }
+        }
     }
 
     // TODO check if this is the actual functionality
