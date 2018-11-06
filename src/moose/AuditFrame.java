@@ -861,57 +861,72 @@ public class AuditFrame extends javax.swing.JFrame {
      * Deletes all files in the filePathList arraylist
      */
     public void deleteAll() {
-        filePathList.forEach((list) -> {
-            deleteAllFilesInList(list);
-        });
-        // clear all the lists to reset counts
-        clearLists();
-        // reset the statistics
-        analyze();
-    }
-    
-    /**
-     * Helper function to clear all sublists in filePathlist
-     */
-    public void clearLists() {
-        filePathList.get(0).clear();
-        filePathList.get(1).clear();
-        filePathList.get(2).clear();
-        filePathList.get(3).clear();
-        filePathList.get(4).clear();
-        filePathList.get(5).clear();
-        filePathList.get(6).clear();
+        if(!isFilePathListEmpty()) {
+            filePathList.forEach((list) -> {
+                deleteAllFilesInList(list);
+            });
+            // clear all the lists to reset counts
+            clearLists();
+            // reset the statistics
+            analyze();
+        } else {
+            // show that there's nothing to delete
+            JOptionPane.showMessageDialog(this, "Delete All", "Nothing to Delete!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     /**
      * Deletes only the checked file types
      */
     public void deleteSelected() {
+
+        boolean nothingToDelete = true;
+
         if (mp3asdCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(0).isEmpty();
             deleteAllFilesInList(filePathList.get(0));
+            filePathList.get(0).clear();
         }
         if (flacCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(1).isEmpty();
             deleteAllFilesInList(filePathList.get(1));
+            filePathList.get(1).clear();
         }
         if (wavCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(2).isEmpty();
             deleteAllFilesInList(filePathList.get(2));
+            filePathList.get(2).clear();
         }
         if (zipCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(3).isEmpty();
             deleteAllFilesInList(filePathList.get(3));
+            filePathList.get(3).clear();
         }
         if (imagesCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(4).isEmpty();
             deleteAllFilesInList(filePathList.get(4));
+            filePathList.get(4).clear();
         }
         if (windowsCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(5).isEmpty();
             deleteAllFilesInList(filePathList.get(5));
+            filePathList.get(5).clear();
         }
         if (everythingElseCheckBox.isSelected()) {
+            nothingToDelete = filePathList.get(6).isEmpty();
             deleteAllFilesInList(filePathList.get(6));
+            filePathList.get(6).clear();
         }
-        // clear all the lists to reset counts
-        clearLists();
-        // reset the statistics
-        analyze();
+
+        if(nothingToDelete) {
+            // show that there's nothing to delete
+            JOptionPane.showMessageDialog(this, "Delete Selected", "Nothing to Delete!", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // clear all the lists to reset counts
+            clearLists();
+            // reset the statistics
+            analyze();
+        }
     }
 
     /**
@@ -927,6 +942,32 @@ public class AuditFrame extends javax.swing.JFrame {
                 logger.logError("Tried to delete file in cleanup, but couldn't!");
             }
         });
+    }
+
+    /**
+     * Helper function to clear all sublists in filePathlist
+     */
+    public void clearLists() {
+        filePathList.get(0).clear();
+        filePathList.get(1).clear();
+        filePathList.get(2).clear();
+        filePathList.get(3).clear();
+        filePathList.get(4).clear();
+        filePathList.get(5).clear();
+        filePathList.get(6).clear();
+    }
+
+    /**
+     * Helper function to check if any of the lists are empty
+     */
+    public boolean isFilePathListEmpty() {
+        return (!filePathList.get(0).isEmpty()
+                || !filePathList.get(1).isEmpty()
+                || !filePathList.get(2).isEmpty()
+                || !filePathList.get(3).isEmpty()
+                || !filePathList.get(4).isEmpty()
+                || !filePathList.get(5).isEmpty()
+                || !filePathList.get(6).isEmpty());
     }
 
     /**
@@ -1166,8 +1207,9 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void analyze() {
 
-        // let's count the mp3s, cause why not
+        // let's count the mp3s and covers, cause why not
         int mp3Count = 0;
+        int coverCount = 0;
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
@@ -1183,6 +1225,8 @@ public class AuditFrame extends javax.swing.JFrame {
             // add it to the specified sublist
             if (filename.endsWith(".mp3")) {
                 mp3Count++;
+            } else if (filename.startsWith("cover.")) {
+                coverCount++;
             } else if (filename.endsWith(".mp3.asd")) {
                 filePathList.get(0).add(file.getPath());
             } else if (filename.endsWith(".flac")) {
@@ -1209,6 +1253,7 @@ public class AuditFrame extends javax.swing.JFrame {
         // update the results
         resultsTextArea.setText(
                 "MP3 Files:     " + mp3Count + "\n"
+                + "Cover Files:   " + coverCount + "\n"
                 + "ZIP Files:     " + filePathList.get(3).size() + "\n"
                 + "ASD Files:     " + filePathList.get(0).size() + "\n"
                 + "WAV Files:     " + filePathList.get(2).size() + "\n"
