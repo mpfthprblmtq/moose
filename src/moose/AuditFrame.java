@@ -5,8 +5,6 @@
  */
 package moose;
 
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
@@ -40,12 +38,12 @@ public class AuditFrame extends javax.swing.JFrame {
 
     // Arraylist for files found
     ArrayList<ArrayList<String>> filePathList = new ArrayList<>(Arrays.asList(
-            new ArrayList<>(),      // mp3.asd
-            new ArrayList<>(),      // flac
-            new ArrayList<>(),      // wav
-            new ArrayList<>(),      // zip
-            new ArrayList<>(),      // image files
-            new ArrayList<>(),      // windows files
+            new ArrayList<>(), // mp3.asd
+            new ArrayList<>(), // flac
+            new ArrayList<>(), // wav
+            new ArrayList<>(), // zip
+            new ArrayList<>(), // image files
+            new ArrayList<>(), // windows files
             new ArrayList<>()));    // other files
 
     /**
@@ -432,6 +430,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the next folder/album button press
+     *
      * @param evt
      */
     private void nextFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextFolderButtonActionPerformed
@@ -440,6 +439,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the previous folder/album button press
+     *
      * @param evt
      */
     private void previousFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousFolderButtonActionPerformed
@@ -448,6 +448,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the choose folder button press
+     *
      * @param evt
      */
     private void chooseFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFolderButtonActionPerformed
@@ -459,6 +460,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the start audit button press
+     *
      * @param evt
      */
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
@@ -472,6 +474,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the stop audit button press
+     *
      * @param evt
      */
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
@@ -481,6 +484,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the clear button press, which clears the results text area
+     *
      * @param evt
      */
     private void clearResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearResultsButtonActionPerformed
@@ -489,6 +493,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the analyze button press
+     *
      * @param evt
      */
     private void analyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analyzeButtonActionPerformed
@@ -510,22 +515,41 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Handles the delete all button press
+     *
      * @param evt
      */
     private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
-        deleteAll();
+        int returnVal = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to delete all extra files?", 
+                "Confirm Delete", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        if(returnVal == 0) {
+            deleteAll();
+        }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
     /**
      * Handles the delete selected button press
+     *
      * @param evt
      */
     private void deleteSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSelectedButtonActionPerformed
-        deleteSelected();
+        int returnVal = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to delete the selected extra files?", 
+                "Confirm Delete", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        if(returnVal == 0) {
+            deleteAll();
+        }
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
     /**
      * Handles the view results button press
+     *
      * @param evt
      */
     private void viewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewResultsButtonActionPerformed
@@ -542,8 +566,13 @@ public class AuditFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_viewResultsButtonActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        resetAuditFrame();
+    }//GEN-LAST:event_formWindowClosed
+
     /**
-     * Refreshes the three checks and the current directory when a new album is loaded
+     * Refreshes the three checks and the current directory when a new album is
+     * loaded
      */
     public void refreshAuditFrame() {
         if (checkID3Tags()) {
@@ -584,7 +613,8 @@ public class AuditFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Creates a master list of files from the audit folder, then imports all the albums into the albums ivar list
+     * Creates a master list of files from the audit folder, then imports all
+     * the albums into the albums ivar list
      */
     public void importAlbums() {
 
@@ -608,24 +638,17 @@ public class AuditFrame extends javax.swing.JFrame {
         }
 
         // sort them alphabetically
-        if (!logger.libraryLocation.equals("") || logger.libraryLocation != null) {
-            Collections.sort(albums, (File o1, File o2) -> {
-                //String filename1 = o1.getPath().replace("/Users/pat/Music/Library/", "");
-                //String filename2 = o2.getPath().replace("/Users/pat/Music/Library/", "");
-                //String filename1 = o1.getPath().replace(logger.libraryLocation, "");
-                //String filename2 = o2.getPath().replace(logger.libraryLocation, "");
-                String filename1 = o1.getPath().replace(auditFolder.getPath(), "");
-                String filename2 = o2.getPath().replace(auditFolder.getPath(), "");
-                return filename1.compareToIgnoreCase(filename2);
-            });
-        } else {
-
-        }
+        Collections.sort(albums, (File o1, File o2) -> {
+            String filename1 = o1.getPath().replace(auditFolder.getPath(), "");
+            String filename2 = o2.getPath().replace(auditFolder.getPath(), "");
+            return filename1.compareToIgnoreCase(filename2);
+        });
     }
 
     /**
-     * Called from the start audit button press
-     * Checks if an audit is already in process first, then user decides to either start a new audit or continue that existing audit
+     * Called from the start audit button press Checks if an audit is already in
+     * process first, then user decides to either start a new audit or continue
+     * that existing audit
      */
     public void startAudit() {
 
@@ -809,8 +832,28 @@ public class AuditFrame extends javax.swing.JFrame {
         nextFolderButton.setEnabled(false);
         currentDirLabel.setText("");
         pathLabel.setText("");
+        resultsTextArea.setText("");
         startButton.setEnabled(false);
         stopButton.setEnabled(false);
+        analyzeButton.setEnabled(false);
+        clearResultsButton.setEnabled(false);
+        viewResultsButton.setEnabled(false);
+        deleteAllButton.setEnabled(false);
+        deleteSelectedButton.setEnabled(false);
+        mp3asdCheckBox.setSelected(false);
+        mp3asdCheckBox.setEnabled(false);
+        wavCheckBox.setSelected(false);
+        wavCheckBox.setEnabled(false);
+        flacCheckBox.setSelected(false);
+        flacCheckBox.setEnabled(false);
+        zipCheckBox.setSelected(false);
+        zipCheckBox.setEnabled(false);
+        windowsCheckBox.setSelected(false);
+        windowsCheckBox.setEnabled(false);
+        everythingElseCheckBox.setSelected(false);
+        everythingElseCheckBox.setEnabled(false);
+        imagesCheckBox.setSelected(false);
+        imagesCheckBox.setEnabled(false);
         this.requestFocus();
     }
 
@@ -818,69 +861,92 @@ public class AuditFrame extends javax.swing.JFrame {
      * Deletes all files in the filePathList arraylist
      */
     public void deleteAll() {
-        for (ArrayList list : filePathList) {
+        filePathList.forEach((list) -> {
             deleteAllFilesInList(list);
-        }
+        });
+        // clear all the lists to reset counts
+        clearLists();
         // reset the statistics
         analyze();
+    }
+    
+    /**
+     * Helper function to clear all sublists in filePathlist
+     */
+    public void clearLists() {
+        filePathList.get(0).clear();
+        filePathList.get(1).clear();
+        filePathList.get(2).clear();
+        filePathList.get(3).clear();
+        filePathList.get(4).clear();
+        filePathList.get(5).clear();
+        filePathList.get(6).clear();
     }
 
     /**
      * Deletes only the checked file types
      */
     public void deleteSelected() {
-        if(mp3asdCheckBox.isSelected()) {
+        if (mp3asdCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(0));
         }
-        if(flacCheckBox.isSelected()) {
+        if (flacCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(1));
         }
-        if(wavCheckBox.isSelected()) {
+        if (wavCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(2));
         }
-        if(zipCheckBox.isSelected()) {
+        if (zipCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(3));
         }
-        if(imagesCheckBox.isSelected()) {
+        if (imagesCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(4));
         }
-        if(windowsCheckBox.isSelected()) {
+        if (windowsCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(5));
         }
-        if(everythingElseCheckBox.isSelected()) {
+        if (everythingElseCheckBox.isSelected()) {
             deleteAllFilesInList(filePathList.get(6));
         }
+        // clear all the lists to reset counts
+        clearLists();
         // reset the statistics
         analyze();
     }
 
     /**
      * Helper function used to delete files in a specific list
+     *
      * @param list
      */
     public void deleteAllFilesInList(ArrayList<String> list) {
-        for (String path : list) {
-            File file = new File(path);
-            if(file.exists()) {
+        list.stream().map((path) -> new File(path)).forEachOrdered((file) -> {
+            if (file.exists()) {
                 file.delete();
             } else {
                 logger.logError("Tried to delete file in cleanup, but couldn't!");
             }
-        }
+        });
     }
 
     /**
-     * Checks to see if in the audit folder there exists a done file in any of its subfolders
-     * @return the result of the check, true for existing audit, false for no existing audit
+     * Checks to see if in the audit folder there exists a done file in any of
+     * its subfolders
+     *
+     * @return the result of the check, true for existing audit, false for no
+     * existing audit
      */
     public boolean checkForExisitingAudit() {
         return albums.stream().anyMatch((album) -> (containsFile(album)));
     }
 
     /**
-     * Helper function used to see if there's a done file in the specified folder
+     * Helper function used to see if there's a done file in the specified
+     * folder
+     *
      * @param dir, the directory to check
-     * @return the result of the search, true for file found, false for file not found
+     * @return the result of the search, true for file found, false for file not
+     * found
      */
     public boolean containsFile(File dir) {
         File[] filesInAlbum = dir.listFiles();
@@ -894,6 +960,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Function used to create a done file in the specified folder
+     *
      * @param dir, the directory to create the file in
      */
     public void setDone(File dir) {
@@ -908,6 +975,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Checks if that specified directory/album is done
+     *
      * @param dir, the directory to check
      * @return the result of the check, true for done, false for not done
      */
@@ -923,6 +991,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Gets the next album index in the albums arraylist
+     *
      * @return the int index of that album
      */
     public int getNextAlbum() {
@@ -949,7 +1018,9 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Checks the album/folder for a cover.* file (image file)
-     * @return the result of the check, true for a cover file exists, false for a cover file doesn't exist
+     *
+     * @return the result of the check, true for a cover file exists, false for
+     * a cover file doesn't exist
      */
     private boolean checkFolderCover() {
 
@@ -970,7 +1041,9 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Checks all the files in a folder for the standardized file name
-     * @return the result of the check, true if all files are good, false if one or more doesn't match
+     *
+     * @return the result of the check, true if all files are good, false if one
+     * or more doesn't match
      */
     private boolean checkFilenames() {
 
@@ -1000,7 +1073,9 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Checks all the mp3s in a folder for all the necessary id3 tags
-     * @return the result of the check, true if all mp3s are good, false if one or more doesn't have all information needed
+     *
+     * @return the result of the check, true if all mp3s are good, false if one
+     * or more doesn't have all information needed
      */
     private boolean checkID3Tags() {
 
@@ -1075,8 +1150,10 @@ public class AuditFrame extends javax.swing.JFrame {
 
     /**
      * Check if a directory is from a label
+     *
      * @param dir, the directory to check
-     * @return the result of the check, true if it is a label, false if it isn't a label
+     * @return the result of the check, true if it is a label, false if it isn't
+     * a label
      */
     public boolean isLabel(File dir) {
         String path = dir.getPath();
@@ -1084,7 +1161,8 @@ public class AuditFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Larger function used to check all the files in the auditFolder for any files that don't really belong
+     * Larger function used to check all the files in the auditFolder for any
+     * files that don't really belong
      */
     public void analyze() {
 
@@ -1120,8 +1198,8 @@ public class AuditFrame extends javax.swing.JFrame {
             } else if (filename.equals("Thumbs.db") || filename.startsWith("folder.")) {
                 filePathList.get(5).add(file.getPath());
             } else {
-                if (!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG")) 
-                        && !filename.equals("done") 
+                if (!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG"))
+                        && !filename.equals("done")
                         && !filename.equals(".DS_Store")) {
                     filePathList.get(6).add(file.getPath());
                 }
@@ -1130,7 +1208,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
         // update the results
         resultsTextArea.setText(
-                  "MP3 Files:     " + mp3Count + "\n"
+                "MP3 Files:     " + mp3Count + "\n"
                 + "ZIP Files:     " + filePathList.get(3).size() + "\n"
                 + "ASD Files:     " + filePathList.get(0).size() + "\n"
                 + "WAV Files:     " + filePathList.get(2).size() + "\n"
@@ -1158,7 +1236,7 @@ public class AuditFrame extends javax.swing.JFrame {
             // get the app support path from the logger object
             bw = new BufferedWriter(new FileWriter(logger.appSupportPath + "cleanupResults.txt"));
             bw.write("\n");
-            
+
             // zip files
             bw.write("\tZIP FILES:\n");
             bw.write("\n");
@@ -1166,7 +1244,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // mp3.asd files
             bw.write("\tMP3.ASD FILES:\n");
             bw.write("\n");
@@ -1174,7 +1252,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // wav files
             bw.write("\tWAV FILES:\n");
             bw.write("\n");
@@ -1182,7 +1260,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // flac files
             bw.write("\tFLAC FILES:\n");
             bw.write("\n");
@@ -1190,7 +1268,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // image files
             bw.write("\tIMAGE FILES:\n");
             bw.write("\n");
@@ -1198,7 +1276,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // mp3 asd files
             bw.write("\tWINDOWS FILES:\n");
             bw.write("\n");
@@ -1206,7 +1284,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
             // mp3 asd files
             bw.write("\tOTHER FILES:\n");
             bw.write("\n");
@@ -1214,12 +1292,12 @@ public class AuditFrame extends javax.swing.JFrame {
                 bw.write("\t\t" + str + "\n");
             }
             bw.write("\n");
-            
+
         } catch (IOException ex) {
             logger.logError("Couldn't create the cleanupResults.txt file", ex);
         } finally {
             // close the bufferedwriter
-            if(bw != null) {
+            if (bw != null) {
                 try {
                     bw.close();
                 } catch (IOException ex) {
