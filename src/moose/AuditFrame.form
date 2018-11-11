@@ -30,17 +30,15 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="tabbedPane" min="-2" max="-2" attributes="0"/>
                   <Component id="label1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="tabbedPane" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="pathLabel" max="32767" attributes="0"/>
-                          <Component id="chooseFolderButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="pathLabel" min="-2" pref="426" max="-2" attributes="0"/>
+                      <Component id="chooseFolderButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,7 +53,7 @@
               <Component id="chooseFolderButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
               <Component id="tabbedPane" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -80,7 +78,6 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="currentDirLabel" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -89,26 +86,28 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="ID3TagCheck" min="-2" pref="30" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label3" pref="363" max="32767" attributes="0"/>
+                              <Component id="label3" pref="364" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="filenameCheck" min="-2" pref="30" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="label4" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="startButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="stopButton" min="-2" pref="104" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <Component id="label2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="previousFolderButton" min="-2" max="-2" attributes="0"/>
+                              <Component id="previousFolderButton" min="-2" pref="149" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="nextFolderButton" min="-2" pref="143" max="-2" attributes="0"/>
+                              <Component id="nextFolderButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="currentDirLabel" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="auditAnalyzeButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="auditStartButton" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                                  <Component id="auditViewResultsButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jScrollPane2" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -119,15 +118,21 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="stopButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                          <Component id="startButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="auditAnalyzeButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="auditViewResultsButton" min="-2" pref="40" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="auditStartButton" min="-2" pref="40" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jScrollPane2" min="-2" pref="140" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="label2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="currentDirLabel" min="-2" pref="17" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -144,7 +149,7 @@
                           <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
                           <Component id="label5" min="-2" pref="30" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="93" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="previousFolderButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
                           <Component id="nextFolderButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
@@ -212,22 +217,40 @@
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="startButton">
+            <Component class="javax.swing.JButton" name="auditAnalyzeButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Perform Analysis"/>
+                <Property name="enabled" type="boolean" value="false"/>
+                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[150, 40]"/>
+                </Property>
+                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[150, 40]"/>
+                </Property>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[150, 40]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="auditAnalyzeButtonActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="auditStartButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Start Audit"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="startButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="auditStartButtonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="stopButton">
+            <Component class="javax.swing.JButton" name="auditViewResultsButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Stop Audit"/>
+                <Property name="text" type="java.lang.String" value="View Results"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stopButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="auditViewResultsButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="currentDirLabel">
@@ -248,6 +271,25 @@
                 </Property>
               </Properties>
             </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextArea" name="auditResultsTextArea">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="columns" type="int" value="20"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Monospaced" size="13" style="0"/>
+                    </Property>
+                    <Property name="rows" type="int" value="5"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="jPanel2">
@@ -265,121 +307,91 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="imagesCheckBox" alignment="0" pref="405" max="32767" attributes="0"/>
+                          <Component id="imagesCheckBox" alignment="0" pref="406" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="flacCheckBox" min="-2" pref="123" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="zipCheckBox" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="everythingElseCheckBox" min="-2" pref="146" max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="wavCheckBox" min="-2" pref="123" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="mp3asdCheckBox" max="32767" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="windowsCheckBox" min="-2" pref="140" max="-2" attributes="0"/>
+                                  </Group>
                                   <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                              <Component id="wavCheckBox" alignment="0" max="32767" attributes="0"/>
-                                              <Component id="mp3asdCheckBox" alignment="0" pref="100" max="32767" attributes="0"/>
-                                          </Group>
-                                          <Component id="flacCheckBox" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="cleanupAnalyzeButton" max="32767" attributes="0"/>
+                                          <Component id="cleanupViewResultsButton" max="32767" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="windowsCheckBox" max="32767" attributes="0"/>
-                                          <Group type="102" attributes="0">
-                                              <Component id="zipCheckBox" min="-2" pref="140" max="-2" attributes="0"/>
-                                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                          </Group>
-                                          <Component id="everythingElseCheckBox" max="32767" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="152" max="-2" attributes="0"/>
+                                      <Component id="jScrollPane1" max="32767" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="analyzeButton" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Group type="102" attributes="0">
-                                              <Component id="label6" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace min="-2" pref="120" max="-2" attributes="0"/>
-                                              <Component id="clearResultsButton" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="jScrollPane1" min="-2" pref="246" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="deleteAllButton" alignment="1" max="32767" attributes="0"/>
-                                          <Component id="deleteSelectedButton" alignment="1" max="32767" attributes="0"/>
-                                          <Component id="viewResultsButton" alignment="1" max="32767" attributes="0"/>
-                                      </Group>
+                                      <Component id="deleteSelectedButton" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="deleteAllButton" min="-2" pref="140" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                      <Component id="analyzeButton" min="-2" pref="40" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="label6" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="clearResultsButton" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
-                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="jScrollPane1" min="-2" pref="144" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="viewResultsButton" max="32767" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="deleteAllButton" min="-2" pref="40" max="-2" attributes="0"/>
+                              <Component id="cleanupAnalyzeButton" min="-2" pref="40" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="deleteSelectedButton" min="-2" pref="40" max="-2" attributes="0"/>
+                              <Component id="cleanupViewResultsButton" min="-2" pref="40" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="jScrollPane1" min="-2" pref="140" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="mp3asdCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="zipCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="wavCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="windowsCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="mp3asdCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="flacCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="everythingElseCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="zipCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="12" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="imagesCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="32" max="32767" attributes="0"/>
+                      <Component id="deleteSelectedButton" min="-2" pref="40" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="deleteAllButton" min="-2" pref="40" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JButton" name="analyzeButton">
+            <Component class="javax.swing.JButton" name="cleanupAnalyzeButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Perform Analysis"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="analyzeButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cleanupAnalyzeButtonActionPerformed"/>
               </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="clearResultsButton">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Clear"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="clearResultsButtonActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JLabel" name="label6">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Results:"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
             </Component>
             <Container class="javax.swing.JScrollPane" name="jScrollPane1">
               <Properties>
@@ -392,7 +404,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JTextArea" name="resultsTextArea">
+                <Component class="javax.swing.JTextArea" name="cleanupResultsTextArea">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
                     <Property name="columns" type="int" value="20"/>
@@ -411,50 +423,71 @@
                 <Property name="text" type="java.lang.String" value=".mp3.asd"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="mp3asdCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="wavCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value=".wav"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="wavCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="flacCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value=".flac"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="flacCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="zipCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value=".zip"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="zipCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="windowsCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Windows files"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="windowsCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="everythingElseCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Other files"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="everythingElseCheckBoxStateChanged"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="imagesCheckBox">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Images (Excludes cover art images, i.e. cover.*)"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="imagesCheckBoxStateChanged"/>
+              </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="viewResultsButton">
+            <Component class="javax.swing.JButton" name="cleanupViewResultsButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="View Results"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewResultsButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cleanupViewResultsButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="deleteAllButton">
