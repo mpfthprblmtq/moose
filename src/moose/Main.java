@@ -3,6 +3,9 @@ package moose;
 
 public class Main {
     
+    // version
+    public static String version = "1.1.0";
+    
     // create and instantiate the frames and controllers
     static Frame frame = new Frame();
     static Logger logger = new Logger();

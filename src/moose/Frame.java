@@ -29,9 +29,6 @@ import javax.swing.table.*;
 // class Frame
 public class Frame extends javax.swing.JFrame {
 
-    // version
-    String version = "1.0.1";
-
     // logger object
     Logger logger = new Logger();
 
@@ -1678,7 +1675,7 @@ public class Frame extends javax.swing.JFrame {
     public void showAboutDialog() {
         Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
-                "Moose\nVersion: " + version + "\n" + "© Pat Ripley 2018",
+                "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
     }
 
