@@ -12,7 +12,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -30,33 +29,12 @@ import javax.swing.JTextArea;
  */
 public class AuditFrame extends javax.swing.JFrame {
 
-    // some ivars
-    int auditCount;
-    ArrayList<File> albums = new ArrayList<>();
-    File auditFolder;
-    File currentDir;
-
-    // some constants
-    public final int AUDIT = 1;
-    public final int CLEANUP = 2;
+    // controllers
+    AuditController auditController = new AuditController();
+    CleanupController cleanupController = new CleanupController();
 
     // logger object
     Logger logger = new Logger();
-
-    // Arraylist for files found
-    ArrayList<ArrayList<String>> cleanupFilePathList = new ArrayList<>(Arrays.asList(
-            new ArrayList<>(), // mp3.asd
-            new ArrayList<>(), // flac
-            new ArrayList<>(), // wav
-            new ArrayList<>(), // zip
-            new ArrayList<>(), // image files
-            new ArrayList<>(), // windows files
-            new ArrayList<>()));    // other files
-
-    ArrayList<ArrayList<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
-            new ArrayList<>(), // id3
-            new ArrayList<>(), // filenames
-            new ArrayList<>()));    // cover art
 
     /**
      * Creates new form AuditFrame
@@ -506,7 +484,9 @@ public class AuditFrame extends javax.swing.JFrame {
         auditAnalyzeButton.setEnabled(true);
         auditStartButton.setEnabled(true);
         cleanupAnalyzeButton.setEnabled(true);
-        importAlbums();
+        
+        auditController.importAlbums();
+        cleanupController.importAlbums();
     }//GEN-LAST:event_chooseFolderButtonActionPerformed
 
     /**
@@ -521,9 +501,9 @@ public class AuditFrame extends javax.swing.JFrame {
             nextFolderButton.setEnabled(true);
             previousFolderButton.setEnabled(true);
             auditStartButton.setText("Stop Audit");
-            startAudit();
+            auditController.startAudit();
         } else if (auditStartButton.getText().equals("Stop Audit")) {
-            stopAudit();
+            auditController.stopAudit();
             resetAuditFrame();
             auditStartButton.setText("Start Audit");
         }
@@ -535,7 +515,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void auditViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditViewResultsButtonActionPerformed
-        viewResults(AUDIT);
+        auditController.viewResults();
     }//GEN-LAST:event_auditViewResultsButtonActionPerformed
 
     /**
@@ -554,7 +534,7 @@ public class AuditFrame extends javax.swing.JFrame {
         deleteAllButton.setEnabled(true);
         cleanupResultsTextArea.setEnabled(true);
 
-        analyze(CLEANUP);
+        cleanupController.analyze();
     }//GEN-LAST:event_cleanupAnalyzeButtonActionPerformed
 
     /**
@@ -570,7 +550,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            deleteAll();
+            cleanupController.deleteAll();
         }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
@@ -587,7 +567,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            deleteSelected();
+            cleanupController.deleteSelected();
         }
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
@@ -597,7 +577,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
-        viewResults(CLEANUP);
+        cleanupController.viewResults();
     }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -634,9 +614,31 @@ public class AuditFrame extends javax.swing.JFrame {
 
     private void auditAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditAnalyzeButtonActionPerformed
         auditViewResultsButton.setEnabled(true);
-        analyze(AUDIT);
+        auditController.analyze();
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
 
+    /**
+     * Function to get the folder to audit and sets the auditFolder ivar
+     */
+    public void chooseFolder() {
+
+        // use a filechooser to open the folder full of stuff
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+
+        // result of filechoosing
+        int returnVal = fc.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            // set the file ivars in the controllers
+            auditController.setAuditFolder(fc.getSelectedFile());
+            cleanupController.setCleanupFolder(fc.getSelectedFile());
+            // update some graphics
+            label1.setEnabled(true);
+            pathLabel.setText(fc.getSelectedFile().getPath());
+        }
+    }
+    
     /**
      * Shows the result of the audit/cleanup
      *
@@ -709,24 +711,7 @@ public class AuditFrame extends javax.swing.JFrame {
         currentDirLabel.setText(currentDir.getPath());
     }
 
-    /**
-     * Function to get the folder to audit and sets the auditFolder ivar
-     */
-    public void chooseFolder() {
-
-        // use a filechooser to open the folder full of stuff
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false);
-
-        // result of filechoosing
-        int returnVal = fc.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            auditFolder = fc.getSelectedFile();
-            label1.setEnabled(true);
-            pathLabel.setText(auditFolder.getPath());
-        }
-    }
+    
 
     /**
      * Creates a master list of files from the audit folder, then imports all
