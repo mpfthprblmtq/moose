@@ -1,18 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *  Proj:   Moose
+ *  File:   AuditFrame.java
+ *  Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
+ *          Works with the AuditController to clean and audit directories, this class just handles all the UI.
+ *
+ *  Copyright Pat Ripley 2018
  */
+
+// package
 package moose;
 
-import com.mpatric.mp3agic.InvalidDataException;
-import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.UnsupportedTagException;
+// imports
 import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,10 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-/**
- *
- * @author pat
- */
+// class AuditFrame
 public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
