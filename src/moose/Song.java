@@ -1,5 +1,9 @@
 /**
- * Song.java
+ *  Proj:   Moose
+ *  File:   Song.java
+ *  Desc:   Object class for the Song object
+ *
+ *  Copyright Pat Ripley 2018
  */
 
 // package
@@ -11,8 +15,6 @@ import java.io.File;
 // class Song
 public class Song {
 
-    //private String filepath;
-    //private String filename;
     private File file;
     private String title;
     private String artist;
@@ -24,7 +26,6 @@ public class Song {
     private String totaltracks;
     private String disk;
     private String totaldisks;
-    //private Icon artwork;
     private byte[] artwork_bytes;
 
     public Song() {

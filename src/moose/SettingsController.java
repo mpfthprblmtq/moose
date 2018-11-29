@@ -1,11 +1,27 @@
+/**
+ *  Proj:   Moose
+ *  File:   SettingsController.java
+ *  Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
+ *
+ *  Copyright Pat Ripley 2018
+ */
+
+// package
 package moose;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+// imports
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// class SettingsController
 public class SettingsController {
 
     File settings;      // main settings file

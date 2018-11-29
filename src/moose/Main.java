@@ -1,6 +1,15 @@
+/**
+ *  Proj:   Moose
+ *  File:   Main.java
+ *  Desc:   Class that controls everything
+ *
+ *  Copyright Pat Ripley 2018
+ */
 
+// package
 package moose;
 
+// class Main
 public class Main {
     
     // version
@@ -11,7 +20,11 @@ public class Main {
     static Logger logger = new Logger();
     static SettingsFrame settings = new SettingsFrame();
     static AuditFrame auditFrame = new AuditFrame();
-    
+
+    /**
+     * Entry point for the app, launches the main Frame
+     * @param args
+     */
     public static void main(String args[]) {
         launchFrame();
     }

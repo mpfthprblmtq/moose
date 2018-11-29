@@ -1,4 +1,5 @@
 /**
+ *  Proj:   Moose
  *  File:   Logger.java
  *  Desc:   Custom logger class used to... log...
  *

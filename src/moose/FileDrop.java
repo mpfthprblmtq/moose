@@ -1,5 +1,17 @@
+/**
+ *  Proj:   Moose
+ *  File:   FileDrop.java
+ *  Desc:   Helper class that controls the dropping of files
+ *          NOTE:  Not mine
+ *
+ *  Copyright Robert Harder 2007
+ *  Copyright Pat Ripley 2018
+ */
+
+// package
 package moose;
 
+//imports
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,6 +58,8 @@ import java.io.Reader;
  * @author  rharder@users.sf.net
  * @version 1.0.1
  */
+
+// class FileDrop
 public class FileDrop
 {
     private transient javax.swing.border.Border normalBorder;
