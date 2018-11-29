@@ -1,5 +1,16 @@
+/**
+ *  Proj:   Moose
+ *  File:   SettingsFrame.java
+ *  Desc:   Main UI class for the JFrame containing the settings and options.
+ *          Works with the SettingsController to load and update settings, this class just handles all the UI.
+ *
+ *  Copyright Pat Ripley 2018
+ */
+
+// package
 package moose;
 
+// imports
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,14 +25,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+// class SettingsFrame
 public class SettingsFrame extends javax.swing.JFrame {
 
-    File settings;      // main settings file
-
-    // variables
-    boolean debugMode;
-    ArrayList<String> genres = new ArrayList<>();
-    String libraryLocation;
+    // controller
+    SettingsController settingsController = new SettingsController();
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
@@ -31,29 +39,10 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public SettingsFrame() {
 
-        // create the logging directory if it doesn't already exist
-        String settingsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/";
-        File settingsDir = new File(settingsDir_path);
-        if (!settingsDir.exists()) {
-            settingsDir.mkdirs();
-        }
-
-        // create the settings file if it doesn't already exist
-        String settings_path = settingsDir_path + "moose.conf";
-        settings = new File(settings_path);
-        if (!settings.exists()) {
-            try {
-                settings.createNewFile();
-
-                // since we've created a brand new file, fill it with some default values
-                fillDefaults();
-            } catch (IOException ex) {
-                Main.logger.logError("Couldn't create settings file!", ex);
-            }
-        }
+        settingsController.setUpSupportDirectory();
 
         // initially load the settings
-        readSettingsFile();
+        settingsController.readSettingsFile();
 
         // init the components
         initComponents();
@@ -187,7 +176,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         jLabel3.setText("Logging");
 
-        debugCheckBox.setSelected(getDebugMode());
+        debugCheckBox.setSelected(settingsController.getDebugMode());
         debugCheckBox.setText("Enable Enhanced Debugging");
         debugCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -276,7 +265,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         jLabel6.setText("Music Library Location:");
 
         jLabel7.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        jLabel7.setText(getLibraryLocation());
+        jLabel7.setText(settingsController.getLibraryLocation());
         jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         browseButton.setText("Browse...");
@@ -388,7 +377,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
-        setDebugMode(debugCheckBox.isSelected());
+        settingsController.setDebugMode(debugCheckBox.isSelected());
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
@@ -396,7 +385,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        setDefaults();
+        settingsController.setDefaults();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
@@ -404,7 +393,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        writeSettingsFile(debugMode, genres, libraryLocation);
+        settingsController.writeSettingsFile();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     /**
@@ -422,7 +411,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void openEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openEventLogButtonActionPerformed
-        openEventLog();
+        settingsController.openEventLog();
     }//GEN-LAST:event_openEventLogButtonActionPerformed
 
     /**
@@ -430,7 +419,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void openErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openErrorLogButtonActionPerformed
-        openErrorLog();
+        settingsController.openErrorLog();
     }//GEN-LAST:event_openErrorLogButtonActionPerformed
 
     /**
@@ -445,7 +434,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION, 
                 JOptionPane.WARNING_MESSAGE);
         if(returnVal == 0) {
-            clearEventLog();
+            settingsController.clearEventLog();
         }
     }//GEN-LAST:event_clearEventLogButtonActionPerformed
 
@@ -461,7 +450,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION, 
                 JOptionPane.WARNING_MESSAGE);
         if(returnVal == 0) {
-            clearErrorLog();
+            settingsController.clearErrorLog();
         }
     }//GEN-LAST:event_clearErrorLogButtonActionPerformed
 
@@ -480,8 +469,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         // get the selected file
         File dir = jfc.getSelectedFile();
         if(dir != null) {
-            setLibraryLocation(dir.getAbsolutePath());
-            jLabel7.setText(libraryLocation);
+            settingsController.setLibraryLocation(dir.getAbsolutePath());
+            jLabel7.setText(settingsController.getLibraryLocation());
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -490,83 +479,13 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @return the listModel for the JList
      */
     public DefaultListModel getGenreListModel() {
-        if (genres != null) {
-            for (int i = 0; i < genres.size(); i++) {
-                genreListModel.add(i, genres.get(i));
+        if (settingsController.genres != null) {
+            for (int i = 0; i < settingsController.genres.size(); i++) {
+                genreListModel.add(i, settingsController.genres.get(i));
             }
             return genreListModel;
         } else {
             return new DefaultListModel();
-        }
-    }
-    
-    /**
-     * Sets the settings.conf file to default values
-     */
-    public void setDefaults() {
-        debugMode = false;
-        genres = new ArrayList<>();
-        genres.add("Indie Electronic");
-        genres.add("Rock");
-        genres.add("Electronic/Rock");
-        libraryLocation = "Library location not set";
-
-        writeSettingsFile(debugMode, genres, libraryLocation);
-    }
-
-    /**
-     * Opens the event log
-     */
-    public void openEventLog() {
-        try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.eventLog.exists()) {
-                desktop.open(Main.logger.eventLog);
-            }
-        } catch (IOException ex) {
-            Main.logger.logError("Couldn't open the event log!", ex);
-        }
-    }
-
-    /**
-     * Opens the error log
-     */
-    public void openErrorLog() {
-        try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.errorLog.exists()) {
-                desktop.open(Main.logger.errorLog);
-            }
-        } catch (IOException ex) {
-            Main.logger.logError("Couldn't open the event log!", ex);
-        }
-    }
-
-    /**
-     * Clears the event log
-     */
-    public void clearEventLog() {
-        if (Main.logger.eventLog.exists()) {
-            Main.logger.eventLog.delete();
-        }
-        try {
-            Main.logger.eventLog.createNewFile();
-        } catch (IOException e) {
-            Main.logger.logError("Couldn't clear the event log!", e);
-        }
-    }
-
-    /**
-     * Clears the error log
-     */
-    public void clearErrorLog() {
-        if (Main.logger.errorLog.exists()) {
-            Main.logger.errorLog.delete();
-        }
-        try {
-            Main.logger.errorLog.createNewFile();
-        } catch (IOException e) {
-            Main.logger.logError("Couldn't clear the error log!", e);
         }
     }
 
@@ -575,13 +494,13 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        genres.add(genre);
+        settingsController.addGenre(genre);
         genreListModel.add(genreListModel.size(), genre);
     }
 
     /**
      * Removes the genre from the ivar list and the JList model
-     * @param genre 
+     * @param genre
      */
     public void removeGenreFromList(String genre) {
 
@@ -590,7 +509,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         if (!result) {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            genres.remove(genre);
+            settingsController.removeGenre(genre);
             genreTextField.setText("");
         }
     }
@@ -598,180 +517,13 @@ public class SettingsFrame extends javax.swing.JFrame {
     /**
      * Submits the change in the list and in the arraylist
      * @param oldGenre
-     * @param newGenre 
+     * @param newGenre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
-        genres.set(genres.indexOf(oldGenre), newGenre);
+        settingsController.genres.set(settingsController.genres.indexOf(oldGenre), newGenre);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
         genreTextField.setText("");
         addGenreButton.setText("Add");
-    }
-
-    /**
-     * Fills the settings file with some default values
-     */
-    public void fillDefaults() {
-        String defDebug = "DEBUGMODE=false";
-        String defGenres = "GENRES={Indie Electronic,Rock,Electronic/Rock}";
-        String defLibraryLocation = "LIBRARYLOCATION=";
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
-
-            bufferedWriter.write(defDebug);
-            bufferedWriter.write("\n");
-            bufferedWriter.write(defGenres);
-            bufferedWriter.write("\n");
-            bufferedWriter.write(defLibraryLocation);
-
-        } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
-        } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
-        }
-    }
-
-    /**
-     * Reads the settings from the file and sets the ivars
-     */
-    public void readSettingsFile() {
-        String line;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(settings));
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                // get the debugmode field
-                if (line.contains("DEBUGMODE=")) {
-                    setDebugMode((line.contains("true")));
-                }
-
-                // get the genres
-                if (line.contains("GENRES=")) {
-                    setGenres(line);
-                }
-                
-                // get the library location
-                if(line.contains("LIBRARYLOCATION=")) {
-                    setLibraryLocation(line.replace("LIBRARYLOCATION=", "") + "/");
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
-        } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
-        }
-    }
-
-    /**
-     * Writes the settings file from the ivars that were set in the program
-     * @param debugMode
-     * @param genres 
-     * @param libraryLocation 
-     */
-    public void writeSettingsFile(boolean debugMode, ArrayList<String> genres, String libraryLocation) {
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
-
-            bufferedWriter.write("DEBUGMODE=" + debugMode);
-            bufferedWriter.write("\n");
-            bufferedWriter.write("GENRES=" + listGenres(genres));
-            bufferedWriter.write("\n");
-            bufferedWriter.write("LIBRARYLOCATION=" + libraryLocation);
-            bufferedWriter.flush();
-
-        } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
-        } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
-        }
-    }
-
-    /**
-     * Lists the genres in a string form
-     * @param genres
-     * @return 
-     */
-    public String listGenres(ArrayList<String> genres) {
-        String str = "{";
-        for (int i = 0; i < genres.size(); i++) {
-            str = str + genres.get(i);
-            if (i < genres.size() - 1) {
-                str = str + ",";
-            } else {
-                str = str + "}";
-            }
-        }
-        return str;
-    }
-
-    /**
-     * Sets the debugmode
-     * @param bool 
-     */
-    public void setDebugMode(boolean bool) {
-        this.debugMode = bool;
-    }
-
-    /**
-     * Returns the debugmode
-     * @return 
-     */
-    public boolean getDebugMode() {
-        return debugMode;
-    }
-
-    /**
-     * Sets the genre arraylist
-     * @param arr 
-     */
-    public void setGenres(ArrayList<String> arr) {
-        this.genres = arr;
-    }
-
-    /**
-     * Returns the genre arraylist
-     * @return 
-     */
-    public ArrayList<String> getGenres() {
-        return genres;
-    }
-    
-    /**
-     * Sets the library location
-     * @param libraryLocation 
-     */
-    public void setLibraryLocation(String libraryLocation) {
-        this.libraryLocation = libraryLocation;
-    }
-
-    /**
-     * Returns the library location
-     * @return 
-     */
-    public String getLibraryLocation() {
-        return libraryLocation;
-    }
-
-    /**
-     * Sets the Genres arraylist from a String
-     * @param line 
-     */
-    public void setGenres(String line) {
-
-        // remove the garbage from the string
-        line = line.replace("GENRES=", "");
-        line = line.replace("{", "");
-        line = line.replace("}", "");
-
-        // split the string based on a comma
-        String[] genresArray = line.split(",");
-
-        // clear the genres arraylist
-        genres.clear();
-
-        // convert that array to an arraylist
-        genres.addAll(Arrays.asList(genresArray));
     }
 
     /**
