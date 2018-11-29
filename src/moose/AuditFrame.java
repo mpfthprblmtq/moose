@@ -31,7 +31,6 @@ public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
     AuditController auditController = new AuditController();
-    CleanupController cleanupController = new CleanupController();
 
     // logger object
     Logger logger = new Logger();
@@ -462,7 +461,9 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void nextFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextFolderButtonActionPerformed
-        nextAuditFolder();
+        auditController.nextAuditFolder();
+        refreshAuditFrame();    // refresh the frame with the new album and the checks
+        this.requestFocus();
     }//GEN-LAST:event_nextFolderButtonActionPerformed
 
     /**
@@ -471,7 +472,9 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void previousFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousFolderButtonActionPerformed
-        previousAuditFolder();
+        auditController.previousAuditFolder();
+        refreshAuditFrame();    // refresh the frame with the new album and the checks
+        this.requestFocus();
     }//GEN-LAST:event_previousFolderButtonActionPerformed
 
     /**
@@ -486,7 +489,6 @@ public class AuditFrame extends javax.swing.JFrame {
         cleanupAnalyzeButton.setEnabled(true);
         
         auditController.importAlbums();
-        cleanupController.importAlbums();
     }//GEN-LAST:event_chooseFolderButtonActionPerformed
 
     /**
@@ -501,10 +503,15 @@ public class AuditFrame extends javax.swing.JFrame {
             nextFolderButton.setEnabled(true);
             previousFolderButton.setEnabled(true);
             auditStartButton.setText("Stop Audit");
+            label3.setEnabled(true);
+            label4.setEnabled(true);
+            label5.setEnabled(true);
+            refreshAuditFrame();
             auditController.startAudit();
         } else if (auditStartButton.getText().equals("Stop Audit")) {
             auditController.stopAudit();
             resetAuditFrame();
+            auditStartButton.setEnabled(true);
             auditStartButton.setText("Start Audit");
         }
     }//GEN-LAST:event_auditStartButtonActionPerformed
@@ -515,7 +522,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void auditViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditViewResultsButtonActionPerformed
-        auditController.viewResults();
+        viewResults(auditController.AUDIT);
     }//GEN-LAST:event_auditViewResultsButtonActionPerformed
 
     /**
@@ -534,7 +541,10 @@ public class AuditFrame extends javax.swing.JFrame {
         deleteAllButton.setEnabled(true);
         cleanupResultsTextArea.setEnabled(true);
 
-        cleanupController.analyze();
+        cleanupResultsTextArea.setText(auditController.analyze(auditController.CLEANUP));
+
+        // enable the button used for viewing now that we have results
+        cleanupViewResultsButton.setEnabled(true);
     }//GEN-LAST:event_cleanupAnalyzeButtonActionPerformed
 
     /**
@@ -550,7 +560,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            cleanupController.deleteAll();
+            auditController.deleteAll();
         }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
@@ -567,7 +577,14 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            cleanupController.deleteSelected();
+            auditController.deleteSelected(
+                    mp3asdCheckBox.isSelected(),
+                    flacCheckBox.isSelected(),
+                    wavCheckBox.isSelected(),
+                    zipCheckBox.isSelected(),
+                    imagesCheckBox.isSelected(),
+                    windowsCheckBox.isSelected(),
+                    everythingElseCheckBox.isSelected());
         }
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
@@ -577,7 +594,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
-        cleanupController.viewResults();
+        viewResults(auditController.CLEANUP);
     }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -613,8 +630,8 @@ public class AuditFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_imagesCheckBoxStateChanged
 
     private void auditAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditAnalyzeButtonActionPerformed
-        auditViewResultsButton.setEnabled(true);
-        auditController.analyze();
+        auditResultsTextArea.setText(auditController.analyze(auditController.AUDIT));
+        auditViewResultsButton.setEnabled(true);    // enable the button used for viewing now that we have results
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
 
     /**
@@ -631,24 +648,25 @@ public class AuditFrame extends javax.swing.JFrame {
         int returnVal = fc.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             // set the file ivars in the controllers
-            auditController.setAuditFolder(fc.getSelectedFile());
-            cleanupController.setCleanupFolder(fc.getSelectedFile());
+            auditController.setFolder(fc.getSelectedFile());
             // update some graphics
             label1.setEnabled(true);
             pathLabel.setText(fc.getSelectedFile().getPath());
+        } else {
+            // nothing was chosen
         }
     }
-    
+
     /**
      * Shows the result of the audit/cleanup
      *
      * @param type the type of results needed
      */
     public void viewResults(int type) {
-        if (type == AUDIT) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(AUDIT), "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
-        } else if (type == CLEANUP) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(CLEANUP), "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
+        if (type == auditController.AUDIT) {
+            JOptionPane.showMessageDialog(null, buildResultsPanel(auditController.AUDIT), "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
+        } else if (type == auditController.CLEANUP) {
+            JOptionPane.showMessageDialog(null, buildResultsPanel(auditController.CLEANUP), "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
         }
     }
 
@@ -662,18 +680,18 @@ public class AuditFrame extends javax.swing.JFrame {
     public JPanel buildResultsPanel(int type) {
 
         // header JLabel
-        JLabel cleanupPathLabel = new JLabel("Audit folder: " + auditFolder.getPath());
+        JLabel cleanupPathLabel = new JLabel("Audit folder: " + auditController.getFolder().getPath());
 
         // text area
         JTextArea ta = new JTextArea(20, 100);
         ta.setEditable(false);
         ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switch (type) {
-            case AUDIT:
-                ta.setText(exportResultsToString(AUDIT));
+            case AuditController.AUDIT:
+                ta.setText(auditController.exportResultsToString(auditController.AUDIT));
                 break;
-            case CLEANUP:
-                ta.setText(exportResultsToString(CLEANUP));
+            case AuditController.CLEANUP:
+                ta.setText(auditController.exportResultsToString(auditController.CLEANUP));
                 break;
         }
 
@@ -693,57 +711,22 @@ public class AuditFrame extends javax.swing.JFrame {
      * loaded
      */
     public void refreshAuditFrame() {
-        if (checkID3Tags(currentDir)) {
+        if (auditController.checkID3Tags(auditController.currentDir)) {
             ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        if (checkFilenames(currentDir)) {
+        if (auditController.checkFilenames(auditController.currentDir)) {
             filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        if (checkFolderCover(currentDir)) {
+        if (auditController.checkFolderCover(auditController.currentDir)) {
             coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        currentDirLabel.setText(currentDir.getPath());
-    }
-
-    
-
-    /**
-     * Creates a master list of files from the audit folder, then imports all
-     * the albums into the albums ivar list
-     */
-    public void importAlbums() {
-
-        // arraylist to store all the files
-        ArrayList<File> allFiles = new ArrayList<>();
-        allFiles = Main.frame.listFiles(auditFolder, allFiles);
-
-        // traverse the list of files and add the albums to the albums ivar list
-        for (File file : allFiles) {
-            if (file.getName().endsWith(".mp3")) {
-                File a = file.getParentFile();
-
-                // folder is a multi-disk album
-                if (a.getName().equals("CD1") || a.getName().equals("CD2")) {
-                    a = a.getParentFile();
-                }
-                if (!albums.contains(a)) {
-                    albums.add(a);
-                }
-            }
-        }
-
-        // sort them alphabetically
-        Collections.sort(albums, (File o1, File o2) -> {
-            String filename1 = o1.getPath().replace(auditFolder.getPath(), "");
-            String filename2 = o2.getPath().replace(auditFolder.getPath(), "");
-            return filename1.compareToIgnoreCase(filename2);
-        });
+        currentDirLabel.setText(auditController.currentDir.getPath());
     }
 
     /**
@@ -761,184 +744,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 || everythingElseCheckBox.isSelected());
     }
 
-    /**
-     * Called from the start audit button press Checks if an audit is already in
-     * process first, then user decides to either start a new audit or continue
-     * that existing audit
-     */
-    public void startAudit() {
 
-        // check for an audit in process
-        if (checkForExisitingAudit()) {
-            Object[] options = new Object[]{"Cancel", "Start New", "Continue"};
-            int returnVal = JOptionPane.showOptionDialog(
-                    this,
-                    "An exisiting audit is in process, do you want to continue?",
-                    "Existing audit found",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    null,
-                    options,
-                    null);
-            switch (returnVal) {
-                case 2:     // continue
-                    continueAudit();
-                    break;
-                case 1:     // start a new one
-                    newAudit();
-                    break;
-                default:
-                    // do nothing
-                    break;
-            }
-        } else {
-            // existing audit not found, start a fresh one
-            newAudit();
-        }
-    }
-
-    /**
-     * Start a brand new audit
-     */
-    public void newAudit() {
-
-        // update graphics
-        label3.setEnabled(true);
-        label4.setEnabled(true);
-        label5.setEnabled(true);
-
-        // clear any residual files
-        clearDoneFiles();
-
-        // set some ivars
-        auditCount = 0;
-        currentDir = albums.get(auditCount);
-
-        // sets up the audit frame with the three checks
-        refreshAuditFrame();
-
-        // open up a new Frame with the album preloaded
-        Main.frame.dispose();
-        Main.frame = new Frame(albums.get(auditCount));
-        Main.launchFrame();
-    }
-
-    /**
-     * Continue an existing audit
-     */
-    public void continueAudit() {
-
-        // update graphics
-        label3.setEnabled(true);
-        label4.setEnabled(true);
-        label5.setEnabled(true);
-
-        // set some ivars
-        auditCount = getNextAlbum();
-        currentDir = albums.get(auditCount);
-
-        // refreshes the audit frame with the three checks
-        refreshAuditFrame();
-
-        // open up a new Frame with the next album preloaded
-        Main.frame.dispose();
-        Main.frame = new Frame(currentDir);
-        Main.launchFrame();
-    }
-
-    /**
-     * Goes to the next audit album/folder
-     */
-    public void nextAuditFolder() {
-
-        // sets the current album as done
-        if (!checkIfDone(albums.get(auditCount))) {
-            setDone(albums.get(auditCount));
-        }
-
-        // update the ivar
-        auditCount++;
-
-        // save the tracks here instead of forcing the user to save it in the main frame form
-        Main.frame.saveAll();
-
-        // check if the audit is done
-        if (auditCount < albums.size()) {
-
-            // refresh the frame with the new album and the checks
-            currentDir = albums.get(auditCount);
-            refreshAuditFrame();
-
-            // close the current frame and open a new one with the new album preloaded
-            Main.frame.dispose();
-            Main.frame = new Frame(currentDir);
-            Main.launchFrame();
-            this.requestFocus();
-        } else {
-            // audit is done
-            finishAudit();
-        }
-    }
-
-    /**
-     * Goes to the previous album/folder
-     */
-    public void previousAuditFolder() {
-
-        // sets the current album as done
-        if (!checkIfDone(albums.get(auditCount))) {
-            setDone(albums.get(auditCount));
-        }
-
-        // prevent a negative auditCount
-        if (auditCount <= 0) {
-            // do nothing
-        } else {
-
-            // update ivars
-            auditCount--;
-            currentDir = albums.get(auditCount);
-
-            // refresh the frame with the new album and the checks
-            refreshAuditFrame();
-            Main.frame.dispose();
-            Main.frame = new Frame(currentDir);
-            Main.launchFrame();
-            this.requestFocus();
-        }
-    }
-
-    /**
-     * Stops the audit
-     */
-    public void stopAudit() {
-        albums.clear();
-        auditStartButton.setEnabled(true);
-        Main.frame.dispose();
-        Main.frame = new Frame();
-        Main.launchFrame();
-    }
-
-    /**
-     * Finishes the audit
-     */
-    public void finishAudit() {
-
-        // set some ivars
-        albums.clear();
-        auditCount = 0;
-
-        // launch a blank mainframe
-        Main.frame.dispose();
-        Main.frame = new Frame();
-        Main.launchFrame();
-
-        // reset the audit frame
-        resetAuditFrame();
-
-        // show that audit is done
-        JOptionPane.showMessageDialog(null, "Audit is complete!", "Audit Completed", JOptionPane.INFORMATION_MESSAGE);
-    }
 
     /**
      * Sets the audit frame back to disabled
@@ -983,553 +789,6 @@ public class AuditFrame extends javax.swing.JFrame {
         imagesCheckBox.setSelected(false);
         imagesCheckBox.setEnabled(false);
         this.requestFocus();
-    }
-
-    /**
-     * Deletes all files in the cleanupFilePathList arraylist
-     */
-    public void deleteAll() {
-        if (!iscleanupFilePathListEmpty()) {
-            cleanupFilePathList.forEach((list) -> {
-                deleteAllFilesInList(list);
-            });
-            // clear all the lists to reset counts
-            clearLists(CLEANUP);
-            // reset the statistics
-            analyze(CLEANUP);
-        } else {
-            // show that there's nothing to delete
-            JOptionPane.showMessageDialog(null, "Nothing to Delete!", "Delete All", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    /**
-     * Deletes only the checked file types
-     */
-    public void deleteSelected() {
-
-        boolean nothingToDelete = true;
-
-        if (mp3asdCheckBox.isSelected()) {
-            nothingToDelete = cleanupFilePathList.get(0).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(0));
-            cleanupFilePathList.get(0).clear();
-        }
-        if (flacCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(1).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(1));
-            cleanupFilePathList.get(1).clear();
-        }
-        if (wavCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(2).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(2));
-            cleanupFilePathList.get(2).clear();
-        }
-        if (zipCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(3).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(3));
-            cleanupFilePathList.get(3).clear();
-        }
-        if (imagesCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(4).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(4));
-            cleanupFilePathList.get(4).clear();
-        }
-        if (windowsCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(5).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(5));
-            cleanupFilePathList.get(5).clear();
-        }
-        if (everythingElseCheckBox.isSelected()) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(6).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(6));
-            cleanupFilePathList.get(6).clear();
-        }
-
-        if (nothingToDelete) {
-            // show that there's nothing to delete
-            JOptionPane.showMessageDialog(null, "Nothing to Delete!", "Delete Selected", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            // clear all the lists to reset counts
-            clearLists(CLEANUP);
-            // reset the statistics
-            analyze(CLEANUP);
-        }
-    }
-
-    /**
-     * Helper function used to delete files in a specific list
-     *
-     * @param list
-     */
-    public void deleteAllFilesInList(ArrayList<String> list) {
-        list.stream().map((path) -> new File(path)).forEachOrdered((file) -> {
-            if (file.exists()) {
-                file.delete();
-            } else {
-                logger.logError("Tried to delete file in cleanup, but couldn't!");
-            }
-        });
-    }
-
-    /**
-     * Helper function to clear all sublists in cleanupFilePathList
-     *
-     * @param type the type of lists to clear
-     */
-    public void clearLists(int type) {
-        switch (type) {
-            case CLEANUP:
-                cleanupFilePathList.get(0).clear();
-                cleanupFilePathList.get(1).clear();
-                cleanupFilePathList.get(2).clear();
-                cleanupFilePathList.get(3).clear();
-                cleanupFilePathList.get(4).clear();
-                cleanupFilePathList.get(5).clear();
-                cleanupFilePathList.get(6).clear();
-                break;
-            case AUDIT:
-                auditFilePathList.get(0).clear();
-                auditFilePathList.get(1).clear();
-                auditFilePathList.get(2).clear();
-                break;
-        }
-
-    }
-
-    /**
-     * Helper function to check if any of the lists are empty
-     *
-     * @return the result of the check
-     */
-    public boolean iscleanupFilePathListEmpty() {
-        return (cleanupFilePathList.get(0).isEmpty()
-                && cleanupFilePathList.get(1).isEmpty()
-                && cleanupFilePathList.get(2).isEmpty()
-                && cleanupFilePathList.get(3).isEmpty()
-                && cleanupFilePathList.get(4).isEmpty()
-                && cleanupFilePathList.get(5).isEmpty()
-                && cleanupFilePathList.get(6).isEmpty());
-    }
-
-    /**
-     * Checks to see if in the audit folder there exists a done file in any of
-     * its subfolders
-     *
-     * @return the result of the check, true for existing audit, false for no
-     * existing audit
-     */
-    public boolean checkForExisitingAudit() {
-        return albums.stream().anyMatch((album) -> (containsFile(album)));
-    }
-
-    /**
-     * Helper function used to see if there's a done file in the specified
-     * folder
-     *
-     * @param dir, the directory to check
-     * @return the result of the search, true for file found, false for file not
-     * found
-     */
-    public boolean containsFile(File dir) {
-        File[] filesInAlbum = dir.listFiles();
-        for (File file : filesInAlbum) {
-            if (file.getName().equals("done")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Function used to create a done file in the specified folder
-     *
-     * @param dir, the directory to create the file in
-     */
-    public void setDone(File dir) {
-        String path = dir.getPath() + "/done";
-        File done = new File(path);
-        try {
-            done.createNewFile();
-        } catch (IOException ex) {
-            Main.logger.logError("Error creating done file for auditing in folder: " + path, ex);
-        }
-    }
-
-    /**
-     * Checks if that specified directory/album is done
-     *
-     * @param dir, the directory to check
-     * @return the result of the check, true for done, false for not done
-     */
-    public boolean checkIfDone(File dir) {
-        File[] files = dir.listFiles();
-        for (File file : files) {
-            if (file.getName().equals("done")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets the next album index in the albums arraylist
-     *
-     * @return the int index of that album
-     */
-    public int getNextAlbum() {
-        for (File album : albums) {
-            if (!checkIfDone(album)) {
-                return albums.indexOf(album);
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Function used to clear all of the done files from the albums list
-     */
-    public void clearDoneFiles() {
-        albums.stream().filter((album) -> (containsFile(album))).map((album) -> album.listFiles()).forEachOrdered((files) -> {
-            for (File file : files) {
-                if (file.getName().equals("done")) {
-                    file.delete();
-                }
-            }
-        });
-    }
-
-    /**
-     * Checks the album/folder for a cover.* file (image file)
-     *
-     * @return the result of the check, true for a cover file exists, false for
-     * a cover file doesn't exist
-     */
-    private boolean checkFolderCover(File dir) {
-
-        // check the current directory ivar
-        File[] files = dir.listFiles();
-        for (File file : files) {
-            if (file.getName().startsWith("cover")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks all the files in a folder for the standardized file name
-     *
-     * @return the result of the check, true if all files are good, false if one
-     * or more doesn't match
-     */
-    private boolean checkFilenames(File dir) {
-
-        // create a list of all files from that directory
-        ArrayList<File> files = new ArrayList<>();
-        files = Main.frame.listFiles(dir, files);
-
-        // regex to check
-        String regex = "\\d\\d ((.)*)";
-
-        // check all files in that list
-        // also checks if the album artist is a label, since those files aren't formatted the same
-        for (File file : files) {
-            if (file.getName().endsWith(".mp3")) {
-                if (!file.getName().matches(regex) && !isLabel(file)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Checks all the mp3s in a folder for all the necessary id3 tags
-     *
-     * @return the result of the check, true if all mp3s are good, false if one
-     * or more doesn't have all information needed
-     */
-    private boolean checkID3Tags(File dir) {
-
-        // create a list of all files from that directory
-        ArrayList<File> files = new ArrayList<>();
-        files = Main.frame.listFiles(dir, files);
-
-        // traverse the file list
-        for (File file : files) {
-
-            // check if it's an mp3
-            if (file.getName().endsWith(".mp3")) {
-
-                // mp3agic Mp3File object, used for the id3tags
-                Mp3File mp3file;
-                try {
-                    // create the mp3file from the file's path
-                    mp3file = new Mp3File(file.getAbsolutePath());
-
-                    // if the mp3file doesn't have an id3tag
-                    if (!mp3file.hasId3v2Tag()) {
-                        return false;
-                    }
-                } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-                    logger.logError("Exception when checking if an mp3 has id3 information!", ex);
-                    mp3file = null;
-                }
-
-                // get the id3v2 info
-                String title = mp3file.getId3v2Tag().getTitle();
-                String artist = mp3file.getId3v2Tag().getArtist();
-                String album = mp3file.getId3v2Tag().getAlbum();
-                String albumartist = mp3file.getId3v2Tag().getAlbumArtist();
-                String genre = mp3file.getId3v2Tag().getGenreDescription();
-                String year = mp3file.getId3v2Tag().getYear();
-                String track = mp3file.getId3v2Tag().getTrack();
-                String disk = mp3file.getId3v2Tag().getPartOfSet();
-                byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
-
-                // check if it's a label, since those mp3s don't need as much information
-                if (isLabel(dir)) {
-                    if (title == null
-                            || artist == null
-                            || album == null
-                            || albumartist == null
-                            || genre == null
-                            || artwork_bytes == null) {
-                        return false;
-                    }
-                } else {
-                    if (title == null
-                            || artist == null
-                            || album == null
-                            || albumartist == null
-                            || genre == null
-                            || year == null
-                            || track == null
-                            || disk == null
-                            || artwork_bytes == null) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check if a directory is from a label
-     *
-     * @param dir, the directory to check
-     * @return the result of the check, true if it is a label, false if it isn't
-     * a label
-     */
-    public boolean isLabel(File dir) {
-        String path = dir.getPath();
-        return path.contains("/Genres/");
-    }
-
-    /**
-     * Larger function used to check all the files in the auditFolder for any
-     * files that don't really belong
-     *
-     * @param type the type of analysis to run
-     */
-    public void analyze(int type) {
-
-        switch (type) {
-            case CLEANUP:
-
-                // reset everything
-                clearLists(CLEANUP);
-
-                // let's count the mp3s and covers, cause why not
-                int mp3Count = 0;
-                int coverCount = 0;
-
-                // create a list of all files from that directory
-                ArrayList<File> cleanupFiles = new ArrayList<>();
-                cleanupFiles = Main.frame.listFiles(auditFolder, cleanupFiles);
-
-                // traverse that list
-                for (File file : cleanupFiles) {
-
-                    // get the filename to check
-                    String filename = file.getName();
-
-                    // check the ending/extension
-                    // add it to the specified sublist
-                    if (filename.endsWith(".mp3")) {
-                        mp3Count++;
-                    } else if (filename.startsWith("cover.")) {
-                        coverCount++;
-                    } else if (filename.endsWith(".mp3.asd")) {
-                        cleanupFilePathList.get(0).add(file.getPath());
-                    } else if (filename.endsWith(".flac")) {
-                        cleanupFilePathList.get(1).add(file.getPath());
-                    } else if (filename.endsWith(".wav")) {
-                        cleanupFilePathList.get(2).add(file.getPath());
-                    } else if (filename.endsWith(".zip")) {
-                        cleanupFilePathList.get(3).add(file.getPath());
-                    } else if ((filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG"))
-                            && !filename.startsWith("cover.")
-                            && !file.getParentFile().getName().equals("artwork")) {
-                        cleanupFilePathList.get(4).add(file.getPath());
-                    } else if (filename.equals("Thumbs.db") || filename.startsWith("folder.")) {
-                        cleanupFilePathList.get(5).add(file.getPath());
-                    } else {
-                        if (!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG"))
-                                && !filename.equals("done")
-                                && !filename.equals(".DS_Store")) {
-                            cleanupFilePathList.get(6).add(file.getPath());
-                        }
-                    }
-                }
-
-                // update the results
-                cleanupResultsTextArea.setText(
-                        "MP3 Files:     " + mp3Count + "\n"
-                        + "Cover Files:   " + coverCount + "\n"
-                        + "ZIP Files:     " + cleanupFilePathList.get(3).size() + "\n"
-                        + "ASD Files:     " + cleanupFilePathList.get(0).size() + "\n"
-                        + "WAV Files:     " + cleanupFilePathList.get(2).size() + "\n"
-                        + "FLAC Files:    " + cleanupFilePathList.get(1).size() + "\n"
-                        + "Image Files:   " + cleanupFilePathList.get(4).size() + "\n"
-                        + "Windows Files: " + cleanupFilePathList.get(5).size() + "\n"
-                        + "Other Files:   " + cleanupFilePathList.get(6).size()
-                );
-
-                // enable the button used for viewing now that we have results
-                cleanupViewResultsButton.setEnabled(true);
-
-                break;
-
-            case AUDIT:
-
-                // reset everything
-                clearLists(AUDIT);
-                
-//                // create a list of all files from that directory
-//                ArrayList<File> auditFiles = new ArrayList<>();
-//                auditFiles = Main.frame.listFiles(auditFolder, auditFiles);
-
-                // traverse that list
-                for (File dir : albums) {
-                    if(!checkID3Tags(dir)) {
-                        auditFilePathList.get(0).add(dir.getPath());
-                    }
-                    if(!checkFilenames(dir)) {
-                        auditFilePathList.get(1).add(dir.getPath());
-                    }
-                    if(!checkFolderCover(dir)) {
-                        auditFilePathList.get(2).add(dir.getPath());
-                    }
-                }
-                
-                // update the results
-                auditResultsTextArea.setText(
-                        "ID3Tags missing:   " + auditFilePathList.get(0).size() + "\n"
-                      + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
-                      + "Cover art missing: " + auditFilePathList.get(2).size()
-                );
-                
-                // enable the button used for viewing now that we have results
-                auditViewResultsButton.setEnabled(true);
-                
-                break;
-        }
-    }
-
-    /**
-     * Function used to export the results to a heavily formatted string
-     *
-     * @param type the type of results needed
-     * @return a string representation of the results
-     */
-    public String exportResultsToString(int type) {
-
-        // lets make a string
-        String str = "\n";
-
-        // do something based on the type
-        switch (type) {
-            case AUDIT:
-
-                // id3tags
-                str = str.concat(" Some ID3Tags missing:\n");
-                for (String path : auditFilePathList.get(0)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-                
-                // id3tags
-                str = str.concat(" Some filenames don't match standard:\n");
-                for (String path : auditFilePathList.get(1)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-                
-                // cover art
-                str = str.concat(" Cover art not found in folder:\n");
-                for (String path : auditFilePathList.get(2)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-                break;
-            case CLEANUP:
-
-                // zip files
-                str = str.concat(" ZIP FILES:\n");
-                for (String path : cleanupFilePathList.get(3)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // mp3.asd files
-                str = str.concat(" MP3.ASD FILES:\n");
-                for (String path : cleanupFilePathList.get(0)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // wav files
-                str = str.concat(" WAV FILES:\n");
-                for (String path : cleanupFilePathList.get(2)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // flac files
-                str = str.concat(" FLAC FILES:\n");
-                for (String path : cleanupFilePathList.get(1)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // image files
-                str = str.concat(" IMAGE FILES:\n");
-                for (String path : cleanupFilePathList.get(4)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // windows files
-                str = str.concat(" WINDOWS FILES:\n");
-                for (String path : cleanupFilePathList.get(5)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // other files
-                str = str.concat(" OTHER FILES:\n");
-                for (String path : cleanupFilePathList.get(6)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                break;
-        }
-
-        return str;
     }
 
     /**
