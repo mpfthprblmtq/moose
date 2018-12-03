@@ -8,10 +8,16 @@
  */
 
 // package
-package moose;
+package moose.views;
 
 // imports
-import java.awt.Desktop;
+import moose.*;
+import moose.controllers.SongController;
+import moose.utilities.FileDrop;
+import moose.utilities.Logger;
+import moose.utilities.TableCellListener;
+import moose.utilities.Utils;
+
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -19,11 +25,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.swing.table.*;
 
 // class Frame

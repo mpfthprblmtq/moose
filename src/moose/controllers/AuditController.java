@@ -7,12 +7,17 @@
  */
 
 // package
-package moose;
+package moose.controllers;
 
 //imports
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import moose.views.Frame;
+import moose.utilities.Logger;
+import moose.Main;
+import moose.utilities.Utils;
+
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;

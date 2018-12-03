@@ -8,9 +8,12 @@
  */
 
 // package
-package moose;
+package moose.views;
 
 // imports
+import moose.utilities.Logger;
+import moose.controllers.AuditController;
+
 import java.awt.Font;
 import javax.swing.Box;
 import javax.swing.BoxLayout;

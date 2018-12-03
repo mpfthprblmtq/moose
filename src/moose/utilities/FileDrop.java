@@ -9,7 +9,7 @@
  */
 
 // package
-package moose;
+package moose.utilities;
 
 //imports
 import java.awt.datatransfer.DataFlavor;

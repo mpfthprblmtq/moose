@@ -9,6 +9,11 @@
 // package
 package moose;
 
+import moose.utilities.Logger;
+import moose.views.AuditFrame;
+import moose.views.Frame;
+import moose.views.SettingsFrame;
+
 // class Main
 public class Main {
     
@@ -16,10 +21,10 @@ public class Main {
     public static String version = "1.1.0";
     
     // create and instantiate the frames and controllers
-    static Frame frame = new Frame();
-    static Logger logger = new Logger();
-    static SettingsFrame settings = new SettingsFrame();
-    static AuditFrame auditFrame = new AuditFrame();
+    public static Frame frame = new Frame();
+    public static Logger logger = new Logger();
+    public static SettingsFrame settings = new SettingsFrame();
+    public static AuditFrame auditFrame = new AuditFrame();
 
     /**
      * Entry point for the app, launches the main Frame
