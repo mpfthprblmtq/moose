@@ -1,7 +1,8 @@
 # Moose
 A music management system capable of reading and modifying dynamic id3 tags.
 
-Current version:  1.0.1  
+![Generic badge](https://img.shields.io/badge/version-1.1.2-brightgreen.svg)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 [View project on Github](https://www.github.com/mpfthprblmtq/moose)
 
@@ -33,12 +34,30 @@ Once built, you can run the terminal-commands file to package the app into a .pk
 
 ## Changelog
 
-### 1.1.1 (The Refactoring update and/or the "All 1's update" and/or the Cleanup update)
+### 1.1.2 (The "Random features" update)
 
 **Release Date:** UPCOMING
 
+- Improved console logging on front end
+- Added a "More Info" panel
+- Made it smart
+  - Ability to determine certain id3tags based on the filename and file location alone
+- Bugfixes:
+  - Random VectorEnumerationExceptions are no longer a thing
+  - GUI doesn't skew anymore when adding a long-titled file into the UI
+  - Tracknum and Disknum doesn't get set to "/0" when there's nothing in those fields
+  - Fixed find and replace functionality not setting anything except the first row in the table
+
+### 1.1.1 (The Refactoring update and/or the "All 1's update" and/or the Cleanup update)
+
+**Release Date:** 3 December 2018
+
 - Refactoring classes to match an MVC framework (Model View Controller)
 - General cleanup
+  - Update README
+  - Package project into smaller packages (views, controllers, utils, etc.)
+- Tamed moose
+  - Taught it sit, stay, roll over, and attack
 
 ### 1.1.0 (The Auditing update)
 
@@ -57,6 +76,8 @@ Once built, you can run the terminal-commands file to package the app into a .pk
     2. Garbage Windows files (*Thumbs.db*, *folder.jpg*, etc.)
     3. Any audio file not an .mp3 (*.wav*, *.mp3.asd*, *.flac*, etc.)
     4. Any other file
+- Capturing moose, it got out of its pen and bit people
+  - A Møøse once bit my sister... No realli!
 
 ### 1.0.2 (The Settings update)
 
@@ -68,6 +89,8 @@ Once built, you can run the terminal-commands file to package the app into a .pk
   - Genres list (functionality slated for future release)
 - Better logging on front end
 - Minor code improvements
+- Gave moose legs to walk with
+  -  Frolicking optional
 
 ## 1.0.1
 
@@ -75,6 +98,7 @@ Once built, you can run the terminal-commands file to package the app into a .pk
 
 - Added logging functionality to log errors and events to Application support folder
   - Created custom Logger class
+- Added antlers to moose
 
 
 ## 1.0.0
@@ -85,3 +109,4 @@ Once built, you can run the terminal-commands file to package the app into a .pk
   - Ability to read/write id3tags on mp3files
   - Some automatic functionalities (auto add cover art, sorting)
   - One god-class (will definitely reformat this in future release)
+- Created moose
