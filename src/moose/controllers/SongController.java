@@ -43,6 +43,13 @@ public class SongController {
     }
 
     /**
+     * Returns the songs list
+     */
+    public HashMap<Integer, Song> getSongs() {
+        return songs;
+    }
+
+    /**
      * Gets a song object from a file
      */
     public Song getSongFromFile(File file) {

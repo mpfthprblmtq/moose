@@ -29,7 +29,7 @@ import javax.swing.JTextArea;
 public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
-    AuditController auditController = new AuditController();
+    public AuditController auditController = new AuditController();
 
     // logger object
     Logger logger = new Logger();
@@ -710,22 +710,22 @@ public class AuditFrame extends javax.swing.JFrame {
      * loaded
      */
     public void refreshAuditFrame() {
-        if (auditController.checkID3Tags(auditController.currentDir)) {
+        if (auditController.checkID3Tags(auditController.getCurrentDir())) {
             ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        if (auditController.checkFilenames(auditController.currentDir)) {
+        if (auditController.checkFilenames(auditController.getCurrentDir())) {
             filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        if (auditController.checkFolderCover(auditController.currentDir)) {
+        if (auditController.checkFolderCover(auditController.getCurrentDir())) {
             coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
         } else {
             coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
         }
-        currentDirLabel.setText(auditController.currentDir.getPath());
+        currentDirLabel.setText(auditController.getCurrentDir().getPath());
     }
 
     /**

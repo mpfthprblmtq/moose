@@ -203,8 +203,8 @@ public class SettingsController {
     public void openEventLog() {
         try {
             Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.eventLog.exists()) {
-                desktop.open(Main.logger.eventLog);
+            if (Main.logger.getEventLog().exists()) {
+                desktop.open(Main.logger.getEventLog());
             }
         } catch (IOException ex) {
             Main.logger.logError("Couldn't open the event log!", ex);
@@ -217,8 +217,8 @@ public class SettingsController {
     public void openErrorLog() {
         try {
             Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.errorLog.exists()) {
-                desktop.open(Main.logger.errorLog);
+            if (Main.logger.getErrorLog().exists()) {
+                desktop.open(Main.logger.getErrorLog());
             }
         } catch (IOException ex) {
             Main.logger.logError("Couldn't open the event log!", ex);
@@ -229,11 +229,11 @@ public class SettingsController {
      * Clears the event log
      */
     public void clearEventLog() {
-        if (Main.logger.eventLog.exists()) {
-            Main.logger.eventLog.delete();
+        if (Main.logger.getEventLog().exists()) {
+            Main.logger.getEventLog().delete();
         }
         try {
-            Main.logger.eventLog.createNewFile();
+            Main.logger.getEventLog().createNewFile();
         } catch (IOException e) {
             Main.logger.logError("Couldn't clear the event log!", e);
         }
@@ -243,11 +243,11 @@ public class SettingsController {
      * Clears the error log
      */
     public void clearErrorLog() {
-        if (Main.logger.errorLog.exists()) {
-            Main.logger.errorLog.delete();
+        if (Main.logger.getErrorLog().exists()) {
+            Main.logger.getErrorLog().delete();
         }
         try {
-            Main.logger.errorLog.createNewFile();
+            Main.logger.getErrorLog().createNewFile();
         } catch (IOException e) {
             Main.logger.logError("Couldn't clear the error log!", e);
         }

@@ -71,13 +71,29 @@ public class AuditController {
     public AuditController() {
         
     }
-    
+
+    /**
+     * Sets the folder being audited/cleaned
+     * @param folder
+     */
     public void setFolder(File folder) {
         this.folder = folder;
     }
 
+    /**
+     * Returns the folder being audited/cleaned
+     * @return the File folder
+     */
     public File getFolder() {
         return folder;
+    }
+
+    /**
+     * Returns the currentDir
+     * @return the currentDir File
+     */
+    public File getCurrentDir() {
+        return currentDir;
     }
 
     /**

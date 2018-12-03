@@ -36,7 +36,7 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = new Logger();
 
     // controller, instantiated in constructor
-    SongController songController;
+    public SongController songController;
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -384,7 +384,7 @@ public class Frame extends javax.swing.JFrame {
                 s.getFullTrackString(),
                 s.getFullDiskString(),
                 (thumbnail_icon != null) ? thumbnail_icon : null, // checks for null value first
-                songController.songs.size() // hidden index for the song object
+                songController.getSongs().size() // hidden index for the song object
             });
         }
 
@@ -1263,7 +1263,7 @@ public class Frame extends javax.swing.JFrame {
             genres[i] = table.getValueAt(selectedRows[i], 7).toString();
             tracks[i] = table.getValueAt(selectedRows[i], 8).toString();
             disks[i] = table.getValueAt(selectedRows[i], 9).toString();
-            images[i] = songController.songs.get(songController.getIndex(row)).getArtwork_bytes();
+            images[i] = songController.getSongs().get(songController.getIndex(row)).getArtwork_bytes();
         }
 
         // fill the fields
