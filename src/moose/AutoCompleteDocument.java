@@ -5,7 +5,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
-import java.util.Arrays;
 import java.util.List;
 
 /**

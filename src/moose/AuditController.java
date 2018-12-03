@@ -98,7 +98,7 @@ public class AuditController {
 
                 // create a list of all files from that directory
                 ArrayList<File> cleanupFiles = new ArrayList<>();
-                cleanupFiles = Main.frame.listFiles(folder, cleanupFiles);
+                cleanupFiles = Utils.listFiles(folder, cleanupFiles);
 
                 // traverse that list
                 for (File file : cleanupFiles) {
@@ -184,7 +184,7 @@ public class AuditController {
 
         // arraylist to store all the files
         ArrayList<File> allFiles = new ArrayList<>();
-        allFiles = Main.frame.listFiles(folder, allFiles);
+        allFiles = Utils.listFiles(folder, allFiles);
 
         // traverse the list of files and add the albums to the albums ivar list
         for (File file : allFiles) {
@@ -217,11 +217,11 @@ public class AuditController {
     public void startAudit() {
 
         // check for an audit in process
-        if (checkForExisitingAudit()) {
+        if (checkForExistingAudit()) {
             Object[] options = new Object[]{"Cancel", "Start New", "Continue"};
             int returnVal = JOptionPane.showOptionDialog(
                     Main.auditFrame,
-                    "An exisiting audit is in process, do you want to continue?",
+                    "An existing audit is in process, do you want to continue?",
                     "Existing audit found",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE,
@@ -293,7 +293,7 @@ public class AuditController {
         currentDir = albums.get(auditCount);
 
         // save the tracks here instead of forcing the user to save it in the main frame form
-        Main.frame.saveAll();
+        Main.frame.songController.saveAll();
 
         // check if the audit is done
         if (auditCount < albums.size()) {
@@ -370,7 +370,7 @@ public class AuditController {
      * @return the result of the check, true for existing audit, false for no
      * existing audit
      */
-    public boolean checkForExisitingAudit() {
+    public boolean checkForExistingAudit() {
         return albums.stream().anyMatch((album) -> (containsFile(album)));
     }
 
@@ -403,7 +403,7 @@ public class AuditController {
         try {
             done.createNewFile();
         } catch (IOException ex) {
-            Main.logger.logError("Error creating done file for auditing in folder: " + path, ex);
+            logger.logError("Error creating done file for auditing in folder: " + path, ex);
         }
     }
 
@@ -467,72 +467,72 @@ public class AuditController {
 
                 // id3tags
                 str = str.concat(" Some ID3Tags missing:\n");
-                for (String path : auditFilePathList.get(0)) {
+                for (String path : auditFilePathList.get(ID3)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
-                // id3tags
+                // filenames
                 str = str.concat(" Some filenames don't match standard:\n");
-                for (String path : auditFilePathList.get(1)) {
+                for (String path : auditFilePathList.get(FILENAMES)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
                 // cover art
                 str = str.concat(" Cover art not found in folder:\n");
-                for (String path : auditFilePathList.get(2)) {
+                for (String path : auditFilePathList.get(COVER)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
                 break;
             case CLEANUP:
 
-                // zip files
-                str = str.concat(" ZIP FILES:\n");
-                for (String path : cleanupFilePathList.get(3)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
                 // mp3.asd files
                 str = str.concat(" MP3.ASD FILES:\n");
-                for (String path : cleanupFilePathList.get(0)) {
-                    str = str.concat(" \t" + path + " \n");
-                }
-                str = str.concat("\n");
-
-                // wav files
-                str = str.concat(" WAV FILES:\n");
-                for (String path : cleanupFilePathList.get(2)) {
+                for (String path : cleanupFilePathList.get(MP3ASD)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
                 // flac files
                 str = str.concat(" FLAC FILES:\n");
-                for (String path : cleanupFilePathList.get(1)) {
+                for (String path : cleanupFilePathList.get(FLAC)) {
+                    str = str.concat(" \t" + path + " \n");
+                }
+                str = str.concat("\n");
+
+                // wav files
+                str = str.concat(" WAV FILES:\n");
+                for (String path : cleanupFilePathList.get(WAV)) {
+                    str = str.concat(" \t" + path + " \n");
+                }
+                str = str.concat("\n");
+
+                // zip files
+                str = str.concat(" ZIP FILES:\n");
+                for (String path : cleanupFilePathList.get(ZIP)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
                 // image files
                 str = str.concat(" IMAGE FILES:\n");
-                for (String path : cleanupFilePathList.get(4)) {
+                for (String path : cleanupFilePathList.get(IMG)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
                 // windows files
                 str = str.concat(" WINDOWS FILES:\n");
-                for (String path : cleanupFilePathList.get(5)) {
+                for (String path : cleanupFilePathList.get(WINDOWS)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
 
                 // other files
                 str = str.concat(" OTHER FILES:\n");
-                for (String path : cleanupFilePathList.get(6)) {
+                for (String path : cleanupFilePathList.get(OTHER)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
@@ -571,7 +571,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        files = Main.frame.listFiles(dir, files);
+        files = Utils.listFiles(dir, files);
 
         // regex to check
         String regex = "\\d\\d ((.)*)";
@@ -598,7 +598,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        files = Main.frame.listFiles(dir, files);
+        files = Utils.listFiles(dir, files);
 
         // traverse the file list
         for (File file : files) {
@@ -698,39 +698,39 @@ public class AuditController {
         boolean nothingToDelete = true;
 
         if (mp3asd) {
-            nothingToDelete = cleanupFilePathList.get(0).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(0));
-            cleanupFilePathList.get(0).clear();
+            nothingToDelete = cleanupFilePathList.get(MP3ASD).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(MP3ASD));
+            cleanupFilePathList.get(MP3ASD).clear();
         }
         if (flac) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(1).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(1));
-            cleanupFilePathList.get(1).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(FLAC).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(FLAC));
+            cleanupFilePathList.get(FLAC).clear();
         }
         if (wav) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(2).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(2));
-            cleanupFilePathList.get(2).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(WAV).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(WAV));
+            cleanupFilePathList.get(WAV).clear();
         }
         if (zip) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(3).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(3));
-            cleanupFilePathList.get(3).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(ZIP).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(ZIP));
+            cleanupFilePathList.get(ZIP).clear();
         }
         if (images) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(4).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(4));
-            cleanupFilePathList.get(4).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(IMG).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(IMG));
+            cleanupFilePathList.get(IMG).clear();
         }
         if (windows) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(5).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(5));
-            cleanupFilePathList.get(5).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(WINDOWS).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(WINDOWS));
+            cleanupFilePathList.get(WINDOWS).clear();
         }
         if (everythingElse) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(6).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(6));
-            cleanupFilePathList.get(6).clear();
+            nothingToDelete = nothingToDelete && cleanupFilePathList.get(OTHER).isEmpty();
+            deleteAllFilesInList(cleanupFilePathList.get(OTHER));
+            cleanupFilePathList.get(OTHER).clear();
         }
 
         if (nothingToDelete) {
