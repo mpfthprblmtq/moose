@@ -13,6 +13,7 @@ package moose.views;
 // imports
 import moose.*;
 import moose.controllers.SongController;
+import moose.objects.Song;
 import moose.utilities.FileDrop;
 import moose.utilities.Logger;
 import moose.utilities.TableCellListener;

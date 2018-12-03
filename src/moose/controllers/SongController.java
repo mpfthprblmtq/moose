@@ -13,7 +13,7 @@ import com.mpatric.mp3agic.*;
 
 import moose.utilities.Logger;
 import moose.Main;
-import moose.Song;
+import moose.objects.Song;
 import moose.utilities.Utils;
 
 import javax.swing.*;

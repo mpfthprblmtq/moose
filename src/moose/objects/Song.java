@@ -7,7 +7,7 @@
  */
 
 // package
-package moose;
+package moose.objects;
 
 // imports
 import java.io.File;
