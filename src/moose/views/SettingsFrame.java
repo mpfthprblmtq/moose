@@ -8,9 +8,11 @@
  */
 
 // package
-package moose;
+package moose.views;
 
 // imports
+import moose.controllers.SettingsController;
+
 import java.io.File;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;

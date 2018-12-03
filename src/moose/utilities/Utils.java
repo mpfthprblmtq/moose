@@ -1,4 +1,4 @@
-package moose;
+package moose.utilities;
 
 import javax.swing.*;
 import java.awt.*;

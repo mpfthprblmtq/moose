@@ -7,9 +7,14 @@
  */
 
 // package
-package moose;
+package moose.controllers;
 
 import com.mpatric.mp3agic.*;
+
+import moose.utilities.Logger;
+import moose.Main;
+import moose.Song;
+import moose.utilities.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
