@@ -83,6 +83,22 @@ public class Logger {
     }
 
     /**
+     * Returns the error log
+     * @return the error log File
+     */
+    public File getErrorLog() {
+        return errorLog;
+    }
+
+    /**
+     * Returns the event log
+     * @return the event log File
+     */
+    public File getEventLog() {
+        return eventLog;
+    }
+
+    /**
      * Method that actually does the logging for errors
      * @param str the localized string
      * @param ex the exception text

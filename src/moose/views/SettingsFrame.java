@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 public class SettingsFrame extends javax.swing.JFrame {
 
     // controller
-    SettingsController settingsController = new SettingsController();
+    public SettingsController settingsController = new SettingsController();
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
@@ -472,9 +472,9 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @return the listModel for the JList
      */
     public DefaultListModel getGenreListModel() {
-        if (settingsController.genres != null) {
-            for (int i = 0; i < settingsController.genres.size(); i++) {
-                genreListModel.add(i, settingsController.genres.get(i));
+        if (settingsController.getGenres() != null) {
+            for (int i = 0; i < settingsController.getGenres().size(); i++) {
+                genreListModel.add(i, settingsController.getGenres().get(i));
             }
             return genreListModel;
         } else {
@@ -513,7 +513,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param newGenre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
-        settingsController.genres.set(settingsController.genres.indexOf(oldGenre), newGenre);
+        settingsController.getGenres().set(settingsController.getGenres().indexOf(oldGenre), newGenre);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
         genreTextField.setText("");
         addGenreButton.setText("Add");
