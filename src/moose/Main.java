@@ -18,7 +18,7 @@ import moose.views.SettingsFrame;
 public class Main {
     
     // version
-    public static String version = "1.1.0";
+    public static String version = "1.1.1";
     
     // create and instantiate the frames and controllers
     public static Frame frame = new Frame();
