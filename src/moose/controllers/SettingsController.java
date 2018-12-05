@@ -11,6 +11,7 @@ package moose.controllers;
 
 // imports
 import moose.Main;
+import moose.utilities.Utils;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -81,7 +82,9 @@ public class SettingsController {
         } catch (IOException ex) {
             Main.logger.logError("Error reading settings file!", ex);
         }
-    }/**
+    }
+
+    /**
      * Reads the settings from the file and sets the ivars
      */
     public void readSettingsFile() {
@@ -202,10 +205,7 @@ public class SettingsController {
      */
     public void openEventLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.getEventLog().exists()) {
-                desktop.open(Main.logger.getEventLog());
-            }
+            Utils.openFile(Main.logger.getEventLog());
         } catch (IOException ex) {
             Main.logger.logError("Couldn't open the event log!", ex);
         }
@@ -216,10 +216,7 @@ public class SettingsController {
      */
     public void openErrorLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.getErrorLog().exists()) {
-                desktop.open(Main.logger.getErrorLog());
-            }
+            Utils.openFile(Main.logger.getEventLog());
         } catch (IOException ex) {
             Main.logger.logError("Couldn't open the event log!", ex);
         }

@@ -288,59 +288,19 @@ public class SongController {
 
     /**
      * Goes through the edited_songs array and saves each one
+     * TODO confirm that this works
      */
     public void saveAll() {
-
-        // traverse the array of songs
+        // traverse the array of songs and save them all
         for (int i = 0; i < songs.size(); i++) {
-
-            // if the song at i is in edited_songs, update it
-            if (edited_songs.contains(i)) {
-                Song s = songs.get(i);
-                File file = s.getFile();
-                Mp3File mp3file = null;
-
-                try {
-                    mp3file = new Mp3File(file.getAbsolutePath());
-                    ID3v2 tag = new ID3v24Tag();
-                    mp3file.setId3v2Tag(tag);
-                } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-                    System.err.println(ex);
-                }
-
-                // set all the text based items
-                try {
-                    mp3file.getId3v2Tag().setTitle(s.getTitle());
-                    mp3file.getId3v2Tag().setArtist(s.getArtist());
-                    mp3file.getId3v2Tag().setAlbum(s.getAlbum());
-                    mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumartist());
-                    mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
-                    mp3file.getId3v2Tag().setYear(s.getYear());
-                    mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
-                    mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
-                } catch (IllegalArgumentException ex) {
-                    // this exception doesn't really matter
-                    // this only happens if you save a track with no genre
-                }
-
-                // set album art
-                String type = "image/jpeg";
-                mp3file.getId3v2Tag().clearAlbumImage();
-                mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
-
-                save(mp3file, file);
-
-                // update the row graphic
-                Main.frame.setRowIcon(Main.frame.SAVED, getRow(i));
-            } else {
-                // skip it, no changes
-            }
+            save(i);
         }
-
-        // done with the saving, clear the edited_songs list
-        edited_songs.clear();
     }
 
+    /**
+     * Grabs the index from the selected row, then calls save() with that index
+     * @param selectedRows, the row indices to save
+     */
     public void saveTracks(int[] selectedRows) {
         // traverse the array of rows and play each file sequentially
         for (int i = 0; i < selectedRows.length; i++) {
@@ -350,6 +310,10 @@ public class SongController {
         }
     }
 
+    /**
+     * Saves an individual track
+     * @param index, the index of the song to save in the songs map
+     */
     public void save(int index) {
         if (edited_songs.contains(index)) {
             Song s = songs.get(index);
@@ -384,6 +348,7 @@ public class SongController {
             mp3file.getId3v2Tag().clearAlbumImage();
             mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
 
+            // not a recursive call, this function does the actual file saving
             save(mp3file, file);
 
             // update the row graphic
@@ -403,7 +368,6 @@ public class SongController {
 
     /**
      * Saves an individual file
-     *
      * @param mp3file
      * @param file
      */
@@ -420,7 +384,7 @@ public class SongController {
             newFile.renameTo(file);
 
         } catch (IOException | NotSupportedException ex) {
-            System.err.println(ex);
+            logger.logError("Exception when trying to save a song!", ex);
         }
     }
 
@@ -483,7 +447,7 @@ public class SongController {
                 }
 
             } catch (IOException ex) {
-                //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                logger.logError("Exception while adding album art!", ex);
             }
         }
     }
@@ -521,6 +485,9 @@ public class SongController {
      * @param selectedRows the rows of songs to update
      */
     public void autoAddCovers(int[] selectedRows) {
+
+        int count = 0;
+
         // traverse the array of rows and add each image
         for (int i = 0; i < selectedRows.length; i++) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
@@ -533,8 +500,10 @@ public class SongController {
             if (cover != null) {
                 // if cover doesn't return as null, add the cover
                 addIndividualCover(row, cover);
+                count++;
             }
         }
+        Main.frame.updateConsole("Added cover art for " + count + " file(s)!");
     }
 
     /**
@@ -611,19 +580,29 @@ public class SongController {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
 
             for (int i = 0; i < selectedRows.length; i++) {
-                File file = (File) table.getModel().getValueAt(selectedRows[i], 1);
-
-                File directory = jfc.getSelectedFile();
-                File new_file = new File(directory.getPath() + "/" + file.getName());
-                file.renameTo(new_file);
-
-                int index = getIndex(selectedRows[i]);
-                songs.get(index).setFile(new_file);
-                table.getModel().setValueAt(new_file, selectedRows[i], 1);
+                File old_file = (File) table.getModel().getValueAt(selectedRows[i], 1);
+                File new_location = jfc.getSelectedFile();
+                int row = selectedRows[i];
+                moveFile(row, old_file, new_location);
             }
         } else {
             // do nothing, user exited or pressed cancel
         }
+    }
+
+    /**
+     * Function that actually moves the file
+     * @param row
+     * @param old_file
+     * @param new_location
+     */
+    public void moveFile(int row, File old_file, File new_location) {
+        File new_file = new File(new_location.getPath() + "/" + old_file.getName());
+        old_file.renameTo(new_file);
+
+        int index = getIndex(row);
+        songs.get(index).setFile(new_file);
+        table.getModel().setValueAt(new_file, row, 1);
     }
 
     /**
@@ -634,15 +613,12 @@ public class SongController {
     public void playFiles(int[] selectedRows) {
         // traverse the array of rows and play each file sequentially
         for (int i = 0; i < selectedRows.length; i++) {
+            int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
+            File file = (File) table.getModel().getValueAt(row, 1);
             try {
-                int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
-                File file = (File) table.getModel().getValueAt(row, 1);
-                Desktop desktop = Desktop.getDesktop();
-                if (file.exists()) {
-                    desktop.open(file);
-                }
+                Utils.openFile(file);
             } catch (IOException ex) {
-                System.err.println(ex);
+                logger.logError("Couldn't play file " + file.getName(), ex);
             }
         }
     }
