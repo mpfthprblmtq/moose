@@ -44,6 +44,7 @@ public class SongController {
 
     /**
      * Returns the songs list
+     * @return the songs map
      */
     public HashMap<Integer, Song> getSongs() {
         return songs;

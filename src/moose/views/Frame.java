@@ -6,7 +6,6 @@
  *
  *  Copyright Pat Ripley 2018
  */
-
 // package
 package moose.views;
 
@@ -56,6 +55,7 @@ public class Frame extends javax.swing.JFrame {
                 return Object.class;
             }
         }
+
         @Override   // returns if the cell is editable based on the column index
         public boolean isCellEditable(int row, int column) {
             return !(column == 11 || column == 0);
@@ -95,6 +95,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Creates new form Frame with a
+     *
      * @param folder, the folder we want to start with
      */
     public Frame(File folder) {
@@ -110,7 +111,7 @@ public class Frame extends javax.swing.JFrame {
             });
         }
         songController = new SongController(table);
-        
+
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         files = Utils.listFiles(folder, files);
@@ -120,7 +121,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     public void init() {
-        
+
         // set the table's model to the custom model
         table.setModel(model);
 
@@ -155,7 +156,7 @@ public class Frame extends javax.swing.JFrame {
                     break;
             }
         }; // end menuListener
-        
+
         // create the columns
         model.addColumn("");
         model.addColumn("File");
@@ -218,6 +219,9 @@ public class Frame extends javax.swing.JFrame {
 
                 // switch to see what column changed, and do a task based on that
                 switch (c) {
+                    case 0:
+
+                        break;
                     case 2:     // filename was changed
                         // with the filename changing, this changes automatically without hitting save
                         // this functionality might change
@@ -301,10 +305,10 @@ public class Frame extends javax.swing.JFrame {
                         break;
 
                     case 11:    // artwork was changed
-                        // TODO:  Check to see if we can use this?
-                        //setAlbumImage(index, tcl.getNewValue().toString());
+                    // TODO:  Check to see if we can use this?
+                    //setAlbumImage(index, tcl.getNewValue().toString());
                     default:    // not accounted for
-                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() +": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
+                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
                         break;
                 }
             }
@@ -341,13 +345,13 @@ public class Frame extends javax.swing.JFrame {
         row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
                 break;
         }
     }
@@ -366,6 +370,7 @@ public class Frame extends javax.swing.JFrame {
             return false;
         } else {
 
+            int index = songController.getSongs().size();
             Song s = songController.getSongFromFile(file);
 
             // getting the image to put on the table
@@ -373,7 +378,7 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
+                new ImageIcon(this.getClass().getResource("../../resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
                 s.getFile().getName().replace(".mp3", ""), // actual editable file name
                 s.getTitle(),
@@ -385,7 +390,7 @@ public class Frame extends javax.swing.JFrame {
                 s.getFullTrackString(),
                 s.getFullDiskString(),
                 (thumbnail_icon != null) ? thumbnail_icon : null, // checks for null value first
-                songController.getSongs().size() // hidden index for the song object
+                index // hidden index for the song object
             });
         }
 
@@ -529,9 +534,7 @@ public class Frame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable() {
-
-        };
+        table = new javax.swing.JTable();
         consoleSP = new javax.swing.JScrollPane();
         console = new javax.swing.JTextArea();
         multPanel = new javax.swing.JPanel();
@@ -571,6 +574,7 @@ public class Frame extends javax.swing.JFrame {
         formatFilenamesMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -928,6 +932,15 @@ public class Frame extends javax.swing.JFrame {
         });
         helpMenu.add(aboutMenuItem);
 
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        jMenuItem1.setText("Command Prompt");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        helpMenu.add(jMenuItem1);
+
         settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_MASK));
         settingsMenuItem.setText("Preferences");
         settingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -987,7 +1000,6 @@ public class Frame extends javax.swing.JFrame {
 
             // import the files
             importFiles(files);
-
 
         } else {
             // no files chose, update console
@@ -1221,11 +1233,39 @@ public class Frame extends javax.swing.JFrame {
         Main.launchAuditFrame();
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // prompt the user to enter a command
+        String command = JOptionPane.showInputDialog(this, "Enter a command:");
+        if(command != null) {
+            doCommand(command);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    /**
+     * Performs a command based on the user input
+     *
+     * @param command
+     */
+    public void doCommand(String command) {
+        command = command.toLowerCase();
+        switch (command) {
+            case "clear error log":
+                Main.settings.settingsController.clearErrorLog();
+                break;
+            case "clear event log":
+                Main.settings.settingsController.clearEventLog();
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown Command!");
+                break;
+        }
+    }
+
     /**
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
+        Icon icon = new ImageIcon(this.getClass().getResource("../../resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
@@ -1680,6 +1720,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
