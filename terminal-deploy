@@ -1,5 +1,4 @@
-# To start process, ensure that you have the compiled package-for-store .jar file and the .icns image file in the same folder
-# Then paste the commands below
+# To start process, ensure that you have the compiled package-for-deploy .jar in the deploy folder
 
 cp git/moose/src/resources/moose.icns git/moose/deploy
 cd git/moose/deploy
