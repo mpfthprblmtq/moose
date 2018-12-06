@@ -984,7 +984,6 @@ public class Frame extends javax.swing.JFrame {
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
 
-        // TODO create a importFiles method that takes a File[] and does this stuff
         // use a filechooser to open the folder full of stuff
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -1118,7 +1117,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_tableKeyReleased
 
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_addTrackNumbersMenuItemActionPerformed
 
     /**
@@ -1207,7 +1206,8 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_addCoversMenuItemActionPerformed
 
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
-        // TODO add your handling code here:
+        int[] selectedRows = table.getSelectedRows();
+        songController.saveTracks(selectedRows);
     }//GEN-LAST:event_saveTrackMenuItemActionPerformed
 
     private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
@@ -1656,10 +1656,8 @@ public class Frame extends javax.swing.JFrame {
     private void setColumnWidth(int column, int width) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
         if (width < 0) {
-            // use the preferred width of the header..
             JLabel label = new JLabel((String) tableColumn.getHeaderValue());
             Dimension preferred = label.getPreferredSize();
-            // altered 10->14 as per camickr comment.
             width = (int) preferred.getWidth() + 14;
         }
         tableColumn.setPreferredWidth(width);
