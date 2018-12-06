@@ -597,6 +597,102 @@ public class SongController {
         }
     }
 
+    /**
+     * Function that looks at the file's name and location and auto generates some tags
+     * @param selectedRows, the rows selected on the table
+     */
+    public void autoTagFiles(int[] selectedRows) {
+        for (int i = 0; i < selectedRows.length; i++) {
+            autoTag(selectedRows[i], (File) table.getValueAt(i, 1));
+        }
+    }
+
+    /**
+     * Function that actually does the autotagging
+     * @param row, the row to update
+     * @param file, the file to look at
+     */
+    public void autoTag(int row, File file) {
+
+        String title = getTitleFromFile(file);
+        String album = getAlbumFromFile(file);
+        String year = getYearFromFile(file);
+        String tracks = getTracksFromFolder(file.getParentFile());
+    }
+
+    public String getTitleFromFile(File file) {
+        String regex = "\\d{2} .*\\.mp3";
+        if(file.getName().matches(regex)) {
+            return file.getName().substring(3);
+        } else {
+            return "";
+        }
+    }
+
+    public String getAlbumFromFile(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if(dir.getName().matches(regex)) {
+            return dir.getName().substring(6);
+        } else if (dir.getName().startsWith("CD")) {
+            // album is a multiple CD album
+            dir = dir.getParentFile();
+            if (dir.getName().equals(regex)) {
+                return dir.getName().substring(6);
+            }
+        }
+        return "";
+    }
+
+    public String getYearFromFile(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if(dir.getName().matches(regex)) {
+            return dir.getName().substring(1,5);
+        } else if (dir.getName().startsWith("CD")) {
+            // album is a multiple CD album
+            dir = dir.getParentFile();
+            if (dir.getName().equals(regex)) {
+                return dir.getName().substring(1, 5);
+            }
+        }
+        return "";
+    }
+
+    public String getTracksFromFolder(File file) {
+        String regex = "\\d{2} .*\\.mp3";
+        if(file.getName().matches(regex)) {
+            return file.getName().substring(0,1) + "/" + getTotalTracksFromFolder(file);
+        } else {
+            return "";
+        }
+    }
+
+    public String getTotalTracksFromFolder(File file) {
+        String regex = "\\[\\d{4}\\] .*";
+        int totalTracks = 0;
+        if(file.getName().matches(regex)) {
+            return String.valueOf(getNumberOfSongs(file));
+        } else if (file.getName().startsWith("CD")) {
+            // album is a multiple CD album
+            // TODO handle this logic
+            return "";
+        } else {
+            return "";
+        }
+    }
+
+    public int getNumberOfSongs(File file) {
+        File[] files = file.listFiles();
+        int count = 0;
+        for (int i = 0; i< files.length; i++) {
+            if(files[i].getName().endsWith(".mp3")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // TODO Make sure this works and document it
     public void moveFiles(int[] selectedRows) {
 
