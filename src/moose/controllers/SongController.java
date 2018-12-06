@@ -291,10 +291,15 @@ public class SongController {
      * TODO confirm that this works
      */
     public void saveAll() {
+
+        int count = 0;
+
         // traverse the array of songs and save them all
         for (int i = 0; i < songs.size(); i++) {
             save(i);
+            count++;
         }
+        Main.frame.updateConsole(count + " files updated!");
     }
 
     /**
@@ -302,12 +307,17 @@ public class SongController {
      * @param selectedRows, the row indices to save
      */
     public void saveTracks(int[] selectedRows) {
+
+        int count = 0;
+
         // traverse the array of rows and play each file sequentially
         for (int i = 0; i < selectedRows.length; i++) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
             int index = getIndex(row);
             save(index);
+            count++;
         }
+        Main.frame.updateConsole(count + " files updated!");
     }
 
     /**
@@ -503,7 +513,7 @@ public class SongController {
                 count++;
             }
         }
-        Main.frame.updateConsole("Added cover art for " + count + " file(s)!");
+        Main.frame.updateConsole("Auto-added cover art for " + count + " file(s)!");
     }
 
     /**
@@ -548,7 +558,6 @@ public class SongController {
             // update graphics
             Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
 
-
             // set the image on the row
             table.getModel().setValueAt(thumbnail_icon, row, 11);
 
@@ -566,6 +575,10 @@ public class SongController {
         }
     }
 
+    /**
+     * Function that moves files based on the files selected
+     * @param selectedRows, the rows with the file you want moved
+     */
     // TODO Make sure this works and document it
     public void moveFiles(int[] selectedRows) {
 
