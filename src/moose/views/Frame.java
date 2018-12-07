@@ -33,7 +33,7 @@ import javax.swing.table.*;
 public class Frame extends javax.swing.JFrame {
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // controller, instantiated in constructor
     public SongController songController = new SongController();

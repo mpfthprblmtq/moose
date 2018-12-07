@@ -11,8 +11,9 @@
 package moose.views;
 
 // imports
-import moose.utilities.Logger;
-import moose.controllers.AuditController;
+import moose.Main;
+import moose.utilities.*;
+import moose.controllers.*;
 
 import java.awt.Font;
 import javax.swing.Box;
@@ -32,7 +33,7 @@ public class AuditFrame extends javax.swing.JFrame {
     public AuditController auditController = new AuditController();
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     /**
      * Creates new form AuditFrame

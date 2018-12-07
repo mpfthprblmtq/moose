@@ -11,7 +11,9 @@
 package moose.views;
 
 // imports
-import moose.controllers.SettingsController;
+import moose.Main;
+import moose.controllers.*;
+import moose.utilities.*;
 
 import java.io.File;
 import javax.swing.DefaultListModel;
@@ -23,6 +25,9 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // controller
     public SettingsController settingsController = new SettingsController();
+
+    // logger object
+    Logger logger = Main.getLogger();
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
