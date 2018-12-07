@@ -38,7 +38,10 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
-    public SongController(JTable table) {
+    public SongController() {
+    }
+    
+    public void setTable(JTable table) {
         this.table = table;
     }
 

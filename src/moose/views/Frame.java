@@ -36,7 +36,7 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = new Logger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();;
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -90,7 +90,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
     }
 
     /**
@@ -110,7 +109,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
 
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
@@ -345,13 +343,13 @@ public class Frame extends javax.swing.JFrame {
         row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
+                model.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
                 break;
         }
     }
@@ -378,7 +376,7 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("../../resources/default.png")), // adds the default status icon
+                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
                 s.getFile().getName().replace(".mp3", ""), // actual editable file name
                 s.getTitle(),
@@ -598,6 +596,7 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
+        songController.setTable(table);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
@@ -1255,6 +1254,12 @@ public class Frame extends javax.swing.JFrame {
             case "clear event log":
                 Main.settings.settingsController.clearEventLog();
                 break;
+            case "open error log":
+                Main.settings.settingsController.openErrorLog();
+                break;
+            case "open event log":
+                Main.settings.settingsController.openEventLog();
+                break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
                 break;
@@ -1265,7 +1270,7 @@ public class Frame extends javax.swing.JFrame {
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("../../resources/moose128.png"));
+        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
