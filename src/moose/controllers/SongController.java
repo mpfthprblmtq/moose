@@ -38,10 +38,13 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
-    public SongController(JTable table) {
-        this.table = table;
+    public SongController() {
     }
 
+    public void setTable(JTable table) {
+        this.table = table;
+    }
+    
     /**
      * Returns the songs list
      * @return the songs map
@@ -52,6 +55,8 @@ public class SongController {
 
     /**
      * Gets a song object from a file
+     * @param file, the file to get info from
+     * @return a song object
      */
     public Song getSongFromFile(File file) {
         // mp3agic Mp3File object, used for the id3tags
@@ -623,7 +628,7 @@ public class SongController {
     public String getTitleFromFile(File file) {
         String regex = "\\d{2} .*\\.mp3";
         if(file.getName().matches(regex)) {
-            return file.getName().substring(3);
+            return file.getName().substring(3).trim();
         } else {
             return "";
         }
@@ -633,12 +638,12 @@ public class SongController {
         File dir = file.getParentFile();
         String regex = "\\[\\d{4}\\] .*";
         if(dir.getName().matches(regex)) {
-            return dir.getName().substring(6);
+            return dir.getName().substring(6).trim();
         } else if (dir.getName().startsWith("CD")) {
             // album is a multiple CD album
             dir = dir.getParentFile();
             if (dir.getName().equals(regex)) {
-                return dir.getName().substring(6);
+                return dir.getName().substring(6).trim();
             }
         }
         return "";
@@ -648,12 +653,12 @@ public class SongController {
         File dir = file.getParentFile();
         String regex = "\\[\\d{4}\\] .*";
         if(dir.getName().matches(regex)) {
-            return dir.getName().substring(1,5);
+            return dir.getName().substring(1,5).trim();
         } else if (dir.getName().startsWith("CD")) {
             // album is a multiple CD album
             dir = dir.getParentFile();
             if (dir.getName().equals(regex)) {
-                return dir.getName().substring(1, 5);
+                return dir.getName().substring(1, 5).trim();
             }
         }
         return "";
