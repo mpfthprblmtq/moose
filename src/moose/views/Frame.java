@@ -36,7 +36,7 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = new Logger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -90,7 +90,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
     }
 
     /**
@@ -110,8 +109,7 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
-
+        
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         files = Utils.listFiles(folder, files);
@@ -598,6 +596,7 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
+        songController.setTable(table);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
