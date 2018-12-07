@@ -32,7 +32,7 @@ public class SongController {
     JTable table;
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
@@ -584,7 +584,6 @@ public class SongController {
             // update graphics
             Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
 
-
             // set the image on the row
             table.getModel().setValueAt(thumbnail_icon, row, 11);
 
@@ -610,6 +609,7 @@ public class SongController {
         for (int i = 0; i < selectedRows.length; i++) {
             autoTag(selectedRows[i], (File) table.getValueAt(i, 1));
         }
+        autoAddCovers(selectedRows);
     }
 
     /**
@@ -620,9 +620,22 @@ public class SongController {
     public void autoTag(int row, File file) {
 
         String title = getTitleFromFile(file);
+        String artist = getArtistFromFile(file);
         String album = getAlbumFromFile(file);
+        String albumartist = getAlbumArtistFromFile(file);
         String year = getYearFromFile(file);
-        String tracks = getTracksFromFolder(file.getParentFile());
+        String tracks = getTracksFromFolder(file);
+        String disks = getDisksFromFile(file);
+        String genre = getGenreFromFile(file);
+
+        table.getModel().setValueAt(title, row, 3);
+        table.getModel().setValueAt(artist, row, 4);
+        table.getModel().setValueAt(album, row, 5);
+        table.getModel().setValueAt(albumartist, row, 6);
+        table.getModel().setValueAt(year, row, 7);
+        table.getModel().setValueAt(genre, row, 8);
+        table.getModel().setValueAt(tracks, row, 9);
+        table.getModel().setValueAt(disks, row, 10);
     }
 
     public String getTitleFromFile(File file) {
@@ -632,6 +645,14 @@ public class SongController {
         } else {
             return "";
         }
+    }
+
+    public String getArtistFromFile(File file) {
+        if(Utils.isPartOfALabel(file)) {
+            return "";
+        }
+
+        return getArtist(file);
     }
 
     public String getAlbumFromFile(File file) {
@@ -649,7 +670,34 @@ public class SongController {
         return "";
     }
 
+    public String getAlbumArtistFromFile(File file) {
+        if(Utils.isPartOfALabel(file)) {
+            File dir = file.getParentFile().getParentFile().getParentFile();
+            return dir.getName();
+        }
+
+        return getArtist(file);
+    }
+
+    public String getArtist(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if(dir.getName().matches(regex)) {
+            dir = dir.getParentFile();
+            return dir.getName();
+        } else if (dir.getName().startsWith("CD")) {
+            dir = dir.getParentFile().getParentFile();
+            return dir.getName();
+        } else {
+            return "";
+        }
+    }
+
     public String getYearFromFile(File file) {
+        if(file == null) {
+            return "";
+        }
+
         File dir = file.getParentFile();
         String regex = "\\[\\d{4}\\] .*";
         if(dir.getName().matches(regex)) {
@@ -665,9 +713,15 @@ public class SongController {
     }
 
     public String getTracksFromFolder(File file) {
+        if(file == null) {
+            return "";
+        }
+
+        file = file.getParentFile();
+        String totalTracks = getTotalTracksFromFolder(file);
         String regex = "\\d{2} .*\\.mp3";
         if(file.getName().matches(regex)) {
-            return file.getName().substring(0,1) + "/" + getTotalTracksFromFolder(file);
+            return file.getName().substring(0,1) + "/" + totalTracks;
         } else {
             return "";
         }
@@ -696,6 +750,42 @@ public class SongController {
             }
         }
         return count;
+    }
+
+    public String getDisksFromFile(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if(dir.getName().matches(regex)) {
+            // there's no CD1, CD2 folders, single disk album
+            return "1/1";
+        } else if (dir.getName().startsWith("CD") && dir.getParentFile().getName().matches(regex)) {
+            int totalDisks = getTotalDisksFromFolder(dir);
+            return dir.getName().substring(2) + "/" + totalDisks;
+        } else {
+            return "";
+        }
+    }
+
+    public int getTotalDisksFromFolder(File dir) {
+        dir = dir.getParentFile();
+        File[] dirs = dir.listFiles(File::isDirectory);
+        int count = 0;
+        for (File folder : dirs) {
+            if(folder.getName().startsWith("CD")) {
+                // most (if not all) times, this should be 2
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public String getGenreFromFile(File file) {
+        if(!Utils.isPartOfALabel(file)) {
+            return "";
+        }
+
+        File dir = file.getParentFile();
+        return dir.getName();
     }
 
     // TODO Make sure this works and document it

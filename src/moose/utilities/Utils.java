@@ -51,4 +51,16 @@ public class Utils {
         }
         return thumbnail_icon;
     }
+
+    /**
+     * Check if a directory is from a label
+     *
+     * @param dir, the directory to check
+     * @return the result of the check, true if it is a label, false if it isn't
+     * a label
+     */
+    public static boolean isPartOfALabel(File dir) {
+        String path = dir.getPath();
+        return path.contains("/Genres/");
+    }
 }

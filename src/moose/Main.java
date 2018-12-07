@@ -20,11 +20,13 @@ public class Main {
     // version
     public static String version = "1.1.1";
     
-    // create and instantiate the frames and controllers
+    // create and instantiate the frames
     public static Frame frame = new Frame();
-    public static Logger logger = new Logger();
     public static SettingsFrame settings = new SettingsFrame();
     public static AuditFrame auditFrame = new AuditFrame();
+
+    // logger object
+    public static Logger logger = new Logger();
 
     /**
      * Entry point for the app, launches the main Frame
@@ -33,7 +35,11 @@ public class Main {
     public static void main(String args[]) {
         launchFrame();
     }
-    
+
+    public static Logger getLogger() {
+        return logger;
+    }
+
     /**
      * MainUI
      * Controls the Frame opening
