@@ -5,7 +5,6 @@
  *
  *  Copyright Pat Ripley 2018
  */
-
 // package
 package moose.controllers;
 
@@ -32,18 +31,22 @@ public class SongController {
     JTable table;
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
-    public SongController(JTable table) {
+    public SongController() {
+    }
+
+    public void setTable(JTable table) {
         this.table = table;
     }
 
     /**
      * Returns the songs list
+     *
      * @return the songs map
      */
     public HashMap<Integer, Song> getSongs() {
@@ -52,6 +55,9 @@ public class SongController {
 
     /**
      * Gets a song object from a file
+     *
+     * @param file, the file to get info from
+     * @return a song object
      */
     public Song getSongFromFile(File file) {
         // mp3agic Mp3File object, used for the id3tags
@@ -523,12 +529,25 @@ public class SongController {
      * @return the cover file, or null if it doesn't exist
      */
     public File folderContainsCover(File folder) {
+        String regex = "\\[\\d{4}\\] .*";
+        if (folder.getName().matches(regex)) {
+            // all is well, just get the cover normally
+        } else if (folder.getName().startsWith("CD")) {
+            folder = folder.getParentFile();
+        }
+
         File[] files = folder.listFiles();      // get all the files
         for (File file : files) {
             if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
                 return file;
             }
         }
+        // if we reach this point, then the cover wasn't found
+        // perform one final check and recursively call itself
+        if (folder.getParentFile().getName().matches(regex)) {
+            return folderContainsCover(folder.getParentFile());
+        }
+
         // no cover files were found, returning null
         return null;
     }
@@ -576,22 +595,307 @@ public class SongController {
     }
 
     /**
-     * Function that moves files based on the files selected
-     * @param selectedRows, the rows with the file you want moved
+     * Function that looks at the file's name and location and auto generates
+     * some tags
+     *
+     * @param selectedRows, the rows selected on the table
      */
-    // TODO Make sure this works and document it
+    public void autoTagFiles(int[] selectedRows) {
+        for (int i = 0; i < selectedRows.length; i++) {
+            autoTag(selectedRows[i], (File) table.getModel().getValueAt(i, 1));
+        }
+        autoAddCovers(selectedRows);
+    }
+
+    /**
+     * Function that actually does the autotagging
+     *
+     * @param row, the row to update
+     * @param file, the file to look at
+     */
+    public void autoTag(int row, File file) {
+
+        String title = getTitleFromFile(file);
+        String artist = getArtistFromFile(file);
+        String album = getAlbumFromFile(file);
+        String albumartist = getAlbumArtistFromFile(file);
+        String year = getYearFromFile(file);
+        String tracks = getTracksFromFolder(file);
+        String disks = getDisksFromFile(file);
+        String genre = getGenreFromFile(file);
+
+        // get the index for the setters
+        int index = getIndex(row);
+
+        // title
+        setTitle(index, title);
+        table.getModel().setValueAt(title, row, 3);
+
+        // artist
+        if (!Utils.isPartOfALabel(file)) {
+            setArtist(index, artist);
+            table.getModel().setValueAt(artist, row, 4);
+        }
+
+        // album
+        setAlbum(index, album);
+        table.getModel().setValueAt(album, row, 5);
+
+        // album artist
+        setAlbumArtist(index, albumartist);
+        table.getModel().setValueAt(albumartist, row, 6);
+
+        // year
+        setYear(index, year);
+        table.getModel().setValueAt(year, row, 7);
+
+        // genre
+        if (Utils.isPartOfALabel(file)) {
+            setGenre(index, genre);
+            table.getModel().setValueAt(genre, row, 8);
+        }
+
+        // tracks
+        setTrack(index, tracks);
+        table.getModel().setValueAt(tracks, row, 9);
+
+        // disks
+        setDisk(index, disks);
+        table.getModel().setValueAt(disks, row, 10);
+    }
+
+    /**
+     * Gets the title based on the filename
+     *
+     * @param file, the file to check
+     * @return a string track title
+     */
+    public String getTitleFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return file.getName().replace(".mp3", "");
+        } else {
+            String regex = "\\d{2} .*\\.mp3";
+            if (file.getName().matches(regex)) {
+                return file.getName().substring(3).replace(".mp3", "").trim();
+            } else {
+                return "";
+            }
+        }
+    }
+
+    /**
+     * Gets the artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string artist
+     */
+    public String getArtistFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return "";
+        }
+
+        return getArtist(file);
+    }
+
+    /**
+     * Gets the album based on the file location
+     *
+     * @param file, the file to check
+     * @return a string album
+     */
+    public String getAlbumFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return getGenreFromFile(file);
+        } else {
+            File dir = file.getParentFile();
+            String regex = "\\[\\d{4}\\] .*";
+            if (dir.getName().matches(regex)) {
+                return dir.getName().substring(6).trim();
+            } else if (dir.getName().startsWith("CD")) {
+                // album is a multiple CD album
+                dir = dir.getParentFile();
+                if (dir.getName().matches(regex)) {
+                    return dir.getName().substring(6).trim();
+                }
+            }
+            return "";
+        }
+    }
+
+    /**
+     * Gets the album artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string album artist
+     */
+    public String getAlbumArtistFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            File dir = file.getParentFile().getParentFile().getParentFile();
+            return dir.getName();
+        }
+
+        // get the normal artist
+        return getArtist(file);
+    }
+
+    /**
+     * Gets the artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string artist
+     */
+    public String getArtist(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            dir = dir.getParentFile();
+            return dir.getName();
+        } else if (dir.getName().startsWith("CD")) {
+            dir = dir.getParentFile().getParentFile();
+            return dir.getName();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the year based on the file location
+     *
+     * @param file, the file to check
+     * @return a string year
+     */
+    public String getYearFromFile(File file) {
+        if (file == null) {
+            return "";
+        }
+
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            return dir.getName().substring(1, 5).trim();
+        } else if (dir.getName().startsWith("CD")) {
+            // album is a multiple CD album
+            dir = dir.getParentFile();
+            if (dir.getName().matches(regex)) {
+                return dir.getName().substring(1, 5).trim();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Gets the tracks based on the filename and other files in the directory
+     *
+     * @param file, the file to check
+     * @return a tracks in the form of a string
+     */
+    public String getTracksFromFolder(File file) {
+        if (file == null) {
+            return "";
+        }
+
+        File dir = file.getParentFile();
+        String totalTracks = getTotalTracksFromFolder(dir);
+        String regex = "\\d{2} .*\\.mp3";
+        if (file.getName().matches(regex)) {
+            if (Integer.valueOf(file.getName().substring(0, 2)) < 10) {
+                return file.getName().substring(1, 2) + "/" + totalTracks;
+            } else {
+                return file.getName().substring(0, 2) + "/" + totalTracks;
+            }
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the total number of tracks in a folder
+     *
+     * @param file, the folder to check
+     * @return a String representation of the songs in the folder
+     */
+    public String getTotalTracksFromFolder(File file) {
+        return String.valueOf(getNumberOfSongs(file));
+    }
+
+    /**
+     * Gets the total number of tracks in a folder
+     *
+     * @param file, the folder to check
+     * @return an int count of mp3 files in a folder
+     */
+    public int getNumberOfSongs(File file) {
+        File[] files = file.listFiles();
+        int count = 0;
+        for (File file1 : files) {
+            if (file1.getName().endsWith(".mp3")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the disks from the file
+     *
+     * @param file, the file to check
+     * @return a string representation of disks
+     */
+    public String getDisksFromFile(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            // there's no CD1, CD2 folders, single disk album
+            return "1/1";
+        } else if (dir.getName().startsWith("CD") && dir.getParentFile().getName().matches(regex)) {
+            // multiple disk album, get the current disk based on the folder it's in
+            int totalDisks = getTotalDisksFromFolder(dir);
+            return dir.getName().substring(2) + "/" + totalDisks;
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the total disks from a folder
+     *
+     * @param dir, the folder to check
+     * @return an int count of disks
+     */
+    public int getTotalDisksFromFolder(File dir) {
+        dir = dir.getParentFile();
+        File[] dirs = dir.listFiles(File::isDirectory);
+        int count = 0;
+        for (File folder : dirs) {
+            if (folder.getName().startsWith("CD")) {
+                // most (if not all) times, this should be 2
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Returns a genre String if the file is a part of a label
+     *
+     * @param file, the file to check
+     * @return a genre string
+     */
+    public String getGenreFromFile(File file) {
+        if (!Utils.isPartOfALabel(file)) {
+            return "";
+        }
+        return file.getParentFile().getName();
+    }
+
+    /**
+     * Moves selected files to a new destination
+     * @param selectedRows, the rows to move
+     */
     public void moveFiles(int[] selectedRows) {
 
-        JFileChooser jfc = new JFileChooser();
-        File library = new File("/Users/pat/Music/Library");
-        jfc.setCurrentDirectory(library);
-        jfc.setDialogTitle("Choose the destination folder...");
-        jfc.setMultiSelectionEnabled(false);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = jfc.showDialog(Main.frame, "Select");
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-
+        File directory = Utils.launchJFileChooser("Choose the destination folder...", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
+        if (directory != null) {
             for (int i = 0; i < selectedRows.length; i++) {
                 File old_file = (File) table.getModel().getValueAt(selectedRows[i], 1);
                 File new_location = jfc.getSelectedFile();
