@@ -1,12 +1,17 @@
 package moose.utilities;
 
+import moose.Main;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import moose.Main;
 
 public class Utils {
+
+    static Logger logger = Main.logger;
 
     /**
      * Helper Function that lists and stores all of the files in a directory and
@@ -123,6 +128,18 @@ public class Utils {
         } else {
             return null;
         }
-        
+    }  
+    
+    /**
+     * Opens a file
+     * @param file, the file to open
+     */
+    public static void openFile(File file) throws IOException {
+            Desktop desktop = Desktop.getDesktop();
+            if (file.exists()) {
+                desktop.open(file);
+            } else {
+                logger.logError("Tried to open file, but " + file.getName() + " doesn't exist!");
+            }
     }
 }
