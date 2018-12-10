@@ -264,6 +264,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         jLabel7.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
         jLabel7.setText(settingsController.getLibraryLocation());
+        jLabel7.setToolTipText("");
         jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         browseButton.setText("Browse...");
@@ -457,17 +458,10 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        // create a jfc, configure it, and launch it
-        JFileChooser jfc = new JFileChooser();
-        jfc.setDialogTitle("Choose the directory you want to store music in...");
-        jfc.setMultiSelectionEnabled(false);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.showOpenDialog(null);
-        
-        // get the selected file
-        File dir = jfc.getSelectedFile();
+        // get the folder through a JFileChooser
+        File dir = Utils.launchJFileChooser("Choose the directory you want to store music in...", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
         if(dir != null) {
-            settingsController.setLibraryLocation(dir.getAbsolutePath());
+            settingsController.setLibraryLocation(dir.getAbsolutePath() + "/");
             jLabel7.setText(settingsController.getLibraryLocation());
         }
     }//GEN-LAST:event_browseButtonActionPerformed

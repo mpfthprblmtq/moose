@@ -108,7 +108,7 @@ public class SettingsController {
 
                 // get the library location
                 if(line.contains("LIBRARYLOCATION=")) {
-                    setLibraryLocation(line.replace("LIBRARYLOCATION=", "") + "/");
+                    setLibraryLocation(line.replace("LIBRARYLOCATION=", ""));
                 }
             }
 
@@ -197,7 +197,7 @@ public class SettingsController {
         genres.add("Indie Electronic");
         genres.add("Rock");
         genres.add("Electronic/Rock");
-        libraryLocation = "Library location not set";
+        libraryLocation = "Library location not set!";
 
         writeSettingsFile();
     }
