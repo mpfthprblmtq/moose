@@ -86,7 +86,9 @@ public class SettingsController {
         } catch (IOException ex) {
             logger.logError("Error reading settings file!", ex);
         }
-    }/**
+    }
+
+    /**
      * Reads the settings from the file and sets the ivars
      */
     public void readSettingsFile() {
@@ -207,10 +209,7 @@ public class SettingsController {
      */
     public void openEventLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (logger.getEventLog().exists()) {
-                desktop.open(logger.getEventLog());
-            }
+            Utils.openFile(Main.logger.getEventLog());
         } catch (IOException ex) {
             logger.logError("Couldn't open the event log!", ex);
         }
@@ -221,10 +220,7 @@ public class SettingsController {
      */
     public void openErrorLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (logger.getErrorLog().exists()) {
-                desktop.open(logger.getErrorLog());
-            }
+            Utils.openFile(Main.logger.getEventLog());
         } catch (IOException ex) {
             logger.logError("Couldn't open the event log!", ex);
         }
