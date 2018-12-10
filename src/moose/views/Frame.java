@@ -33,10 +33,10 @@ import javax.swing.table.*;
 public class Frame extends javax.swing.JFrame {
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -90,7 +90,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
     }
 
     /**
@@ -110,8 +109,7 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
-
+        
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         files = Utils.listFiles(folder, files);
@@ -568,6 +566,7 @@ public class Frame extends javax.swing.JFrame {
         refreshMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
         addCoversMenuItem = new javax.swing.JMenuItem();
         findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
@@ -598,6 +597,7 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
+        songController.setTable(table);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
@@ -891,6 +891,15 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(jMenuItem2);
 
+        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        jMenuItem3.setText("AutoTag");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        macroMenu.add(jMenuItem3);
+
         addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         addCoversMenuItem.setText("Add Covers");
         addCoversMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -900,7 +909,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addCoversMenuItem);
 
-        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.META_MASK));
+        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         findAndReplaceMenuItem.setText("Find and Replace");
         findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -984,18 +993,15 @@ public class Frame extends javax.swing.JFrame {
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
 
-        // use a filechooser to open the folder full of stuff
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false);
+        // select some file(s)
+        File[] dirs = Utils.launchJFileChooser("Select a folder to open...", "Open", JFileChooser.DIRECTORIES_ONLY, true);
 
-        // result of filechoosing
-        int returnVal = fc.showOpenDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-
+        if(dirs != null) {
             // create an arraylist of files
             ArrayList<File> files = new ArrayList<>();
-            files = Utils.listFiles(fc.getSelectedFile(), files);
+            for (int i = 0; i < dirs.length; i++) {
+                files = Utils.listFiles(dirs[i], files);
+            }
 
             // import the files
             importFiles(files);
@@ -1241,6 +1247,11 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        songController.autoTagFiles(table.getSelectedRows());
+        setMultiplePanelFields();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     /**
      * Performs a command based on the user input
      *
@@ -1265,7 +1276,7 @@ public class Frame extends javax.swing.JFrame {
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("../../resources/moose128.png"));
+        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
@@ -1720,6 +1731,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;

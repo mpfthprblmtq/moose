@@ -7,6 +7,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import moose.Main;
 
 public class Utils {
 
@@ -21,6 +22,7 @@ public class Utils {
      * @return
      */
     public static ArrayList<File> listFiles(File directory, ArrayList<File> files) {
+        
         // get all the files from a directory
         File[] fList = directory.listFiles();
         for (File file : fList) {
@@ -48,7 +50,7 @@ public class Utils {
             Image img = icon.getImage();
 
             // scaling down the image to put on the row
-            Image thumbnail = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
+            Image thumbnail = img.getScaledInstance(dim, dim, java.awt.Image.SCALE_SMOOTH);
             thumbnail_icon = new ImageIcon(thumbnail);
 
         } catch (NullPointerException e) {
@@ -57,6 +59,81 @@ public class Utils {
         return thumbnail_icon;
     }
 
+    /**
+     * Check if a directory is from a label
+     *
+     * @param dir, the directory to check
+     * @return the result of the check, true if it is a label, false if it isn't
+     * a label
+     */
+    public static boolean isPartOfALabel(File dir) {
+        String path = dir.getPath();
+        return path.contains("/Genres/");
+    }
+    
+    /**
+     * Checks if the libraryLocation is set
+     * @return the result of the check
+     */
+    public static boolean isLibraryLocationSet() {
+        return !(Main.settings.settingsController.getLibraryLocation() == null
+                || Main.settings.settingsController.getLibraryLocation().equals(""));
+    }
+    
+    /**
+     * Creates a JFileChooser, configures it, and launches it
+     * Returns a single index array if there's only one file returned
+     * 
+     * @param title
+     * @param approveButtonText
+     * @param selectionMode
+     * @param multipleSelection
+     * @return 
+     */
+    public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection) {
+        
+        // create it
+        JFileChooser jfc = new JFileChooser() {
+            // overriding to prevent a user selecting nothing inside a directory
+            @Override
+            public void approveSelection() {
+                File file = this.getSelectedFile();
+                if (file.isDirectory()) {
+                    super.approveSelection();
+                }
+            }
+        };
+        
+        // configure it
+        File library;
+        if(Utils.isLibraryLocationSet()) {
+            library = new File(Main.settings.settingsController.getLibraryLocation());
+        } else {
+            library = new File(System.getProperty("user.home"));
+        }
+        jfc.setCurrentDirectory(library);
+        jfc.setDialogTitle(title);
+        jfc.setMultiSelectionEnabled(multipleSelection);
+        jfc.setFileSelectionMode(selectionMode);
+        
+        // launch it
+        int returnVal = jfc.showDialog(null, approveButtonText);
+        
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            if(multipleSelection) {
+                return jfc.getSelectedFiles();
+            } else {
+                return new File[] { jfc.getSelectedFile() };
+            }
+        } else {
+            return null;
+        }
+    }  
+    
+    /**
+     * Opens a file
+     * @param file, the file to open
+     */
     public static void openFile(File file) throws IOException {
             Desktop desktop = Desktop.getDesktop();
             if (file.exists()) {
