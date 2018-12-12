@@ -38,7 +38,10 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
-    public SongController(JTable table) {
+    public SongController() {
+    }
+    
+    public void setTable(JTable table) {
         this.table = table;
     }
 
@@ -130,7 +133,7 @@ public class SongController {
     public void songEdited(int index) {
         if (!edited_songs.contains(index)) {
             edited_songs.add(index);
-            int row = getRow(index);
+            int row = getRow2(index);
             Main.frame.setRowIcon(Main.frame.EDITED, row);
         } else {
             // do nothing, index is already added
@@ -149,6 +152,15 @@ public class SongController {
             String[] arr = i.split("_");
             if (Integer.valueOf(arr[1]) == index) {
                 return Integer.valueOf(arr[0]);
+            }
+        }
+        return -1;
+    }
+    
+    public int getRow2(int index) {
+        for (int i = 0; i < table.getRowCount(); i++) {
+            if(Integer.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(i), 12).toString()) == index) {
+                return i;
             }
         }
         return -1;
@@ -422,6 +434,81 @@ public class SongController {
         } catch (IOException | NotSupportedException ex) {
             System.err.println(ex);
         }
+    }
+
+    /**
+     * Does the finding and replacing from showFindAndReplaceDialog()
+     *
+     * @param find, the string to find
+     * @param replace, the string to replace
+     * @return the results of the replace, true if there was something to
+     * replace, false if not
+     */
+    public int findAndReplace(String find, String replace) {
+        int count = 0;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                if (table.getValueAt(i, j).toString().contains(find)) {
+                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
+                    // TODO find out why when changing Default to Deeeefault it sets Ingenue as edited
+                    int index = getIndex(i);
+                    switch(j) {
+                        case 2:     // title
+                            table.setValueAt(toReplace, i, j);
+                            setTitle(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;  
+                        case 3:     // artist
+                            table.setValueAt(toReplace, i, j);
+                            setArtist(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 4:     // album
+                            table.setValueAt(toReplace, i, j);
+                            setAlbum(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 5:     // album artist
+                            table.setValueAt(toReplace, i, j);
+                            setAlbumArtist(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 6:     // year
+                            table.setValueAt(toReplace, i, j);
+                            setYear(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 7:     // genre
+                            table.setValueAt(toReplace, i, j);
+                            setGenre(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 8:     // tracks
+                            table.setValueAt(toReplace, i, j);
+                            setTrack(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        case 9:     // disks
+                            table.setValueAt(toReplace, i, j);
+                            setDisk(index, toReplace);
+                            songEdited(index);
+                            count++;
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+            }
+        }
+        return count;
     }
 
     /**

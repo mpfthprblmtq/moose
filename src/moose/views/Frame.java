@@ -36,7 +36,7 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = new Logger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -90,7 +90,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
     }
 
     /**
@@ -110,7 +109,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
 
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
@@ -174,7 +172,7 @@ public class Frame extends javax.swing.JFrame {
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
-        table.removeColumn(table.getColumnModel().getColumn(11));
+        //table.removeColumn(table.getColumnModel().getColumn(11));
 
         // set the widths of the columns
         // file name and title are left out so they can take the remainder of the space dynamically
@@ -187,6 +185,7 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
+        setColumnWidth(11, 12);     // index
 
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (File[] files) -> {
@@ -598,6 +597,7 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
+        songController.setTable(table);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
@@ -900,7 +900,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addCoversMenuItem);
 
-        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.META_MASK));
+        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         findAndReplaceMenuItem.setText("Find and Replace");
         findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1529,7 +1529,7 @@ public class Frame extends javax.swing.JFrame {
         if (option == JOptionPane.OK_OPTION) {
             String findStr = find.getText();
             String replStr = replace.getText();
-            int result = findAndReplace(findStr, replStr);
+            int result = songController.findAndReplace(findStr, replStr);
             if (result == 0) {   // nothing to replace
                 JOptionPane.showMessageDialog(null, "Nothing to replace!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
             } else if (result > 0) {
@@ -1539,29 +1539,6 @@ public class Frame extends javax.swing.JFrame {
             // user changed their mind
         }
         nav_status = FROM_DIALOG;
-    }
-
-    /**
-     * Does the finding and replacing from showFindAndReplaceDialog()
-     *
-     * @param find, the string to find
-     * @param replace, the string to replace
-     * @return the results of the replace, true if there was something to
-     * replace, false if not
-     */
-    public int findAndReplace(String find, String replace) {
-        int count = 0;
-        for (int i = 0; i < table.getRowCount(); i++) {
-            for (int j = 0; j < table.getColumnCount(); j++) {
-                if (table.getValueAt(i, j).toString().contains(find)) {
-                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
-                    table.setValueAt(toReplace, i, j);
-                    songController.songEdited(table.convertRowIndexToModel(i));
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     /**

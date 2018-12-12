@@ -91,7 +91,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="findAndReplaceMenuItem">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Meta+H"/>
+                  <KeyStroke key="Shift+Meta+H"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Find and Replace"/>
               </Properties>
@@ -287,6 +287,7 @@
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableKeyReleased"/>
               </Events>
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="songController.setTable(table);"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
             </Component>
