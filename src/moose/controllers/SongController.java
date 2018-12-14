@@ -59,6 +59,10 @@ public class SongController {
      * @return a song object
      */
     public Song getSongFromFile(File file) {
+        
+        // regex for checking tracks/disks for "/0" or similar
+        String regex = "\\/\\d*";
+        
         // mp3agic Mp3File object, used for the id3tags
         Mp3File mp3file;
         try {
@@ -105,10 +109,10 @@ public class SongController {
         if (year == null) {
             year = "";
         }
-        if (track == null) {
+        if (track == null || track.matches(regex)) {
             track = "";
         }
-        if (disk == null) {
+        if (disk == null || disk.matches(regex)) {
             disk = "";
         }
         if (artwork_bytes == null) {
@@ -292,10 +296,11 @@ public class SongController {
 
         // traverse the array of songs and save them all
         for (int i = 0; i < songs.size(); i++) {
-            save(i);
-            count++;
+            if(save(i)) {
+                count++;
+            }
         }
-        Main.frame.updateConsole(count + " files updated!");
+        Main.frame.updateConsole(count + " file(s) updated!");
     }
 
     /**
@@ -313,14 +318,15 @@ public class SongController {
             save(index);
             count++;
         }
-        Main.frame.updateConsole(count + " files updated!");
+        Main.frame.updateConsole(count + " file(s) updated!");
     }
 
     /**
      * Saves an individual track
      * @param index, the index of the song to save in the songs map
+     * @return the result of the save, true for success, false for not success
      */
-    public void save(int index) {
+    public boolean save(int index) {
         if (edited_songs.contains(index)) {
             Song s = songs.get(index);
             File file = s.getFile();
@@ -365,11 +371,13 @@ public class SongController {
             if (edited_songs.size() == 1) {
                 edited_songs.clear();
             } else if (edited_songs.size() > 1) {
-                edited_songs.remove(index);
+               // edited_songs.remove(index);
+                edited_songs.remove(new Integer(index));
             }
         } else {
-            // song doesn't need to be saved
+            return false;
         }
+        return true;
     }
 
     /**
@@ -955,7 +963,7 @@ public class SongController {
         if (directory != null) {
             for (int i = 0; i < selectedRows.length; i++) {
                 File old_file = (File) table.getModel().getValueAt(selectedRows[i], 1);
-                File new_location = jfc.getSelectedFile();
+                File new_location = directory;
                 int row = selectedRows[i];
                 moveFile(row, old_file, new_location);
             }
