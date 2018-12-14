@@ -109,7 +109,7 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        
+
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         files = Utils.listFiles(folder, files);
@@ -340,16 +340,15 @@ public class Frame extends javax.swing.JFrame {
      */
     public void setRowIcon(int icon, int row) {
 
-        row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
                 break;
         }
     }
@@ -1405,7 +1404,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1421,7 +1420,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1437,7 +1436,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1453,7 +1452,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1469,7 +1468,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1485,7 +1484,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1501,7 +1500,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1517,7 +1516,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1540,7 +1539,7 @@ public class Frame extends javax.swing.JFrame {
         if (option == JOptionPane.OK_OPTION) {
             String findStr = find.getText();
             String replStr = replace.getText();
-            int result = findAndReplace(findStr, replStr);
+            int result = songController.findAndReplace(findStr, replStr);
             if (result == 0) {   // nothing to replace
                 JOptionPane.showMessageDialog(null, "Nothing to replace!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
             } else if (result > 0) {
@@ -1550,29 +1549,6 @@ public class Frame extends javax.swing.JFrame {
             // user changed their mind
         }
         nav_status = FROM_DIALOG;
-    }
-
-    /**
-     * Does the finding and replacing from showFindAndReplaceDialog()
-     *
-     * @param find, the string to find
-     * @param replace, the string to replace
-     * @return the results of the replace, true if there was something to
-     * replace, false if not
-     */
-    public int findAndReplace(String find, String replace) {
-        int count = 0;
-        for (int i = 0; i < table.getRowCount(); i++) {
-            for (int j = 0; j < table.getColumnCount(); j++) {
-                if (table.getValueAt(i, j).toString().contains(find)) {
-                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
-                    table.setValueAt(toReplace, i, j);
-                    songController.songEdited(table.convertRowIndexToModel(i));
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     /**
