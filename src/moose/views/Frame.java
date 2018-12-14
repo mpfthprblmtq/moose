@@ -616,6 +616,8 @@ public class Frame extends javax.swing.JFrame {
         console.setColumns(20);
         console.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
         console.setRows(5);
+        console.setMaximumSize(new java.awt.Dimension(611, 219));
+        console.setMinimumSize(new java.awt.Dimension(611, 219));
         consoleSP.setViewportView(console);
 
         multPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -639,56 +641,80 @@ public class Frame extends javax.swing.JFrame {
 
         L9.setText("Disk:");
 
+        multTitle.setMaximumSize(new java.awt.Dimension(250, 26));
+        multTitle.setMinimumSize(new java.awt.Dimension(250, 26));
         multTitle.setNextFocusableComponent(multArtist);
+        multTitle.setPreferredSize(new java.awt.Dimension(250, 26));
         multTitle.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTitleKeyPressed(evt);
             }
         });
 
+        multArtist.setMaximumSize(new java.awt.Dimension(250, 26));
+        multArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multArtist.setNextFocusableComponent(multAlbum);
+        multArtist.setPreferredSize(new java.awt.Dimension(250, 26));
         multArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multArtistKeyPressed(evt);
             }
         });
 
+        multAlbum.setMaximumSize(new java.awt.Dimension(250, 26));
+        multAlbum.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbum.setNextFocusableComponent(multAlbumArtist);
+        multAlbum.setPreferredSize(new java.awt.Dimension(250, 26));
         multAlbum.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumKeyPressed(evt);
             }
         });
 
+        multAlbumArtist.setMaximumSize(new java.awt.Dimension(250, 26));
+        multAlbumArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.setNextFocusableComponent(multGenre);
+        multAlbumArtist.setPreferredSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumArtistKeyPressed(evt);
             }
         });
 
+        multGenre.setMaximumSize(new java.awt.Dimension(150, 26));
+        multGenre.setMinimumSize(new java.awt.Dimension(150, 26));
         multGenre.setNextFocusableComponent(multYear);
+        multGenre.setPreferredSize(new java.awt.Dimension(150, 26));
         multGenre.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multGenreKeyPressed(evt);
             }
         });
 
+        multYear.setMaximumSize(new java.awt.Dimension(100, 26));
+        multYear.setMinimumSize(new java.awt.Dimension(100, 26));
         multYear.setNextFocusableComponent(multTrack);
+        multYear.setPreferredSize(new java.awt.Dimension(100, 26));
         multYear.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multYearKeyPressed(evt);
             }
         });
 
+        multTrack.setMaximumSize(new java.awt.Dimension(50, 26));
+        multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
+        multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
             }
         });
 
+        multDisk.setMaximumSize(new java.awt.Dimension(50, 26));
+        multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
+        multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -732,10 +758,10 @@ public class Frame extends javax.swing.JFrame {
                             .addComponent(L5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                            .addComponent(multArtist)
-                            .addComponent(multAlbum)
-                            .addComponent(multAlbumArtist))
+                            .addComponent(multArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multAlbum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multAlbumArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(L8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -746,9 +772,9 @@ public class Frame extends javax.swing.JFrame {
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(29, 29, 29))
                     .addGroup(multPanelLayout.createSequentialGroup()
                         .addComponent(L1)
@@ -768,9 +794,9 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(9, 9, 9)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(multPanelLayout.createSequentialGroup()
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(L2)
-                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(L3)
@@ -819,8 +845,8 @@ public class Frame extends javax.swing.JFrame {
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveButton))
-                    .addGroup(containerLayout.createSequentialGroup()
-                        .addComponent(consoleSP, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
+                        .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
