@@ -81,6 +81,29 @@ public class Logger {
         System.setOut(errorStream);
         System.setErr(errorStream);
     }
+    
+    /**
+     * Sets the System.out and System.err stream back to the console for debugging in the IDE
+     */
+    public void setSystemOutToConsole() {
+        System.setOut(console);
+        System.setErr(console);
+    }
+    
+    /**
+     * Sets the System.out and System.err stream to the errorLog
+     */
+    public void setSystemOutToLog() {
+        System.setOut(errorStream);
+        System.setErr(errorStream);
+    }
+    
+    /**
+     * Sets the System.out stream to the eventLog
+     */
+    public void setSystemOutToEventLog() {
+        System.setOut(eventStream);
+    }
 
     /**
      * Returns the error log
