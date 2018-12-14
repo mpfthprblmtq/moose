@@ -55,6 +55,8 @@ public class SongController {
 
     /**
      * Gets a song object from a file
+     * @param file, the file to get the song from
+     * @return a song object
      */
     public Song getSongFromFile(File file) {
         // mp3agic Mp3File object, used for the id3tags
@@ -133,7 +135,7 @@ public class SongController {
     public void songEdited(int index) {
         if (!edited_songs.contains(index)) {
             edited_songs.add(index);
-            int row = getRow2(index);
+            int row = getRow(index);
             Main.frame.setRowIcon(Main.frame.EDITED, row);
         } else {
             // do nothing, index is already added
@@ -147,32 +149,13 @@ public class SongController {
      * @return the row where the index matches
      */
     public int getRow(int index) {
-        String[] indices = getIndices();
-        for (String i : indices) {
-            String[] arr = i.split("_");
-            if (Integer.valueOf(arr[1]) == index) {
-                return Integer.valueOf(arr[0]);
-            }
-        }
-        return -1;
-    }
-    
-    public int getRow2(int index) {
         for (int i = 0; i < table.getRowCount(); i++) {
-            if(Integer.valueOf(table.getModel().getValueAt(table.convertRowIndexToModel(i), 12).toString()) == index) {
+            if(getIndex(i) == index) {
                 return i;
             }
         }
+        
         return -1;
-    }
-
-    public String[] getIndices() {
-        String[] indices = new String[table.getRowCount()];
-        for (int i = 0; i < indices.length; i++) {
-            int row = table.convertRowIndexToModel(i);
-            indices[i] = i + "_" + getIndex(row);
-        }
-        return indices;
     }
 
     /**
@@ -182,6 +165,7 @@ public class SongController {
      * @return
      */
     public int getIndex(int row) {
+        row = table.convertRowIndexToModel(row);
         return Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
     }
 
@@ -396,6 +380,7 @@ public class SongController {
             mp3file.getId3v2Tag().clearAlbumImage();
             mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
 
+            // save the mp3 info to the file
             save(mp3file, file);
 
             // update the row graphic
@@ -456,49 +441,41 @@ public class SongController {
                         case 2:     // title
                             table.setValueAt(toReplace, i, j);
                             setTitle(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;  
                         case 3:     // artist
                             table.setValueAt(toReplace, i, j);
                             setArtist(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 4:     // album
                             table.setValueAt(toReplace, i, j);
                             setAlbum(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 5:     // album artist
                             table.setValueAt(toReplace, i, j);
                             setAlbumArtist(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 6:     // year
                             table.setValueAt(toReplace, i, j);
                             setYear(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 7:     // genre
                             table.setValueAt(toReplace, i, j);
                             setGenre(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 8:     // tracks
                             table.setValueAt(toReplace, i, j);
                             setTrack(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         case 9:     // disks
                             table.setValueAt(toReplace, i, j);
                             setDisk(index, toReplace);
-                            songEdited(index);
                             count++;
                             break;
                         default:
