@@ -172,7 +172,7 @@ public class Frame extends javax.swing.JFrame {
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
-        //table.removeColumn(table.getColumnModel().getColumn(11));
+        table.removeColumn(table.getColumnModel().getColumn(11));
 
         // set the widths of the columns
         // file name and title are left out so they can take the remainder of the space dynamically
@@ -185,7 +185,6 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
-        setColumnWidth(11, 12);     // index
 
         // taken from the FileDrop example
         FileDrop fileDrop = new FileDrop(System.out, tableSP, (File[] files) -> {
@@ -341,16 +340,15 @@ public class Frame extends javax.swing.JFrame {
      */
     public void setRowIcon(int icon, int row) {
 
-        row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
                 break;
         }
     }
@@ -1394,7 +1392,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1410,7 +1408,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1426,7 +1424,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1442,7 +1440,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1458,7 +1456,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1474,7 +1472,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1490,7 +1488,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1506,7 +1504,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
