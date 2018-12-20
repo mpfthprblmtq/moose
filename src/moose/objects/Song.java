@@ -27,12 +27,17 @@ public class Song {
     private String disk;
     private String totaldisks;
     private byte[] artwork_bytes;
+    
+    private String bitrate;
+    private String samplerate;
+    private String length;
+    private String comment;
 
     public Song() {
-
+        // default constructor
     }
 
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String year, String track, String disk, byte[] artwork_bytes) {
+    public Song(File file, String title, String artist, String album, String albumartist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int samplerate, long len, String comment) {
 
         // standard string stuff
         this.file = file;
@@ -49,27 +54,49 @@ public class Song {
             this.track = t[0];
             this.totaltracks = t[1];
         } else {
-            this.track = "0";
-            this.totaltracks = "0";
+            this.track = "";
+            this.totaltracks = "";
         }
         if (disk != null && disk.contains("/")) {
             String[] d = disk.split("/");
             this.disk = d[0];
             this.totaldisks = d[1];
         } else {
-            this.disk = "0";
-            this.totaldisks = "0";
+            this.disk = "";
+            this.totaldisks = "";
         }
 
         this.artwork_bytes = artwork_bytes;
         
+        // parsing some ints and longs
+        this.bitrate = bitrate + " Kbps";
+        this.samplerate = samplerate + " Hz";
+        this.length = getLengthString(len);
+        
+        this.comment = comment;
+        
+    }
+    
+    /**
+     * @param len, the long to convert
+     * @return the full length string #:##
+     */
+    public String getLengthString(long len) {
+        String minutes;
+        String seconds;
+        minutes = String.valueOf((len - (len % 60))/60);
+        seconds = String.valueOf(len % 60);
+        if(Integer.valueOf(seconds) < 10) {
+            seconds = "0" + seconds;
+        }
+        return minutes + ":" + seconds;
     }
 
     /**
      * @return the full track string
      */
     public String getFullTrackString() {
-        if (track.equals("0") && totaltracks.equals("0")) {
+        if (track.equals("") && totaltracks.equals("")) {
             return "";
         } else {
             return track + "/" + totaltracks;
@@ -80,7 +107,7 @@ public class Song {
      * @return the full disk string
      */
     public String getFullDiskString() {
-        if (disk.equals("0") && totaldisks.equals("0")) {
+        if (disk.equals("") && totaldisks.equals("")) {
             return "";
         } else {
             return disk + "/" + totaldisks;
@@ -253,12 +280,6 @@ public class Song {
         this.totaldisks = arr[1];
     }
 
-    @Override
-    public String toString() {
-        return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
-        //return this.file.getName();
-    }
-
     /**
      * @return the year
      */
@@ -271,5 +292,67 @@ public class Song {
      */
     public void setYear(String year) {
         this.year = year;
+    }
+
+    /**
+     * @return the bitrate
+     */
+    public String getBitrate() {
+        return bitrate;
+    }
+
+    /**
+     * @param bitrate the bitrate to set
+     */
+    public void setBitrate(String bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    /**
+     * @return the samplerate
+     */
+    public String getSamplerate() {
+        return samplerate;
+    }
+
+    /**
+     * @param samplerate the samplerate to set
+     */
+    public void setSamplerate(String samplerate) {
+        this.samplerate = samplerate;
+    }
+
+    /**
+     * @return the length
+     */
+    public String getLength() {
+        return length;
+    }
+
+    /**
+     * @param length the length to set
+     */
+    public void setLength(String length) {
+        this.length = length;
+    }
+
+    /**
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment the comment to set
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    @Override
+    public String toString() {
+        return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
+        //return this.file.getName();
     }
 }

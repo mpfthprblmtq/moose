@@ -11,10 +11,12 @@
 package moose.views;
 
 // imports
-import moose.utilities.Logger;
-import moose.controllers.AuditController;
+import moose.Main;
+import moose.utilities.*;
+import moose.controllers.*;
 
 import java.awt.Font;
+import java.io.File;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -32,7 +34,7 @@ public class AuditFrame extends javax.swing.JFrame {
     public AuditController auditController = new AuditController();
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     /**
      * Creates new form AuditFrame
@@ -483,11 +485,13 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     private void chooseFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFolderButtonActionPerformed
         chooseFolder();
-        auditAnalyzeButton.setEnabled(true);
-        auditStartButton.setEnabled(true);
-        cleanupAnalyzeButton.setEnabled(true);
         
-        auditController.importAlbums();
+        if(auditController.getFolder() != null) {
+            auditAnalyzeButton.setEnabled(true);
+            auditStartButton.setEnabled(true);
+            cleanupAnalyzeButton.setEnabled(true);
+            auditController.importAlbums();
+        }
     }//GEN-LAST:event_chooseFolderButtonActionPerformed
 
     /**
@@ -638,19 +642,14 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void chooseFolder() {
 
-        // use a filechooser to open the folder full of stuff
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false);
-
-        // result of filechoosing
-        int returnVal = fc.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File folder = Utils.launchJFileChooser("Select a folder to audit/cleanup", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
+        
+        if(folder != null) {
             // set the file ivars in the controllers
-            auditController.setFolder(fc.getSelectedFile());
+            auditController.setFolder(folder);
             // update some graphics
             label1.setEnabled(true);
-            pathLabel.setText(fc.getSelectedFile().getPath());
+            pathLabel.setText(folder.getPath());
         } else {
             // nothing was chosen
         }
