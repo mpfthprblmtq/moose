@@ -6,6 +6,7 @@
  *
  *  Copyright Pat Ripley 2018
  */
+
 // package
 package moose.views;
 
@@ -33,10 +34,10 @@ import javax.swing.table.*;
 public class Frame extends javax.swing.JFrame {
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -90,7 +91,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
     }
 
     /**
@@ -110,7 +110,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-        songController = new SongController(table);
 
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
@@ -151,6 +150,9 @@ public class Frame extends javax.swing.JFrame {
                     break;
                 case "Save":
                     songController.saveTracks(selectedRows);
+                    break;
+                case "More Info...":
+                    openMoreInfo();
                     break;
                 default:
                     break;
@@ -342,16 +344,15 @@ public class Frame extends javax.swing.JFrame {
      */
     public void setRowIcon(int icon, int row) {
 
-        row = table.convertRowIndexToModel(row);
         switch (icon) {
             case DEFAULT:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                model.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
                 break;
         }
     }
@@ -378,7 +379,7 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("../../resources/default.png")), // adds the default status icon
+                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
                 s.getFile().getName().replace(".mp3", ""), // actual editable file name
                 s.getTitle(),
@@ -568,6 +569,7 @@ public class Frame extends javax.swing.JFrame {
         refreshMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
         addCoversMenuItem = new javax.swing.JMenuItem();
         findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
@@ -598,6 +600,7 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
+        songController.setTable(table);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
@@ -617,6 +620,8 @@ public class Frame extends javax.swing.JFrame {
         console.setColumns(20);
         console.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
         console.setRows(5);
+        console.setMaximumSize(new java.awt.Dimension(611, 219));
+        console.setMinimumSize(new java.awt.Dimension(611, 219));
         consoleSP.setViewportView(console);
 
         multPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -640,56 +645,80 @@ public class Frame extends javax.swing.JFrame {
 
         L9.setText("Disk:");
 
+        multTitle.setMaximumSize(new java.awt.Dimension(250, 26));
+        multTitle.setMinimumSize(new java.awt.Dimension(250, 26));
         multTitle.setNextFocusableComponent(multArtist);
+        multTitle.setPreferredSize(new java.awt.Dimension(250, 26));
         multTitle.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTitleKeyPressed(evt);
             }
         });
 
+        multArtist.setMaximumSize(new java.awt.Dimension(250, 26));
+        multArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multArtist.setNextFocusableComponent(multAlbum);
+        multArtist.setPreferredSize(new java.awt.Dimension(250, 26));
         multArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multArtistKeyPressed(evt);
             }
         });
 
+        multAlbum.setMaximumSize(new java.awt.Dimension(250, 26));
+        multAlbum.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbum.setNextFocusableComponent(multAlbumArtist);
+        multAlbum.setPreferredSize(new java.awt.Dimension(250, 26));
         multAlbum.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumKeyPressed(evt);
             }
         });
 
+        multAlbumArtist.setMaximumSize(new java.awt.Dimension(250, 26));
+        multAlbumArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.setNextFocusableComponent(multGenre);
+        multAlbumArtist.setPreferredSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumArtistKeyPressed(evt);
             }
         });
 
+        multGenre.setMaximumSize(new java.awt.Dimension(150, 26));
+        multGenre.setMinimumSize(new java.awt.Dimension(150, 26));
         multGenre.setNextFocusableComponent(multYear);
+        multGenre.setPreferredSize(new java.awt.Dimension(150, 26));
         multGenre.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multGenreKeyPressed(evt);
             }
         });
 
+        multYear.setMaximumSize(new java.awt.Dimension(100, 26));
+        multYear.setMinimumSize(new java.awt.Dimension(100, 26));
         multYear.setNextFocusableComponent(multTrack);
+        multYear.setPreferredSize(new java.awt.Dimension(100, 26));
         multYear.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multYearKeyPressed(evt);
             }
         });
 
+        multTrack.setMaximumSize(new java.awt.Dimension(50, 26));
+        multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
+        multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
             }
         });
 
+        multDisk.setMaximumSize(new java.awt.Dimension(50, 26));
+        multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
+        multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -733,10 +762,10 @@ public class Frame extends javax.swing.JFrame {
                             .addComponent(L5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                            .addComponent(multArtist)
-                            .addComponent(multAlbum)
-                            .addComponent(multAlbumArtist))
+                            .addComponent(multArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multAlbum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multAlbumArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(L8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -747,16 +776,16 @@ public class Frame extends javax.swing.JFrame {
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(29, 29, 29))
                     .addGroup(multPanelLayout.createSequentialGroup()
                         .addComponent(L1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(multImage, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                    .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         multPanelLayout.setVerticalGroup(
@@ -769,9 +798,9 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(9, 9, 9)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(multPanelLayout.createSequentialGroup()
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(L2)
-                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(L3)
@@ -817,13 +846,14 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(19, 19, 19)
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveButton))
-                    .addGroup(containerLayout.createSequentialGroup()
-                        .addComponent(consoleSP, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
+                        .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         containerLayout.setVerticalGroup(
@@ -891,6 +921,15 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(jMenuItem2);
 
+        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        jMenuItem3.setText("AutoTag");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        macroMenu.add(jMenuItem3);
+
         addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         addCoversMenuItem.setText("Add Covers");
         addCoversMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -900,7 +939,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addCoversMenuItem);
 
-        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.META_MASK));
+        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         findAndReplaceMenuItem.setText("Find and Replace");
         findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -984,19 +1023,15 @@ public class Frame extends javax.swing.JFrame {
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
 
-        // TODO create a importFiles method that takes a File[] and does this stuff
-        // use a filechooser to open the folder full of stuff
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false);
+        // select some file(s)
+        File[] dirs = Utils.launchJFileChooser("Select a folder to open...", "Open", JFileChooser.DIRECTORIES_ONLY, true);
 
-        // result of filechoosing
-        int returnVal = fc.showOpenDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-
+        if (dirs != null) {
             // create an arraylist of files
             ArrayList<File> files = new ArrayList<>();
-            files = Utils.listFiles(fc.getSelectedFile(), files);
+            for (int i = 0; i < dirs.length; i++) {
+                files = Utils.listFiles(dirs[i], files);
+            }
 
             // import the files
             importFiles(files);
@@ -1026,16 +1061,17 @@ public class Frame extends javax.swing.JFrame {
             case java.awt.event.MouseEvent.BUTTON3:
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
+                int rows = table.getSelectedRowCount();
                 if (row >= 0 && col >= 0) {
                     switch (col) {
                         case 10:
-                            showArtworkPopup(evt);
+                            showArtworkPopup(evt, rows);
                             break;
                         case 1:
-                            showFilePopup(evt);
+                            showFilePopup(evt, rows);
                             break;
                         default:
-                            showRegularPopup(evt);
+                            showRegularPopup(evt, rows);
                             break;
                     }
                 } else {
@@ -1049,7 +1085,7 @@ public class Frame extends javax.swing.JFrame {
                 // check if double click
                 if (evt.getClickCount() == 2) {
                     if (table.getSelectedColumn() == 10) {
-                        showArtworkPopup(evt);
+                        showArtworkPopup(evt, table.getSelectedRowCount());
                     } else {
                         changeSelection(table.getSelectedRow(), table.getSelectedColumn(), -1);
                     }
@@ -1118,7 +1154,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_tableKeyReleased
 
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_addTrackNumbersMenuItemActionPerformed
 
     /**
@@ -1127,7 +1163,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
-        showArtworkPopup(evt);
+        showArtworkPopup(evt, table.getSelectedRowCount());
     }//GEN-LAST:event_multImageMousePressed
 
     /**
@@ -1207,7 +1243,8 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_addCoversMenuItemActionPerformed
 
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
-        // TODO add your handling code here:
+        int[] selectedRows = table.getSelectedRows();
+        songController.saveTracks(selectedRows);
     }//GEN-LAST:event_saveTrackMenuItemActionPerformed
 
     private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
@@ -1236,10 +1273,15 @@ public class Frame extends javax.swing.JFrame {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // prompt the user to enter a command
         String command = JOptionPane.showInputDialog(this, "Enter a command:");
-        if(command != null) {
+        if (command != null) {
             doCommand(command);
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        songController.autoTagFiles(table.getSelectedRows());
+        setMultiplePanelFields();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * Performs a command based on the user input
@@ -1262,10 +1304,148 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
+     * Gets the info for a song
+     */
+    public void openMoreInfo() {
+        Song s = songController.getSongs().get(songController.getIndex(table.getSelectedRow()));
+        InfoFrame infoFrame = new InfoFrame(s, table.getSelectedRow());
+        infoFrame.setLocationRelativeTo(this);
+        infoFrame.setVisible(true);
+    }
+
+    /**
+     * Moves to the next song
+     */
+    public void next() {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row + 1, row + 1);
+        openMoreInfo();
+    }
+
+    /**
+     * Moves to the previous song
+     */
+    public void previous() {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row - 1, row - 1);
+        openMoreInfo();
+    }
+
+    /**
+     * Get the changes from the info panel
+     *
+     * @param filename
+     * @param title
+     * @param artist
+     * @param album
+     * @param albumartist
+     * @param year
+     * @param genre
+     * @param tracks
+     * @param disks
+     * @param comment
+     */
+    public void submitChangesFromInfoFrame(
+            String filename,
+            String title,
+            String artist,
+            String album,
+            String albumartist,
+            String year,
+            String genre,
+            String tracks,
+            String disks,
+            String comment) {
+        
+        int row = table.getSelectedRow();
+        
+        if (!table.getValueAt(row, 1).equals(filename)) {
+            File old_file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
+            String path = old_file.getPath().replace(old_file.getName(), "");
+            File new_file = new File(path + "//" + filename + ".mp3");
+            songController.setFile(songController.getIndex(row), old_file, new_file);
+            old_file.renameTo(new_file);
+            model.setValueAt(new_file, row, 1);
+            table.setValueAt(filename, row, 1);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 2).equals(title)) {
+            songController.setTitle(songController.getIndex(row), title);
+            table.setValueAt(title, row, 2);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 3).equals(artist)) {
+            songController.setArtist(songController.getIndex(row), artist);
+            table.setValueAt(artist, row, 3);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 4).equals(album)) {
+            songController.setAlbum(songController.getIndex(row), album);
+            table.setValueAt(album, row, 4);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 5).equals(albumartist)) {
+            songController.setAlbumArtist(songController.getIndex(row), albumartist);
+            table.setValueAt(albumartist, row, 5);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 6).equals(year)) {
+            songController.setYear(songController.getIndex(row), year);
+            table.setValueAt(year, row, 6);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 7).equals(genre)) {
+            songController.setGenre(songController.getIndex(row), genre);
+            table.setValueAt(genre, row, 7);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 8).equals(tracks)) {
+            if(!tracks.equals("/")) {
+                songController.setTrack(songController.getIndex(row), tracks);
+                table.setValueAt(tracks, row, 8);
+            } else {
+                songController.setDisk(songController.getIndex(row), "");
+                table.setValueAt("", row, 8);
+            }
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 9).equals(disks)) {
+            if(!disks.equals("/")) {
+                songController.setDisk(songController.getIndex(row), disks);
+                table.setValueAt(disks, row, 9);
+            } else {
+                songController.setDisk(songController.getIndex(row), "");
+                table.setValueAt("", row, 9);
+            }
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        songController.setComment(songController.getIndex(row), comment);
+        
+    }
+
+    /**
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("../../resources/moose128.png"));
+        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
@@ -1394,7 +1574,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1410,7 +1590,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1426,7 +1606,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1442,7 +1622,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1458,7 +1638,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1474,7 +1654,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1490,7 +1670,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1506,7 +1686,7 @@ public class Frame extends javax.swing.JFrame {
             for (int i = 0; i < selectedRows.length; i++) {
 
                 // get the index of the song in the table
-                int row = table.convertRowIndexToModel(selectedRows[i]);
+                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
@@ -1529,7 +1709,7 @@ public class Frame extends javax.swing.JFrame {
         if (option == JOptionPane.OK_OPTION) {
             String findStr = find.getText();
             String replStr = replace.getText();
-            int result = findAndReplace(findStr, replStr);
+            int result = songController.findAndReplace(findStr, replStr);
             if (result == 0) {   // nothing to replace
                 JOptionPane.showMessageDialog(null, "Nothing to replace!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
             } else if (result > 0) {
@@ -1539,29 +1719,6 @@ public class Frame extends javax.swing.JFrame {
             // user changed their mind
         }
         nav_status = FROM_DIALOG;
-    }
-
-    /**
-     * Does the finding and replacing from showFindAndReplaceDialog()
-     *
-     * @param find, the string to find
-     * @param replace, the string to replace
-     * @return the results of the replace, true if there was something to
-     * replace, false if not
-     */
-    public int findAndReplace(String find, String replace) {
-        int count = 0;
-        for (int i = 0; i < table.getRowCount(); i++) {
-            for (int j = 0; j < table.getColumnCount(); j++) {
-                if (table.getValueAt(i, j).toString().contains(find)) {
-                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
-                    table.setValueAt(toReplace, i, j);
-                    songController.songEdited(table.convertRowIndexToModel(i));
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     /**
@@ -1597,7 +1754,7 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showArtworkPopup(MouseEvent e) {
+    void showArtworkPopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         popup.add(item = new JMenuItem("Add"));
@@ -1613,9 +1770,14 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showRegularPopup(MouseEvent e) {
+    void showRegularPopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More Info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
         popup.add(item = new JMenuItem("Remove from list"));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
@@ -1631,9 +1793,14 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showFilePopup(MouseEvent e) {
+    void showFilePopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More Info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
         popup.add(item = new JMenuItem("Remove from list"));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
@@ -1641,7 +1808,7 @@ public class Frame extends javax.swing.JFrame {
         popup.add(item = new JMenuItem("Save"));
         item.addActionListener(menuListener);
         popup.addSeparator();
-        popup.add(item = new JMenuItem("Move File..."));
+        popup.add(item = new JMenuItem(rows > 1 ? "Move File..." : "Move Files..."));
         item.addActionListener(menuListener);
 
         popup.show(e.getComponent(), e.getX(), e.getY());
@@ -1656,10 +1823,8 @@ public class Frame extends javax.swing.JFrame {
     private void setColumnWidth(int column, int width) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
         if (width < 0) {
-            // use the preferred width of the header..
             JLabel label = new JLabel((String) tableColumn.getHeaderValue());
             Dimension preferred = label.getPreferredSize();
-            // altered 10->14 as per camickr comment.
             width = (int) preferred.getWidth() + 14;
         }
         tableColumn.setPreferredWidth(width);
@@ -1722,6 +1887,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;
