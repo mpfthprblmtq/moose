@@ -1,14 +1,14 @@
 # Moose
 A music management system capable of reading and modifying dynamic id3 tags.
 
-![Generic badge](https://img.shields.io/badge/version-1.1.2-brightgreen.svg)
+![Generic badge](https://img.shields.io/badge/version-1.1.3-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 [View project on Github](https://www.github.com/mpfthprblmtq/moose)
 
 [View Backlog (Pivotal Tracker)](https://www.pivotaltracker.com/n/projects/2194861)
 
-[Download pkg file (OSX)](www.something.com)
+[Download pkg file (OSX)](https://www.prblmtq.com/projects/moose/download)
 
 Compatible with:
 * OS X (Mac)
@@ -34,9 +34,19 @@ Once built, you can run the terminal-commands file to package the app into a .pk
 
 ## Changelog
 
+### 1.1.3 (The Tracks update)
+
+**Release Date:** Upcoming
+
+- Macro for just adding track numbers and disk numbers
+- Fix for sorting tracks (1/10, 2/10, ... ,10/10 instead of 1/10, 10/10, 2/10, ...)
+- Manual track sorting, which will also set the filenames' numbers
+- Made a shortcut to google images for when the cover art isn't found
+- Probably will separate this changelog into a separate file, we'll see how it goes
+
 ### 1.1.2 (The "Random features" update)
 
-**Release Date:** UPCOMING
+**Release Date:** 20 December 2018
 
 - Improved console logging on front end
 - Added a "More Info" panel
@@ -48,6 +58,9 @@ Once built, you can run the terminal-commands file to package the app into a .pk
   - GUI doesn't skew anymore when adding a long-titled file into the UI
   - Tracknum and Disknum doesn't get set to "/0" when there's nothing in those fields
   - Fixed find and replace functionality not setting anything except the first row in the table
+- Entered moose in a Eukanuba dog/moose show
+  - He was the only moose :(
+  - He placed 2nd for training but 1st for lovability
 
 ### 1.1.1 (The Refactoring update and/or the "All 1's update" and/or the Cleanup update)
 

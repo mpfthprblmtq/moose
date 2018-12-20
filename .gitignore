@@ -20,3 +20,6 @@ nbproject/build-impl.xml
 nbproject/genfiles.properties
 nbproject/project.properties
 nbproject/project.xml
+moose.icns
+Moose-1.0.0.pkg
+moose-installer.pkg
