@@ -220,9 +220,9 @@ public class SettingsController {
      */
     public void openErrorLog() {
         try {
-            Utils.openFile(Main.logger.getEventLog());
+            Utils.openFile(Main.logger.getErrorLog());
         } catch (IOException ex) {
-            logger.logError("Couldn't open the event log!", ex);
+            logger.logError("Couldn't open the error log!", ex);
         }
     }
 
