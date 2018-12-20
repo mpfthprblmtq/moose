@@ -1297,6 +1297,12 @@ public class Frame extends javax.swing.JFrame {
             case "clear event log":
                 Main.settings.settingsController.clearEventLog();
                 break;
+            case "open error log":
+                Main.settings.settingsController.openErrorLog();
+                break;
+            case "open event log":
+                Main.settings.settingsController.openEventLog();
+                break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
                 break;
