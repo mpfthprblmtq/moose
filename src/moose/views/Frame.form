@@ -219,7 +219,7 @@
                           <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                           <Component id="jLabel3" min="-2" pref="64" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" pref="205" max="-2" attributes="0"/>
+                          <Component id="jLabel1" min="-2" pref="206" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                           <Component id="saveButton" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -227,6 +227,7 @@
                           <Component id="consoleSP" min="-2" pref="611" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="multPanel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -382,8 +383,8 @@
                           </Group>
                       </Group>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="multUpdateButton" max="32767" attributes="0"/>
-                          <Component id="multImage" min="-2" pref="156" max="-2" attributes="0"/>
+                          <Component id="multUpdateButton" pref="156" max="32767" attributes="0"/>
+                          <Component id="multImage" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
