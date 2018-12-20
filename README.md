@@ -50,6 +50,7 @@ Once built, you can run the terminal-commands file to package the app into a .pk
 
 - Improved console logging on front end
 - Added a "More Info" panel
+- Cover art search now checks the parent file if the album is a multi-disk album
 - Made it smart
   - Ability to determine certain id3tags based on the filename and file location alone
 - Bugfixes:

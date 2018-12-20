@@ -5,10 +5,10 @@
  *
  *  Copyright Pat Ripley 2018
  */
-
 // package
 package moose.controllers;
 
+// imports
 import com.mpatric.mp3agic.*;
 
 import moose.utilities.Logger;
@@ -18,7 +18,6 @@ import moose.utilities.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -26,27 +25,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+// class SongController
 public class SongController {
 
     // table object that references the JTable on the form
     JTable table;
 
     // logger object
-    Logger logger = new Logger();
+    Logger logger = Main.getLogger();
 
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
+    /**
+     * Default constructor
+     */
     public SongController() {
     }
-    
+  
+    /**
+     * Sets the table ivar
+     * @param table 
+     */
     public void setTable(JTable table) {
         this.table = table;
     }
 
     /**
      * Returns the songs list
+     *
      * @return the songs map
      */
     public HashMap<Integer, Song> getSongs() {
@@ -55,8 +63,14 @@ public class SongController {
 
     /**
      * Gets a song object from a file
+     * @param file, the file to get info from
+     * @return a song object
      */
     public Song getSongFromFile(File file) {
+        
+        // regex for checking tracks/disks for "/0" or similar
+        String regex = "\\/\\d*";
+        
         // mp3agic Mp3File object, used for the id3tags
         Mp3File mp3file;
         try {
@@ -83,6 +97,11 @@ public class SongController {
         String track = mp3file.getId3v2Tag().getTrack();
         String disk = mp3file.getId3v2Tag().getPartOfSet();
         byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
+        
+        int bitrate = mp3file.getBitrate();
+        int samplerate = mp3file.getSampleRate();
+        long len = mp3file.getLengthInSeconds();
+        String comment = mp3file.getId3v2Tag().getComment();
 
         // sets the strings to blank to avoid NPE
         if (title == null) {
@@ -103,18 +122,22 @@ public class SongController {
         if (year == null) {
             year = "";
         }
-        if (track == null) {
+        if (track == null || track.matches(regex)) {
             track = "";
         }
-        if (disk == null) {
+        if (disk == null || disk.matches(regex)) {
             disk = "";
         }
         if (artwork_bytes == null) {
             artwork_bytes = new byte[0];
         }
+        if (comment == null) {
+            comment = "";
+        }
+        
 
         // create a song object with the information
-        Song s = new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes);
+        Song s = new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes, bitrate, samplerate, len, comment);
 
         // make an index
         int index = songs.size();
@@ -147,23 +170,13 @@ public class SongController {
      * @return the row where the index matches
      */
     public int getRow(int index) {
-        String[] indices = getIndices();
-        for (String i : indices) {
-            String[] arr = i.split("_");
-            if (Integer.valueOf(arr[1]) == index) {
-                return Integer.valueOf(arr[0]);
+        for (int i = 0; i < table.getRowCount(); i++) {
+            if(getIndex(i) == index) {
+                return i;
             }
         }
+        
         return -1;
-    }
-
-    public String[] getIndices() {
-        String[] indices = new String[table.getRowCount()];
-        for (int i = 0; i < indices.length; i++) {
-            int row = table.convertRowIndexToModel(i);
-            indices[i] = i + "_" + getIndex(row);
-        }
-        return indices;
     }
 
     /**
@@ -173,6 +186,7 @@ public class SongController {
      * @return
      */
     public int getIndex(int row) {
+        row = table.convertRowIndexToModel(row);
         return Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
     }
 
@@ -290,70 +304,58 @@ public class SongController {
     }
 
     /**
+     * Helper function to set the comment of the song in the songs
+     * arraylist.
+     *
+     * @param index, the index of the song
+     * @param comment, the comment to set
+     */
+    public void setComment(int index, String comment) {
+        songs.get(index).setComment(comment);
+        songEdited(index);
+    }
+    
+    /**
      * Goes through the edited_songs array and saves each one
+     * TODO confirm that this works
      */
     public void saveAll() {
 
-        // traverse the array of songs
+        int count = 0;
+
+        // traverse the array of songs and save them all
         for (int i = 0; i < songs.size(); i++) {
-
-            // if the song at i is in edited_songs, update it
-            if (edited_songs.contains(i)) {
-                Song s = songs.get(i);
-                File file = s.getFile();
-                Mp3File mp3file = null;
-
-                try {
-                    mp3file = new Mp3File(file.getAbsolutePath());
-                    ID3v2 tag = new ID3v24Tag();
-                    mp3file.setId3v2Tag(tag);
-                } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-                    System.err.println(ex);
-                }
-
-                // set all the text based items
-                try {
-                    mp3file.getId3v2Tag().setTitle(s.getTitle());
-                    mp3file.getId3v2Tag().setArtist(s.getArtist());
-                    mp3file.getId3v2Tag().setAlbum(s.getAlbum());
-                    mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumartist());
-                    mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
-                    mp3file.getId3v2Tag().setYear(s.getYear());
-                    mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
-                    mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
-                } catch (IllegalArgumentException ex) {
-                    // this exception doesn't really matter
-                    // this only happens if you save a track with no genre
-                }
-
-                // set album art
-                String type = "image/jpeg";
-                mp3file.getId3v2Tag().clearAlbumImage();
-                mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
-
-                save(mp3file, file);
-
-                // update the row graphic
-                Main.frame.setRowIcon(Main.frame.SAVED, getRow(i));
-            } else {
-                // skip it, no changes
+            if(save(i)) {
+                count++;
             }
         }
-
-        // done with the saving, clear the edited_songs list
-        edited_songs.clear();
+        Main.frame.updateConsole(count + " file(s) updated!");
     }
 
+    /**
+     * Grabs the index from the selected row, then calls save() with that index
+     * @param selectedRows, the row indices to save
+     */
     public void saveTracks(int[] selectedRows) {
+
+        int count = 0;
+
         // traverse the array of rows and play each file sequentially
         for (int i = 0; i < selectedRows.length; i++) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
             int index = getIndex(row);
             save(index);
+            count++;
         }
+        Main.frame.updateConsole(count + " file(s) updated!");
     }
 
-    public void save(int index) {
+    /**
+     * Saves an individual track
+     * @param index, the index of the song to save in the songs map
+     * @return the result of the save, true for success, false for not success
+     */
+    public boolean save(int index) {
         if (edited_songs.contains(index)) {
             Song s = songs.get(index);
             File file = s.getFile();
@@ -377,6 +379,7 @@ public class SongController {
                 mp3file.getId3v2Tag().setYear(s.getYear());
                 mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
                 mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
+                mp3file.getId3v2Tag().setComment(s.getComment());
             } catch (IllegalArgumentException ex) {
                 // this exception doesn't really matter
                 // this only happens if you save a track with no genre
@@ -387,6 +390,7 @@ public class SongController {
             mp3file.getId3v2Tag().clearAlbumImage();
             mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
 
+            // not a recursive call, this function does the actual file saving
             save(mp3file, file);
 
             // update the row graphic
@@ -397,16 +401,17 @@ public class SongController {
             if (edited_songs.size() == 1) {
                 edited_songs.clear();
             } else if (edited_songs.size() > 1) {
-                edited_songs.remove(index);
+               // edited_songs.remove(index);
+                edited_songs.remove(new Integer(index));
             }
         } else {
-            // song doesn't need to be saved
+            return false;
         }
+        return true;
     }
 
     /**
      * Saves an individual file
-     *
      * @param mp3file
      * @param file
      */
@@ -423,8 +428,75 @@ public class SongController {
             newFile.renameTo(file);
 
         } catch (IOException | NotSupportedException ex) {
-            System.err.println(ex);
+            logger.logError("Exception when trying to save a song!", ex);
         }
+    }
+
+    /**
+     * Does the finding and replacing from showFindAndReplaceDialog()
+     *
+     * @param find, the string to find
+     * @param replace, the string to replace
+     * @return the results of the replace, true if there was something to
+     * replace, false if not
+     */
+    public int findAndReplace(String find, String replace) {
+        int count = 0;
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                if (table.getValueAt(i, j).toString().contains(find)) {
+                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
+                    // TODO find out why when changing Default to Deeeefault it sets Ingenue as edited
+                    int index = getIndex(i);
+                    switch(j) {
+                        case 2:     // title
+                            table.setValueAt(toReplace, i, j);
+                            setTitle(index, toReplace);
+                            count++;
+                            break;  
+                        case 3:     // artist
+                            table.setValueAt(toReplace, i, j);
+                            setArtist(index, toReplace);
+                            count++;
+                            break;
+                        case 4:     // album
+                            table.setValueAt(toReplace, i, j);
+                            setAlbum(index, toReplace);
+                            count++;
+                            break;
+                        case 5:     // album artist
+                            table.setValueAt(toReplace, i, j);
+                            setAlbumArtist(index, toReplace);
+                            count++;
+                            break;
+                        case 6:     // year
+                            table.setValueAt(toReplace, i, j);
+                            setYear(index, toReplace);
+                            count++;
+                            break;
+                        case 7:     // genre
+                            table.setValueAt(toReplace, i, j);
+                            setGenre(index, toReplace);
+                            count++;
+                            break;
+                        case 8:     // tracks
+                            table.setValueAt(toReplace, i, j);
+                            setTrack(index, toReplace);
+                            count++;
+                            break;
+                        case 9:     // disks
+                            table.setValueAt(toReplace, i, j);
+                            setDisk(index, toReplace);
+                            count++;
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+            }
+        }
+        return count;
     }
 
     /**
@@ -484,9 +556,9 @@ public class SongController {
                     Icon artwork_icon = Utils.getScaledImage(bytes, 150);
                     Main.frame.multImage.setIcon(artwork_icon);
                 }
-
+                
             } catch (IOException ex) {
-                //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                logger.logError("Exception while adding album art!", ex);
             }
         }
     }
@@ -524,6 +596,9 @@ public class SongController {
      * @param selectedRows the rows of songs to update
      */
     public void autoAddCovers(int[] selectedRows) {
+
+        int count = 0;
+
         // traverse the array of rows and add each image
         for (int i = 0; i < selectedRows.length; i++) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
@@ -536,8 +611,10 @@ public class SongController {
             if (cover != null) {
                 // if cover doesn't return as null, add the cover
                 addIndividualCover(row, cover);
+                count++;
             }
         }
+        Main.frame.updateConsole("Auto-added cover art for " + count + " file(s)!");
     }
 
     /**
@@ -547,12 +624,25 @@ public class SongController {
      * @return the cover file, or null if it doesn't exist
      */
     public File folderContainsCover(File folder) {
+        String regex = "\\[\\d{4}\\] .*";
+        if (folder.getName().matches(regex)) {
+            // all is well, just get the cover normally
+        } else if (folder.getName().startsWith("CD")) {
+            folder = folder.getParentFile();
+        }
+
         File[] files = folder.listFiles();      // get all the files
         for (File file : files) {
             if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
                 return file;
             }
         }
+        // if we reach this point, then the cover wasn't found
+        // perform one final check and recursively call itself
+        if (folder.getParentFile().getName().matches(regex)) {
+            return folderContainsCover(folder.getParentFile());
+        }
+
         // no cover files were found, returning null
         return null;
     }
@@ -582,7 +672,6 @@ public class SongController {
             // update graphics
             Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
 
-
             // set the image on the row
             table.getModel().setValueAt(thumbnail_icon, row, 11);
 
@@ -600,33 +689,332 @@ public class SongController {
         }
     }
 
-    // TODO Make sure this works and document it
+    /**
+     * Function that looks at the file's name and location and auto generates
+     * some tags
+     *
+     * @param selectedRows, the rows selected on the table
+     */
+    public void autoTagFiles(int[] selectedRows) {
+        for (int i = 0; i < selectedRows.length; i++) {
+            autoTag(selectedRows[i], (File) table.getModel().getValueAt(i, 1));
+        }
+        autoAddCovers(selectedRows);
+    }
+
+    /**
+     * Function that actually does the autotagging
+     *
+     * @param row, the row to update
+     * @param file, the file to look at
+     */
+    public void autoTag(int row, File file) {
+
+        String title = getTitleFromFile(file);
+        String artist = getArtistFromFile(file);
+        String album = getAlbumFromFile(file);
+        String albumartist = getAlbumArtistFromFile(file);
+        String year = getYearFromFile(file);
+        String tracks = getTracksFromFolder(file);
+        String disks = getDisksFromFile(file);
+        String genre = getGenreFromFile(file);
+
+        // get the index for the setters
+        int index = getIndex(row);
+
+        // title
+        setTitle(index, title);
+        table.getModel().setValueAt(title, row, 3);
+
+        // artist
+        if (!Utils.isPartOfALabel(file)) {
+            setArtist(index, artist);
+            table.getModel().setValueAt(artist, row, 4);
+        }
+
+        // album
+        setAlbum(index, album);
+        table.getModel().setValueAt(album, row, 5);
+
+        // album artist
+        setAlbumArtist(index, albumartist);
+        table.getModel().setValueAt(albumartist, row, 6);
+
+        // year
+        setYear(index, year);
+        table.getModel().setValueAt(year, row, 7);
+
+        // genre
+        if (Utils.isPartOfALabel(file)) {
+            setGenre(index, genre);
+            table.getModel().setValueAt(genre, row, 8);
+        }
+
+        // tracks
+        setTrack(index, tracks);
+        table.getModel().setValueAt(tracks, row, 9);
+
+        // disks
+        setDisk(index, disks);
+        table.getModel().setValueAt(disks, row, 10);
+    }
+
+    /**
+     * Gets the title based on the filename
+     *
+     * @param file, the file to check
+     * @return a string track title
+     */
+    public String getTitleFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return file.getName().replace(".mp3", "");
+        } else {
+            String regex = "\\d{2} .*\\.mp3";
+            if (file.getName().matches(regex)) {
+                return file.getName().substring(3).replace(".mp3", "").trim();
+            } else {
+                return "";
+            }
+        }
+    }
+
+    /**
+     * Gets the artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string artist
+     */
+    public String getArtistFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return "";
+        }
+
+        return getArtist(file);
+    }
+
+    /**
+     * Gets the album based on the file location
+     *
+     * @param file, the file to check
+     * @return a string album
+     */
+    public String getAlbumFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            return getGenreFromFile(file);
+        } else {
+            File dir = file.getParentFile();
+            String regex = "\\[\\d{4}\\] .*";
+            if (dir.getName().matches(regex)) {
+                return dir.getName().substring(6).trim();
+            } else if (dir.getName().startsWith("CD")) {
+                // album is a multiple CD album
+                dir = dir.getParentFile();
+                if (dir.getName().matches(regex)) {
+                    return dir.getName().substring(6).trim();
+                }
+            }
+            return "";
+        }
+    }
+
+    /**
+     * Gets the album artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string album artist
+     */
+    public String getAlbumArtistFromFile(File file) {
+        if (Utils.isPartOfALabel(file)) {
+            File dir = file.getParentFile().getParentFile().getParentFile();
+            return dir.getName();
+        }
+
+        // get the normal artist
+        return getArtist(file);
+    }
+
+    /**
+     * Gets the artist based on the file location
+     *
+     * @param file, the file to check
+     * @return a string artist
+     */
+    public String getArtist(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            dir = dir.getParentFile();
+            return dir.getName();
+        } else if (dir.getName().startsWith("CD")) {
+            dir = dir.getParentFile().getParentFile();
+            return dir.getName();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the year based on the file location
+     *
+     * @param file, the file to check
+     * @return a string year
+     */
+    public String getYearFromFile(File file) {
+        if (file == null) {
+            return "";
+        }
+
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            return dir.getName().substring(1, 5).trim();
+        } else if (dir.getName().startsWith("CD")) {
+            // album is a multiple CD album
+            dir = dir.getParentFile();
+            if (dir.getName().matches(regex)) {
+                return dir.getName().substring(1, 5).trim();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Gets the tracks based on the filename and other files in the directory
+     *
+     * @param file, the file to check
+     * @return a tracks in the form of a string
+     */
+    public String getTracksFromFolder(File file) {
+        if (file == null) {
+            return "";
+        }
+
+        File dir = file.getParentFile();
+        String totalTracks = getTotalTracksFromFolder(dir);
+        String regex = "\\d{2} .*\\.mp3";
+        if (file.getName().matches(regex)) {
+            if (Integer.valueOf(file.getName().substring(0, 2)) < 10) {
+                return file.getName().substring(1, 2) + "/" + totalTracks;
+            } else {
+                return file.getName().substring(0, 2) + "/" + totalTracks;
+            }
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the total number of tracks in a folder
+     *
+     * @param file, the folder to check
+     * @return a String representation of the songs in the folder
+     */
+    public String getTotalTracksFromFolder(File file) {
+        return String.valueOf(getNumberOfSongs(file));
+    }
+
+    /**
+     * Gets the total number of tracks in a folder
+     *
+     * @param file, the folder to check
+     * @return an int count of mp3 files in a folder
+     */
+    public int getNumberOfSongs(File file) {
+        File[] files = file.listFiles();
+        int count = 0;
+        for (File file1 : files) {
+            if (file1.getName().endsWith(".mp3")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the disks from the file
+     *
+     * @param file, the file to check
+     * @return a string representation of disks
+     */
+    public String getDisksFromFile(File file) {
+        File dir = file.getParentFile();
+        String regex = "\\[\\d{4}\\] .*";
+        if (dir.getName().matches(regex)) {
+            // there's no CD1, CD2 folders, single disk album
+            return "1/1";
+        } else if (dir.getName().startsWith("CD") && dir.getParentFile().getName().matches(regex)) {
+            // multiple disk album, get the current disk based on the folder it's in
+            int totalDisks = getTotalDisksFromFolder(dir);
+            return dir.getName().substring(2) + "/" + totalDisks;
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Gets the total disks from a folder
+     *
+     * @param dir, the folder to check
+     * @return an int count of disks
+     */
+    public int getTotalDisksFromFolder(File dir) {
+        dir = dir.getParentFile();
+        File[] dirs = dir.listFiles(File::isDirectory);
+        int count = 0;
+        for (File folder : dirs) {
+            if (folder.getName().startsWith("CD")) {
+                // most (if not all) times, this should be 2
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Returns a genre String if the file is a part of a label
+     *
+     * @param file, the file to check
+     * @return a genre string
+     */
+    public String getGenreFromFile(File file) {
+        if (!Utils.isPartOfALabel(file)) {
+            return "";
+        }
+        return file.getParentFile().getName();
+    }
+
+    /**
+     * Moves selected files to a new destination
+     * @param selectedRows, the rows to move
+     */
     public void moveFiles(int[] selectedRows) {
 
-        JFileChooser jfc = new JFileChooser();
-        File library = new File("/Users/pat/Music/Library");
-        jfc.setCurrentDirectory(library);
-        jfc.setDialogTitle("Choose the destination folder...");
-        jfc.setMultiSelectionEnabled(false);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = jfc.showDialog(Main.frame, "Select");
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-
+        File directory = Utils.launchJFileChooser("Choose the destination folder...", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
+        if (directory != null) {
             for (int i = 0; i < selectedRows.length; i++) {
-                File file = (File) table.getModel().getValueAt(selectedRows[i], 1);
-
-                File directory = jfc.getSelectedFile();
-                File new_file = new File(directory.getPath() + "/" + file.getName());
-                file.renameTo(new_file);
-
-                int index = getIndex(selectedRows[i]);
-                songs.get(index).setFile(new_file);
-                table.getModel().setValueAt(new_file, selectedRows[i], 1);
+                File old_file = (File) table.getModel().getValueAt(selectedRows[i], 1);
+                File new_location = directory;
+                int row = selectedRows[i];
+                moveFile(row, old_file, new_location);
             }
         } else {
             // do nothing, user exited or pressed cancel
         }
+    }
+
+    /**
+     * Function that actually moves the file
+     * @param row
+     * @param old_file
+     * @param new_location
+     */
+    public void moveFile(int row, File old_file, File new_location) {
+        File new_file = new File(new_location.getPath() + "/" + old_file.getName());
+        old_file.renameTo(new_file);
+
+        int index = getIndex(row);
+        songs.get(index).setFile(new_file);
+        table.getModel().setValueAt(new_file, row, 1);
     }
 
     /**
@@ -637,15 +1025,12 @@ public class SongController {
     public void playFiles(int[] selectedRows) {
         // traverse the array of rows and play each file sequentially
         for (int i = 0; i < selectedRows.length; i++) {
+            int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
+            File file = (File) table.getModel().getValueAt(row, 1);
             try {
-                int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
-                File file = (File) table.getModel().getValueAt(row, 1);
-                Desktop desktop = Desktop.getDesktop();
-                if (file.exists()) {
-                    desktop.open(file);
-                }
+                Utils.openFile(file);
             } catch (IOException ex) {
-                System.err.println(ex);
+                logger.logError("Couldn't play file " + file.getName(), ex);
             }
         }
     }

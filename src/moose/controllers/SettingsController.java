@@ -11,6 +11,7 @@ package moose.controllers;
 
 // imports
 import moose.Main;
+import moose.utilities.*;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -26,12 +27,16 @@ import java.util.Arrays;
 // class SettingsController
 public class SettingsController {
 
-    File settings;      // main settings file
+    // main settings file
+    File settings;
 
     // variables
     boolean debugMode;
     ArrayList<String> genres = new ArrayList<>();
     String libraryLocation;
+
+    // logger object
+    Logger logger = Main.getLogger();
 
     public SettingsController() {
 
@@ -55,7 +60,7 @@ public class SettingsController {
                 // since we've created a brand new file, fill it with some default values
                 fillDefaults();
             } catch (IOException ex) {
-                Main.logger.logError("Couldn't create settings file!", ex);
+                logger.logError("Couldn't create settings file!", ex);
             }
         }
     }
@@ -77,11 +82,13 @@ public class SettingsController {
             bufferedWriter.write(defLibraryLocation);
 
         } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
+            logger.logError("Couldn't find settings file!", ex);
         } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
+            logger.logError("Error reading settings file!", ex);
         }
-    }/**
+    }
+
+    /**
      * Reads the settings from the file and sets the ivars
      */
     public void readSettingsFile() {
@@ -103,14 +110,14 @@ public class SettingsController {
 
                 // get the library location
                 if(line.contains("LIBRARYLOCATION=")) {
-                    setLibraryLocation(line.replace("LIBRARYLOCATION=", "") + "/");
+                    setLibraryLocation(line.replace("LIBRARYLOCATION=", ""));
                 }
             }
 
         } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
+            logger.logError("Couldn't find settings file!", ex);
         } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
+            logger.logError("Error reading settings file!", ex);
         }
     }
 
@@ -192,7 +199,7 @@ public class SettingsController {
         genres.add("Indie Electronic");
         genres.add("Rock");
         genres.add("Electronic/Rock");
-        libraryLocation = "Library location not set";
+        libraryLocation = "Library location not set!";
 
         writeSettingsFile();
     }
@@ -202,12 +209,9 @@ public class SettingsController {
      */
     public void openEventLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.getEventLog().exists()) {
-                desktop.open(Main.logger.getEventLog());
-            }
+            Utils.openFile(Main.logger.getEventLog());
         } catch (IOException ex) {
-            Main.logger.logError("Couldn't open the event log!", ex);
+            logger.logError("Couldn't open the event log!", ex);
         }
     }
 
@@ -216,12 +220,9 @@ public class SettingsController {
      */
     public void openErrorLog() {
         try {
-            Desktop desktop = Desktop.getDesktop();
-            if (Main.logger.getErrorLog().exists()) {
-                desktop.open(Main.logger.getErrorLog());
-            }
+            Utils.openFile(Main.logger.getErrorLog());
         } catch (IOException ex) {
-            Main.logger.logError("Couldn't open the event log!", ex);
+            logger.logError("Couldn't open the error log!", ex);
         }
     }
 
@@ -229,13 +230,13 @@ public class SettingsController {
      * Clears the event log
      */
     public void clearEventLog() {
-        if (Main.logger.getEventLog().exists()) {
-            Main.logger.getEventLog().delete();
+        if (logger.getEventLog().exists()) {
+            logger.getEventLog().delete();
         }
         try {
-            Main.logger.getEventLog().createNewFile();
+            logger.getEventLog().createNewFile();
         } catch (IOException e) {
-            Main.logger.logError("Couldn't clear the event log!", e);
+            logger.logError("Couldn't clear the event log!", e);
         }
     }
 
@@ -243,13 +244,13 @@ public class SettingsController {
      * Clears the error log
      */
     public void clearErrorLog() {
-        if (Main.logger.getErrorLog().exists()) {
-            Main.logger.getErrorLog().delete();
+        if (logger.getErrorLog().exists()) {
+            logger.getErrorLog().delete();
         }
         try {
-            Main.logger.getErrorLog().createNewFile();
+            logger.getErrorLog().createNewFile();
         } catch (IOException e) {
-            Main.logger.logError("Couldn't clear the error log!", e);
+            logger.logError("Couldn't clear the error log!", e);
         }
     }
 
@@ -276,9 +277,9 @@ public class SettingsController {
             bufferedWriter.flush();
 
         } catch (FileNotFoundException ex) {
-            Main.logger.logError("Couldn't find settings file!", ex);
+            logger.logError("Couldn't find settings file!", ex);
         } catch (IOException ex) {
-            Main.logger.logError("Error reading settings file!", ex);
+            logger.logError("Error reading settings file!", ex);
         }
     }
 

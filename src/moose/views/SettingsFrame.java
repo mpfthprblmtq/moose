@@ -11,7 +11,9 @@
 package moose.views;
 
 // imports
-import moose.controllers.SettingsController;
+import moose.Main;
+import moose.controllers.*;
+import moose.utilities.*;
 
 import java.io.File;
 import javax.swing.DefaultListModel;
@@ -23,6 +25,9 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // controller
     public SettingsController settingsController = new SettingsController();
+
+    // logger object
+    Logger logger = Main.getLogger();
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
@@ -59,6 +64,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         genreTextField = new javax.swing.JTextField();
         addGenreButton = new javax.swing.JButton();
         deleteGenreButton = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         openErrorLogButton = new javax.swing.JButton();
@@ -86,6 +92,8 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         genreList.setModel(getGenreListModel());
         genreList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        genreList.setMaximumSize(new java.awt.Dimension(200, 300));
+        genreList.setMinimumSize(new java.awt.Dimension(200, 300));
         genreList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 genreListMouseClicked(evt);
@@ -93,7 +101,9 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(genreList);
 
-        genreTextField.setMaximumSize(new java.awt.Dimension(10, 26));
+        genreTextField.setMaximumSize(new java.awt.Dimension(167, 26));
+        genreTextField.setMinimumSize(new java.awt.Dimension(167, 26));
+        genreTextField.setPreferredSize(new java.awt.Dimension(167, 26));
 
         addGenreButton.setText("Add");
         addGenreButton.addActionListener(new java.awt.event.ActionListener() {
@@ -109,22 +119,29 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel8.setText("Genre to add:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(genreTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 67, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
+                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1))
+                            .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -134,16 +151,18 @@ public class SettingsFrame extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(addGenreButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteGenreButton)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 132, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -249,7 +268,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addComponent(clearErrorLogButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addContainerGap(177, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Logging", jPanel2);
@@ -259,6 +278,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         jLabel7.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
         jLabel7.setText(settingsController.getLibraryLocation());
+        jLabel7.setToolTipText("");
         jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         browseButton.setText("Browse...");
@@ -293,7 +313,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(browseButton)
-                .addContainerGap(318, Short.MAX_VALUE))
+                .addContainerGap(238, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Files", jPanel3);
@@ -333,7 +353,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveButton)
@@ -452,17 +472,10 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        // create a jfc, configure it, and launch it
-        JFileChooser jfc = new JFileChooser();
-        jfc.setDialogTitle("Choose the directory you want to store music in...");
-        jfc.setMultiSelectionEnabled(false);
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.showOpenDialog(null);
-        
-        // get the selected file
-        File dir = jfc.getSelectedFile();
+        // get the folder through a JFileChooser
+        File dir = Utils.launchJFileChooser("Choose the directory you want to store music in...", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
         if(dir != null) {
-            settingsController.setLibraryLocation(dir.getAbsolutePath());
+            settingsController.setLibraryLocation(dir.getAbsolutePath() + "/");
             jLabel7.setText(settingsController.getLibraryLocation());
         }
     }//GEN-LAST:event_browseButtonActionPerformed
@@ -569,6 +582,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
