@@ -8,6 +8,7 @@
 // package
 package moose.controllers;
 
+// imports
 import com.mpatric.mp3agic.*;
 
 import moose.utilities.Logger;
@@ -17,7 +18,6 @@ import moose.utilities.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+// class SongController
 public class SongController {
 
     // table object that references the JTable on the form
@@ -37,9 +38,16 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
+    /**
+     * Default constructor
+     */
     public SongController() {
     }
   
+    /**
+     * Sets the table ivar
+     * @param table 
+     */
     public void setTable(JTable table) {
         this.table = table;
     }
@@ -89,6 +97,11 @@ public class SongController {
         String track = mp3file.getId3v2Tag().getTrack();
         String disk = mp3file.getId3v2Tag().getPartOfSet();
         byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
+        
+        int bitrate = mp3file.getBitrate();
+        int samplerate = mp3file.getSampleRate();
+        long len = mp3file.getLengthInSeconds();
+        String comment = mp3file.getId3v2Tag().getComment();
 
         // sets the strings to blank to avoid NPE
         if (title == null) {
@@ -118,9 +131,13 @@ public class SongController {
         if (artwork_bytes == null) {
             artwork_bytes = new byte[0];
         }
+        if (comment == null) {
+            comment = "";
+        }
+        
 
         // create a song object with the information
-        Song s = new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes);
+        Song s = new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes, bitrate, samplerate, len, comment);
 
         // make an index
         int index = songs.size();
@@ -287,6 +304,18 @@ public class SongController {
     }
 
     /**
+     * Helper function to set the comment of the song in the songs
+     * arraylist.
+     *
+     * @param index, the index of the song
+     * @param comment, the comment to set
+     */
+    public void setComment(int index, String comment) {
+        songs.get(index).setComment(comment);
+        songEdited(index);
+    }
+    
+    /**
      * Goes through the edited_songs array and saves each one
      * TODO confirm that this works
      */
@@ -350,6 +379,7 @@ public class SongController {
                 mp3file.getId3v2Tag().setYear(s.getYear());
                 mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
                 mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
+                mp3file.getId3v2Tag().setComment(s.getComment());
             } catch (IllegalArgumentException ex) {
                 // this exception doesn't really matter
                 // this only happens if you save a track with no genre
@@ -526,7 +556,7 @@ public class SongController {
                     Icon artwork_icon = Utils.getScaledImage(bytes, 150);
                     Main.frame.multImage.setIcon(artwork_icon);
                 }
-
+                
             } catch (IOException ex) {
                 logger.logError("Exception while adding album art!", ex);
             }
