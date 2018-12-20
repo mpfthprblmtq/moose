@@ -50,7 +50,7 @@ public class AuditController {
             new ArrayList<>()));    // other files
     
     // logger object
-    Logger logger = Main.logger;
+    Logger logger = Main.getLogger();
     
     // some constants
     public static final int AUDIT = 0;
@@ -601,7 +601,7 @@ public class AuditController {
         // also checks if the album artist is a label, since those files aren't formatted the same
         for (File file : files) {
             if (file.getName().endsWith(".mp3")) {
-                if (!file.getName().matches(regex) && !isLabel(file)) {
+                if (!file.getName().matches(regex) && !Utils.isPartOfALabel(file)) {
                     return false;
                 }
             }
@@ -654,7 +654,7 @@ public class AuditController {
                 byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
 
                 // check if it's a label, since those mp3s don't need as much information
-                if (isLabel(dir)) {
+                if (Utils.isPartOfALabel(dir)) {
                     if (title == null
                             || artist == null
                             || album == null
@@ -679,18 +679,6 @@ public class AuditController {
             }
         }
         return true;
-    }
-
-    /**
-     * Check if a directory is from a label
-     *
-     * @param dir, the directory to check
-     * @return the result of the check, true if it is a label, false if it isn't
-     * a label
-     */
-    public boolean isLabel(File dir) {
-        String path = dir.getPath();
-        return path.contains("/Genres/");
     }
 
     /**
