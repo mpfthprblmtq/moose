@@ -6,6 +6,7 @@
  *
  *  Copyright Pat Ripley 2018
  */
+
 // package
 package moose.views;
 
@@ -149,6 +150,9 @@ public class Frame extends javax.swing.JFrame {
                     break;
                 case "Save":
                     songController.saveTracks(selectedRows);
+                    break;
+                case "More Info...":
+                    openMoreInfo();
                     break;
                 default:
                     break;
@@ -342,13 +346,13 @@ public class Frame extends javax.swing.JFrame {
 
         switch (icon) {
             case DEFAULT:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/default.jpg")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
                 break;
             case EDITED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/edit.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
                 break;
             case SAVED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("../../resources/check.png")), row, 0);
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
                 break;
         }
     }
@@ -375,7 +379,7 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("../../resources/default.png")), // adds the default status icon
+                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
                 s.getFile().getName().replace(".mp3", ""), // actual editable file name
                 s.getTitle(),
@@ -780,8 +784,8 @@ public class Frame extends javax.swing.JFrame {
                         .addComponent(L1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(multImage, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                    .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         multPanelLayout.setVerticalGroup(
@@ -842,13 +846,14 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(19, 19, 19)
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(saveButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
                         .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         containerLayout.setVerticalGroup(
@@ -1021,7 +1026,7 @@ public class Frame extends javax.swing.JFrame {
         // select some file(s)
         File[] dirs = Utils.launchJFileChooser("Select a folder to open...", "Open", JFileChooser.DIRECTORIES_ONLY, true);
 
-        if(dirs != null) {
+        if (dirs != null) {
             // create an arraylist of files
             ArrayList<File> files = new ArrayList<>();
             for (int i = 0; i < dirs.length; i++) {
@@ -1056,16 +1061,17 @@ public class Frame extends javax.swing.JFrame {
             case java.awt.event.MouseEvent.BUTTON3:
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
+                int rows = table.getSelectedRowCount();
                 if (row >= 0 && col >= 0) {
                     switch (col) {
                         case 10:
-                            showArtworkPopup(evt);
+                            showArtworkPopup(evt, rows);
                             break;
                         case 1:
-                            showFilePopup(evt);
+                            showFilePopup(evt, rows);
                             break;
                         default:
-                            showRegularPopup(evt);
+                            showRegularPopup(evt, rows);
                             break;
                     }
                 } else {
@@ -1079,7 +1085,7 @@ public class Frame extends javax.swing.JFrame {
                 // check if double click
                 if (evt.getClickCount() == 2) {
                     if (table.getSelectedColumn() == 10) {
-                        showArtworkPopup(evt);
+                        showArtworkPopup(evt, table.getSelectedRowCount());
                     } else {
                         changeSelection(table.getSelectedRow(), table.getSelectedColumn(), -1);
                     }
@@ -1157,7 +1163,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
-        showArtworkPopup(evt);
+        showArtworkPopup(evt, table.getSelectedRowCount());
     }//GEN-LAST:event_multImageMousePressed
 
     /**
@@ -1267,7 +1273,7 @@ public class Frame extends javax.swing.JFrame {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // prompt the user to enter a command
         String command = JOptionPane.showInputDialog(this, "Enter a command:");
-        if(command != null) {
+        if (command != null) {
             doCommand(command);
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -1295,6 +1301,144 @@ public class Frame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
                 break;
         }
+    }
+
+    /**
+     * Gets the info for a song
+     */
+    public void openMoreInfo() {
+        Song s = songController.getSongs().get(songController.getIndex(table.getSelectedRow()));
+        InfoFrame infoFrame = new InfoFrame(s, table.getSelectedRow());
+        infoFrame.setLocationRelativeTo(this);
+        infoFrame.setVisible(true);
+    }
+
+    /**
+     * Moves to the next song
+     */
+    public void next() {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row + 1, row + 1);
+        openMoreInfo();
+    }
+
+    /**
+     * Moves to the previous song
+     */
+    public void previous() {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row - 1, row - 1);
+        openMoreInfo();
+    }
+
+    /**
+     * Get the changes from the info panel
+     *
+     * @param filename
+     * @param title
+     * @param artist
+     * @param album
+     * @param albumartist
+     * @param year
+     * @param genre
+     * @param tracks
+     * @param disks
+     * @param comment
+     */
+    public void submitChangesFromInfoFrame(
+            String filename,
+            String title,
+            String artist,
+            String album,
+            String albumartist,
+            String year,
+            String genre,
+            String tracks,
+            String disks,
+            String comment) {
+        
+        int row = table.getSelectedRow();
+        
+        if (!table.getValueAt(row, 1).equals(filename)) {
+            File old_file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
+            String path = old_file.getPath().replace(old_file.getName(), "");
+            File new_file = new File(path + "//" + filename + ".mp3");
+            songController.setFile(songController.getIndex(row), old_file, new_file);
+            old_file.renameTo(new_file);
+            model.setValueAt(new_file, row, 1);
+            table.setValueAt(filename, row, 1);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 2).equals(title)) {
+            songController.setTitle(songController.getIndex(row), title);
+            table.setValueAt(title, row, 2);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 3).equals(artist)) {
+            songController.setArtist(songController.getIndex(row), artist);
+            table.setValueAt(artist, row, 3);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 4).equals(album)) {
+            songController.setAlbum(songController.getIndex(row), album);
+            table.setValueAt(album, row, 4);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 5).equals(albumartist)) {
+            songController.setAlbumArtist(songController.getIndex(row), albumartist);
+            table.setValueAt(albumartist, row, 5);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 6).equals(year)) {
+            songController.setYear(songController.getIndex(row), year);
+            table.setValueAt(year, row, 6);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 7).equals(genre)) {
+            songController.setGenre(songController.getIndex(row), genre);
+            table.setValueAt(genre, row, 7);
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 8).equals(tracks)) {
+            if(!tracks.equals("/")) {
+                songController.setTrack(songController.getIndex(row), tracks);
+                table.setValueAt(tracks, row, 8);
+            } else {
+                songController.setDisk(songController.getIndex(row), "");
+                table.setValueAt("", row, 8);
+            }
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        if(!table.getValueAt(row, 9).equals(disks)) {
+            if(!disks.equals("/")) {
+                songController.setDisk(songController.getIndex(row), disks);
+                table.setValueAt(disks, row, 9);
+            } else {
+                songController.setDisk(songController.getIndex(row), "");
+                table.setValueAt("", row, 9);
+            }
+        } else {
+            // do nothing, nothing was changed
+        }
+        
+        songController.setComment(songController.getIndex(row), comment);
+        
     }
 
     /**
@@ -1610,7 +1754,7 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showArtworkPopup(MouseEvent e) {
+    void showArtworkPopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         popup.add(item = new JMenuItem("Add"));
@@ -1626,9 +1770,14 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showRegularPopup(MouseEvent e) {
+    void showRegularPopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More Info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
         popup.add(item = new JMenuItem("Remove from list"));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
@@ -1644,9 +1793,14 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param e
      */
-    void showFilePopup(MouseEvent e) {
+    void showFilePopup(MouseEvent e, int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More Info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
         popup.add(item = new JMenuItem("Remove from list"));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Play"));
@@ -1654,7 +1808,7 @@ public class Frame extends javax.swing.JFrame {
         popup.add(item = new JMenuItem("Save"));
         item.addActionListener(menuListener);
         popup.addSeparator();
-        popup.add(item = new JMenuItem("Move File..."));
+        popup.add(item = new JMenuItem(rows > 1 ? "Move File..." : "Move Files..."));
         item.addActionListener(menuListener);
 
         popup.show(e.getComponent(), e.getX(), e.getY());
