@@ -37,6 +37,16 @@ public class SongController {
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
+    
+    private static final int TABLE_COLUMN_TITLE = 2;
+    private static final int TABLE_COLUMN_ARTIST = 3;
+    private static final int TABLE_COLUMN_ALBUM = 4;
+    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
+    private static final int TABLE_COLUMN_YEAR = 6;
+    private static final int TABLE_COLUMN_GENRE = 7;
+    private static final int TABLE_COLUMN_TRACK = 8;
+    private static final int TABLE_COLUMN_DISK = 9;
+    private static final int TABLE_COLUMN_ALBUMART = 10;
 
     /**
      * Default constructor
@@ -75,16 +85,17 @@ public class SongController {
         Mp3File mp3file;
         try {
             // create the mp3file from the file's path
-            mp3file = new Mp3File(file.getAbsolutePath());
+            mp3file = new Mp3File(file.getPath());
 
             // if the mp3file doesn't have an id3tag, create one
             if (!mp3file.hasId3v2Tag()) {
                 ID3v2 tag = new ID3v24Tag();
                 mp3file.setId3v2Tag(tag);
             }
-        } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
+        } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             // things borked
             mp3file = null;
+            logger.logError("Exception when trying to read data from file: " + file.getName(), e);
         }
 
         // get the id3v2 info
@@ -446,7 +457,6 @@ public class SongController {
             for (int j = 0; j < table.getColumnCount(); j++) {
                 if (table.getValueAt(i, j).toString().contains(find)) {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
-                    // TODO find out why when changing Default to Deeeefault it sets Ingenue as edited
                     int index = getIndex(i);
                     switch(j) {
                         case 2:     // title
@@ -657,7 +667,7 @@ public class SongController {
 
         try {
             // get the index of the track
-            int index = Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
+            int index = getIndex(row);
 
             // convert file to byte array
             byte[] bytes;
@@ -673,7 +683,7 @@ public class SongController {
             Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
 
             // set the image on the row
-            table.getModel().setValueAt(thumbnail_icon, row, 11);
+            table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
 
             // song was edited, add it to the list
             songEdited(index);
@@ -697,11 +707,13 @@ public class SongController {
      */
     public void autoTagFiles(int[] selectedRows) {
         for (int i = 0; i < selectedRows.length; i++) {
-            autoTag(selectedRows[i], (File) table.getModel().getValueAt(i, 1));
+            int row = selectedRows[i];
+            File file = (File) table.getModel().getValueAt(table.convertRowIndexToModel(selectedRows[i]), 1);
+            autoTag(row, file);
         }
         autoAddCovers(selectedRows);
     }
-
+    
     /**
      * Function that actually does the autotagging
      *
@@ -721,42 +733,42 @@ public class SongController {
 
         // get the index for the setters
         int index = getIndex(row);
-
+        
         // title
         setTitle(index, title);
-        table.getModel().setValueAt(title, row, 3);
+        table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
         // artist
         if (!Utils.isPartOfALabel(file)) {
             setArtist(index, artist);
-            table.getModel().setValueAt(artist, row, 4);
+            table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
         }
 
         // album
         setAlbum(index, album);
-        table.getModel().setValueAt(album, row, 5);
+        table.setValueAt(album, row, TABLE_COLUMN_ALBUM);
 
         // album artist
         setAlbumArtist(index, albumartist);
-        table.getModel().setValueAt(albumartist, row, 6);
+        table.setValueAt(albumartist, row, TABLE_COLUMN_ALBUMARTIST);
 
         // year
         setYear(index, year);
-        table.getModel().setValueAt(year, row, 7);
+        table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
         // genre
         if (Utils.isPartOfALabel(file)) {
             setGenre(index, genre);
-            table.getModel().setValueAt(genre, row, 8);
+            table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
         }
 
         // tracks
         setTrack(index, tracks);
-        table.getModel().setValueAt(tracks, row, 9);
+        table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
         // disks
         setDisk(index, disks);
-        table.getModel().setValueAt(disks, row, 10);
+        table.setValueAt(disks, row, TABLE_COLUMN_DISK);
     }
 
     /**
