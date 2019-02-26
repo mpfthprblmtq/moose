@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -62,7 +63,7 @@ public class Frame extends javax.swing.JFrame {
             return !(column == 11 || column == 0);
         }
     };
-
+    
     // some constants to make life easier
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
@@ -191,7 +192,7 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(10, 100);    // album art
 
         // taken from the FileDrop example
-        FileDrop fileDrop = new FileDrop(System.out, tableSP, (File[] files) -> {
+        new FileDrop(System.out, tableSP, (File[] files) -> {
 
             // create an arraylist of files and traverse it
             ArrayList<File> fileList = new ArrayList<>();
@@ -202,7 +203,11 @@ public class Frame extends javax.swing.JFrame {
                     fileList.add(file);
                 }
             }
+            
+            // sort the file list
+            Collections.sort(fileList, (File f1, File f2) -> f1.getName().compareTo(f2.getName()));
 
+            // import them all
             importFiles(fileList);
         });
 
@@ -325,7 +330,6 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param selectedRows the rows to remove
      */
-    // TODO:  Check to see what this does to the songs array and the multpanel
     public void removeRows(int[] selectedRows) {
         // traverse the array of selectedRows and delete them
         for (int i = selectedRows.length - 1; i >= 0; i--) {
@@ -406,6 +410,8 @@ public class Frame extends javax.swing.JFrame {
         list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
         sorter.setSortKeys(list);
         sorter.sort();
+        
+//        ((AbstractTableModel) table.getModel()).fireTableDataChanged();
 
         // all is well in the world
         return true;
@@ -495,6 +501,8 @@ public class Frame extends javax.swing.JFrame {
 
         int succ_mp3Count = 0;   // lets count the number of successful files imported
         int unsucc_mp3Count = 0; // lets count the number of all files attempted to import
+        
+        
 
         // iterate through the files and try to add them
         for (File file : files) {
