@@ -151,10 +151,12 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 	@Override
 	public void run()
 	{
+            if (table.getEditingRow() >= 0) {
 		row = table.convertRowIndexToModel( table.getEditingRow() );
 		column = table.convertColumnIndexToModel( table.getEditingColumn() );
 		oldValue = table.getModel().getValueAt(row, column);
 		newValue = null;
+            }
 	}
 
 	/*
