@@ -68,6 +68,16 @@ public class Utils {
      */
     public static boolean isPartOfALabel(File dir) {
         String path = dir.getPath();
+        return (path.contains("/Genres/") || path.contains("/EPs/") || path.contains("/EP's/"));
+    }
+    
+    public static boolean isAnEPPartOfALabel(File dir) {
+        String path = dir.getPath();
+        return (path.contains("/EPs/") || path.contains("/EP's/"));
+    }
+    
+    public static boolean isAGenrePartOfALabel(File dir) {
+        String path = dir.getPath();
         return path.contains("/Genres/");
     }
     
@@ -133,6 +143,7 @@ public class Utils {
     /**
      * Opens a file
      * @param file, the file to open
+     * @throws java.io.IOException
      */
     public static void openFile(File file) throws IOException {
             Desktop desktop = Desktop.getDesktop();
