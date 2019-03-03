@@ -1185,18 +1185,22 @@ public class Frame extends javax.swing.JFrame {
             curr_col++;
             changeSelection(curr_row, curr_col, TAB);
             table.setRowSelectionInterval(curr_row, curr_row);
+            setMultiplePanelFields();
         } else if (evt.getKeyCode() == KeyEvent.VK_ENTER && !evt.isShiftDown()) {
             curr_row++;
             changeSelection(curr_row, curr_col, ENTER);
             table.setRowSelectionInterval(curr_row, curr_row);
+            setMultiplePanelFields();
         } else if (evt.getKeyCode() == KeyEvent.VK_TAB && evt.isShiftDown()) {
             curr_col--;
             changeSelection(curr_row, curr_col, SHIFT_TAB);
             table.setRowSelectionInterval(curr_row, curr_row);
+            setMultiplePanelFields();
         } else if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.isShiftDown()) {
             curr_row--;
             changeSelection(curr_row, curr_col, SHIFT_ENTER);
             table.setRowSelectionInterval(curr_row, curr_row);
+            setMultiplePanelFields();
         } else {
             // do nothing
         }
@@ -1542,7 +1546,6 @@ public class Frame extends javax.swing.JFrame {
         // fill the arrays
         for (int i = 0; i < selectedRows.length; i++) {
 
-//            int row = table.convertRowIndexToModel(selectedRows[i]);
             int row = selectedRows[i];
 
             titles[i] = table.getValueAt(selectedRows[i], 2).toString();
