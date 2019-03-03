@@ -18,7 +18,7 @@ Compatible with:
 
 ### Building the project
 
-Compile the source code using the "package-for-deploy" target in build.xml.  This project was built in NetBeans (don't judge), so it's much easier to build the target by creating a project in NetBeans and just right clicking on build.xml in the "Files" tab, selecting Run Target -> Other Targets -> package-for-deploy.
+Compile the source code using the "package-for-deploy" target in build.xml.  This project was built in NetBeans (because who likes to hardcode Swing GUIs), so it's much easier to build the target by creating a project in NetBeans and just right clicking on build.xml in the "Files" tab, selecting Run Target -> Other Targets -> package-for-deploy.
 
 If you're building from command line with Apache ant, go to the project folder, and the command is `ant -f / package-for-deploy`
 
@@ -29,3 +29,4 @@ Building the project will create an executable jar in the deploy folder.
 ### Packaging the project (Into native MacOSX app)
 
 Once built, you can run the terminal-commands file to package the app into a .pkg file, which can be used to install the app.
+*Note: I use JavaPackager 10.0.2, I know it has issues with other versions*

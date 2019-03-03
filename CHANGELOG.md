@@ -18,8 +18,11 @@
 - The Find + Replace dialog now autofocuses on the find field
 - Bugfixes: 
     - Fixed autotagging not setting the right track info, that was a mess
-    - Fixed the issue where, when autotagging, the cell won't update
+    - Fixed the issue where, when autotagging, the cell currently in focus won't update
 - Separated this changelog into a separate file
+- Sharpened antlers for battle
+    - THE FIGHT FOR CANADIA WILL BE GLORIOUS
+    - HAIL MOOSE
 
 ### 1.1.2 (The "Random features" update)
 
