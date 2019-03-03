@@ -38,15 +38,26 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
+    private static final int TABLE_COLUMN_TITLE = 2;
+    private static final int TABLE_COLUMN_ARTIST = 3;
+    private static final int TABLE_COLUMN_ALBUM = 4;
+    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
+    private static final int TABLE_COLUMN_YEAR = 6;
+    private static final int TABLE_COLUMN_GENRE = 7;
+    private static final int TABLE_COLUMN_TRACK = 8;
+    private static final int TABLE_COLUMN_DISK = 9;
+    private static final int TABLE_COLUMN_ALBUMART = 10;
+
     /**
      * Default constructor
      */
     public SongController() {
     }
-  
+
     /**
      * Sets the table ivar
-     * @param table 
+     *
+     * @param table
      */
     public void setTable(JTable table) {
         this.table = table;
@@ -63,28 +74,30 @@ public class SongController {
 
     /**
      * Gets a song object from a file
+     *
      * @param file, the file to get info from
      * @return a song object
      */
     public Song getSongFromFile(File file) {
-        
+
         // regex for checking tracks/disks for "/0" or similar
         String regex = "\\/\\d*";
-        
+
         // mp3agic Mp3File object, used for the id3tags
         Mp3File mp3file;
         try {
             // create the mp3file from the file's path
-            mp3file = new Mp3File(file.getAbsolutePath());
+            mp3file = new Mp3File(file.getPath());
 
             // if the mp3file doesn't have an id3tag, create one
             if (!mp3file.hasId3v2Tag()) {
                 ID3v2 tag = new ID3v24Tag();
                 mp3file.setId3v2Tag(tag);
             }
-        } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
+        } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             // things borked
             mp3file = null;
+            logger.logError("Exception when trying to read data from file: " + file.getName(), e);
         }
 
         // get the id3v2 info
@@ -97,7 +110,7 @@ public class SongController {
         String track = mp3file.getId3v2Tag().getTrack();
         String disk = mp3file.getId3v2Tag().getPartOfSet();
         byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
-        
+
         int bitrate = mp3file.getBitrate();
         int samplerate = mp3file.getSampleRate();
         long len = mp3file.getLengthInSeconds();
@@ -134,7 +147,6 @@ public class SongController {
         if (comment == null) {
             comment = "";
         }
-        
 
         // create a song object with the information
         Song s = new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes, bitrate, samplerate, len, comment);
@@ -171,11 +183,11 @@ public class SongController {
      */
     public int getRow(int index) {
         for (int i = 0; i < table.getRowCount(); i++) {
-            if(getIndex(i) == index) {
+            if (getIndex(i) == index) {
                 return i;
             }
         }
-        
+
         return -1;
     }
 
@@ -304,8 +316,7 @@ public class SongController {
     }
 
     /**
-     * Helper function to set the comment of the song in the songs
-     * arraylist.
+     * Helper function to set the comment of the song in the songs arraylist.
      *
      * @param index, the index of the song
      * @param comment, the comment to set
@@ -314,10 +325,10 @@ public class SongController {
         songs.get(index).setComment(comment);
         songEdited(index);
     }
-    
+
     /**
-     * Goes through the edited_songs array and saves each one
-     * TODO confirm that this works
+     * Goes through the edited_songs array and saves each one TODO confirm that
+     * this works
      */
     public void saveAll() {
 
@@ -325,7 +336,7 @@ public class SongController {
 
         // traverse the array of songs and save them all
         for (int i = 0; i < songs.size(); i++) {
-            if(save(i)) {
+            if (save(i)) {
                 count++;
             }
         }
@@ -334,6 +345,7 @@ public class SongController {
 
     /**
      * Grabs the index from the selected row, then calls save() with that index
+     *
      * @param selectedRows, the row indices to save
      */
     public void saveTracks(int[] selectedRows) {
@@ -352,6 +364,7 @@ public class SongController {
 
     /**
      * Saves an individual track
+     *
      * @param index, the index of the song to save in the songs map
      * @return the result of the save, true for success, false for not success
      */
@@ -401,7 +414,7 @@ public class SongController {
             if (edited_songs.size() == 1) {
                 edited_songs.clear();
             } else if (edited_songs.size() > 1) {
-               // edited_songs.remove(index);
+                // edited_songs.remove(index);
                 edited_songs.remove(new Integer(index));
             }
         } else {
@@ -412,6 +425,7 @@ public class SongController {
 
     /**
      * Saves an individual file
+     *
      * @param mp3file
      * @param file
      */
@@ -446,14 +460,13 @@ public class SongController {
             for (int j = 0; j < table.getColumnCount(); j++) {
                 if (table.getValueAt(i, j).toString().contains(find)) {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
-                    // TODO find out why when changing Default to Deeeefault it sets Ingenue as edited
                     int index = getIndex(i);
-                    switch(j) {
+                    switch (j) {
                         case 2:     // title
                             table.setValueAt(toReplace, i, j);
                             setTitle(index, toReplace);
                             count++;
-                            break;  
+                            break;
                         case 3:     // artist
                             table.setValueAt(toReplace, i, j);
                             setArtist(index, toReplace);
@@ -492,7 +505,7 @@ public class SongController {
                         default:
                             break;
                     }
-                    
+
                 }
             }
         }
@@ -556,7 +569,7 @@ public class SongController {
                     Icon artwork_icon = Utils.getScaledImage(bytes, 150);
                     Main.frame.multImage.setIcon(artwork_icon);
                 }
-                
+
             } catch (IOException ex) {
                 logger.logError("Exception while adding album art!", ex);
             }
@@ -601,10 +614,10 @@ public class SongController {
 
         // traverse the array of rows and add each image
         for (int i = 0; i < selectedRows.length; i++) {
-            int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
+            int row = selectedRows[i];    // get the row
 
             // get the parent directory of the song
-            File dir = songs.get(getIndex(row)).getFile().getParentFile();
+            File dir = getFile(row).getParentFile();
 
             // check if the parent directory has a cover.* file
             File cover = folderContainsCover(dir);
@@ -657,7 +670,7 @@ public class SongController {
 
         try {
             // get the index of the track
-            int index = Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
+            int index = getIndex(row);
 
             // convert file to byte array
             byte[] bytes;
@@ -673,7 +686,7 @@ public class SongController {
             Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
 
             // set the image on the row
-            table.getModel().setValueAt(thumbnail_icon, row, 11);
+            table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
 
             // song was edited, add it to the list
             songEdited(index);
@@ -690,6 +703,40 @@ public class SongController {
     }
 
     /**
+     * Function for adding the track numbers
+     *
+     * @param selectedRows, the rows selected on the table
+     */
+    public void addTrackAndDiskNumbers(int[] selectedRows) {
+        for (int i = 0; i < selectedRows.length; i++) {
+            int row = selectedRows[i];
+            File file = getFile(row);
+            autoAddTrackAndDiskNumbers(row, file);
+        }
+    }
+
+    /**
+     * Function that actually sets the row info
+     *
+     * @param row
+     * @param file
+     */
+    public void autoAddTrackAndDiskNumbers(int row, File file) {
+        int index = getIndex(row);
+
+        String tracks = getTracksFromFolder(file);
+        String disks = getDisksFromFile(file);
+
+        // tracks
+        setTrack(index, tracks);
+        table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
+
+        // disks
+        setDisk(index, disks);
+        table.setValueAt(disks, row, TABLE_COLUMN_DISK);
+    }
+
+    /**
      * Function that looks at the file's name and location and auto generates
      * some tags
      *
@@ -697,9 +744,21 @@ public class SongController {
      */
     public void autoTagFiles(int[] selectedRows) {
         for (int i = 0; i < selectedRows.length; i++) {
-            autoTag(selectedRows[i], (File) table.getModel().getValueAt(i, 1));
+            int row = selectedRows[i];
+            File file = getFile(row);
+            autoTag(row, file);
         }
         autoAddCovers(selectedRows);
+    }
+
+    /**
+     * Gets the File object from the row
+     *
+     * @param row
+     * @return the File from the row
+     */
+    public File getFile(int row) {
+        return (File) table.getModel().getValueAt(table.convertRowIndexToModel(row), 1);
     }
 
     /**
@@ -724,39 +783,39 @@ public class SongController {
 
         // title
         setTitle(index, title);
-        table.getModel().setValueAt(title, row, 3);
+        table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
         // artist
         if (!Utils.isPartOfALabel(file)) {
             setArtist(index, artist);
-            table.getModel().setValueAt(artist, row, 4);
+            table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
         }
 
         // album
         setAlbum(index, album);
-        table.getModel().setValueAt(album, row, 5);
+        table.setValueAt(album, row, TABLE_COLUMN_ALBUM);
 
         // album artist
         setAlbumArtist(index, albumartist);
-        table.getModel().setValueAt(albumartist, row, 6);
+        table.setValueAt(albumartist, row, TABLE_COLUMN_ALBUMARTIST);
 
         // year
         setYear(index, year);
-        table.getModel().setValueAt(year, row, 7);
+        table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
         // genre
         if (Utils.isPartOfALabel(file)) {
             setGenre(index, genre);
-            table.getModel().setValueAt(genre, row, 8);
+            table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
         }
 
         // tracks
         setTrack(index, tracks);
-        table.getModel().setValueAt(tracks, row, 9);
+        table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
         // disks
         setDisk(index, disks);
-        table.getModel().setValueAt(disks, row, 10);
+        table.setValueAt(disks, row, TABLE_COLUMN_DISK);
     }
 
     /**
@@ -766,7 +825,7 @@ public class SongController {
      * @return a string track title
      */
     public String getTitleFromFile(File file) {
-        if (Utils.isPartOfALabel(file)) {
+        if (Utils.isAGenrePartOfALabel(file)) {
             return file.getName().replace(".mp3", "");
         } else {
             String regex = "\\d{2} .*\\.mp3";
@@ -785,7 +844,7 @@ public class SongController {
      * @return a string artist
      */
     public String getArtistFromFile(File file) {
-        if (Utils.isPartOfALabel(file)) {
+        if (Utils.isAnEPPartOfALabel(file)) {
             return "";
         }
 
@@ -799,7 +858,7 @@ public class SongController {
      * @return a string album
      */
     public String getAlbumFromFile(File file) {
-        if (Utils.isPartOfALabel(file)) {
+        if (Utils.isAGenrePartOfALabel(file)) {
             return getGenreFromFile(file);
         } else {
             File dir = file.getParentFile();
@@ -977,7 +1036,7 @@ public class SongController {
      * @return a genre string
      */
     public String getGenreFromFile(File file) {
-        if (!Utils.isPartOfALabel(file)) {
+        if (!Utils.isAGenrePartOfALabel(file)) {
             return "";
         }
         return file.getParentFile().getName();
@@ -985,6 +1044,7 @@ public class SongController {
 
     /**
      * Moves selected files to a new destination
+     *
      * @param selectedRows, the rows to move
      */
     public void moveFiles(int[] selectedRows) {
@@ -1004,6 +1064,7 @@ public class SongController {
 
     /**
      * Function that actually moves the file
+     *
      * @param row
      * @param old_file
      * @param new_location

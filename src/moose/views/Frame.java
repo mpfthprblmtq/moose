@@ -6,11 +6,11 @@
  *
  *  Copyright Pat Ripley 2018
  */
-
 // package
 package moose.views;
 
 // imports
+import java.awt.Component;
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Song;
@@ -26,9 +26,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EventObject;
+import java.util.logging.Level;
 import javax.swing.*;
 import javax.swing.table.*;
+import moose.utilities.SelectingEditor;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -60,6 +65,18 @@ public class Frame extends javax.swing.JFrame {
         @Override   // returns if the cell is editable based on the column index
         public boolean isCellEditable(int row, int column) {
             return !(column == 11 || column == 0);
+        }
+    };
+
+    DefaultCellEditor editor = new DefaultCellEditor(new JTextField()) {
+        @Override
+        public boolean isCellEditable(EventObject e) {
+            if (e instanceof MouseEvent) {
+                if (((MouseEvent) e).getClickCount() == 2) {
+                    return true;
+                }
+            }
+            return super.isCellEditable(e);
         }
     };
 
@@ -189,9 +206,12 @@ public class Frame extends javax.swing.JFrame {
         setColumnWidth(8, 50);      // track
         setColumnWidth(9, 50);      // disk
         setColumnWidth(10, 100);    // album art
+//        setColumnWidth(11, 20);
+
+        table.setCellEditor(editor);
 
         // taken from the FileDrop example
-        FileDrop fileDrop = new FileDrop(System.out, tableSP, (File[] files) -> {
+        new FileDrop(System.out, tableSP, (File[] files) -> {
 
             // create an arraylist of files and traverse it
             ArrayList<File> fileList = new ArrayList<>();
@@ -203,6 +223,10 @@ public class Frame extends javax.swing.JFrame {
                 }
             }
 
+            // sort the file list
+            Collections.sort(fileList, (File f1, File f2) -> f1.getName().compareTo(f2.getName()));
+
+            // import them all
             importFiles(fileList);
         });
 
@@ -325,7 +349,6 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param selectedRows the rows to remove
      */
-    // TODO:  Check to see what this does to the songs array and the multpanel
     public void removeRows(int[] selectedRows) {
         // traverse the array of selectedRows and delete them
         for (int i = selectedRows.length - 1; i >= 0; i--) {
@@ -407,6 +430,7 @@ public class Frame extends javax.swing.JFrame {
         sorter.setSortKeys(list);
         sorter.sort();
 
+//        ((AbstractTableModel) table.getModel()).fireTableDataChanged();
         // all is well in the world
         return true;
     }
@@ -535,7 +559,19 @@ public class Frame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
+        table = table = new JTable() {
+            @Override
+            public Component prepareEditor(TableCellEditor editor, int row, int col)
+            {
+                Component result = super.prepareEditor(editor, row, col);
+                if (result instanceof JTextField)
+                {
+                    ((JTextField)result).selectAll();
+                    result.requestFocus();
+                }
+                return result;
+            }
+        };
         consoleSP = new javax.swing.JScrollPane();
         console = new javax.swing.JTextArea();
         multPanel = new javax.swing.JPanel();
@@ -559,6 +595,7 @@ public class Frame extends javax.swing.JFrame {
         multImage = new javax.swing.JLabel();
         multUpdateButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -596,6 +633,7 @@ public class Frame extends javax.swing.JFrame {
 
         table.setAutoCreateRowSorter(true);
         table.setModel(model);
+        table.setCellEditor(new SelectingEditor(new JTextField()));
         table.setRequestFocusEnabled(false);
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -835,6 +873,13 @@ public class Frame extends javax.swing.JFrame {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/moose64.png"))); // NOI18N
 
+        jButton1.setText("Clear All");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout containerLayout = new javax.swing.GroupLayout(container);
         container.setLayout(containerLayout);
         containerLayout.setHorizontalGroup(
@@ -848,6 +893,8 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
                         .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -863,7 +910,8 @@ public class Frame extends javax.swing.JFrame {
                 .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-                    .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableSP)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1029,8 +1077,8 @@ public class Frame extends javax.swing.JFrame {
         if (dirs != null) {
             // create an arraylist of files
             ArrayList<File> files = new ArrayList<>();
-            for (int i = 0; i < dirs.length; i++) {
-                files = Utils.listFiles(dirs[i], files);
+            for (File dir : dirs) {
+                files = Utils.listFiles(dir, files);
             }
 
             // import the files
@@ -1053,6 +1101,8 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multUpdateButtonActionPerformed
 
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
+
+        table.setCellEditor(editor);
 
         // check what type of click
         switch (evt.getButton()) {
@@ -1088,26 +1138,23 @@ public class Frame extends javax.swing.JFrame {
                         showArtworkPopup(evt, table.getSelectedRowCount());
                     } else {
                         changeSelection(table.getSelectedRow(), table.getSelectedColumn(), -1);
+                        table.getEditorComponent().requestFocusInWindow();
                     }
                 }
                 break;
 
             // if it's a scroll click
             case java.awt.event.MouseEvent.BUTTON2:
-//                row = table.rowAtPoint(evt.getPoint());
-//                table.setRowSelectionInterval(row, row);
-//
-//                int index = getIndex(table.convertRowIndexToModel(row));
-//                File file = songs.get(index).getFile();
-//
-//                try {
-//                    Desktop desktop = Desktop.getDesktop();
-//                    if (file.exists()) {
-//                        desktop.open(file);
-//                    }
-//                } catch (IOException ex) {
-//                    //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-//                }
+                int[] selectedRows = table.getSelectedRows();
+                File file = null;
+                for (int i = 0; i < selectedRows.length; i++) {
+                    try {
+                        file = songController.getFile(selectedRows[i]);
+                        Utils.openFile(file);
+                    } catch (IOException ex) {
+                        logger.logError("Exception trying to open file: " + file.getName(), ex);
+                    }
+                }
                 break;
 
             default:
@@ -1121,6 +1168,7 @@ public class Frame extends javax.swing.JFrame {
         } else if (table.getSelectedRowCount() < 1) {
             // no rows selected
         }
+
 
     }//GEN-LAST:event_tableMousePressed
 
@@ -1149,12 +1197,15 @@ public class Frame extends javax.swing.JFrame {
             curr_row--;
             changeSelection(curr_row, curr_col, SHIFT_ENTER);
             table.setRowSelectionInterval(curr_row, curr_row);
+        } else {
+            // do nothing
         }
 
     }//GEN-LAST:event_tableKeyReleased
 
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
-
+        int[] selectedRows = table.getSelectedRows();
+        songController.addTrackAndDiskNumbers(selectedRows);
     }//GEN-LAST:event_addTrackNumbersMenuItemActionPerformed
 
     /**
@@ -1283,6 +1334,10 @@ public class Frame extends javax.swing.JFrame {
         setMultiplePanelFields();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        clearAll();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * Performs a command based on the user input
      *
@@ -1307,6 +1362,13 @@ public class Frame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
                 break;
         }
+    }
+    
+    public void clearAll() {
+//        table.removeAll();
+        model.setRowCount(0);
+        songController.getSongs().clear();
+        enableMultPanel(false);
     }
 
     /**
@@ -1362,9 +1424,9 @@ public class Frame extends javax.swing.JFrame {
             String tracks,
             String disks,
             String comment) {
-        
+
         int row = table.getSelectedRow();
-        
+
         if (!table.getValueAt(row, 1).equals(filename)) {
             File old_file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
             String path = old_file.getPath().replace(old_file.getName(), "");
@@ -1376,51 +1438,51 @@ public class Frame extends javax.swing.JFrame {
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 2).equals(title)) {
+
+        if (!table.getValueAt(row, 2).equals(title)) {
             songController.setTitle(songController.getIndex(row), title);
             table.setValueAt(title, row, 2);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 3).equals(artist)) {
+
+        if (!table.getValueAt(row, 3).equals(artist)) {
             songController.setArtist(songController.getIndex(row), artist);
             table.setValueAt(artist, row, 3);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 4).equals(album)) {
+
+        if (!table.getValueAt(row, 4).equals(album)) {
             songController.setAlbum(songController.getIndex(row), album);
             table.setValueAt(album, row, 4);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 5).equals(albumartist)) {
+
+        if (!table.getValueAt(row, 5).equals(albumartist)) {
             songController.setAlbumArtist(songController.getIndex(row), albumartist);
             table.setValueAt(albumartist, row, 5);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 6).equals(year)) {
+
+        if (!table.getValueAt(row, 6).equals(year)) {
             songController.setYear(songController.getIndex(row), year);
             table.setValueAt(year, row, 6);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 7).equals(genre)) {
+
+        if (!table.getValueAt(row, 7).equals(genre)) {
             songController.setGenre(songController.getIndex(row), genre);
             table.setValueAt(genre, row, 7);
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 8).equals(tracks)) {
-            if(!tracks.equals("/")) {
+
+        if (!table.getValueAt(row, 8).equals(tracks)) {
+            if (!tracks.equals("/")) {
                 songController.setTrack(songController.getIndex(row), tracks);
                 table.setValueAt(tracks, row, 8);
             } else {
@@ -1430,9 +1492,9 @@ public class Frame extends javax.swing.JFrame {
         } else {
             // do nothing, nothing was changed
         }
-        
-        if(!table.getValueAt(row, 9).equals(disks)) {
-            if(!disks.equals("/")) {
+
+        if (!table.getValueAt(row, 9).equals(disks)) {
+            if (!disks.equals("/")) {
                 songController.setDisk(songController.getIndex(row), disks);
                 table.setValueAt(disks, row, 9);
             } else {
@@ -1442,9 +1504,9 @@ public class Frame extends javax.swing.JFrame {
         } else {
             // do nothing, nothing was changed
         }
-        
+
         songController.setComment(songController.getIndex(row), comment);
-        
+
     }
 
     /**
@@ -1480,7 +1542,8 @@ public class Frame extends javax.swing.JFrame {
         // fill the arrays
         for (int i = 0; i < selectedRows.length; i++) {
 
-            int row = table.convertRowIndexToModel(selectedRows[i]);
+//            int row = table.convertRowIndexToModel(selectedRows[i]);
+            int row = selectedRows[i];
 
             titles[i] = table.getValueAt(selectedRows[i], 2).toString();
             artists[i] = table.getValueAt(selectedRows[i], 3).toString();
@@ -1711,6 +1774,20 @@ public class Frame extends javax.swing.JFrame {
         JTextField find = new JTextField();
         JTextField replace = new JTextField();
         Object[] message = {"Find:", find, "Replace:", replace};
+
+        // create a thread to wait until the dialog box pops up
+        (new Thread() {
+            @Override
+            public void run() {
+                try {
+                    sleep(500);
+                } catch (InterruptedException e) {
+                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
+                }
+                find.requestFocus();
+            }
+        }).start();
+
         int option = JOptionPane.showConfirmDialog(null, message, "Find and Replace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (option == JOptionPane.OK_OPTION) {
             String findStr = find.getText();
@@ -1888,6 +1965,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem findAndReplaceMenuItem;
     private javax.swing.JMenuItem formatFilenamesMenuItem;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
