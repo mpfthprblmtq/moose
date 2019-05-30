@@ -30,10 +30,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
-import java.util.logging.Level;
 import javax.swing.*;
 import javax.swing.table.*;
-import moose.utilities.SelectingEditor;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -559,15 +557,17 @@ public class Frame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
-        table = table = new JTable() {
-            @Override
+        table = new JTable() {
             public Component prepareEditor(TableCellEditor editor, int row, int col)
             {
                 Component result = super.prepareEditor(editor, row, col);
-                if (result instanceof JTextField)
-                {
-                    ((JTextField)result).selectAll();
-                    result.requestFocus();
+                if (result instanceof JTextField) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            ((JTextField)result).requestFocus();
+                            ((JTextField)result).selectAll();
+                        }
+                    });
                 }
                 return result;
             }
@@ -633,7 +633,6 @@ public class Frame extends javax.swing.JFrame {
 
         table.setAutoCreateRowSorter(true);
         table.setModel(model);
-        table.setCellEditor(new SelectingEditor(new JTextField()));
         table.setRequestFocusEnabled(false);
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

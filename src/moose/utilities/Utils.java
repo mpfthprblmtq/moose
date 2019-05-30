@@ -1,7 +1,5 @@
 package moose.utilities;
 
-import moose.Main;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
