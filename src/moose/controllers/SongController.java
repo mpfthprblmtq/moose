@@ -38,6 +38,7 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
 
+    // column constants
     private static final int TABLE_COLUMN_TITLE = 2;
     private static final int TABLE_COLUMN_ARTIST = 3;
     private static final int TABLE_COLUMN_ALBUM = 4;

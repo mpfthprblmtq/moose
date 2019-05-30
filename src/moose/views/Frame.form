@@ -289,9 +289,6 @@
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="model" type="code"/>
                 </Property>
-                <Property name="cellEditor" type="javax.swing.table.TableCellEditor" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new SelectingEditor(new JTextField())" type="code"/>
-                </Property>
                 <Property name="requestFocusEnabled" type="boolean" value="false"/>
                 <Property name="rowHeight" type="int" value="20"/>
                 <Property name="selectionMode" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -305,7 +302,7 @@
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableKeyReleased"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="table = new JTable() {&#xa;@Override&#xa;public Component prepareEditor(TableCellEditor editor, int row, int col)&#xa;{&#xa; Component result = super.prepareEditor(editor, row, col);&#xa; if (result instanceof JTextField)&#xa; {&#xa;   ((JTextField)result).selectAll();&#xa;   result.requestFocus();&#xa; }&#xa; return result;&#xa;}&#xa;}"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable() {&#xa;    public Component prepareEditor(TableCellEditor editor, int row, int col)&#xa;    {&#xa;     Component result = super.prepareEditor(editor, row, col);&#xa;     if (result instanceof JTextField) {&#xa;        SwingUtilities.invokeLater(new Runnable() {&#xa;            public void run() {&#xa;                ((JTextField)result).requestFocus();&#xa;                ((JTextField)result).selectAll();&#xa;            }&#xa;        });&#xa;     }&#xa;     return result;&#xa;    }&#xa;};"/>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="songController.setTable(table);"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
