@@ -267,6 +267,7 @@ public class SongController {
      * @param genre, the genre to set
      */
     public void setGenre(int index, String genre) {
+        System.out.println("updating genre");
         songs.get(index).setGenre(genre);
         songEdited(index);
     }
@@ -452,10 +453,12 @@ public class SongController {
      *
      * @param find, the string to find
      * @param replace, the string to replace
+     * @param includeFiles, a boolean to check if we're including the file names
+     * in the search
      * @return the results of the replace, true if there was something to
      * replace, false if not
      */
-    public int findAndReplace(String find, String replace) {
+    public int findAndReplace(String find, String replace, boolean includeFiles) {
         int count = 0;
         for (int i = 0; i < table.getRowCount(); i++) {
             for (int j = 0; j < table.getColumnCount(); j++) {
@@ -463,6 +466,20 @@ public class SongController {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
                     int index = getIndex(i);
                     switch (j) {
+                        case 1:
+                            if (includeFiles) {
+                                table.setValueAt(toReplace, i, j);
+                                File old_file = (File) table.getModel().getValueAt(i, 1);
+                                String path = old_file.getPath().replace(old_file.getName(), "");
+                                String fileName = table.getValueAt(i, j).toString();
+                                File new_file = new File(path + "//" + fileName + ".mp3");
+
+                                setFile(index, old_file, new_file);
+                                old_file.renameTo(new_file);
+                                table.getModel().setValueAt(new_file, i, 1);
+                            }
+                            count++;
+                            break;
                         case 2:     // title
                             table.setValueAt(toReplace, i, j);
                             setTitle(index, toReplace);

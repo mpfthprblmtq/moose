@@ -1,11 +1,14 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package moose.utilities;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
-import java.util.List;
 
 /**
  * A {@link Document} performing auto completion on the inserted text. This
@@ -26,10 +29,10 @@ public class AutoCompleteDocument extends PlainDocument {
     private static final long serialVersionUID = 1L;
 
     /** Completion service. */
-    private CompletionService<?> completionService;
+    private final CompletionService<?> completionService;
 
     /** The document owner. */
-    private JTextComponent documentOwner;
+    private final JTextComponent documentOwner;
 
     /**
      * Create a new <code>AutoCompletionDocument</code>.
@@ -93,43 +96,4 @@ interface CompletionService<T> {
     T autoComplete(String startsWith);
 }
 
-class NameService implements CompletionService<String> {
 
-    /** Our name data. */
-    private List<String> data;
-
-    /**
-     * Create a new <code>NameService</code> and populate it.
-     */
-    public NameService(List<String> data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder b = new StringBuilder();
-        for (String o : data) {
-            b.append(o).append("\n");
-        }
-        return b.toString();
-    }
-
-    public String autoComplete(String startsWith) {
-        // Naive implementation, but good enough for the sample
-        String hit = null;
-        for (String o : data) {
-            if (o.startsWith(startsWith)) {
-                // CompletionService contract states that we only
-                // should return completion for unique hits.
-                if (hit == null) {
-                    hit = o;
-                } else {
-                    hit = null;
-                    break;
-                }
-            }
-        }
-        return hit;
-    }
-
-}

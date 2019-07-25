@@ -61,6 +61,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Refresh"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="refreshMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -120,8 +123,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="formatFilenamesMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Shift+Meta+F"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Format Filenames"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="formatFilenamesMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -302,7 +311,7 @@
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableKeyReleased"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable() {&#xa;    public Component prepareEditor(TableCellEditor editor, int row, int col)&#xa;    {&#xa;     Component result = super.prepareEditor(editor, row, col);&#xa;     if (result instanceof JTextField) {&#xa;        SwingUtilities.invokeLater(new Runnable() {&#xa;            public void run() {&#xa;                ((JTextField)result).requestFocus();&#xa;                ((JTextField)result).selectAll();&#xa;            }&#xa;        });&#xa;     }&#xa;     return result;&#xa;    }&#xa;};"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable() {&#xa;    public Component prepareEditor(TableCellEditor editor, int row, int col)&#xa;    {&#xa;     Component result = super.prepareEditor(editor, row, col);&#xa;     if (result instanceof JTextField) {&#xa;        SwingUtilities.invokeLater(new Runnable() {&#xa;            public void run() {&#xa;                String originalText = ((JTextField)result).getText();&#xa;                ((JTextField)result).setDocument(&#xa;                    new AutoCompleteDocument(&#xa;                        AutocompleteService.getNameService(table.getEditingColumn() == TABLE_COLUMN_GENRE, table),&#xa;                        ((JTextField)result)&#xa;                    )&#xa;                );&#xa;                ((JTextField)result).setText(originalText);&#xa;                ((JTextField)result).requestFocus();&#xa;                ((JTextField)result).selectAll();&#xa;            }&#xa;        });&#xa;     }&#xa;     return result;&#xa;    }&#xa;};"/>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="songController.setTable(table);"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
@@ -504,6 +513,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="multTitle">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[250, 26]"/>
                 </Property>
@@ -518,11 +528,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multTitleFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multTitleKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multArtist">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[250, 26]"/>
                 </Property>
@@ -537,11 +549,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multArtistFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multArtistKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multAlbum">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[250, 26]"/>
                 </Property>
@@ -556,11 +570,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multAlbumFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multAlbumKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multAlbumArtist">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[250, 26]"/>
                 </Property>
@@ -575,11 +591,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multAlbumArtistFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multAlbumArtistKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multGenre">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[150, 26]"/>
                 </Property>
@@ -594,11 +612,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multGenreFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multGenreKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multYear">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[100, 26]"/>
                 </Property>
@@ -613,11 +633,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multYearFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multYearKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multTrack">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[50, 26]"/>
                 </Property>
@@ -632,11 +654,13 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multTrackFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multTrackKeyPressed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="multDisk">
               <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[50, 26]"/>
                 </Property>
@@ -651,6 +675,7 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="multDiskFocusGained"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="multDiskKeyPressed"/>
               </Events>
             </Component>
@@ -683,6 +708,7 @@
             <Component class="javax.swing.JButton" name="multUpdateButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Update Fields"/>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
               </Properties>
               <Events>
