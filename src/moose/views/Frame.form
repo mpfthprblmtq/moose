@@ -312,7 +312,7 @@
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTable() {&#xa;    public Component prepareEditor(TableCellEditor editor, int row, int col)&#xa;    {&#xa;     Component result = super.prepareEditor(editor, row, col);&#xa;     if (result instanceof JTextField) {&#xa;        SwingUtilities.invokeLater(new Runnable() {&#xa;            public void run() {&#xa;                String originalText = ((JTextField)result).getText();&#xa;                ((JTextField)result).setDocument(&#xa;                    new AutoCompleteDocument(&#xa;                        AutocompleteService.getNameService(table.getEditingColumn() == TABLE_COLUMN_GENRE, table),&#xa;                        ((JTextField)result)&#xa;                    )&#xa;                );&#xa;                ((JTextField)result).setText(originalText);&#xa;                ((JTextField)result).requestFocus();&#xa;                ((JTextField)result).selectAll();&#xa;            }&#xa;        });&#xa;     }&#xa;     return result;&#xa;    }&#xa;};"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="songController.setTable(table);"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="songController.setTable(table);&#xa;table.putClientProperty(&quot;terminateEditOnFocusLost&quot;, Boolean.TRUE);"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
             </Component>

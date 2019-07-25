@@ -564,7 +564,7 @@ public class Frame extends javax.swing.JFrame {
                     break;
             }
         }
-        
+
         // set the view to the row we're editing
         table.scrollRectToVisible(table.getCellRect(table.getEditingRow(), table.getEditingColumn(), false));
     }
@@ -576,37 +576,32 @@ public class Frame extends javax.swing.JFrame {
      */
     public void importFiles(ArrayList<File> files) {
 
-        int succ_mp3Count = 0;   // lets count the number of successful files imported
-        int unsucc_mp3Count = 0; // lets count the number of all files attempted to import
-        
         List<File> filesToRemove = new ArrayList<>();
 
         // iterate through the files and try to add them
-        for (File file : files) {
+        files.forEach((file) -> {
             if (file.getName().endsWith(".mp3")) {
-                succ_mp3Count++;
                 addFileToTable(file);
             } else {
-                unsucc_mp3Count++;
                 filesToRemove.add(file);
             }
-        }
-        
+        });
+
         filesToRemove.forEach((file) -> {
             files.remove(file);
         });
-        
+
         // update the log table when you're done with the file iteration
         if (files.isEmpty()) {
             updateConsole("No mp3 files found!");
         } else if (files.size() > 1 && filesToRemove.isEmpty()) {
-            updateConsole(succ_mp3Count + " mp3 files loaded!");
+            updateConsole(files.size() + " mp3 files loaded!");
         } else if (files.size() == 1) {
             updateConsole("1 mp3 file imported.");
         } else if (files.size() > 1 && filesToRemove.size() == 1) {
-            updateConsole(succ_mp3Count + " mp3 files loaded, 1 file wasn't an mp3!");
+            updateConsole(files.size() + " mp3 files loaded, 1 file wasn't an mp3!");
         } else if (files.size() > 1 && filesToRemove.size() > 1) {
-            updateConsole(succ_mp3Count + " mp3 files loaded, " + unsucc_mp3Count + " unknown files not loaded!");
+            updateConsole(files.size() + " mp3 files loaded, " + filesToRemove.size() + " unknown files not loaded!");
         }
     }
 
@@ -712,6 +707,7 @@ public class Frame extends javax.swing.JFrame {
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
         songController.setTable(table);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
@@ -1385,6 +1381,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private void multGenreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multGenreKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+//            if (table.isEditing()) table.getCellEditor().stopCellEditing();
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multGenreKeyPressed
@@ -1989,17 +1986,17 @@ public class Frame extends javax.swing.JFrame {
                         case JOptionPane.OK_OPTION:
                             // add the genre to the settings
                             Main.settings.settingsController.addGenre(genre);
-
-                            // set the value in the table to the new value
-                            table.setValueAt(genre, selectedRows[i], 7);
-
-                            // set the value in the songs array
-                            songController.setGenre(index, genre);
                             break;
                         default:
                             break;
                     }
                 }
+
+                // set the value in the table to the new value
+                table.setValueAt(genre, selectedRows[i], 7);
+
+                // set the value in the songs array
+                songController.setGenre(index, genre);
 
             }
         }
