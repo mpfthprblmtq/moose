@@ -13,7 +13,6 @@ package moose.controllers;
 import moose.Main;
 import moose.utilities.*;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -23,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 // class SettingsController
 public class SettingsController {
@@ -32,7 +33,7 @@ public class SettingsController {
 
     // variables
     boolean debugMode;
-    ArrayList<String> genres = new ArrayList<>();
+    List<String> genres = new ArrayList<>();
     String libraryLocation;
 
     // logger object
@@ -149,7 +150,7 @@ public class SettingsController {
      * Returns the genre arraylist
      * @return
      */
-    public ArrayList<String> getGenres() {
+    public List<String> getGenres() {
         return genres;
     }
 
@@ -174,11 +175,15 @@ public class SettingsController {
      * @param line
      */
     public void setGenres(String line) {
-
+        
         // remove the garbage from the string
         line = line.replace("GENRES=", "");
         line = line.replace("{", "");
         line = line.replace("}", "");
+
+        if(line.equals("")) {
+            return;
+        }
 
         // split the string based on a comma
         String[] genresArray = line.split(",");
@@ -188,6 +193,11 @@ public class SettingsController {
 
         // convert that array to an arraylist
         genres.addAll(Arrays.asList(genresArray));
+        
+        // sort them alphabetically
+        Collections.sort(genres, (String o1, String o2) -> {
+            return o1.compareToIgnoreCase(o2);
+        });
     }
 
     /**
@@ -256,6 +266,7 @@ public class SettingsController {
 
     public void addGenre(String genre) {
         genres.add(genre);
+        writeSettingsFile();
     }
 
     public void removeGenre(String genre) {
@@ -288,7 +299,7 @@ public class SettingsController {
      * @param genres
      * @return
      */
-    public String listGenres(ArrayList<String> genres) {
+    public String listGenres(List<String> genres) {
         String str = "{";
         for (int i = 0; i < genres.size(); i++) {
             str = str + genres.get(i);

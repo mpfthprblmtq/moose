@@ -10,6 +10,7 @@
 package moose.views;
 
 // imports
+import com.mpatric.mp3agic.Mp3File;
 import java.awt.Component;
 import moose.*;
 import moose.controllers.SongController;
@@ -30,14 +31,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
+import moose.services.AutocompleteService;
+import moose.utilities.AutoCompleteDocument;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
 
     // logger object
     Logger logger = Main.getLogger();
+
+    // autocomplete service
+    AutocompleteService autocompleteService = new AutocompleteService();
 
     // controller, instantiated in constructor
     public SongController songController = new SongController();
@@ -91,6 +98,17 @@ public class Frame extends javax.swing.JFrame {
     private static final int FROM_DIALOG = 1;
     private static final int NORMAL_NAV = 2;
 
+    // column constants
+    private static final int TABLE_COLUMN_TITLE = 2;
+    private static final int TABLE_COLUMN_ARTIST = 3;
+    private static final int TABLE_COLUMN_ALBUM = 4;
+    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
+    private static final int TABLE_COLUMN_YEAR = 6;
+    private static final int TABLE_COLUMN_GENRE = 7;
+    private static final int TABLE_COLUMN_TRACK = 8;
+    private static final int TABLE_COLUMN_DISK = 9;
+    private static final int TABLE_COLUMN_ALBUMART = 10;
+
     /**
      * Creates new form Frame
      */
@@ -129,9 +147,13 @@ public class Frame extends javax.swing.JFrame {
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         files = Utils.listFiles(folder, files);
-        for (File file : files) {
-            addFileToTable(file);
-        }
+//        for (File file : files) {
+//            if (!addFileToTable(file)) {
+//                files.remove(file);
+//            }
+//        }
+        importFiles(files);
+        checkForNewGenres(files);
     }
 
     public void init() {
@@ -226,6 +248,9 @@ public class Frame extends javax.swing.JFrame {
 
             // import them all
             importFiles(fileList);
+
+            // check for new genres
+            checkForNewGenres(fileList);
         });
 
         // listener for editing cells
@@ -305,8 +330,22 @@ public class Frame extends javax.swing.JFrame {
                         break;
 
                     case 8:     // genre was changed
+                        String genre = tcl.getNewValue().toString();
+                        // check and see if the genre exists already
+                        if (!Main.settings.settingsController.getGenres().contains(genre)) {
+                            int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
+                            switch (res) {
+                                case JOptionPane.YES_OPTION:
+                                    // add the genre to the settings
+                                    Main.settings.settingsController.addGenre(genre);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setGenre(index, tcl.getNewValue().toString());
+                            songController.setGenre(index, genre);
+
                         } else {
                             // do nothing, nothing was changed
                         }
@@ -340,6 +379,26 @@ public class Frame extends javax.swing.JFrame {
 
         // declare the TCL for use
         TableCellListener tcl = new TableCellListener(table, action);
+    }
+
+    public void checkForNewGenres(List<File> files) {
+        List<String> genres = new ArrayList<>();
+        files.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
+            genres.add(s.getGenre());
+        });
+        for (String genre : genres) {
+            if (!Main.settings.settingsController.getGenres().contains(genre)) {
+                int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
+                switch (res) {
+                    case JOptionPane.YES_OPTION:
+                        // add the genre to the settings
+                        Main.settings.settingsController.addGenre(genre);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -428,7 +487,6 @@ public class Frame extends javax.swing.JFrame {
         sorter.setSortKeys(list);
         sorter.sort();
 
-//        ((AbstractTableModel) table.getModel()).fireTableDataChanged();
         // all is well in the world
         return true;
     }
@@ -506,6 +564,9 @@ public class Frame extends javax.swing.JFrame {
                     break;
             }
         }
+        
+        // set the view to the row we're editing
+        table.scrollRectToVisible(table.getCellRect(table.getEditingRow(), table.getEditingColumn(), false));
     }
 
     /**
@@ -517,6 +578,8 @@ public class Frame extends javax.swing.JFrame {
 
         int succ_mp3Count = 0;   // lets count the number of successful files imported
         int unsucc_mp3Count = 0; // lets count the number of all files attempted to import
+        
+        List<File> filesToRemove = new ArrayList<>();
 
         // iterate through the files and try to add them
         for (File file : files) {
@@ -525,22 +588,25 @@ public class Frame extends javax.swing.JFrame {
                 addFileToTable(file);
             } else {
                 unsucc_mp3Count++;
+                filesToRemove.add(file);
             }
         }
-
+        
+        filesToRemove.forEach((file) -> {
+            files.remove(file);
+        });
+        
         // update the log table when you're done with the file iteration
-        if (succ_mp3Count == 0) {
+        if (files.isEmpty()) {
             updateConsole("No mp3 files found!");
-        } else if (succ_mp3Count > 1 && unsucc_mp3Count == 0) {
+        } else if (files.size() > 1 && filesToRemove.isEmpty()) {
             updateConsole(succ_mp3Count + " mp3 files loaded!");
-        } else if (succ_mp3Count == 1) {
+        } else if (files.size() == 1) {
             updateConsole("1 mp3 file imported.");
-        } else if (succ_mp3Count > 1 && unsucc_mp3Count == 1) {
+        } else if (files.size() > 1 && filesToRemove.size() == 1) {
             updateConsole(succ_mp3Count + " mp3 files loaded, 1 file wasn't an mp3!");
-        } else if (succ_mp3Count > 1 && unsucc_mp3Count > 1) {
+        } else if (files.size() > 1 && filesToRemove.size() > 1) {
             updateConsole(succ_mp3Count + " mp3 files loaded, " + unsucc_mp3Count + " unknown files not loaded!");
-        } else {
-            // I don't think this should happen
         }
     }
 
@@ -564,6 +630,14 @@ public class Frame extends javax.swing.JFrame {
                 if (result instanceof JTextField) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
+                            String originalText = ((JTextField)result).getText();
+                            ((JTextField)result).setDocument(
+                                new AutoCompleteDocument(
+                                    AutocompleteService.getNameService(table.getEditingColumn() == TABLE_COLUMN_GENRE, table),
+                                    ((JTextField)result)
+                                )
+                            );
+                            ((JTextField)result).setText(originalText);
                             ((JTextField)result).requestFocus();
                             ((JTextField)result).selectAll();
                         }
@@ -682,80 +756,128 @@ public class Frame extends javax.swing.JFrame {
 
         L9.setText("Disk:");
 
+        multTitle.setEnabled(false);
         multTitle.setMaximumSize(new java.awt.Dimension(250, 26));
         multTitle.setMinimumSize(new java.awt.Dimension(250, 26));
         multTitle.setNextFocusableComponent(multArtist);
         multTitle.setPreferredSize(new java.awt.Dimension(250, 26));
+        multTitle.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multTitleFocusGained(evt);
+            }
+        });
         multTitle.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTitleKeyPressed(evt);
             }
         });
 
+        multArtist.setEnabled(false);
         multArtist.setMaximumSize(new java.awt.Dimension(250, 26));
         multArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multArtist.setNextFocusableComponent(multAlbum);
         multArtist.setPreferredSize(new java.awt.Dimension(250, 26));
+        multArtist.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multArtistFocusGained(evt);
+            }
+        });
         multArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multArtistKeyPressed(evt);
             }
         });
 
+        multAlbum.setEnabled(false);
         multAlbum.setMaximumSize(new java.awt.Dimension(250, 26));
         multAlbum.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbum.setNextFocusableComponent(multAlbumArtist);
         multAlbum.setPreferredSize(new java.awt.Dimension(250, 26));
+        multAlbum.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multAlbumFocusGained(evt);
+            }
+        });
         multAlbum.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumKeyPressed(evt);
             }
         });
 
+        multAlbumArtist.setEnabled(false);
         multAlbumArtist.setMaximumSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.setMinimumSize(new java.awt.Dimension(250, 26));
         multAlbumArtist.setNextFocusableComponent(multGenre);
         multAlbumArtist.setPreferredSize(new java.awt.Dimension(250, 26));
+        multAlbumArtist.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multAlbumArtistFocusGained(evt);
+            }
+        });
         multAlbumArtist.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multAlbumArtistKeyPressed(evt);
             }
         });
 
+        multGenre.setEnabled(false);
         multGenre.setMaximumSize(new java.awt.Dimension(150, 26));
         multGenre.setMinimumSize(new java.awt.Dimension(150, 26));
         multGenre.setNextFocusableComponent(multYear);
         multGenre.setPreferredSize(new java.awt.Dimension(150, 26));
+        multGenre.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multGenreFocusGained(evt);
+            }
+        });
         multGenre.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multGenreKeyPressed(evt);
             }
         });
 
+        multYear.setEnabled(false);
         multYear.setMaximumSize(new java.awt.Dimension(100, 26));
         multYear.setMinimumSize(new java.awt.Dimension(100, 26));
         multYear.setNextFocusableComponent(multTrack);
         multYear.setPreferredSize(new java.awt.Dimension(100, 26));
+        multYear.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multYearFocusGained(evt);
+            }
+        });
         multYear.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multYearKeyPressed(evt);
             }
         });
 
+        multTrack.setEnabled(false);
         multTrack.setMaximumSize(new java.awt.Dimension(50, 26));
         multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
         multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
+        multTrack.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multTrackFocusGained(evt);
+            }
+        });
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
             }
         });
 
+        multDisk.setEnabled(false);
         multDisk.setMaximumSize(new java.awt.Dimension(50, 26));
         multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
         multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
+        multDisk.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multDiskFocusGained(evt);
+            }
+        });
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -777,6 +899,7 @@ public class Frame extends javax.swing.JFrame {
         });
 
         multUpdateButton.setText("Update Fields");
+        multUpdateButton.setEnabled(false);
         multUpdateButton.setFocusable(false);
         multUpdateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -954,6 +1077,11 @@ public class Frame extends javax.swing.JFrame {
 
         refreshMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.META_MASK));
         refreshMenuItem.setText("Refresh");
+        refreshMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshMenuItemActionPerformed(evt);
+            }
+        });
         viewMenu.add(refreshMenuItem);
 
         jMenuBar1.add(viewMenu);
@@ -1003,7 +1131,13 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addTrackNumbersMenuItem);
 
+        formatFilenamesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
         formatFilenamesMenuItem.setText("Format Filenames");
+        formatFilenamesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                formatFilenamesMenuItemActionPerformed(evt);
+            }
+        });
         macroMenu.add(formatFilenamesMenuItem);
 
         jMenuBar1.add(macroMenu);
@@ -1087,7 +1221,6 @@ public class Frame extends javax.swing.JFrame {
             // no files chose, update console
             updateConsole("No file(s) chosen!");
         }
-
     }//GEN-LAST:event_openMenuItemActionPerformed
 
     /**
@@ -1232,15 +1365,6 @@ public class Frame extends javax.swing.JFrame {
     /**
      * If enter is pressed while field is in focus
      */
-    private void multArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multArtistKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            multUpdateButton.doClick();
-        }
-    }//GEN-LAST:event_multArtistKeyPressed
-
-    /**
-     * If enter is pressed while field is in focus
-     */
     private void multAlbumKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             multUpdateButton.doClick();
@@ -1342,6 +1466,68 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
+     * If enter is pressed while field is in focus
+     */
+    private void multArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multArtistKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            multUpdateButton.doClick();
+        }
+    }//GEN-LAST:event_multArtistKeyPressed
+
+    private void multTitleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTitleFocusGained
+//        updateAutocompleteFields("multTitle");
+    }//GEN-LAST:event_multTitleFocusGained
+
+    private void multArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multArtistFocusGained
+        updateAutocompleteFields(multArtist, false);
+    }//GEN-LAST:event_multArtistFocusGained
+
+    private void multAlbumFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumFocusGained
+        updateAutocompleteFields(multAlbum, false);
+    }//GEN-LAST:event_multAlbumFocusGained
+
+    private void multAlbumArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumArtistFocusGained
+        updateAutocompleteFields(multAlbumArtist, false);
+    }//GEN-LAST:event_multAlbumArtistFocusGained
+
+    private void multGenreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multGenreFocusGained
+        updateAutocompleteFields(multGenre, true);
+    }//GEN-LAST:event_multGenreFocusGained
+
+    private void multYearFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multYearFocusGained
+        updateAutocompleteFields(multYear, false);
+    }//GEN-LAST:event_multYearFocusGained
+
+    private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
+//        updateAutocompleteFields(multTrack);
+    }//GEN-LAST:event_multTrackFocusGained
+
+    private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
+//        updateAutocompleteFields(multDisk);
+    }//GEN-LAST:event_multDiskFocusGained
+
+    private void refreshMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshMenuItemActionPerformed
+        int res = JOptionPane.showConfirmDialog(this, "Are you sure you want to clear your current list and reset?");
+        switch (res) {
+            case JOptionPane.CANCEL_OPTION:
+                // do nothing
+                break;
+            case JOptionPane.OK_OPTION:
+                this.dispose();
+                Main.launchFrame();
+        }
+    }//GEN-LAST:event_refreshMenuItemActionPerformed
+
+    private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
+        int[] selectedRows = table.getSelectedRows();
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this, "No rows selected!");
+        } else {
+            showFormatFilenamesDialog(selectedRows);
+        }
+    }//GEN-LAST:event_formatFilenamesMenuItemActionPerformed
+
+    /**
      * Performs a command based on the user input
      *
      * @param command
@@ -1366,10 +1552,78 @@ public class Frame extends javax.swing.JFrame {
                 break;
         }
     }
-    
+
+    /**
+     * Formats the file names
+     *
+     * @param selectedRows
+     */
+    public void showFormatFilenamesDialog(int[] selectedRows) {
+        JTextField regexField = new JTextField();
+        JCheckBox smartBox = new JCheckBox();
+        smartBox.setText("Figger it out");
+        Object[] message = {regexField, smartBox};
+        // create a thread to wait until the dialog box pops up
+        (new Thread() {
+            @Override
+            public void run() {
+                try {
+                    sleep(500);
+                } catch (InterruptedException e) {
+                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
+                }
+                regexField.requestFocus();
+            }
+        }).start();
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Format file names", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option == JOptionPane.OK_OPTION) {
+            String regex = regexField.getText();
+            boolean smart = smartBox.isSelected();
+            formatFilenames(smart, regex, selectedRows);
+        }
+    }
+
+    /**
+     * Actually does the formatting
+     *
+     * @param regexToUse
+     * @param smart
+     * @param selectedRows
+     */
+    public void formatFilenames(boolean smart, String regexToUse, int[] selectedRows) {
+        if (smart) {
+            String regex = "\\d{2}\\. .*\\.mp3";
+            for (int i = 0; i < selectedRows.length; i++) {
+                File file = (File) table.getModel().getValueAt(
+                        selectedRows[i],
+                        table.convertColumnIndexToModel(1)
+                );
+                if (!file.getName().matches(regex)) {
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the autocomplete selection for the field
+     *
+     * @param component
+     * @param isGenreField
+     */
+    public void updateAutocompleteFields(JTextField component, boolean isGenreField) {
+        String text = component.getText();
+        component.setDocument(new AutoCompleteDocument(AutocompleteService.getNameService(isGenreField, table), component));
+        component.setText(text);
+    }
+
+    /**
+     * Clears the table
+     */
     public void clearAll() {
-//        table.removeAll();
         model.setRowCount(0);
+        table.removeAll();
         songController.getSongs().clear();
         enableMultPanel(false);
     }
@@ -1728,11 +1982,25 @@ public class Frame extends javax.swing.JFrame {
                 int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
-                // set the value in the table to the new value
-                table.setValueAt(genre, selectedRows[i], 7);
+                // check and see if the genre exists already
+                if (!Main.settings.settingsController.getGenres().contains(genre)) {
+                    int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
+                    switch (res) {
+                        case JOptionPane.OK_OPTION:
+                            // add the genre to the settings
+                            Main.settings.settingsController.addGenre(genre);
 
-                // set the value in the songs array
-                songController.setGenre(index, genre);
+                            // set the value in the table to the new value
+                            table.setValueAt(genre, selectedRows[i], 7);
+
+                            // set the value in the songs array
+                            songController.setGenre(index, genre);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
             }
         }
 
@@ -1775,7 +2043,9 @@ public class Frame extends javax.swing.JFrame {
     public void showFindAndReplaceDialog() {
         JTextField find = new JTextField();
         JTextField replace = new JTextField();
-        Object[] message = {"Find:", find, "Replace:", replace};
+        JCheckBox includeFilesBox = new JCheckBox();
+        includeFilesBox.setText("Include file names");
+        Object[] message = {"Find:", find, "Replace:", replace, includeFilesBox};
 
         // create a thread to wait until the dialog box pops up
         (new Thread() {
@@ -1794,7 +2064,8 @@ public class Frame extends javax.swing.JFrame {
         if (option == JOptionPane.OK_OPTION) {
             String findStr = find.getText();
             String replStr = replace.getText();
-            int result = songController.findAndReplace(findStr, replStr);
+            boolean includeFiles = includeFilesBox.isSelected();
+            int result = songController.findAndReplace(findStr, replStr, includeFiles);
             if (result == 0) {   // nothing to replace
                 JOptionPane.showMessageDialog(null, "Nothing to replace!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
             } else if (result > 0) {
