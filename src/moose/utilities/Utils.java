@@ -32,6 +32,18 @@ public class Utils {
         }
         return files;
     }
+    
+    /**
+     * Checks a string if it's empty or not
+     * @param str
+     * @return 
+     */
+    public static boolean isEmpty(String str) {
+        if(str == null) {
+            return true;
+        }
+        return str.equals("");
+    }
 
     /**
      * Gets the scaled instance of album art

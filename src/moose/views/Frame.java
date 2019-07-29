@@ -332,7 +332,7 @@ public class Frame extends javax.swing.JFrame {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Main.settings.settingsController.getGenres().contains(genre)) {
+                        if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
                             switch (res) {
                                 case JOptionPane.YES_OPTION:
@@ -387,7 +387,7 @@ public class Frame extends javax.swing.JFrame {
             genres.add(s.getGenre());
         });
         for (String genre : genres) {
-            if (!Main.settings.settingsController.getGenres().contains(genre)) {
+            if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                 int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
                 switch (res) {
                     case JOptionPane.YES_OPTION:
@@ -1980,7 +1980,7 @@ public class Frame extends javax.swing.JFrame {
                 int index = songController.getIndex(row);
 
                 // check and see if the genre exists already
-                if (!Main.settings.settingsController.getGenres().contains(genre)) {
+                if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                     int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
                     switch (res) {
                         case JOptionPane.OK_OPTION:
