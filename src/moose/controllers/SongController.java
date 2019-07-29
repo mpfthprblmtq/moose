@@ -267,7 +267,6 @@ public class SongController {
      * @param genre, the genre to set
      */
     public void setGenre(int index, String genre) {
-        System.out.println("updating genre");
         songs.get(index).setGenre(genre);
         songEdited(index);
     }
