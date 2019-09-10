@@ -24,6 +24,10 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import moose.views.modals.AlbumArtFinderFrame;
 
 // class SongController
 public class SongController {
@@ -48,6 +52,10 @@ public class SongController {
     private static final int TABLE_COLUMN_TRACK = 8;
     private static final int TABLE_COLUMN_DISK = 9;
     private static final int TABLE_COLUMN_ALBUMART = 10;
+    
+    private static final int UNDETERMINED = -1;
+    private static final int YES = 0;
+    private static final int NO = 1;
 
     /**
      * Default constructor
@@ -620,31 +628,92 @@ public class SongController {
     }
 
     /**
-     * Adds the album art for each song if there exists a cover.* file in the
-     * same dir
+     * Adds the album art for each song if there exists a cover file in the same
+     * dir
      *
      * @param selectedRows the rows of songs to update
      */
     public void autoAddCovers(int[] selectedRows) {
 
         int count = 0;
+        int useService = UNDETERMINED;
 
-        // traverse the array of rows and add each image
-        for (int i = 0; i < selectedRows.length; i++) {
-            int row = selectedRows[i];    // get the row
+        // get a map<query, int list> of the albums to check
+        Map<String, List<Integer>> map = new HashMap<>();
+        for (int row : selectedRows) {
+            String[] queryArr = getArtistAndAlbumFromDirectory(getFile(row).getParentFile());
+            String query = queryArr[0] + " " + queryArr[1];
+            if (!map.containsKey(query)) {
+                map.put(query, new ArrayList<>());
+            }
+            map.get(query).add(row);
+        }
 
-            // get the parent directory of the song
-            File dir = getFile(row).getParentFile();
-
-            // check if the parent directory has a cover.* file
+        // now traverse each list and check to see if the cover exists
+        // if it doesn't, go through the albumartfinderservice method
+        Set<String> keys = map.keySet();
+        for (String key : keys) {
+            List<Integer> rows = map.get(key);
+            File dir = getFile(rows.get(0)).getParentFile();
             File cover = folderContainsCover(dir);
             if (cover != null) {
-                // if cover doesn't return as null, add the cover
-                addIndividualCover(row, cover);
-                count++;
+                for (int row : rows) {
+                    addIndividualCover(row, cover);
+                    count++;
+                }
+            } else {
+                if(useService == UNDETERMINED)
+                    useService = confirmUserWantsAlbumArtFinder();
+                if(useService == YES) 
+                    showAlbumArtWindow(dir, rows, key);
             }
         }
         Main.frame.updateConsole("Auto-added cover art for " + count + " file(s)!");
+    }
+
+    /**
+     * Checks to see if user wants to use the Album Art Finder Service
+     *
+     * @return
+     */
+    public int confirmUserWantsAlbumArtFinder() {
+        return JOptionPane.showConfirmDialog(Main.frame, "Cover art wasn't automatically found, would you like\n"
+                + "to use the Album Art Finder service in Moose?", "Album Art Finder Service", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Shows a window for the album art
+     *
+     * @param dir
+     * @param rows
+     * @param query
+     */
+    public void showAlbumArtWindow(File dir, List<Integer> rows, String query) {
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query, dir, rows);
+            albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+            albumArtFinderFrame.setVisible(true);
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query, dir, rows);
+                albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+                albumArtFinderFrame.setVisible(true);
+            });
+        }
+
+    }
+
+    /**
+     * Gets the artist and album from a directory
+     *
+     * @param dir
+     * @return
+     */
+    public String[] getArtistAndAlbumFromDirectory(File dir) {
+        String artist = dir.getParentFile().getName();
+        String album = dir.getName().substring(7);  // substring to get rid of the year prefix
+        return new String[]{artist, album};
     }
 
     /**
