@@ -312,7 +312,7 @@
             <Component class="javax.swing.JCheckBox" name="debugCheckBox">
               <Properties>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="settingsController.getDebugMode()" type="code"/>
+                  <Connection code="settingsController.getSettings().isInDebugMode()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Enable Enhanced Debugging"/>
               </Properties>
@@ -420,7 +420,7 @@
                   <Font name="Lucida Grande" size="10" style="0"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="settingsController.getLibraryLocation()" type="code"/>
+                  <Connection code="settingsController.getSettings().getLibraryLocation()" type="code"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="verticalAlignment" type="int" value="1"/>

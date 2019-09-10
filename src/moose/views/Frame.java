@@ -10,7 +10,6 @@
 package moose.views;
 
 // imports
-import com.mpatric.mp3agic.Mp3File;
 import java.awt.Component;
 import moose.*;
 import moose.controllers.SongController;
@@ -332,12 +331,13 @@ public class Frame extends javax.swing.JFrame {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
-                            int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
+                        if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
+                            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             switch (res) {
                                 case JOptionPane.YES_OPTION:
                                     // add the genre to the settings
-                                    Main.settings.settingsController.addGenre(genre);
+                                    Main.getSettings().addGenre(genre);
+                                    Main.updateSettings();
                                     break;
                                 default:
                                     break;
@@ -381,22 +381,39 @@ public class Frame extends javax.swing.JFrame {
         TableCellListener tcl = new TableCellListener(table, action);
     }
 
+    /**
+     * Scans all the files and the mp3tags with them and checks to make sure we
+     * know the genre
+     *
+     * @param files
+     */
     public void checkForNewGenres(List<File> files) {
+
+        // get all the songs, then the genres from the list of files
         List<String> genres = new ArrayList<>();
         files.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
             genres.add(s.getGenre());
         });
-        for (String genre : genres) {
-            if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
-                int res = JOptionPane.showConfirmDialog(Main.frame, genre + " isn't in your list, would you like to add it?");
-                switch (res) {
-                    case JOptionPane.YES_OPTION:
-                        // add the genre to the settings
-                        Main.settings.settingsController.addGenre(genre);
-                        break;
-                    default:
-                        break;
-                }
+
+        // create a list of all the genres that don't exist already
+        List<String> newGenres = new ArrayList<>();
+        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre))).forEachOrdered((genre) -> {
+            if(!newGenres.contains(genre)) {
+                newGenres.add(genre);
+            }
+        });
+
+        // for each new genre, ask if we want to add that one
+        for (String newGenre : newGenres) {
+            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            switch (res) {
+                case JOptionPane.YES_OPTION:
+                    // add the genre to the settings and update
+                    Main.getSettings().addGenre(newGenre);
+                    Main.updateSettings();
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -1381,7 +1398,6 @@ public class Frame extends javax.swing.JFrame {
      */
     private void multGenreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multGenreKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-//            if (table.isEditing()) table.getCellEditor().stopCellEditing();
             multUpdateButton.doClick();
         }
     }//GEN-LAST:event_multGenreKeyPressed
@@ -1533,16 +1549,16 @@ public class Frame extends javax.swing.JFrame {
         command = command.toLowerCase();
         switch (command) {
             case "clear error log":
-                Main.settings.settingsController.clearErrorLog();
+                Main.settingsFrame.settingsController.clearErrorLog();
                 break;
             case "clear event log":
-                Main.settings.settingsController.clearEventLog();
+                Main.settingsFrame.settingsController.clearEventLog();
                 break;
             case "open error log":
-                Main.settings.settingsController.openErrorLog();
+                Main.settingsFrame.settingsController.openErrorLog();
                 break;
             case "open event log":
-                Main.settings.settingsController.openEventLog();
+                Main.settingsFrame.settingsController.openEventLog();
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
@@ -1980,12 +1996,13 @@ public class Frame extends javax.swing.JFrame {
                 int index = songController.getIndex(row);
 
                 // check and see if the genre exists already
-                if (!Main.settings.settingsController.getGenres().contains(genre) && !Utils.isEmpty(genre)) {
+                if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                     int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
                     switch (res) {
                         case JOptionPane.OK_OPTION:
                             // add the genre to the settings
-                            Main.settings.settingsController.addGenre(genre);
+                            Main.getSettings().addGenre(genre);
+                            Main.updateSettings();
                             break;
                         default:
                             break;

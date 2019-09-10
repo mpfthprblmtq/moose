@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
 import moose.Main;
-import moose.controllers.SettingsController;
 import moose.utilities.NameService;
 
 /**
@@ -17,8 +16,6 @@ import moose.utilities.NameService;
  * @author pat
  */
 public class AutocompleteService {
-    
-    static SettingsController settingsController = Main.settings.settingsController;
 
     // column constants
     private static final int TABLE_COLUMN_TITLE = 2;
@@ -34,7 +31,7 @@ public class AutocompleteService {
     public static NameService getNameService(boolean isGenreField, JTable table) {
         List<String> list = new ArrayList<>();
         if(isGenreField) {
-            list.addAll(settingsController.getGenres());
+            list.addAll(Main.getSettings().getGenres());
             return new NameService(list);
         } else {
             if(table.getEditingColumn() == TABLE_COLUMN_TITLE

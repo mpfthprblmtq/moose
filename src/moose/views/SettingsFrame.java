@@ -188,7 +188,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         jLabel3.setText("Logging");
 
-        debugCheckBox.setSelected(settingsController.getDebugMode());
+        debugCheckBox.setSelected(settingsController.getSettings().isInDebugMode());
         debugCheckBox.setText("Enable Enhanced Debugging");
         debugCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -277,7 +277,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         jLabel6.setText("Music Library Location:");
 
         jLabel7.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        jLabel7.setText(settingsController.getLibraryLocation());
+        jLabel7.setText(settingsController.getSettings().getLibraryLocation());
         jLabel7.setToolTipText("");
         jLabel7.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -390,7 +390,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
-        settingsController.setDebugMode(debugCheckBox.isSelected());
+        settingsController.getSettings().setDebugMode(debugCheckBox.isSelected());
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
@@ -398,7 +398,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        settingsController.setDefaults();
+        settingsController.fillDefaults();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
@@ -406,7 +406,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt 
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        settingsController.writeSettingsFile();
+        Main.updateSettings();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     /**
@@ -475,8 +475,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         // get the folder through a JFileChooser
         File dir = Utils.launchJFileChooser("Choose the directory you want to store music in...", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
         if(dir != null) {
-            settingsController.setLibraryLocation(dir.getAbsolutePath() + "/");
-            jLabel7.setText(settingsController.getLibraryLocation());
+            settingsController.getSettings().setLibraryLocation(dir.getAbsolutePath() + "/");
+            jLabel7.setText(settingsController.getSettings().getLibraryLocation());
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -485,9 +485,9 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @return the listModel for the JList
      */
     public DefaultListModel getGenreListModel() {
-        if (settingsController.getGenres() != null) {
-            for (int i = 0; i < settingsController.getGenres().size(); i++) {
-                genreListModel.add(i, settingsController.getGenres().get(i));
+        if (settingsController.getSettings().getGenres() != null) {
+            for (int i = 0; i < settingsController.getSettings().getGenres().size(); i++) {
+                genreListModel.add(i, settingsController.getSettings().getGenres().get(i));
             }
             return genreListModel;
         } else {
@@ -500,7 +500,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        settingsController.addGenre(genre);
+        settingsController.getSettings().addGenre(genre);
         genreListModel.add(genreListModel.size(), genre);
     }
 
@@ -515,7 +515,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         if (!result) {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            settingsController.removeGenre(genre);
+            settingsController.getSettings().removeGenre(genre);
             genreTextField.setText("");
         }
     }
@@ -526,7 +526,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param newGenre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
-        settingsController.getGenres().set(settingsController.getGenres().indexOf(oldGenre), newGenre);
+        settingsController.getSettings().getGenres().set(settingsController.getSettings().getGenres().indexOf(oldGenre), newGenre);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
         genreTextField.setText("");
         addGenreButton.setText("Add");
