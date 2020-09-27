@@ -46,7 +46,7 @@ public class Frame extends javax.swing.JFrame {
     AutocompleteService autocompleteService = new AutocompleteService();
 
     // controller, instantiated in constructor
-    public SongController songController = new SongController();
+    public SongController songController;
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -160,6 +160,10 @@ public class Frame extends javax.swing.JFrame {
         // set the table's model to the custom model
         table.setModel(model);
 
+        // set up the song controller
+        songController = new SongController();
+        songController.setTable(table);
+
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
         this.menuListener = (ActionEvent event) -> {
@@ -169,11 +173,8 @@ public class Frame extends javax.swing.JFrame {
 
             // switch based on the option selected
             switch (event.getActionCommand()) {
-                case "Add":
-                    songController.addAlbumArt(selectedRows);
-                    break;
-                case "Remove":
-                    songController.removeAlbumArt(selectedRows);
+                case "More info...":
+                    openMoreInfo();
                     break;
                 case "Remove from list":
                     removeRows(selectedRows);
@@ -181,14 +182,28 @@ public class Frame extends javax.swing.JFrame {
                 case "Play":
                     songController.playFiles(selectedRows);
                     break;
-                case "Move File...":
-                    songController.moveFiles(selectedRows);
-                    break;
                 case "Save":
                     songController.saveTracks(selectedRows);
                     break;
-                case "More Info...":
-                    openMoreInfo();
+                case "Autotag":
+                    songController.autoTagFiles(selectedRows);
+                    setMultiplePanelFields();
+                    break;
+                case "Auto-add track numbers":
+                    songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
+                    break;
+                case "Auto-add artwork":
+                    songController.autoTaggingService.autoAddCoverArt(selectedRows);
+                    break;
+                case "Move file...":
+                case "Move files...":
+                    songController.moveFiles(selectedRows);
+                    break;
+                case "Add artwork":
+                    songController.autoTaggingService.addAlbumArt(selectedRows);
+                    break;
+                case "Remove artwork":
+                    songController.removeAlbumArt(selectedRows);
                     break;
                 default:
                     break;
@@ -681,7 +696,8 @@ public class Frame extends javax.swing.JFrame {
         multImage = new javax.swing.JLabel();
         multUpdateButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        clearAllButton = new javax.swing.JButton();
+        openAllButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -691,15 +707,15 @@ public class Frame extends javax.swing.JFrame {
         viewMenu = new javax.swing.JMenu();
         refreshMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        auditMenuItem = new javax.swing.JMenuItem();
+        autoTagMenuItem = new javax.swing.JMenuItem();
         addCoversMenuItem = new javax.swing.JMenuItem();
         findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
         formatFilenamesMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        commandMenuItem = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -711,6 +727,9 @@ public class Frame extends javax.swing.JFrame {
 
         saveButton.setText("Save All");
         saveButton.setFocusable(false);
+        saveButton.setMaximumSize(new java.awt.Dimension(100, 68));
+        saveButton.setMinimumSize(new java.awt.Dimension(100, 68));
+        saveButton.setPreferredSize(new java.awt.Dimension(100, 68));
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
@@ -723,7 +742,6 @@ public class Frame extends javax.swing.JFrame {
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setShowGrid(true);
-        songController.setTable(table);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -1008,10 +1026,23 @@ public class Frame extends javax.swing.JFrame {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/moose64.png"))); // NOI18N
 
-        jButton1.setText("Clear All");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        clearAllButton.setText("Clear All");
+        clearAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
+        clearAllButton.setMinimumSize(new java.awt.Dimension(100, 68));
+        clearAllButton.setPreferredSize(new java.awt.Dimension(100, 68));
+        clearAllButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                clearAllButtonActionPerformed(evt);
+            }
+        });
+
+        openAllButton.setText("Open All");
+        openAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
+        openAllButton.setMinimumSize(new java.awt.Dimension(100, 68));
+        openAllButton.setPreferredSize(new java.awt.Dimension(100, 68));
+        openAllButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openAllButtonActionPerformed(evt);
             }
         });
 
@@ -1028,9 +1059,11 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
+                        .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(saveButton))
+                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(openAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
                         .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1044,9 +1077,11 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-                    .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(openAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableSP)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1058,7 +1093,7 @@ public class Frame extends javax.swing.JFrame {
 
         fileMenu.setText("File");
 
-        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_MASK));
+        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_DOWN_MASK));
         openMenuItem.setText("Open...");
         openMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1067,7 +1102,7 @@ public class Frame extends javax.swing.JFrame {
         });
         fileMenu.add(openMenuItem);
 
-        saveTrackMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_MASK));
+        saveTrackMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_DOWN_MASK));
         saveTrackMenuItem.setText("Save Track");
         saveTrackMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1076,11 +1111,11 @@ public class Frame extends javax.swing.JFrame {
         });
         fileMenu.add(saveTrackMenuItem);
 
-        saveAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        saveAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
         saveAllMenuItem.setText("Save All");
         fileMenu.add(saveAllMenuItem);
 
-        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_MASK));
+        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_DOWN_MASK));
         exitMenuItem.setText("Exit");
         fileMenu.add(exitMenuItem);
 
@@ -1088,7 +1123,7 @@ public class Frame extends javax.swing.JFrame {
 
         viewMenu.setText("View");
 
-        refreshMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.META_MASK));
+        refreshMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.META_DOWN_MASK));
         refreshMenuItem.setText("Refresh");
         refreshMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1101,24 +1136,24 @@ public class Frame extends javax.swing.JFrame {
 
         macroMenu.setText("Actions");
 
-        jMenuItem2.setText("Audit...");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        auditMenuItem.setText("Audit...");
+        auditMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                auditMenuItemActionPerformed(evt);
             }
         });
-        macroMenu.add(jMenuItem2);
+        macroMenu.add(auditMenuItem);
 
-        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
-        jMenuItem3.setText("AutoTag");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        autoTagMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
+        autoTagMenuItem.setText("AutoTag");
+        autoTagMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                autoTagMenuItemActionPerformed(evt);
             }
         });
-        macroMenu.add(jMenuItem3);
+        macroMenu.add(autoTagMenuItem);
 
-        addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
         addCoversMenuItem.setText("Add Covers");
         addCoversMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1127,7 +1162,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addCoversMenuItem);
 
-        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
         findAndReplaceMenuItem.setText("Find and Replace");
         findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1144,7 +1179,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(addTrackNumbersMenuItem);
 
-        formatFilenamesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
+        formatFilenamesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
         formatFilenamesMenuItem.setText("Format Filenames");
         formatFilenamesMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1165,16 +1200,16 @@ public class Frame extends javax.swing.JFrame {
         });
         helpMenu.add(aboutMenuItem);
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.META_MASK));
-        jMenuItem1.setText("Command Prompt");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        commandMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
+        commandMenuItem.setText("Command Prompt");
+        commandMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                commandMenuItemActionPerformed(evt);
             }
         });
-        helpMenu.add(jMenuItem1);
+        helpMenu.add(commandMenuItem);
 
-        settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_MASK));
+        settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_DOWN_MASK));
         settingsMenuItem.setText("Preferences");
         settingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1206,6 +1241,11 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * ActionPerformed methods
+     */
+    // <editor-fold defaultstate="collapsed" desc="ActionPerformed Methods">   
+    
     /**
      * Action for the save button press
      *
@@ -1248,15 +1288,21 @@ public class Frame extends javax.swing.JFrame {
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
 
         table.setCellEditor(editor);
+        
+        int row = table.rowAtPoint(evt.getPoint());
+        int col = table.columnAtPoint(evt.getPoint());
+        int rows = table.getSelectedRowCount();
+        int[] selectedRows = table.getSelectedRows();
 
         // check what type of click
         switch (evt.getButton()) {
 
             // if it's a right click
             case java.awt.event.MouseEvent.BUTTON3:
-                int row = table.rowAtPoint(evt.getPoint());
-                int col = table.columnAtPoint(evt.getPoint());
-                int rows = table.getSelectedRowCount();
+                
+                if (!Utils.intArrayContains(selectedRows, row)) {
+                    table.setRowSelectionInterval(row, row);
+                }
                 if (row >= 0 && col >= 0) {
                     switch (col) {
                         case 10:
@@ -1279,10 +1325,10 @@ public class Frame extends javax.swing.JFrame {
 
                 // check if double click
                 if (evt.getClickCount() == 2) {
-                    if (table.getSelectedColumn() == 10) {
-                        showArtworkPopup(evt, table.getSelectedRowCount());
+                    if (col == 10) {
+                        showArtworkPopup(evt, rows);
                     } else {
-                        changeSelection(table.getSelectedRow(), table.getSelectedColumn(), -1);
+                        changeSelection(row, col, -1);
                         table.getEditorComponent().requestFocusInWindow();
                     }
                 }
@@ -1290,11 +1336,10 @@ public class Frame extends javax.swing.JFrame {
 
             // if it's a scroll click
             case java.awt.event.MouseEvent.BUTTON2:
-                int[] selectedRows = table.getSelectedRows();
                 File file = null;
                 for (int i = 0; i < selectedRows.length; i++) {
                     try {
-                        file = songController.getFile(selectedRows[i]);
+                        file = songController.autoTaggingService.getFile(selectedRows[i]);
                         Utils.openFile(file);
                     } catch (IOException ex) {
                         logger.logError("Exception trying to open file: " + file.getName(), ex);
@@ -1354,7 +1399,7 @@ public class Frame extends javax.swing.JFrame {
 
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         int[] selectedRows = table.getSelectedRows();
-        songController.addTrackAndDiskNumbers(selectedRows);
+        songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
     }//GEN-LAST:event_addTrackNumbersMenuItemActionPerformed
 
     /**
@@ -1430,7 +1475,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multDiskKeyPressed
 
     private void addCoversMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCoversMenuItemActionPerformed
-        songController.autoAddCovers(table.getSelectedRows());
+        songController.autoTaggingService.autoAddCoverArt(table.getSelectedRows());
     }//GEN-LAST:event_addCoversMenuItemActionPerformed
 
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
@@ -1457,26 +1502,26 @@ public class Frame extends javax.swing.JFrame {
         Main.launchSettingsFrame();
     }//GEN-LAST:event_settingsMenuItemActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void auditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditMenuItemActionPerformed
         Main.launchAuditFrame();
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_auditMenuItemActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void commandMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commandMenuItemActionPerformed
         // prompt the user to enter a command
         String command = JOptionPane.showInputDialog(this, "Enter a command:");
         if (command != null) {
             doCommand(command);
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_commandMenuItemActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void autoTagMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTagMenuItemActionPerformed
         songController.autoTagFiles(table.getSelectedRows());
         setMultiplePanelFields();
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }//GEN-LAST:event_autoTagMenuItemActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
         clearAll();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_clearAllButtonActionPerformed
 
     /**
      * If enter is pressed while field is in focus
@@ -1540,6 +1585,19 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formatFilenamesMenuItemActionPerformed
 
+    private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
+        for (int i = 0; i < table.getRowCount(); i++) {
+            File file = null;
+            try {
+                file = songController.autoTaggingService.getFile(i);
+                Utils.openFile(file);
+            } catch (IOException ex) {
+                logger.logError("Exception trying to open file: " + file.getName(), ex);
+            }
+        }
+    }//GEN-LAST:event_openAllButtonActionPerformed
+    // </editor-fold>
+    
     /**
      * Performs a command based on the user input
      *
@@ -1785,7 +1843,7 @@ public class Frame extends javax.swing.JFrame {
     public void showAboutDialog() {
         Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
-                "Moose\nVersion: " + Main.version + "\n" + "© Pat Ripley 2018",
+                "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
     }
 
@@ -2049,6 +2107,8 @@ public class Frame extends javax.swing.JFrame {
                 songController.setDisk(index, disk);
             }
         }
+
+        // TODO check if the album art field needs updated
     }
 
     /**
@@ -2059,6 +2119,7 @@ public class Frame extends javax.swing.JFrame {
         JTextField replace = new JTextField();
         JCheckBox includeFilesBox = new JCheckBox();
         includeFilesBox.setText("Include file names");
+        includeFilesBox.setSelected(true);
         Object[] message = {"Find:", find, "Replace:", replace, includeFilesBox};
 
         // create a thread to wait until the dialog box pops up
@@ -2125,11 +2186,11 @@ public class Frame extends javax.swing.JFrame {
      * @param e
      */
     void showArtworkPopup(MouseEvent e, int rows) {
-        JPopupMenu popup = new JPopupMenu();
+        JPopupMenu popup = getBasePopUpMenu(rows);
         JMenuItem item;
-        popup.add(item = new JMenuItem("Add"));
+        popup.add(item = new JMenuItem("Add artwork"));
         item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Remove"));
+        popup.add(item = new JMenuItem("Remove artwork"));
         item.addActionListener(menuListener);
 
         popup.show(e.getComponent(), e.getX(), e.getY());
@@ -2141,20 +2202,7 @@ public class Frame extends javax.swing.JFrame {
      * @param e
      */
     void showRegularPopup(MouseEvent e, int rows) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item;
-        if (rows == 1) {
-            popup.add(item = new JMenuItem("More Info..."));
-            item.addActionListener(menuListener);
-            popup.addSeparator();
-        }
-        popup.add(item = new JMenuItem("Remove from list"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Play"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Save"));
-        item.addActionListener(menuListener);
-
+        JPopupMenu popup = getBasePopUpMenu(rows);
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
@@ -2164,10 +2212,27 @@ public class Frame extends javax.swing.JFrame {
      * @param e
      */
     void showFilePopup(MouseEvent e, int rows) {
+        JPopupMenu popup = getBasePopUpMenu(rows);
+        JMenuItem item;
+        popup.add(item = new JMenuItem(rows > 1 ? "Move file..." : "Move files..."));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Format filenames"));
+        item.addActionListener(menuListener);
+
+        popup.show(e.getComponent(), e.getX(), e.getY());
+    }
+    
+    /**
+     * Returns the base popup menu
+     * 
+     * @param rows, the number of rows selected
+     * @return the base popup menu
+     */
+    private JPopupMenu getBasePopUpMenu(int rows) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         if (rows == 1) {
-            popup.add(item = new JMenuItem("More Info..."));
+            popup.add(item = new JMenuItem("More info..."));
             item.addActionListener(menuListener);
             popup.addSeparator();
         }
@@ -2178,10 +2243,14 @@ public class Frame extends javax.swing.JFrame {
         popup.add(item = new JMenuItem("Save"));
         item.addActionListener(menuListener);
         popup.addSeparator();
-        popup.add(item = new JMenuItem(rows > 1 ? "Move File..." : "Move Files..."));
+        popup.add(item = new JMenuItem("Autotag"));
         item.addActionListener(menuListener);
-
-        popup.show(e.getComponent(), e.getX(), e.getY());
+        popup.add(item = new JMenuItem("Auto-add track numbers"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Auto-add artwork"));
+        item.addActionListener(menuListener);
+        
+        return popup;
     }
 
     /**
@@ -2244,6 +2313,10 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem addCoversMenuItem;
     private javax.swing.JMenuItem addTrackNumbersMenuItem;
+    private javax.swing.JMenuItem auditMenuItem;
+    private javax.swing.JMenuItem autoTagMenuItem;
+    private javax.swing.JButton clearAllButton;
+    private javax.swing.JMenuItem commandMenuItem;
     private javax.swing.JTextArea console;
     private javax.swing.JScrollPane consoleSP;
     private javax.swing.JPanel container;
@@ -2252,13 +2325,9 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem findAndReplaceMenuItem;
     private javax.swing.JMenuItem formatFilenamesMenuItem;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;
@@ -2271,6 +2340,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JTextField multTrack;
     private javax.swing.JButton multUpdateButton;
     private javax.swing.JTextField multYear;
+    private javax.swing.JButton openAllButton;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem refreshMenuItem;
     private javax.swing.JMenuItem saveAllMenuItem;

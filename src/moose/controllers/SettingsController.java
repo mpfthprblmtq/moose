@@ -39,14 +39,6 @@ public class SettingsController {
     Map<String, Object> settingsMap = new HashMap<>();
     final ObjectMapper mapper = new ObjectMapper();
 
-    public static final String DEBUG_MODE = "DEBUG_MODE";
-    public static final String GENRES = "GENRES";
-    public static final String LIBRARY_LOCATION = "LIBRARY_LOCATION";
-    public static final String ALBUM_ART_FINDER_API_KEY = "ALBUM_ART_FINDER_API_KEY";
-    public static final String ALBUM_ART_FINDER_CSE_ID = "ALBUM_ART_FINDER_CSE_ID";
-    public static final String ALBUM_ART_FINDER_SEARCH_COUNT = "ALBUM_ART_FINDER_SEARCH_COUNT";
-    public static final String ALBUM_ART_FINDER_SEARCH_DATE = "ALBUM_ART_FINDER_SEARCH_DATE";
-
     // logger object
     Logger logger = Main.getLogger();
 
@@ -88,10 +80,11 @@ public class SettingsController {
 
     /**
      * Fills the settingsFile file with some default values
+     * @return the result of writing the settings file
      */
-    public void fillDefaults() {
+    public boolean fillDefaults() {
         settings = new Settings();
-        writeSettingsFile();
+        return writeSettingsFile();
     }
 
     public Settings getSettings() {
@@ -151,16 +144,18 @@ public class SettingsController {
     /**
      * Writes the settingsFile file from the ivars that were set in the program
      */
-    public void writeSettingsFile() {
+    public boolean writeSettingsFile() {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settingsFile));
             bufferedWriter.write(mapper.writeValueAsString(settings));
             bufferedWriter.flush();
+            return true;
         } catch (FileNotFoundException ex) {
             logger.logError("Couldn't find settings file!", ex);
         } catch (IOException ex) {
             logger.logError("Error reading settings file!", ex);
         }
+        return false;
     }
 
     /**

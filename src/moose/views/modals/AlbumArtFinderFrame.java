@@ -10,17 +10,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.SwingWorker;
+import javax.swing.*;
+
 import moose.Main;
+import moose.objects.ImageSearchQuery;
 import moose.objects.ImageSearchResponse;
 import moose.services.AlbumArtFinderService;
 import moose.utilities.Logger;
 import moose.utilities.Utils;
 
 /**
- *
  * @author pat
  */
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
@@ -29,15 +28,48 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     List<Icon> icons = new ArrayList<>();
     int currentIconIndex;
+    AlbumArtFinderService albumArtFinderService = new AlbumArtFinderService();
 
     SwingWorker<Void, Void> // make a swing worker do the image search in a separate thread so I can update the GUI
             worker = new SwingWorker<Void, Void>() {
         @Override
         protected Void doInBackground() throws Exception {
-            // reset UI
 
+            // get the query
             String query = queryTextField.getText();
-            responses = AlbumArtFinderService.getImages(query);
+
+            // iteratively make the calls so that the progress bar can be updated
+            albumArtFinderService.makeFirstCall(query);
+            progressBar.setValue(8);
+            albumArtFinderService.updateAlbumArtSettings();
+            progressBar.setValue(16);
+            albumArtFinderService.makeSecondCall(query);
+            progressBar.setValue(24);
+            albumArtFinderService.updateAlbumArtSettings();
+            progressBar.setValue(32);
+            albumArtFinderService.makeThirdCall(query);
+            progressBar.setValue(40);
+            albumArtFinderService.updateAlbumArtSettings();
+            progressBar.setValue(48);
+            albumArtFinderService.makeFourthCall(query);
+            progressBar.setValue(56);
+            albumArtFinderService.updateAlbumArtSettings();
+            progressBar.setValue(64);
+
+            responses = albumArtFinderService.getResponses();
+            double interval = responses.size() / 36.0;
+            List<ImageSearchResponse> toRemoveList = new ArrayList<>();
+            responses.forEach((isr) -> {
+                ImageSearchResponse toRemove = albumArtFinderService.processImage(isr);
+                if (toRemove != null) {
+                    toRemoveList.add(toRemove);
+                }
+                progressBar.setValue((int) (progressBar.getValue() + Math.floor(interval)));
+            });
+            responses.removeAll(toRemoveList);
+            progressBar.setValue(100);
+            loadingLabel.setIcon(new ImageIcon(this.getClass().getResource("/resources/check3.png")));
+
 
             icons = getIconsFromImages(responses);
             if (icons.size() > 1) {
@@ -45,12 +77,14 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 currentIconIndex = 0;
                 nextButton.setEnabled(true);
                 prevButton.setEnabled(false);
+                searchButton.setText("Search");
             } else if (icons.size() == 1) {
                 albumArtImageLabel.setIcon(icons.get(0));
                 currentIconIndex = 0;
                 nextButton.setEnabled(false);
                 prevButton.setEnabled(false);
-            } else if (icons.isEmpty()) {
+                searchButton.setText("Search");
+            } else {
                 albumArtImageLabel.setIcon(null);
                 currentIconIndex = -1;
                 nextButton.setEnabled(false);
@@ -65,7 +99,6 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             sourceLabel.setText(responses.get(currentIconIndex).getLink());
             sourceLabel.setToolTipText(responses.get(currentIconIndex).getLink());
             sizeLabel.setText(responses.get(currentIconIndex).getBImage().getWidth() + "x" + responses.get(currentIconIndex).getBImage().getHeight());
-            loadingLabel.setIcon(null);
             confirmButton.setEnabled(true);
             googleImagesButton.setEnabled(true);
 
@@ -81,19 +114,16 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     /**
      * Creates new form AlbumArtFinderFrame
      *
-     * @param albumInfo
-     * @param dir
-     * @param rows
+     * @param query, the ImageSearchQuery to search by
      */
-    public AlbumArtFinderFrame(String albumInfo, File dir, List<Integer> rows) {
+    public AlbumArtFinderFrame(ImageSearchQuery query) {
         initComponents();
-        headerLabel.setText("Finding album art for \"" + albumInfo + "\"");
-        queryTextField.setText(albumInfo);
+        headerLabel.setText("<html>Finding album art for:<br>\"" + query.getQuery() + "\"</html>");
+        queryTextField.setText(query.getQuery());
         queryTextField.requestFocus();
         queryTextField.selectAll();
-        this.dir = dir;
-        this.rows = rows;
-
+        this.dir = query.getDir();
+        this.rows = query.getRows();
     }
 
     /**
@@ -120,6 +150,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         searchButton = new javax.swing.JButton();
         loadingLabel = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Album Art Finder");
@@ -132,6 +163,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 queryTextFieldKeyPressed(evt);
             }
+
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 queryTextFieldKeyReleased(evt);
             }
@@ -189,89 +221,93 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             }
         });
 
+        loadingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(headerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(L1, javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(queryTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(googleImagesButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(prevButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(nextButton))
-                                            .addComponent(confirmButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(sizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(sourceLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addContainerGap())))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(62, 62, 62)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(albumArtImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(headerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jLabel1)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(sourceLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                .addComponent(L1, javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addComponent(queryTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                        .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                                .addComponent(googleImagesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                                                                                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                        .addComponent(prevButton)
+                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                                        .addComponent(nextButton))
+                                                                                .addComponent(confirmButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addGap(0, 0, Short.MAX_VALUE))
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addComponent(albumArtImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addGap(59, 60, Short.MAX_VALUE))
+                                                                        .addComponent(sizeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(headerLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(L1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(queryTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(sourceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(sizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(albumArtImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(confirmButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(nextButton)
-                            .addComponent(prevButton)))
-                    .addComponent(googleImagesButton, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(11, 11, 11))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(headerLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(L1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(queryTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(sourceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel2)
+                                        .addComponent(sizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(loadingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(albumArtImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(confirmButton)
+                                        .addComponent(googleImagesButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(nextButton)
+                                        .addComponent(prevButton)
+                                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(11, 11, 11))
         );
 
         pack();
@@ -346,18 +382,33 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     public void doSearch() {
 
-        // update the gui to signify it starting
-        sourceLabel.setText("");
-        sourceLabel.setToolTipText("");
-        sizeLabel.setText("");
-        statusLabel.setText("Searching...");
-        loadingLabel.setIcon(new ImageIcon(this.getClass().getResource("/resources/loading-icon-2.gif")));
-        searchButton.setText("Cancel");
-        confirmButton.setEnabled(false);
-        googleImagesButton.setEnabled(false);
+        // check to make sure we're below the allowed search threshold
+        if (AlbumArtFinderService.checkIfBelowLimit()) {
 
-        // do the search
-        worker.execute();
+            // update the gui to signify it starting
+            sourceLabel.setText("");
+            sourceLabel.setToolTipText("");
+            sizeLabel.setText("");
+            statusLabel.setText("Searching...");
+            loadingLabel.setIcon(new ImageIcon(this.getClass().getResource("/resources/loading-icon-2.gif")));
+            searchButton.setText("Cancel");
+            confirmButton.setEnabled(false);
+            googleImagesButton.setEnabled(false);
+
+            // do the search
+            worker.execute();
+
+        } else {
+            // ruh roh, to many calls for today
+            JOptionPane.showMessageDialog(null,
+                    "API call limit reached for today!",
+                    "API Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void setProgress(int percentage) {
+
     }
 
     private List<Icon> getIconsFromImages(List<ImageSearchResponse> responses) {
@@ -371,15 +422,14 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     private void confirmImage() {
         foundCover = responses.get(currentIconIndex).getBImage();
-        // TODO get this from settings
-        int dim = 640;
+        int dim = Main.getSettings().getPreferredCoverArtSize();
         File outputFile = Utils.createImageFile(foundCover, dir, dim);
         if (outputFile.exists()) {
-            rows.forEach((row) -> {
-                Main.frame.songController.addIndividualCover(row, outputFile);
-            });
+            for (int i = 0; i < this.rows.size(); i++) {
+                Main.frame.songController.autoTaggingService.addIndividualCover(rows.get(i), outputFile);
+            }
         }
-        Main.frame.updateConsole("Auto-added cover art for " + rows.size() + " file(s)!");
+        Main.frame.setMultiplePanelFields();
         this.dispose();
     }
 
@@ -390,7 +440,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -422,6 +472,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     private javax.swing.JLabel loadingLabel;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JTextField queryTextField;
     private javax.swing.JButton searchButton;
     private javax.swing.JLabel sizeLabel;
