@@ -31,7 +31,7 @@ public class SettingsController {
 
     // hardened version
     // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
-    private String version = "2.0.6";
+    private String version = "1.2.0";
 
     // main settingsFile file
     File settingsFile;
