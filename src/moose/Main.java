@@ -10,6 +10,7 @@
 package moose;
 
 import java.io.File;
+import moose.objects.Settings;
 import moose.utilities.Logger;
 import moose.views.AuditFrame;
 import moose.views.Frame;
@@ -18,24 +19,24 @@ import moose.views.SettingsFrame;
 // class Main
 public class Main {
     
-    // version
-    public static String version = "1.1.3";
-    
     // create and instantiate the frames
     public static Frame frame;
-    public static SettingsFrame settings;
+    public static SettingsFrame settingsFrame;
     public static AuditFrame auditFrame;
 
     // logger object
-    public static Logger logger = new Logger();
+    public static Logger logger;
 
     /**
      * Entry point for the app, launches the main Frame
-     * @param args
+     * @param args, the entry arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         // instantiate the settings object so we can have some log/settings files
-        settings = new SettingsFrame();
+        settingsFrame = new SettingsFrame();
+        
+        // instantiate the logger object so we can have some logging
+        logger = new Logger();
         
         // go
         launchFrame();
@@ -47,6 +48,21 @@ public class Main {
      */
     public static Logger getLogger() {
         return logger;
+    }
+    
+    /**
+     * Returns the settings object
+     * @return the settings object
+     */
+    public static Settings getSettings() {
+        return settingsFrame.settingsController.getSettings();
+    }
+    
+    /**
+     * Sends a command to update the settings file with the settings object
+     */
+    public static boolean updateSettings() {
+        return settingsFrame.settingsController.writeSettingsFile();
     }
 
     /**
@@ -77,13 +93,13 @@ public class Main {
      * Controls the SettingsFrame opening and closing
      */
     public static void launchSettingsFrame() {
-        settings = new SettingsFrame();
-        settings.setLocationRelativeTo(null);
-        settings.setVisible(true);
+        settingsFrame = new SettingsFrame();
+        settingsFrame.setLocationRelativeTo(null);
+        settingsFrame.setVisible(true);
     }
     
     public static void closeSettingsFrame() {
-        settings.dispose();
+        settingsFrame.dispose();
     }
     
     /**

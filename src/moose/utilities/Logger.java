@@ -17,14 +17,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import moose.Main;
 
 // class Logger
 public class Logger {
 
     // streams
-    PrintStream errorStream;
-    PrintStream eventStream;
-    PrintStream console = System.out;   // store current System.out before assigning a new value
+    static PrintStream errorStream;
+    static PrintStream eventStream;
+    static PrintStream console = System.out;   // store current System.out before assigning a new value
     
     File errorLog;
     File eventLog;
@@ -78,31 +79,46 @@ public class Logger {
         }
 
         // by default, setting the System.out to the errorStream just in case I missed catches
-//        System.setOut(errorStream);
-//        System.setErr(errorStream);
+        if (!Main.getSettings().isInDeveloperMode()) {
+            setSystemOutToConsole();
+            setSystemErrToConsole();
+        } else {
+            setSystemOutToEventLog();
+            setSystemErrToErrorLog();
+        }
     }
     
     /**
-     * Sets the System.out and System.err stream back to the console for debugging in the IDE
+     * Sets the System.err stream back to the console for debugging in the IDE
      */
-    public void setSystemOutToConsole() {
+    public static void setSystemOutToConsole() {
         System.setOut(console);
-        System.setErr(console);
-    }
-    
-    /**
-     * Sets the System.out and System.err stream to the errorLog
-     */
-    public void setSystemOutToLog() {
-        System.setOut(errorStream);
-        System.setErr(errorStream);
     }
     
     /**
      * Sets the System.out stream to the eventLog
      */
-    public void setSystemOutToEventLog() {
+    public static void setSystemOutToEventLog() {
         System.setOut(eventStream);
+    }
+    
+    /**
+     * Sets the System.err stream to the console
+     */
+    public static void setSystemErrToConsole() {
+        System.setOut(console);
+    }
+    
+    /**
+     * Sets the System.err stream to the console
+     */
+    public static void setSystemErrToErrorLog() {
+        System.setOut(errorStream);
+    }
+    
+    public static void disableLogging() {
+        System.setErr(null);
+        System.setOut(null);
     }
 
     /**
@@ -126,7 +142,7 @@ public class Logger {
      * @param str the localized string
      * @param ex the exception text
      */
-    public void logError(String str, Exception ex) {
+    public final void logError(String str, Exception ex) {
 
         // get the date to format it
         date = new Date();
