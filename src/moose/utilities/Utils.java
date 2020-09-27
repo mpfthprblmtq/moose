@@ -11,8 +11,8 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import moose.Main;
 
@@ -23,6 +23,17 @@ public class Utils {
 
     // date formatter
     static SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+    
+    /**
+     * Checks if int[] contains a certain int
+     * 
+     * @param arr, the array of ints to check
+     * @param key, the key to check for
+     * @return the result of the check
+     */
+    public static boolean intArrayContains(int[] arr, int key) {
+        return Arrays.stream(arr).anyMatch(i -> i == key);
+    }
 
     /**
      * Helper Function that lists and stores all of the files in a directory and

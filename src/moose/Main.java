@@ -19,24 +19,24 @@ import moose.views.SettingsFrame;
 // class Main
 public class Main {
     
-    // version
-    public static String version = "1.1.3";
-    
     // create and instantiate the frames
     public static Frame frame;
     public static SettingsFrame settingsFrame;
     public static AuditFrame auditFrame;
 
     // logger object
-    public static Logger logger = new Logger();
+    public static Logger logger;
 
     /**
      * Entry point for the app, launches the main Frame
-     * @param args
+     * @param args, the entry arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         // instantiate the settings object so we can have some log/settings files
         settingsFrame = new SettingsFrame();
+        
+        // instantiate the logger object so we can have some logging
+        logger = new Logger();
         
         // go
         launchFrame();
@@ -61,8 +61,8 @@ public class Main {
     /**
      * Sends a command to update the settings file with the settings object
      */
-    public static void updateSettings() {
-        settingsFrame.settingsController.writeSettingsFile();
+    public static boolean updateSettings() {
+        return settingsFrame.settingsController.writeSettingsFile();
     }
 
     /**

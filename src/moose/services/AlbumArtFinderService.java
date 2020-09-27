@@ -13,47 +13,81 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.imageio.ImageIO;
+
+import moose.utilities.Constants;
 import moose.utilities.Logger;
 import moose.Main;
 import moose.objects.ImageSearchResponse;
 import moose.utilities.Utils;
 
+import static moose.utilities.Constants.LARGE;
+import static moose.utilities.Constants.XLARGE;
+
 public class AlbumArtFinderService {
 
     static Logger logger = Main.logger;
+    
+    // list of responses
+    List<ImageSearchResponse> responses = new ArrayList<>();
+    int img_size = Main.getSettings().getPreferredCoverArtSize();
+    
+    public AlbumArtFinderService() {
+        
+    }
 
-    public static final String LARGE = "large";
-    public static final String XLARGE = "xlarge";
+    public List<ImageSearchResponse> getResponses() {
+        return this.responses;
+    }
 
     /**
-     * Entry method, makes the json call and parses through the images
-     *
-     * @param query
-     * @return
+     * Checks to see if we're below the image limit threshold
+     * @return the result of the check
      */
-    public static List<ImageSearchResponse> getImages(String query) {
-        
-        // list of responses
-        List<ImageSearchResponse> responses = new ArrayList<>();
-        
+    public static boolean checkIfBelowLimit() {
+        return Main.getSettings().getAlbumArtFinderSearchCount() < Constants.IMAGE_LIMIT;
+    }
+    
+    public void makeFirstCall(String query) {
         // make the first call for large type images
         responses.addAll(makeJsonCall(query, LARGE, 1));
-        updateAlbumArtSettings();
-        
+    }
+
+    public void makeSecondCall(String query) {
         // make the second call for large type images
         responses.addAll(makeJsonCall(query, LARGE, 11));
-        updateAlbumArtSettings();
-        
+    }
+
+    public void makeThirdCall(String query) {
         // make the first call for xlarge type images
         responses.addAll(makeJsonCall(query, XLARGE, 1));
-        updateAlbumArtSettings();
-        
+    }
+
+    public void makeFourthCall(String query) {
         // make the second call for xlarge type images
         responses.addAll(makeJsonCall(query, XLARGE, 11));
-        updateAlbumArtSettings();
+    }
 
-        // TODO get this image from settings
-        int img_size = 640;
+    public ImageSearchResponse processImage(ImageSearchResponse isr) {
+        if ((isr.getImage().getHeight() != isr.getImage().getWidth())   // if the image isn't square
+                || (isr.getImage().getHeight() < img_size && isr.getImage().getWidth() < img_size)) {   // if the image is smaller than the desired size
+//            toRemove.add(isr);
+            return isr;
+        } else {
+            try {
+                isr.setBImage(ImageIO.read(new URL(isr.getLink())));
+                if(isr.getBImage() == null) {
+                    return isr;
+                }
+            } catch (IOException ex) {
+                logger.logError("IOException when trying to read an image from the url: " + isr.getLink() + ", cause: " + ex.getCause().getMessage(), ex);
+                return isr;
+            }
+        }
+        return null;
+    }
+
+    public void processResponses() {
+//        int img_size = Main.getSettings().getPreferredCoverArtSize();
 
         List<ImageSearchResponse> toRemove = new ArrayList<>();
         responses.forEach((isr) -> {
@@ -73,14 +107,12 @@ public class AlbumArtFinderService {
             }
         });
         responses.removeAll(toRemove);
-        
-        return responses;
     }
     
     /**
      * Updates the album art settings
      */
-    private static void updateAlbumArtSettings() {
+    public void updateAlbumArtSettings() {
         // check if date matches today
         String settingsDate = Main.getSettings().getAlbumArtFinderSearchCountDate();
         String todaysDate = Utils.formatDate(new Date());
@@ -135,9 +167,20 @@ public class AlbumArtFinderService {
                 // parse through the response
                 ObjectMapper mapper = new ObjectMapper();
                 String responseString = response.toString();
-                responseString = responseString.replace("{ \"items\": ", "");   // get rid of the "items" field name in json
+                responseString = responseString.replace("{  \"items\": ", "");   // get rid of the "items" field name in json
                 responseString = responseString.substring(0, responseString.length() - 1);  // get rid of the trailing curly brace
+                
+                // disables the "An illegal reflective access operation has occurred" warning
+                if (Main.getSettings().isInDeveloperMode()) {
+                    Logger.disableLogging();
+                } else {
+                    Logger.setSystemErrToConsole();
+                }
                 responseList = mapper.readValue(responseString, new TypeReference<List<ImageSearchResponse>>(){});  // parse that bad boy
+                // TODO:  Get rid of "An illegal reflective access operation has occured" ^^^ happens on this line
+                if (Main.getSettings().isInDeveloperMode()) {
+                    
+                }
                 
             // if it's not so good
             } else {
@@ -216,5 +259,4 @@ public class AlbumArtFinderService {
 
         return stringBuilder.toString();
     }
-
 }

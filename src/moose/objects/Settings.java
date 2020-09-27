@@ -8,17 +8,17 @@ package moose.objects;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import moose.utilities.Constants;
 import moose.utilities.Utils;
 
-/**
- *
- * @author pat
- */
 public class Settings {
 
+    private String version = "1.1.3";
     private boolean inDebugMode;
+    private boolean inDeveloperMode;
     private List<String> genres;
     private String libraryLocation;
+    private int preferredCoverArtSize;
     private String albumArtFinderApiKey;
     private String albumArtFinderCseId;
     private int albumArtFinderSearchCount;
@@ -28,13 +28,15 @@ public class Settings {
      * Creates a default settings object
      */
     public Settings() {
-        setDebugMode(false);
-        setGenres(new ArrayList<>());
-        setLibraryLocation("");
-        setAlbumArtFinderApiKey("");
-        setAlbumArtFinderCseId("");
-        setAlbumArtFinderSearchCount(0);
-        setAlbumArtFinderSearchCountDate(Utils.formatDate(new Date()));
+        this.inDebugMode = false;
+        this.inDeveloperMode = false;
+        this.genres = new ArrayList<>();
+        this.libraryLocation = Constants.EMPTY_STRING;
+        this.preferredCoverArtSize = 640;
+        this.albumArtFinderApiKey = Constants.EMPTY_STRING;
+        this.albumArtFinderCseId = Constants.EMPTY_STRING;
+        this.albumArtFinderSearchCount = 0;
+        this.albumArtFinderSearchCountDate = Utils.formatDate(new Date());
     }
     
     /**
@@ -52,106 +54,86 @@ public class Settings {
      * @param genre
      */
     public void removeGenre(String genre) {
-        if(!getGenres().contains(genre)) {
-            getGenres().remove(genre);
-        }
+        getGenres().remove(genre);
     }
-    
-    /**
-     * @return the debug
-     */
+
     public boolean isInDebugMode() {
         return inDebugMode;
     }
 
-    /**
-     * @param debugMode the debug to set
-     */
     public void setDebugMode(boolean debugMode) {
         this.inDebugMode = debugMode;
     }
 
-    /**
-     * @return the genres
-     */
+    public boolean isInDeveloperMode() {
+        return inDeveloperMode;
+    }
+
+    public void setDeveloperMode(boolean developermode) {
+        this.inDeveloperMode = developermode;
+    }
+
     public List<String> getGenres() {
         return genres;
     }
 
-    /**
-     * @param genres the genres to set
-     */
     public void setGenres(List<String> genres) {
         this.genres = genres;
     }
 
-    /**
-     * @return the libaryLocation
-     */
+    public int getPreferredCoverArtSize() {
+        return preferredCoverArtSize;
+    }
+
+    public void setPreferredCoverArtSize(int preferredCoverArtSize) {
+        this.preferredCoverArtSize = preferredCoverArtSize;
+    }
+
     public String getLibraryLocation() {
         return libraryLocation;
     }
 
-    /**
-     * @param libraryLocation the libraryLocation to set
-     */
     public void setLibraryLocation(String libraryLocation) {
         this.libraryLocation = libraryLocation;
     }
 
-    /**
-     * @return the albumArtFinderApiKey
-     */
     public String getAlbumArtFinderApiKey() {
         return albumArtFinderApiKey;
     }
 
-    /**
-     * @param albumArtFinderApiKey the albumArtFinderApiKey to set
-     */
     public void setAlbumArtFinderApiKey(String albumArtFinderApiKey) {
         this.albumArtFinderApiKey = albumArtFinderApiKey;
     }
 
-    /**
-     * @return the albumArtFinderCseId
-     */
     public String getAlbumArtFinderCseId() {
         return albumArtFinderCseId;
     }
 
-    /**
-     * @param albumArtFinderCseId the albumArtFinderCseId to set
-     */
     public void setAlbumArtFinderCseId(String albumArtFinderCseId) {
         this.albumArtFinderCseId = albumArtFinderCseId;
     }
 
-    /**
-     * @return the albumArtFinderSearchCount
-     */
     public int getAlbumArtFinderSearchCount() {
         return albumArtFinderSearchCount;
     }
 
-    /**
-     * @param albumArtFinderSearchCount the albumArtFinderSearchCount to set
-     */
     public void setAlbumArtFinderSearchCount(int albumArtFinderSearchCount) {
         this.albumArtFinderSearchCount = albumArtFinderSearchCount;
     }
 
-    /**
-     * @return the albumArtFinderSearchCountDate
-     */
     public String getAlbumArtFinderSearchCountDate() {
         return albumArtFinderSearchCountDate;
     }
 
-    /**
-     * @param albumArtFinderSearchCountDate the albumArtFinderSearchCountDate to set
-     */
     public void setAlbumArtFinderSearchCountDate(String albumArtFinderSearchCountDate) {
         this.albumArtFinderSearchCountDate = albumArtFinderSearchCountDate;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
