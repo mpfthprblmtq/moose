@@ -179,7 +179,7 @@ echo "# PROJECT BUILT AND PACKAGED SUCCESSFULLY        #"
 echo "##################################################"
 
 echo
-printf "Would you like to open the .%s file? [Y/N]: ", $packageType
+printf "Would you like to open the .%s file? [Y/N]: " $packageType
 read -r openFile
 if [ "$openFile" == "y" ] || [ "$openFile" == "Y" ]
 then
