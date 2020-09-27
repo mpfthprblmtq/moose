@@ -394,6 +394,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         cseTextField.setMaximumSize(new java.awt.Dimension(367, 26));
         cseTextField.setMinimumSize(new java.awt.Dimension(367, 26));
         cseTextField.setPreferredSize(new java.awt.Dimension(367, 26));
+        cseTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cseTextFieldKeyReleased(evt);
+            }
+        });
 
         apiKeyLabel.setText("API Key");
 
@@ -401,6 +406,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         apiKeyTextField.setMaximumSize(new java.awt.Dimension(367, 26));
         apiKeyTextField.setMinimumSize(new java.awt.Dimension(367, 26));
         apiKeyTextField.setPreferredSize(new java.awt.Dimension(367, 26));
+        apiKeyTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                apiKeyTextFieldKeyReleased(evt);
+            }
+        });
 
         dateLastUsedLabel.setText("Date last used:");
 
@@ -417,6 +427,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         preferredCoverArtSizeTextField.setMaximumSize(new java.awt.Dimension(70, 26));
         preferredCoverArtSizeTextField.setMinimumSize(new java.awt.Dimension(70, 26));
         preferredCoverArtSizeTextField.setPreferredSize(new java.awt.Dimension(70, 26));
+        preferredCoverArtSizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                preferredCoverArtSizeTextFieldKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout apiPanelLayout = new javax.swing.GroupLayout(apiPanel);
         apiPanel.setLayout(apiPanelLayout);
@@ -689,6 +704,33 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
+    private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyTyped
+        String originalValue = Main.getSettings().getAlbumArtFinderCseId();
+        if (!cseTextField.getText().equals(originalValue)) {
+            cseTextField.setForeground(Constants.GREEN);
+        } else {
+            cseTextField.setForeground(Constants.BLACK);
+        }
+    }//GEN-LAST:event_cseTextFieldKeyTyped
+
+    private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyTyped
+        String originalValue = Main.getSettings().getAlbumArtFinderApiKey();
+        if (!apiKeyTextField.getText().equals(originalValue)) {
+            apiKeyTextField.setForeground(Constants.GREEN);
+        } else {
+            apiKeyTextField.setForeground(Constants.BLACK);
+        }
+    }//GEN-LAST:event_apiKeyTextFieldKeyTyped
+
+    private void preferredCoverArtSizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeTextFieldKeyTyped
+        String originalValue = String.valueOf(Main.getSettings().getPreferredCoverArtSize());
+        if (!preferredCoverArtSizeTextField.getText().equals(originalValue)) {
+            preferredCoverArtSizeTextField.setForeground(Constants.GREEN);
+        } else {
+            preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
+        }
+    }//GEN-LAST:event_preferredCoverArtSizeTextFieldKeyTyped
+
     /**
      * Event for the default button
      * @param evt, the event
@@ -819,7 +861,14 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     private void resetUI() {
         genreList.setModel(getGenreListModel());
-
+        debugCheckBox.setForeground(Constants.BLACK);
+        developerModeCheckBox.setForeground(Constants.BLACK);
+        libraryLocationField.setForeground(Constants.BLACK);
+        cseTextField.setForeground(Constants.BLACK);
+        apiKeyTextField.setForeground(Constants.BLACK);
+        preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
+        debugEdited = false;
+        developerModeEdited = false;
     }
 
     /**

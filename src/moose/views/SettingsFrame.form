@@ -614,6 +614,9 @@
                   <Dimension value="[367, 26]"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="cseTextFieldKeyTyped"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="apiKeyLabel">
               <Properties>
@@ -635,6 +638,9 @@
                   <Dimension value="[367, 26]"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="apiKeyTextFieldKeyTyped"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="dateLastUsedLabel">
               <Properties>
@@ -681,6 +687,9 @@
                   <Dimension value="[70, 26]"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="preferredCoverArtSizeTextFieldKeyTyped"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JSeparator" name="separator2">
             </Component>
