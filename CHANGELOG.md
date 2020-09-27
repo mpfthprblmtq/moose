@@ -1,12 +1,28 @@
 # Changelog
 
-### 1.2.0 (The "Holy moly there's new functionality" update)
+### 1.2.1 (The Navigation and Code Cleanup update)
 
 **Release Date:** Upcoming
 
-- Autocomplete stuff
 - Better keyboard navigation
-- Settings menu reactivity improvement
+- Code cleanup (Lint, standards, etc.)
+- Maybe a feature or two?  Not sure yet.
+
+### 1.2.0 (The "Holy moly there's new functionality" update)
+
+**Release Date:** 27 September 2020
+
+- Autocomplete on the Artist, Album, Album Artist, Year, and Genre fields
+    - The Genre autocomplete feature sources data from the built-in genre list (located in Settings)
+- Album Art Finder service
+    - Uses Google's Custom Search Engine (CSE) to run a google image search based on a query provided by the user
+    - Uses a CSE Id and API Key (provided by user in Settings) to generate a url and make a rest call
+    - User can then choose an image to use as the cover image
+    - *Note: This search is only capable of being run 100 times/day.  Each search in Moose runs 4 api calls, so a total of 25 api calls/day.  This might change later.*
+- Made the Settings menu more reactive
+    - Edited fields become bolded/green
+    - On the "Save Settings" button being pressed, user gets instant feedback and it resets the gui
+- Some smaller bug fixes/improvements
 
 ### 1.1.3 (The Random bugfixes/features update)
 

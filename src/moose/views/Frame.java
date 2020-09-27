@@ -1843,7 +1843,7 @@ public class Frame extends javax.swing.JFrame {
     public void showAboutDialog() {
         Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
-                "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018",
+                "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
     }
 
