@@ -6,44 +6,54 @@ A music management system capable of reading and modifying dynamic id3 tags.
 
 [View project on Github](https://www.github.com/mpfthprblmtq/moose)
 
-[View Backlog (Pivotal Tracker)](https://www.pivotaltracker.com/n/projects/2194861)
+[View Backlog (Github Project)](https://github.com/mpfthprblmtq/moose/projects/1)
 
 [Download pkg file (OSX)](https://www.prblmtq.com/projects/moose/download)
 
 Compatible with:
 * OS X (Mac)
-* Windows *(Coming soon to a future release near you)*
+* ~~Windows~~ *(Coming soon to a future release near you)*
 
 ---
 
-### Building the project
+### Building and Packaging Moose
 
-Compile the source code using the "package-for-deploy" target in build.xml.  This project was built in NetBeans (because who likes to hardcode Swing GUIs), so it's much easier to build the target by creating a project in NetBeans and just right clicking on build.xml in the "Files" tab, selecting Run Target -> Other Targets -> package-for-deploy.
+__Prerequisites__ *These are the versions I've tested with, it may work with more combinations*
+* Apache Ant *(v. 1.10.8)*
+* JavaPackager *(v. 10.0.2) (Comes with Java 10.0.2)* 
 
-If you're building from command line with Apache ant, go to the project folder, and the command is `ant -f / package-for-deploy`
 
-Building the project will create an executable jar in the deploy folder.
+Run the `terminal-deploy.bash` file.  That's it.  There were more steps, like building the app into a single .jar, then 
+moving some files around, then running a javapackager command, but I used my big brain noggin and put it all into one nice script.
 
-(For the moment, I'll keep a current .jar file updated in the `deploy` folder)
-
-## Packaging the project (Into native MacOSX app)
-
-Once built, you can run the terminal-commands file to package the app into a .pkg file, which can be used to install the app.
-
-*Note: I use JavaPackager 10.0.2, I know it has issues with other versions*
+The script does the following:
+1. Displays a super cool ASCII art of a moose that I totally created myself (Totally).
+2. Prints the current versions of the tools it uses.
+3. Asks you if this deployment is a new version. ( [Y/N] )
+    - If it is a new version, will display the current version of the app (sourced from `SettingsController.java`)
+    - If it isn't a new version, skips any versioning
+4. Runs the command `ant -f $APP_PATH package-for-deploy` which runs the package-for-deploy target in the build.xml file.  (`$APP_PATH` your project folder's path)
+5. Runs the command `javapackager -deploy -native $packageType -name Moose \
+                        -BappVersion=1.1.3 -Bicon=package/macosx/moose.icns \
+                        -srcdir . -srcfiles moose.jar -appclass moose.Main \
+                        -outdir out -v`, which packages the app into the specified package type (.pkg or .dmg) with the specified app version.
+6. Cleans up any extra files.
+7. Asks you politely if you'd like to run your newly created .pkg or .dmg in the `deploy` folder.
 
 ---
 
 ## Running the project
 
-To install Moose, run the .pkg you created in the previous section.  Once installed, you should be able to run the app.
+To install Moose, run the installer file you created in the previous section.  Once installed, you should be able to run the app.
 
-*(I don't have a developer key yet to sign the app, but you'll just have to trust me for now)*
+[Or you could just download a fully working .dmg file from my website.](https://www.prblmtq.com/projects/moose/download)
+
+*(I don't have a developer key yet to sign the app, so you'll just have to trust me for now)*
 
 ### Configuring the album art finder
 
 I have some functionality built in to automatically use Google's CSE (Custom Search Engine) and Google's search API to search for images.  You will need to configure this in a few steps:
-1.  Go to cse.google.com and create a new Custom Search Engine.  Name it whatever you want, like "Moose" for example.  Under "Sites to Search," just put www.google.com.
+1.  Go to https://cse.google.com and create a new Custom Search Engine.  Name it whatever you want, like "Moose" for example.  Under "Sites to Search," just put www.google.com.
 2.  On the next screen, click on the Control Panel button on the "Modify your search engine" field.
 3.  You can give a description for your search engine here, as well as provide key words to search by.  I chose "spotify" and "open.spotify" since I want to prioritize spotify's images over others.
 4.  Flip the "Image search" slider to ON.

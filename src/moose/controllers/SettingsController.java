@@ -29,6 +29,10 @@ import moose.objects.Settings;
 // class SettingsController
 public class SettingsController {
 
+    // hardened version
+    // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
+    private String version = "2.0.6";
+
     // main settingsFile file
     File settingsFile;
 
@@ -50,6 +54,7 @@ public class SettingsController {
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
             settings = mapper.readValue(jsonString, Settings.class);
+            settings.setVersion(this.version);
         } catch (IOException e) {
             logger.logError("Exception while reading the settings json!", e);
         }

@@ -13,7 +13,7 @@ import moose.utilities.Utils;
 
 public class Settings {
 
-    private String version = "1.1.3";
+    private String version;
     private boolean inDebugMode;
     private boolean inDeveloperMode;
     private List<String> genres;
