@@ -51,7 +51,7 @@ public class SongControllerTest {
         
         // scenario 1
         System.out.print("Should pass : ");
-        year = songController.getYearFromFile(file1);
+        year = songController.autoTaggingService.getYearFromFile(file1);
         System.out.println(year);
         Assert.assertTrue(year.matches(regex));
         
@@ -60,7 +60,7 @@ public class SongControllerTest {
         File file2 = new File(dir2.getPath() + "//" + "02 trackname.mp3");
         System.out.print("Should not pass : ");
         
-        year = songController.getYearFromFile(file2);
+        year = songController.autoTaggingService.getYearFromFile(file2);
         System.out.println(year);
         Assert.assertFalse(year.matches(regex));
 
@@ -69,12 +69,12 @@ public class SongControllerTest {
         File file3 = new File(dir3.getPath() + "//" + "02 trackname.mp3");
         System.out.print("Should not pass : ");
 
-        year = songController.getYearFromFile(file3);
+        year = songController.autoTaggingService.getYearFromFile(file3);
         System.out.println(year);
         Assert.assertFalse(year.matches(regex));
 
         // scenario 4
-        year = songController.getYearFromFile(null);
+        year = songController.autoTaggingService.getYearFromFile(null);
         System.out.println("Should not pass : ");
         Assert.assertFalse(year.matches(regex));
 
@@ -97,22 +97,22 @@ public class SongControllerTest {
         String disks;
 
         System.out.print("Should pass : ");
-        disks = songController.getDisksFromFile(file1);
+        disks = songController.autoTaggingService.getDisksFromFile(file1);
         System.out.println(disks);
         Assert.assertTrue(disks.matches(regex));
 
         System.out.print("Should pass : ");
-        disks = songController.getDisksFromFile(file2);
+        disks = songController.autoTaggingService.getDisksFromFile(file2);
         System.out.println(disks);
         Assert.assertTrue(disks.matches(regex));
 
         System.out.print("Should pass : ");
-        disks = songController.getDisksFromFile(file3);
+        disks = songController.autoTaggingService.getDisksFromFile(file3);
         System.out.println(disks);
         Assert.assertTrue(disks.matches(regex));
 
         System.out.print("Shouldn't pass : ");
-        disks = songController.getDisksFromFile(file4);
+        disks = songController.autoTaggingService.getDisksFromFile(file4);
         System.out.println(disks);
         Assert.assertFalse(disks.matches(regex));
     }

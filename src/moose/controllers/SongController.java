@@ -11,6 +11,7 @@ package moose.controllers;
 // imports
 import com.mpatric.mp3agic.*;
 
+import moose.services.AutoTaggingService;
 import moose.utilities.Logger;
 import moose.Main;
 import moose.objects.Song;
@@ -24,6 +25,11 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import moose.views.Frame;
+import moose.views.modals.AlbumArtFinderFrame;
 
 // class SongController
 public class SongController {
@@ -31,22 +37,15 @@ public class SongController {
     // table object that references the JTable on the form
     JTable table;
 
+    // AutoTaggingService
+    public AutoTaggingService autoTaggingService = new AutoTaggingService();
+
     // logger object
     Logger logger = Main.getLogger();
 
     // ArrayLists
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     ArrayList edited_songs = new ArrayList();           // arraylist to contain indices of edited songs to save
-
-    private static final int TABLE_COLUMN_TITLE = 2;
-    private static final int TABLE_COLUMN_ARTIST = 3;
-    private static final int TABLE_COLUMN_ALBUM = 4;
-    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
-    private static final int TABLE_COLUMN_YEAR = 6;
-    private static final int TABLE_COLUMN_GENRE = 7;
-    private static final int TABLE_COLUMN_TRACK = 8;
-    private static final int TABLE_COLUMN_DISK = 9;
-    private static final int TABLE_COLUMN_ALBUMART = 10;
 
     /**
      * Default constructor
@@ -169,7 +168,7 @@ public class SongController {
         if (!edited_songs.contains(index)) {
             edited_songs.add(index);
             int row = getRow(index);
-            Main.frame.setRowIcon(Main.frame.EDITED, row);
+            Main.frame.setRowIcon(Frame.EDITED, row);
         } else {
             // do nothing, index is already added
         }
@@ -451,10 +450,12 @@ public class SongController {
      *
      * @param find, the string to find
      * @param replace, the string to replace
+     * @param includeFiles, a boolean to check if we're including the file names
+     * in the search
      * @return the results of the replace, true if there was something to
      * replace, false if not
      */
-    public int findAndReplace(String find, String replace) {
+    public int findAndReplace(String find, String replace, boolean includeFiles) {
         int count = 0;
         for (int i = 0; i < table.getRowCount(); i++) {
             for (int j = 0; j < table.getColumnCount(); j++) {
@@ -462,6 +463,20 @@ public class SongController {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
                     int index = getIndex(i);
                     switch (j) {
+                        case 1:
+                            if (includeFiles) {
+                                table.setValueAt(toReplace, i, j);
+                                File old_file = (File) table.getModel().getValueAt(i, 1);
+                                String path = old_file.getPath().replace(old_file.getName(), "");
+                                String fileName = table.getValueAt(i, j).toString();
+                                File new_file = new File(path + "//" + fileName + ".mp3");
+
+                                setFile(index, old_file, new_file);
+                                old_file.renameTo(new_file);
+                                table.getModel().setValueAt(new_file, i, 1);
+                            }
+                            count++;
+                            break;
                         case 2:     // title
                             table.setValueAt(toReplace, i, j);
                             setTitle(index, toReplace);
@@ -513,70 +528,6 @@ public class SongController {
     }
 
     /**
-     * Method for adding album art for songs manually This method is called when
-     * the "Add" selection is pressed in the context menu
-     *
-     * @param selectedRows
-     */
-    public void addAlbumArt(int[] selectedRows) {
-
-        // need this for some reason
-        File img_file = null;
-
-        for (int i = 0; i < selectedRows.length; i++) {
-
-            try {
-                // get the row and index of the track
-                int row = table.convertRowIndexToModel(selectedRows[i]);
-                int index = Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
-
-                // get the file to use as the starting point for choosing an image
-                File file = songs.get(index).getFile();
-
-                // only show the JFileChooser on the first go
-                if (i == 0) {
-                    JFileChooser fc = new JFileChooser(new File(file.getAbsolutePath()));
-                    fc.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif"));
-
-                    // result of the file choosing
-                    int returnVal = fc.showOpenDialog(null);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        img_file = fc.getSelectedFile();
-                    } else {
-                        return;
-                    }
-                }
-
-                // convert that file to a byte array
-                byte[] bytes;
-                try (RandomAccessFile ra_file = new RandomAccessFile(img_file.getAbsolutePath(), "r")) {
-                    bytes = new byte[(int) ra_file.length()];
-                    ra_file.read(bytes);
-                }
-
-                // set the artwork in the songs array
-                songs.get(index).setArtwork_bytes(bytes);
-
-                // update graphics
-                Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
-                table.getModel().setValueAt(thumbnail_icon, row, 11);
-
-                // send the track to the edited_songs array
-                songEdited(index);
-
-                // if there's multiple images, update the multPanel
-                if (table.getSelectedRowCount() > 1) {
-                    Icon artwork_icon = Utils.getScaledImage(bytes, 150);
-                    Main.frame.multImage.setIcon(artwork_icon);
-                }
-
-            } catch (IOException ex) {
-                logger.logError("Exception while adding album art!", ex);
-            }
-        }
-    }
-
-    /**
      * Method for removing album art for songs manually This method is called
      * when the "Remove" selection is pressed in the context menu
      *
@@ -603,443 +554,13 @@ public class SongController {
     }
 
     /**
-     * Adds the album art for each song if there exists a cover.* file in the
-     * same dir
-     *
-     * @param selectedRows the rows of songs to update
-     */
-    public void autoAddCovers(int[] selectedRows) {
-
-        int count = 0;
-
-        // traverse the array of rows and add each image
-        for (int i = 0; i < selectedRows.length; i++) {
-            int row = selectedRows[i];    // get the row
-
-            // get the parent directory of the song
-            File dir = getFile(row).getParentFile();
-
-            // check if the parent directory has a cover.* file
-            File cover = folderContainsCover(dir);
-            if (cover != null) {
-                // if cover doesn't return as null, add the cover
-                addIndividualCover(row, cover);
-                count++;
-            }
-        }
-        Main.frame.updateConsole("Auto-added cover art for " + count + " file(s)!");
-    }
-
-    /**
-     * Helper function to check and see if a directory has a cover image file
-     *
-     * @param folder, the folder to check
-     * @return the cover file, or null if it doesn't exist
-     */
-    public File folderContainsCover(File folder) {
-        String regex = "\\[\\d{4}\\] .*";
-        if (folder.getName().matches(regex)) {
-            // all is well, just get the cover normally
-        } else if (folder.getName().startsWith("CD")) {
-            folder = folder.getParentFile();
-        }
-
-        File[] files = folder.listFiles();      // get all the files
-        for (File file : files) {
-            if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
-                return file;
-            }
-        }
-        // if we reach this point, then the cover wasn't found
-        // perform one final check and recursively call itself
-        if (folder.getParentFile().getName().matches(regex)) {
-            return folderContainsCover(folder.getParentFile());
-        }
-
-        // no cover files were found, returning null
-        return null;
-    }
-
-    /**
-     * Function to add an album cover for just one row
-     *
-     * @param row
-     * @param cover
-     */
-    public void addIndividualCover(int row, File cover) {
-
-        try {
-            // get the index of the track
-            int index = getIndex(row);
-
-            // convert file to byte array
-            byte[] bytes;
-            try (RandomAccessFile ra_file = new RandomAccessFile(cover.getAbsolutePath(), "r")) {
-                bytes = new byte[(int) ra_file.length()];
-                ra_file.read(bytes);
-            }
-
-            // update the track in the songs array
-            songs.get(index).setArtwork_bytes(bytes);
-
-            // update graphics
-            Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
-
-            // set the image on the row
-            table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
-
-            // song was edited, add it to the list
-            songEdited(index);
-
-            // if there's multiple rows selected, also add it to the multiple fields panel
-            if (table.getSelectedRowCount() > 1) {
-                Icon artwork_icon = Utils.getScaledImage(bytes, 150);
-                Main.frame.multImage.setIcon(artwork_icon);
-            }
-
-        } catch (IOException ex) {
-            logger.logError("Exception adding individual cover!", ex);
-        }
-    }
-
-    /**
-     * Function for adding the track numbers
-     *
-     * @param selectedRows, the rows selected on the table
-     */
-    public void addTrackAndDiskNumbers(int[] selectedRows) {
-        for (int i = 0; i < selectedRows.length; i++) {
-            int row = selectedRows[i];
-            File file = getFile(row);
-            autoAddTrackAndDiskNumbers(row, file);
-        }
-    }
-
-    /**
-     * Function that actually sets the row info
-     *
-     * @param row
-     * @param file
-     */
-    public void autoAddTrackAndDiskNumbers(int row, File file) {
-        int index = getIndex(row);
-
-        String tracks = getTracksFromFolder(file);
-        String disks = getDisksFromFile(file);
-
-        // tracks
-        setTrack(index, tracks);
-        table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
-
-        // disks
-        setDisk(index, disks);
-        table.setValueAt(disks, row, TABLE_COLUMN_DISK);
-    }
-
-    /**
      * Function that looks at the file's name and location and auto generates
      * some tags
      *
      * @param selectedRows, the rows selected on the table
      */
     public void autoTagFiles(int[] selectedRows) {
-        for (int i = 0; i < selectedRows.length; i++) {
-            int row = selectedRows[i];
-            File file = getFile(row);
-            autoTag(row, file);
-        }
-        autoAddCovers(selectedRows);
-    }
-
-    /**
-     * Gets the File object from the row
-     *
-     * @param row
-     * @return the File from the row
-     */
-    public File getFile(int row) {
-        return (File) table.getModel().getValueAt(table.convertRowIndexToModel(row), 1);
-    }
-
-    /**
-     * Function that actually does the autotagging
-     *
-     * @param row, the row to update
-     * @param file, the file to look at
-     */
-    public void autoTag(int row, File file) {
-
-        String title = getTitleFromFile(file);
-        String artist = getArtistFromFile(file);
-        String album = getAlbumFromFile(file);
-        String albumartist = getAlbumArtistFromFile(file);
-        String year = getYearFromFile(file);
-        String tracks = getTracksFromFolder(file);
-        String disks = getDisksFromFile(file);
-        String genre = getGenreFromFile(file);
-
-        // get the index for the setters
-        int index = getIndex(row);
-
-        // title
-        setTitle(index, title);
-        table.setValueAt(title, row, TABLE_COLUMN_TITLE);
-
-        // artist
-        if (!Utils.isPartOfALabel(file)) {
-            setArtist(index, artist);
-            table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
-        }
-
-        // album
-        setAlbum(index, album);
-        table.setValueAt(album, row, TABLE_COLUMN_ALBUM);
-
-        // album artist
-        setAlbumArtist(index, albumartist);
-        table.setValueAt(albumartist, row, TABLE_COLUMN_ALBUMARTIST);
-
-        // year
-        setYear(index, year);
-        table.setValueAt(year, row, TABLE_COLUMN_YEAR);
-
-        // genre
-        if (Utils.isPartOfALabel(file)) {
-            setGenre(index, genre);
-            table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
-        }
-
-        // tracks
-        setTrack(index, tracks);
-        table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
-
-        // disks
-        setDisk(index, disks);
-        table.setValueAt(disks, row, TABLE_COLUMN_DISK);
-    }
-
-    /**
-     * Gets the title based on the filename
-     *
-     * @param file, the file to check
-     * @return a string track title
-     */
-    public String getTitleFromFile(File file) {
-        if (Utils.isAGenrePartOfALabel(file)) {
-            return file.getName().replace(".mp3", "");
-        } else {
-            String regex = "\\d{2} .*\\.mp3";
-            if (file.getName().matches(regex)) {
-                return file.getName().substring(3).replace(".mp3", "").trim();
-            } else {
-                return "";
-            }
-        }
-    }
-
-    /**
-     * Gets the artist based on the file location
-     *
-     * @param file, the file to check
-     * @return a string artist
-     */
-    public String getArtistFromFile(File file) {
-        if (Utils.isAnEPPartOfALabel(file)) {
-            return "";
-        }
-
-        return getArtist(file);
-    }
-
-    /**
-     * Gets the album based on the file location
-     *
-     * @param file, the file to check
-     * @return a string album
-     */
-    public String getAlbumFromFile(File file) {
-        if (Utils.isAGenrePartOfALabel(file)) {
-            return getGenreFromFile(file);
-        } else {
-            File dir = file.getParentFile();
-            String regex = "\\[\\d{4}\\] .*";
-            if (dir.getName().matches(regex)) {
-                return dir.getName().substring(6).trim();
-            } else if (dir.getName().startsWith("CD")) {
-                // album is a multiple CD album
-                dir = dir.getParentFile();
-                if (dir.getName().matches(regex)) {
-                    return dir.getName().substring(6).trim();
-                }
-            }
-            return "";
-        }
-    }
-
-    /**
-     * Gets the album artist based on the file location
-     *
-     * @param file, the file to check
-     * @return a string album artist
-     */
-    public String getAlbumArtistFromFile(File file) {
-        if (Utils.isPartOfALabel(file)) {
-            File dir = file.getParentFile().getParentFile().getParentFile();
-            return dir.getName();
-        }
-
-        // get the normal artist
-        return getArtist(file);
-    }
-
-    /**
-     * Gets the artist based on the file location
-     *
-     * @param file, the file to check
-     * @return a string artist
-     */
-    public String getArtist(File file) {
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
-        if (dir.getName().matches(regex)) {
-            dir = dir.getParentFile();
-            return dir.getName();
-        } else if (dir.getName().startsWith("CD")) {
-            dir = dir.getParentFile().getParentFile();
-            return dir.getName();
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Gets the year based on the file location
-     *
-     * @param file, the file to check
-     * @return a string year
-     */
-    public String getYearFromFile(File file) {
-        if (file == null) {
-            return "";
-        }
-
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
-        if (dir.getName().matches(regex)) {
-            return dir.getName().substring(1, 5).trim();
-        } else if (dir.getName().startsWith("CD")) {
-            // album is a multiple CD album
-            dir = dir.getParentFile();
-            if (dir.getName().matches(regex)) {
-                return dir.getName().substring(1, 5).trim();
-            }
-        }
-        return "";
-    }
-
-    /**
-     * Gets the tracks based on the filename and other files in the directory
-     *
-     * @param file, the file to check
-     * @return a tracks in the form of a string
-     */
-    public String getTracksFromFolder(File file) {
-        if (file == null) {
-            return "";
-        }
-
-        File dir = file.getParentFile();
-        String totalTracks = getTotalTracksFromFolder(dir);
-        String regex = "\\d{2} .*\\.mp3";
-        if (file.getName().matches(regex)) {
-            if (Integer.valueOf(file.getName().substring(0, 2)) < 10) {
-                return file.getName().substring(1, 2) + "/" + totalTracks;
-            } else {
-                return file.getName().substring(0, 2) + "/" + totalTracks;
-            }
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Gets the total number of tracks in a folder
-     *
-     * @param file, the folder to check
-     * @return a String representation of the songs in the folder
-     */
-    public String getTotalTracksFromFolder(File file) {
-        return String.valueOf(getNumberOfSongs(file));
-    }
-
-    /**
-     * Gets the total number of tracks in a folder
-     *
-     * @param file, the folder to check
-     * @return an int count of mp3 files in a folder
-     */
-    public int getNumberOfSongs(File file) {
-        File[] files = file.listFiles();
-        int count = 0;
-        for (File file1 : files) {
-            if (file1.getName().endsWith(".mp3")) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * Gets the disks from the file
-     *
-     * @param file, the file to check
-     * @return a string representation of disks
-     */
-    public String getDisksFromFile(File file) {
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
-        if (dir.getName().matches(regex)) {
-            // there's no CD1, CD2 folders, single disk album
-            return "1/1";
-        } else if (dir.getName().startsWith("CD") && dir.getParentFile().getName().matches(regex)) {
-            // multiple disk album, get the current disk based on the folder it's in
-            int totalDisks = getTotalDisksFromFolder(dir);
-            return dir.getName().substring(2) + "/" + totalDisks;
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Gets the total disks from a folder
-     *
-     * @param dir, the folder to check
-     * @return an int count of disks
-     */
-    public int getTotalDisksFromFolder(File dir) {
-        dir = dir.getParentFile();
-        File[] dirs = dir.listFiles(File::isDirectory);
-        int count = 0;
-        for (File folder : dirs) {
-            if (folder.getName().startsWith("CD")) {
-                // most (if not all) times, this should be 2
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * Returns a genre String if the file is a part of a label
-     *
-     * @param file, the file to check
-     * @return a genre string
-     */
-    public String getGenreFromFile(File file) {
-        if (!Utils.isAGenrePartOfALabel(file)) {
-            return "";
-        }
-        return file.getParentFile().getName();
+        autoTaggingService.autoTag(selectedRows);
     }
 
     /**

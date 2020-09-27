@@ -1,3 +1,6 @@
+# OSX files #
+.DS_Store
+
 # NetBeans specific #
 nbproject/private/
 build/
@@ -6,6 +9,11 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+deploy/
+
+# IntelliJ specific #
+moose.iml
+.idea/
 
 # Class Files #
 *.class
@@ -23,3 +31,6 @@ nbproject/project.xml
 moose.icns
 Moose-1.0.0.pkg
 moose-installer.pkg
+
+# Other random files #
+Application Support - Moose

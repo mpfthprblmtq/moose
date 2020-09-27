@@ -13,33 +13,46 @@ package moose.controllers;
 import moose.Main;
 import moose.utilities.*;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParser;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import moose.objects.Settings;
 
 // class SettingsController
 public class SettingsController {
 
-    // main settings file
-    File settings;
+    // main settingsFile file
+    File settingsFile;
 
-    // variables
-    boolean debugMode;
-    ArrayList<String> genres = new ArrayList<>();
-    String libraryLocation;
+    // main settings object
+    Settings settings;
+
+    // settingsFile map
+    Map<String, Object> settingsMap = new HashMap<>();
+    final ObjectMapper mapper = new ObjectMapper();
 
     // logger object
     Logger logger = Main.getLogger();
 
     public SettingsController() {
+        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    }
 
+    public void readSettingsFile() {
+        try {
+            String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
+            settings = mapper.readValue(jsonString, Settings.class);
+        } catch (IOException e) {
+            logger.logError("Exception while reading the settings json!", e);
+        }
     }
 
     public void setUpSupportDirectory() {
@@ -50,12 +63,12 @@ public class SettingsController {
             settingsDir.mkdirs();
         }
 
-        // create the settings file if it doesn't already exist
-        String settings_path = settingsDir_path + "moose.conf";
-        settings = new File(settings_path);
-        if (!settings.exists()) {
+        // create the settingsFile file if it doesn't already exist
+        String settings_path = settingsDir_path + "moose.json";
+        settingsFile = new File(settings_path);
+        if (!settingsFile.exists()) {
             try {
-                settings.createNewFile();
+                settingsFile.createNewFile();
 
                 // since we've created a brand new file, fill it with some default values
                 fillDefaults();
@@ -66,142 +79,16 @@ public class SettingsController {
     }
 
     /**
-     * Fills the settings file with some default values
+     * Fills the settingsFile file with some default values
+     * @return the result of writing the settings file
      */
-    public void fillDefaults() {
-        String defDebug = "DEBUGMODE=false";
-        String defGenres = "GENRES={Indie Electronic,Rock,Electronic/Rock}";
-        String defLibraryLocation = "LIBRARYLOCATION=";
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
-
-            bufferedWriter.write(defDebug);
-            bufferedWriter.write("\n");
-            bufferedWriter.write(defGenres);
-            bufferedWriter.write("\n");
-            bufferedWriter.write(defLibraryLocation);
-
-        } catch (FileNotFoundException ex) {
-            logger.logError("Couldn't find settings file!", ex);
-        } catch (IOException ex) {
-            logger.logError("Error reading settings file!", ex);
-        }
+    public boolean fillDefaults() {
+        settings = new Settings();
+        return writeSettingsFile();
     }
 
-    /**
-     * Reads the settings from the file and sets the ivars
-     */
-    public void readSettingsFile() {
-        String line;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(settings));
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                // get the debugmode field
-                if (line.contains("DEBUGMODE=")) {
-                    setDebugMode((line.contains("true")));
-                }
-
-                // get the genres
-                if (line.contains("GENRES=")) {
-                    setGenres(line);
-                }
-
-                // get the library location
-                if(line.contains("LIBRARYLOCATION=")) {
-                    setLibraryLocation(line.replace("LIBRARYLOCATION=", ""));
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            logger.logError("Couldn't find settings file!", ex);
-        } catch (IOException ex) {
-            logger.logError("Error reading settings file!", ex);
-        }
-    }
-
-    /**
-     * Sets the debugmode
-     * @param bool
-     */
-    public void setDebugMode(boolean bool) {
-        this.debugMode = bool;
-    }
-
-    /**
-     * Returns the debugmode
-     * @return
-     */
-    public boolean getDebugMode() {
-        return debugMode;
-    }
-
-    /**
-     * Sets the genre arraylist
-     * @param arr
-     */
-    public void setGenres(ArrayList<String> arr) {
-        this.genres = arr;
-    }
-
-    /**
-     * Returns the genre arraylist
-     * @return
-     */
-    public ArrayList<String> getGenres() {
-        return genres;
-    }
-
-    /**
-     * Sets the library location
-     * @param libraryLocation
-     */
-    public void setLibraryLocation(String libraryLocation) {
-        this.libraryLocation = libraryLocation;
-    }
-
-    /**
-     * Returns the library location
-     * @return
-     */
-    public String getLibraryLocation() {
-        return libraryLocation;
-    }
-
-    /**
-     * Sets the Genres arraylist from a String
-     * @param line
-     */
-    public void setGenres(String line) {
-
-        // remove the garbage from the string
-        line = line.replace("GENRES=", "");
-        line = line.replace("{", "");
-        line = line.replace("}", "");
-
-        // split the string based on a comma
-        String[] genresArray = line.split(",");
-
-        // clear the genres arraylist
-        genres.clear();
-
-        // convert that array to an arraylist
-        genres.addAll(Arrays.asList(genresArray));
-    }
-
-    /**
-     * Sets the settings.conf file to default values
-     */
-    public void setDefaults() {
-        debugMode = false;
-        genres = new ArrayList<>();
-        genres.add("Indie Electronic");
-        genres.add("Rock");
-        genres.add("Electronic/Rock");
-        libraryLocation = "Library location not set!";
-
-        writeSettingsFile();
+    public Settings getSettings() {
+        return this.settings;
     }
 
     /**
@@ -254,33 +141,21 @@ public class SettingsController {
         }
     }
 
-    public void addGenre(String genre) {
-        genres.add(genre);
-    }
-
-    public void removeGenre(String genre) {
-        genres.remove(genre);
-    }
-
     /**
-     * Writes the settings file from the ivars that were set in the program
+     * Writes the settingsFile file from the ivars that were set in the program
      */
-    public void writeSettingsFile() {
+    public boolean writeSettingsFile() {
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settings));
-
-            bufferedWriter.write("DEBUGMODE=" + debugMode);
-            bufferedWriter.write("\n");
-            bufferedWriter.write("GENRES=" + listGenres(genres));
-            bufferedWriter.write("\n");
-            bufferedWriter.write("LIBRARYLOCATION=" + libraryLocation);
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settingsFile));
+            bufferedWriter.write(mapper.writeValueAsString(settings));
             bufferedWriter.flush();
-
+            return true;
         } catch (FileNotFoundException ex) {
             logger.logError("Couldn't find settings file!", ex);
         } catch (IOException ex) {
             logger.logError("Error reading settings file!", ex);
         }
+        return false;
     }
 
     /**
@@ -288,7 +163,7 @@ public class SettingsController {
      * @param genres
      * @return
      */
-    public String listGenres(ArrayList<String> genres) {
+    public String listGenres(List<String> genres) {
         String str = "{";
         for (int i = 0; i < genres.size(); i++) {
             str = str + genres.get(i);

@@ -55,7 +55,7 @@ public class InfoFrame extends javax.swing.JFrame {
             // switch based on the option selected
             switch (event.getActionCommand()) {
                 case "Add":
-                    songController.addAlbumArt(new int[] {row});
+                    songController.autoTaggingService.addAlbumArt(new int[] {row});
                     addAlbumArt();
                     break;
                 case "Remove":
