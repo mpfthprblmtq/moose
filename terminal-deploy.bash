@@ -22,6 +22,7 @@ echo "                | |     |"
 echo "         MOOSE  |||     |"
 echo "                 \|"
 sleep 3
+
 ###################################################################################################
 #   Print out the versions of the building tools to use
 ###################################################################################################
@@ -37,8 +38,7 @@ java -version
 echo
 echo "Javapackager Version:"
 jdk=$(/usr/libexec/java_home)
-$jdk/bin/javapackager -version
-echo
+"$jdk"/bin/javapackager -version
 echo
 
 ###################################################################################################
@@ -48,23 +48,44 @@ echo "##################################################"
 echo "# VERSION CONFIGURATION                          #"
 echo "##################################################"
 echo
-# get the old version
-cd git/moose/
-oldVersion=`sed -n '1p' version`
-echo "Old version number: ${oldVersion}"
-# get user input for new version
-printf "Enter new version number: "
-read -r newVersion
-# clear out old version
-> version
-# put in new version in release file
-echo "${newVersion}" >> version
-echo "Put the new version in version file"
-# put in new version in source code for hardened version
-cd src/moose/objects/
-sed -i '' "s/private String version = \"${oldVersion}\";/private String version = \"${newVersion}\";/g" Settings.java
-echo "Put the new version in source code"
-cd ../../..
+# go to where the bash file was executed from (should be the main project directory)
+APP_PATH="`dirname \"$0\"`"
+cd $APP_PATH || exit
+
+# get the old version using grep from Settings.java
+oldVersion=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' src/moose/controllers/SettingsController.java)
+echo "Current version number:   ${oldVersion}"
+echo
+
+# determine if it's a new version
+printf "Is this a new version? [Y/N]: "
+read -r changeVersion
+
+if [ "${changeVersion}" == "y" ] || [ "${changeVersion}" == "Y" ]
+then
+  # get user input for new version
+  printf "Enter new version number: "
+  read -r newVersion
+  echo
+  # put in new version in source code for hardened version
+  cd src/moose/controllers/ || exit
+  sed -i '' "s/private String version = \"${oldVersion}\";/private String version = \"${newVersion}\";/g" SettingsController.java
+
+  # verify new version in Settings.java
+  verifyVersion=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' SettingsController.java)
+  if [ "$verifyVersion" != "$newVersion" ]
+  then
+    echo "Error when setting new version in source code!"
+    exit
+  fi
+  appVersion=$newVersion
+  echo "Put the new version in source code!"
+  cd "$APP_PATH" || exit
+else
+  appVersion=$oldVersion
+fi
+echo
+echo
 
 ###################################################################################################
 #   Building the app
@@ -76,7 +97,18 @@ echo
 echo "Building the app into single jar..."
 sleep 3
 echo
-ant -f /Users/pat/Git/moose package-for-deploy
+pwd
+ant -f "$APP_PATH" package-for-deploy
+
+# verify app built
+builtJar=$APP_PATH/deploy/moose.jar
+if [ -f "$builtJar" ]
+then
+  echo "$builtJar exists!"
+else
+  echo "Error while building app!"
+  exit
+fi
 echo "Done building app!"
 echo
 echo
@@ -85,25 +117,44 @@ echo
 #   Packaging the app
 ###################################################################################################
 echo "##################################################"
-echo "# PACKAGING PROJECT TO .PKG                      #"
+echo "# PACKAGING PROJECT                              #"
 echo "##################################################"
 echo
-echo "Packaging the application into .pkg file..."
+echo "How would like the app packaged?"
+echo "   (1): .pkg"
+echo "   (2): .dmg"
+echo
+printf " [1/2] : "
+read -r packageType
+if [ "$packageType" == "1" ]
+then
+  packageType="pkg"
+elif [ "$packageType" == "2" ]
+then
+  packageType="dmg"
+else
+  echo
+  echo "Unknown response, exiting..."
+  exit
+fi
+echo
+echo "Packaging the application into .$packageType file..."
 sleep 3
 echo
-cp /Users/pat/git/moose/src/resources/moose.icns git/moose/deploy
-cd /Users/pat/git/moose/deploy
+printf "Copying app icon to deploy folder..."
+cp "$APP_PATH"/src/resources/moose.icns "$APP_PATH"/deploy
+cd "$APP_PATH"/deploy || exit
+echo "Done."
 mkdir -p package/macosx
 cp moose.icns package/macosx
-$jdk/bin/javapackager -deploy -native pkg -name Moose \
-   -BappVersion=1.1.3 -Bicon=package/macosx/moose.icns \
+$jdk/bin/javapackager -deploy -native $packageType -name Moose \
+   -BappVersion=$appVersion -Bicon=package/macosx/moose.icns \
    -srcdir . -srcfiles moose.jar -appclass moose.Main \
    -outdir out -v
-cp out/Moose-*.pkg moose-installer.pkg
+cp out/Moose-*.$packageType moose-"$appVersion"-installer.$packageType
 ls -l
 echo
-echo "Done packaging app!"
-
+echo "Done with .$packageType!"
 echo
 echo
 ###################################################################################################
@@ -128,14 +179,12 @@ echo "# PROJECT BUILT AND PACKAGED SUCCESSFULLY        #"
 echo "##################################################"
 
 echo
-printf "Would you like to open the .pkg file? [Y/N]: "
+printf "Would you like to open the .%s file? [Y/N]: ", $packageType
 read -r openFile
-if [ "$openFile" == "y" ]
+if [ "$openFile" == "y" ] || [ "$openFile" == "Y" ]
 then
-  cd deploy
-  open moose-installer.pkg
-else
-    # do nothing, just exit
+  cd "$APP_PATH"/deploy || exit
+  open moose-"$appVersion"-installer.$packageType
 fi
 
 
