@@ -1,5 +1,15 @@
+/*
+   Proj:   Moose
+   File:   Utils.java
+   Desc:   Helper class with a smattering of methods to do some neat stuff
+
+   Copyright Pat Ripley 2018
+ */
+
+// package
 package moose.utilities;
 
+// imports
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -39,14 +49,15 @@ public class Utils {
      * Helper Function that lists and stores all of the files in a directory and
      * subdirectories
      *
-     * @param directory
-     * @param files
-     * @return
+     * @param directory, the directory to list files from
+     * @param files, the arrayList to store the files in
+     * @return a list of all the files in the directory
      */
     public static ArrayList<File> listFiles(File directory, ArrayList<File> files) {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
+        assert fList != null;
         for (File file : fList) {
             if (file.isFile()) {
                 files.add(file);
@@ -60,8 +71,8 @@ public class Utils {
     /**
      * Formats a Date object to a string
      *
-     * @param date
-     * @return
+     * @param date, the date to format
+     * @return the formatted date
      */
     public static String formatDate(Date date) {
         return sdf.format(date);
@@ -70,14 +81,14 @@ public class Utils {
     /**
      * Gets a Date object from a string
      *
-     * @param date
-     * @return
+     * @param date the date string to parse
+     * @return a date object
      */
     public static Date getDate(String date) {
         try {
             return sdf.parse(date);
         } catch (ParseException ex) {
-            logger.logError("ParseExcpetion when parsing date \"" + date + "\"");
+            logger.logError("ParseException when parsing date \"" + date + "\"");
             return null;
         }
     }
@@ -85,14 +96,14 @@ public class Utils {
     /**
      * Checks a string if it's empty or not
      *
-     * @param str
-     * @return
+     * @param str, the string to check
+     * @return the result of the check
      */
     public static boolean isEmpty(String str) {
         if (str == null) {
             return true;
         }
-        return str.equals("");
+        return str.equals(Constants.EMPTY_STRING);
     }
 
     /**
@@ -128,42 +139,16 @@ public class Utils {
             thumbnail_icon = new ImageIcon(thumbnail);
 
         } catch (NullPointerException e) {
-            System.err.println(e);
+            logger.logError("NullPointerException while trying to scale an image!", e);
         }
         return thumbnail_icon;
     }
 
     /**
-     * Gets a byte array from an awt.Image
-     *
-     * @param image
-     * @return
-     */
-    public static byte[] getBytesFromImage(Image image) {
-        int type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage bi = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
-        Graphics2D g2d = bi.createGraphics();
-        g2d.drawImage(image, 0, 0, null);
-        g2d.dispose();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] artwork_bytes = null;
-        try {
-            ImageIO.write(bi, "jpg", baos);
-            artwork_bytes = baos.toByteArray();
-        } catch (IOException e) {
-            logger.logError("IOException when trying to convert an awt.Image to a byte array!", e);
-        }
-        if (artwork_bytes != null) {
-            return artwork_bytes;
-        }
-        return null;
-    }
-
-    /**
      * Returns a byte array from a BufferedImage
      *
-     * @param image
-     * @return
+     * @param image, the image to convert
+     * @return the byte array representation of the image
      */
     public static byte[] getBytesFromBufferedImage(BufferedImage image) {
         try {
@@ -212,14 +197,14 @@ public class Utils {
     }
 
     /**
-     * Creates a JFileChooser, configures it, and launches it Returns a single
-     * index array if there's only one file returned
+     * Creates a JFileChooser, configures it, and launches it
+     * Returns a single index array if there's only one file returned
      *
-     * @param title
-     * @param approveButtonText
-     * @param selectionMode
-     * @param multipleSelection
-     * @return
+     * @param title, the title of the window
+     * @param approveButtonText, the text to show on the approve button
+     * @param selectionMode, the mode for selecting files
+     * @param multipleSelection, a boolean for allowing multiple file selection in the window
+     * @return a file array of the selected file(s)
      */
     public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection) {
 
@@ -265,7 +250,7 @@ public class Utils {
      * Opens a file
      *
      * @param file, the file to open
-     * @throws java.io.IOException
+     * @throws java.io.IOException if an exception is thrown while opening the file
      */
     public static void openFile(File file) throws IOException {
         Desktop desktop = Desktop.getDesktop();
@@ -280,8 +265,8 @@ public class Utils {
      * Creates a img file
      * @param img, the img file to create
      * @param dir, the directory of the file to create
-     * @param dim
-     * @return 
+     * @param dim, the dimension of the image (width and height)
+     * @return the file created from the bufferedImage
      */
     public static File createImageFile(BufferedImage img, File dir, int dim) {
         String filePath = dir.getPath() + "/cover.jpg";

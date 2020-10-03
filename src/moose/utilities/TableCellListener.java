@@ -1,11 +1,11 @@
-/**
- *  Proj:   Moose
- *  File:   TableCellListener.java
- *  Desc:   Helper class that controls changing of cell values
- *          NOTE:  Not mine
- *
- *  Copyright ???
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   TableCellListener.java
+   Desc:   Helper class that controls changing of cell values
+           NOTE:  Not mine
+
+   Copyright ???
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -28,7 +28,7 @@ import java.beans.*;
 // class TableCellListener
 public class TableCellListener implements PropertyChangeListener, Runnable
 {
-	private JTable table;
+	private final JTable table;
 	private Action action;
 
 	private int row;

@@ -1,5 +1,15 @@
+/*
+   Proj:   Moose
+   File:   AutoTaggingService.java
+   Desc:   Service class for auto tagging
+
+   Copyright Pat Ripley 2018
+ */
+
+// package
 package moose.services;
 
+// imports
 import moose.Main;
 import moose.objects.ImageSearchQuery;
 import moose.utilities.Constants;
@@ -13,26 +23,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+
+import static moose.utilities.Constants.*;
 
 public class AutoTaggingService {
 
-    AlbumArtFinderService albumArtFinderService;
     JTable table = Main.frame.table;
     Logger logger = Main.getLogger();
-
-    // column constants
-    private static final int TABLE_COLUMN_TITLE = 2;
-    private static final int TABLE_COLUMN_ARTIST = 3;
-    private static final int TABLE_COLUMN_ALBUM = 4;
-    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
-    private static final int TABLE_COLUMN_YEAR = 6;
-    private static final int TABLE_COLUMN_GENRE = 7;
-    private static final int TABLE_COLUMN_TRACK = 8;
-    private static final int TABLE_COLUMN_DISK = 9;
-    private static final int TABLE_COLUMN_ALBUMART = 10;
 
     /**
      * Function that actually does the autotagging
@@ -103,13 +101,13 @@ public class AutoTaggingService {
         List<Integer> rowsToReprocess = new ArrayList<>();
 
         // go through the list and add the covers that exist
-        for (int i = 0; i < selectedRows.length; i++) {
-            File dir = getFile(selectedRows[i]).getParentFile();
+        for (int selectedRow : selectedRows) {
+            File dir = getFile(selectedRow).getParentFile();
             File cover = folderContainsCover(dir);
             if (cover != null) {
-                addIndividualCover(selectedRows[i], cover);
+                addIndividualCover(selectedRow, cover);
             } else {
-                rowsToReprocess.add(selectedRows[i]);
+                rowsToReprocess.add(selectedRow);
             }
         }
 
@@ -118,22 +116,22 @@ public class AutoTaggingService {
             int useService = confirmUserWantsAlbumArtFinder();
             if (useService == Constants.YES) {
                 List<ImageSearchQuery> queries = new ArrayList<>();
-                for (int i = 0; i < rowsToReprocess.size(); i++) {
-                    File dir = getFile(rowsToReprocess.get(i)).getParentFile();
+                for (Integer toReprocess : rowsToReprocess) {
+                    File dir = getFile(toReprocess).getParentFile();
                     String query = getArtistAndAlbumFromDirectory(dir);
                     if (!ImageSearchQuery.contains(queries, query)) {
                         ImageSearchQuery imageSearchQuery = new ImageSearchQuery(query, dir, new ArrayList<>());
-                        imageSearchQuery.getRows().add(rowsToReprocess.get(i));
+                        imageSearchQuery.getRows().add(toReprocess);
                         queries.add(imageSearchQuery);
                     } else {
                         int index = ImageSearchQuery.getIndex(queries, query);
-                        queries.get(index).getRows().add(rowsToReprocess.get(i));
+                        queries.get(index).getRows().add(toReprocess);
                     }
                 }
 
                 // get the queries and dirs to open the frames with
-                for (int i = 0; i < queries.size(); i++) {
-                    showAlbumArtWindow(queries.get(i));
+                for (ImageSearchQuery query : queries) {
+                    showAlbumArtWindow(query);
                 }
             }
         }
@@ -142,8 +140,8 @@ public class AutoTaggingService {
     /**
      * Function to add an album cover for just one row
      *
-     * @param row
-     * @param cover
+     * @param row, the row to add the cover on
+     * @param cover, the cover to add to the file/table
      */
     public void addIndividualCover(int row, File cover) {
         try {
@@ -184,7 +182,7 @@ public class AutoTaggingService {
      * Method for adding album art for songs manually
      * This method is called when the "Add" selection is pressed in the context menu
      *
-     * @param selectedRows
+     * @param selectedRows, the current selected rows on the table
      */
     public void addAlbumArt(int[] selectedRows) {
 
@@ -195,7 +193,7 @@ public class AutoTaggingService {
 
             // get the row and index of the track
             int row = table.convertRowIndexToModel(selectedRows[i]);
-            int index = Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
+            int index = Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
 
             // get the file to use as the starting point for choosing an image
             File file = Main.frame.songController.getSongs().get(index).getFile();
@@ -220,7 +218,7 @@ public class AutoTaggingService {
     /**
      * Checks to see if user wants to use the Album Art Finder Service
      *
-     * @return
+     * @return if the user wants to use the album art finder
      */
     public int confirmUserWantsAlbumArtFinder() {
         return JOptionPane.showConfirmDialog(
@@ -235,7 +233,7 @@ public class AutoTaggingService {
     /**
      * Shows a window for the album art
      *
-     * @param query
+     * @param query, the ImageSearchQuery object to use in the album art finder window
      */
     public void showAlbumArtWindow(ImageSearchQuery query) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -254,8 +252,8 @@ public class AutoTaggingService {
     /**
      * Gets the artist and album from a directory
      *
-     * @param dir
-     * @return
+     * @param dir, the dir to get the artist and album from
+     * @return the "Artist Album" query
      */
     public String getArtistAndAlbumFromDirectory(File dir) {
         String artist = dir.getParentFile().getName();
@@ -270,14 +268,15 @@ public class AutoTaggingService {
      * @return the cover file, or null if it doesn't exist
      */
     public File folderContainsCover(File folder) {
-        String regex = "\\[\\d{4}\\] .*";
-        if (folder.getName().matches(regex)) {
-            // all is well, just get the cover normally
+        String regex = "\\[\\d{4}] .*";
+        if (!folder.getName().matches(regex)) {
+            return null;
         } else if (folder.getName().startsWith("CD")) {
             folder = folder.getParentFile();
         }
 
         File[] files = folder.listFiles();      // get all the files
+        assert files != null;
         for (File file : files) {
             if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
                 return file;
@@ -296,18 +295,18 @@ public class AutoTaggingService {
     /**
      * Helper Function Gets the index at the specified row
      *
-     * @param row
-     * @return
+     * @param row, the row to search on
+     * @return the index of that row
      */
     public int getIndex(int row) {
         row = table.convertRowIndexToModel(row);
-        return Integer.valueOf(table.getModel().getValueAt(row, 12).toString());
+        return Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
     }
 
     /**
      * Gets the File object from the row
      *
-     * @param row
+     * @param row, the row to get the file from
      * @return the File from the row
      */
     public File getFile(int row) {
@@ -341,9 +340,8 @@ public class AutoTaggingService {
      */
     public String getArtistFromFile(File file) {
         if (Utils.isAnEPPartOfALabel(file)) {
-            return "";
+            return EMPTY_STRING;
         }
-
         return getArtist(file);
     }
 
@@ -358,7 +356,7 @@ public class AutoTaggingService {
             return getGenreFromFile(file);
         } else {
             File dir = file.getParentFile();
-            String regex = "\\[\\d{4}\\] .*";
+            String regex = "\\[\\d{4}] .*";
             if (dir.getName().matches(regex)) {
                 return dir.getName().substring(6).trim();
             } else if (dir.getName().startsWith("CD")) {
@@ -368,7 +366,7 @@ public class AutoTaggingService {
                     return dir.getName().substring(6).trim();
                 }
             }
-            return "";
+            return EMPTY_STRING;
         }
     }
 
@@ -383,7 +381,6 @@ public class AutoTaggingService {
             File dir = file.getParentFile().getParentFile().getParentFile();
             return dir.getName();
         }
-
         // get the normal artist
         return getArtist(file);
     }
@@ -396,7 +393,7 @@ public class AutoTaggingService {
      */
     public String getArtist(File file) {
         File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
+        String regex = "\\[\\d{4}] .*";
         if (dir.getName().matches(regex)) {
             dir = dir.getParentFile();
             return dir.getName();
@@ -404,7 +401,7 @@ public class AutoTaggingService {
             dir = dir.getParentFile().getParentFile();
             return dir.getName();
         } else {
-            return "";
+            return EMPTY_STRING;
         }
     }
 
@@ -420,7 +417,7 @@ public class AutoTaggingService {
         }
 
         File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
+        String regex = "\\[\\d{4}] .*";
         if (dir.getName().matches(regex)) {
             return dir.getName().substring(1, 5).trim();
         } else if (dir.getName().startsWith("CD")) {
@@ -430,7 +427,7 @@ public class AutoTaggingService {
                 return dir.getName().substring(1, 5).trim();
             }
         }
-        return "";
+        return EMPTY_STRING;
     }
 
     /**
@@ -448,8 +445,8 @@ public class AutoTaggingService {
         String totalTracks = getTotalTracksFromFolder(dir);
         String regex = "\\d{2} .*\\.mp3";
         if (file.getName().matches(regex)) {
-            if (Integer.valueOf(file.getName().substring(0, 2)) < 10) {
-                return file.getName().substring(1, 2) + "/" + totalTracks;
+            if (Integer.parseInt(file.getName().substring(0, 2)) < 10) {
+                return file.getName().charAt(1) + "/" + totalTracks;
             } else {
                 return file.getName().substring(0, 2) + "/" + totalTracks;
             }
@@ -477,6 +474,7 @@ public class AutoTaggingService {
     public int getNumberOfSongs(File file) {
         File[] files = file.listFiles();
         int count = 0;
+        assert files != null;
         for (File file1 : files) {
             if (file1.getName().endsWith(".mp3")) {
                 count++;
@@ -493,7 +491,7 @@ public class AutoTaggingService {
      */
     public String getDisksFromFile(File file) {
         File dir = file.getParentFile();
-        String regex = "\\[\\d{4}\\] .*";
+        String regex = "\\[\\d{4}] .*";
         if (dir.getName().matches(regex)) {
             // there's no CD1, CD2 folders, single disk album
             return "1/1";
@@ -502,7 +500,7 @@ public class AutoTaggingService {
             int totalDisks = getTotalDisksFromFolder(dir);
             return dir.getName().substring(2) + "/" + totalDisks;
         } else {
-            return "";
+            return EMPTY_STRING;
         }
     }
 
@@ -516,6 +514,7 @@ public class AutoTaggingService {
         dir = dir.getParentFile();
         File[] dirs = dir.listFiles(File::isDirectory);
         int count = 0;
+        assert dirs != null;
         for (File folder : dirs) {
             if (folder.getName().startsWith("CD")) {
                 // most (if not all) times, this should be 2
@@ -533,7 +532,7 @@ public class AutoTaggingService {
      */
     public String getGenreFromFile(File file) {
         if (!Utils.isAGenrePartOfALabel(file)) {
-            return "";
+            return EMPTY_STRING;
         }
         return file.getParentFile().getName();
     }
@@ -544,8 +543,7 @@ public class AutoTaggingService {
      * @param selectedRows, the rows selected on the table
      */
     public void addTrackAndDiskNumbers(int[] selectedRows) {
-        for (int i = 0; i < selectedRows.length; i++) {
-            int row = selectedRows[i];
+        for (int row : selectedRows) {
             File file = getFile(row);
             autoAddTrackAndDiskNumbers(row, file);
         }
@@ -554,8 +552,8 @@ public class AutoTaggingService {
     /**
      * Function that actually sets the row info
      *
-     * @param row
-     * @param file
+     * @param row, the row to add the track/disk numbers to
+     * @param file, the file to get the information from
      */
     public void autoAddTrackAndDiskNumbers(int row, File file) {
         int index = getIndex(row);
