@@ -1,12 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+   Proj:   Moose
+   File:   ImageSearchResponse.java
+   Desc:   Pojo for the response we get back from the Google CSE API call
+
+   Copyright Pat Ripley 2018
  */
+
+// package
 package moose.objects;
 
+// imports
 import java.awt.image.BufferedImage;
 
+// class ImageSearchResponse
 public class ImageSearchResponse {
 
     private String link;
@@ -46,21 +52,12 @@ public class ImageSearchResponse {
         this.bImage = bImage;
     }
 
-    public class Image {
+    public static class Image {
 
-        private int width;
         private int height;
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
 
         public void setHeight(int height) {
             this.height = height;
-        }
-
-        public int getWidth() {
-            return this.width;
         }
 
         public int getHeight() {

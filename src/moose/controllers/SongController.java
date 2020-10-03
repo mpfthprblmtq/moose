@@ -249,7 +249,7 @@ public class SongController {
      * @param albumartist, the albumartist to set
      */
     public void setAlbumArtist(int index, String albumartist) {
-        songs.get(index).setAlbumartist(albumartist);
+        songs.get(index).setAlbumArtist(albumartist);
         songEdited(index);
     }
 
@@ -382,7 +382,7 @@ public class SongController {
                 mp3file.getId3v2Tag().setTitle(s.getTitle());
                 mp3file.getId3v2Tag().setArtist(s.getArtist());
                 mp3file.getId3v2Tag().setAlbum(s.getAlbum());
-                mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumartist());
+                mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumArtist());
                 mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
                 mp3file.getId3v2Tag().setYear(s.getYear());
                 mp3file.getId3v2Tag().setTrack(s.getFullTrackString());

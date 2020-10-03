@@ -1,25 +1,31 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+   Proj:   Moose
+   File:   Settings.java
+   Desc:   Pojo for the Settings information
+
+   Copyright Pat Ripley 2018
  */
+
+// package
 package moose.objects;
 
+// imports
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import moose.utilities.Constants;
 import moose.utilities.Utils;
 
+// class Settings
 public class Settings {
 
     private String version;
     private boolean inDebugMode;
     private boolean inDeveloperMode;
-    private List<String> genres;
+    private final List<String> genres;
     private String libraryLocation;
-    private int preferredCoverArtSize;
-    private String albumArtFinderApiKey;
+    private final int preferredCoverArtSize;
+    private final String albumArtFinderApiKey;
     private String albumArtFinderCseId;
     private int albumArtFinderSearchCount;
     private String albumArtFinderSearchCountDate;
@@ -41,7 +47,7 @@ public class Settings {
     
     /**
      * Adds a genre to the genre list
-     * @param genre
+     * @param genre, the genre to add
      */
     public void addGenre(String genre) {
         if(!getGenres().contains(genre)) {
@@ -51,7 +57,7 @@ public class Settings {
     
     /**
      * Removes a genre from the genre list
-     * @param genre
+     * @param genre, the genre to remove
      */
     public void removeGenre(String genre) {
         getGenres().remove(genre);
@@ -69,24 +75,16 @@ public class Settings {
         return inDeveloperMode;
     }
 
-    public void setDeveloperMode(boolean developermode) {
-        this.inDeveloperMode = developermode;
+    public void setDeveloperMode(boolean developerMode) {
+        this.inDeveloperMode = developerMode;
     }
 
     public List<String> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<String> genres) {
-        this.genres = genres;
-    }
-
     public int getPreferredCoverArtSize() {
         return preferredCoverArtSize;
-    }
-
-    public void setPreferredCoverArtSize(int preferredCoverArtSize) {
-        this.preferredCoverArtSize = preferredCoverArtSize;
     }
 
     public String getLibraryLocation() {
@@ -99,10 +97,6 @@ public class Settings {
 
     public String getAlbumArtFinderApiKey() {
         return albumArtFinderApiKey;
-    }
-
-    public void setAlbumArtFinderApiKey(String albumArtFinderApiKey) {
-        this.albumArtFinderApiKey = albumArtFinderApiKey;
     }
 
     public String getAlbumArtFinderCseId() {
