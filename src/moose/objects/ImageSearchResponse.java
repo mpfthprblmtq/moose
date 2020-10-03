@@ -54,7 +54,12 @@ public class ImageSearchResponse {
 
     public static class Image {
 
+        protected int width;
         private int height;
+
+        public int getWidth() {
+            return width;
+        }
 
         public void setHeight(int height) {
             this.height = height;
