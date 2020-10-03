@@ -668,16 +668,16 @@ public class InfoFrame extends javax.swing.JFrame {
         titleField.setText(s.getTitle());
         artistField.setText(s.getArtist());
         albumField.setText(s.getAlbum());
-        albumartistField.setText(s.getAlbumartist());
+        albumartistField.setText(s.getAlbumArtist());
         yearField.setText(s.getYear());
         genreField.setText(s.getGenre());
         track1Field.setText(s.getTrack());
-        track2Field.setText(s.getTotaltracks());
+        track2Field.setText(s.getTotalTracks());
         disk1Field.setText(s.getDisk());
-        disk2Field.setText(s.getTotaldisks());
+        disk2Field.setText(s.getTotalDisks());
         lengthField.setText(s.getLength());
         bitrateField.setText(s.getBitrate());
-        samplerateField.setText(s.getSamplerate());
+        samplerateField.setText(s.getSampleRate());
         commentField.setText(s.getComment());
         coverLabel.setIcon(Utils.getScaledImage(s.getArtwork_bytes(), 150));
     }

@@ -471,7 +471,7 @@ public class Frame extends javax.swing.JFrame {
                 s.getTitle(),
                 s.getArtist(),
                 s.getAlbum(),
-                s.getAlbumartist(),
+                s.getAlbumArtist(),
                 s.getYear(),
                 s.getGenre(),
                 s.getFullTrackString(),
