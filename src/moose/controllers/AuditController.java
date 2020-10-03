@@ -1,15 +1,16 @@
-/**
- *  Proj:   Moose
- *  File:   AuditController.java
- *  Desc:   Controller class for AuditFrame, works directly with the data based on input from AuditFrame UI
- *
- *  Copyright Pat Ripley 2018
+/*
+  Proj:   Moose
+  File:   AuditController.java
+  Desc:   Controller class for AuditFrame, works directly with the data based on input from AuditFrame UI
+  <p>
+  Copyright Pat Ripley 2018-2020
  */
 
 // package
 package moose.controllers;
 
 //imports
+
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
@@ -23,17 +24,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Objects;
 
 // class AuditController
 public class AuditController {
-    
+
     // some ivars
     int auditCount;
     ArrayList<File> albums = new ArrayList<>();
     File folder;
     File currentDir;
-    
+
     // Arraylists for results
     ArrayList<ArrayList<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
             new ArrayList<>(),      // id3
@@ -48,10 +49,10 @@ public class AuditController {
             new ArrayList<>(),      // image files
             new ArrayList<>(),      // windows files
             new ArrayList<>()));    // other files
-    
+
     // logger object
     Logger logger = Main.getLogger();
-    
+
     // some constants
     public static final int AUDIT = 0;
     public static final int CLEANUP = 1;
@@ -67,14 +68,15 @@ public class AuditController {
     final int IMG = 4;
     final int WINDOWS = 5;
     final int OTHER = 6;
-    
+
     public AuditController() {
-        
+
     }
 
     /**
      * Sets the folder being audited/cleaned
-     * @param folder
+     *
+     * @param folder, the folder to set
      */
     public void setFolder(File folder) {
         this.folder = folder;
@@ -82,6 +84,7 @@ public class AuditController {
 
     /**
      * Returns the folder being audited/cleaned
+     *
      * @return the File folder
      */
     public File getFolder() {
@@ -90,6 +93,7 @@ public class AuditController {
 
     /**
      * Returns the currentDir
+     *
      * @return the currentDir File
      */
     public File getCurrentDir() {
@@ -107,21 +111,21 @@ public class AuditController {
         // string to return
         String results = "";
 
+        // reset everything
+        // let's count the mp3s and covers, cause why not
+        // create a list of all files from that directory
+        // traverse that list
+        // update the results
+        // reset everything
+        // traverse that list
+        // update the results
         switch (type) {
-            case CLEANUP:
-
-                // reset everything
+            case CLEANUP -> {
                 clearLists(CLEANUP);
-
-                // let's count the mp3s and covers, cause why not
                 int mp3Count = 0;
                 int coverCount = 0;
-
-                // create a list of all files from that directory
                 ArrayList<File> cleanupFiles = new ArrayList<>();
-                cleanupFiles = Utils.listFiles(folder, cleanupFiles);
-
-                // traverse that list
+                Utils.listFiles(folder, cleanupFiles);
                 for (File file : cleanupFiles) {
 
                     // get the filename to check
@@ -141,58 +145,53 @@ public class AuditController {
                         cleanupFilePathList.get(2).add(file.getPath());
                     } else if (filename.endsWith(".zip")) {
                         cleanupFilePathList.get(3).add(file.getPath());
-                    } else if ((filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG"))
-                            && !filename.startsWith("cover.")
-                            && !file.getParentFile().getName().equals("artwork")) {
-                        cleanupFilePathList.get(4).add(file.getPath());
-                    } else if (filename.equals("Thumbs.db") || filename.startsWith("folder.")) {
-                        cleanupFilePathList.get(5).add(file.getPath());
                     } else {
-                        if (!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".JPG"))
-                                && !filename.equals("done")
-                                && !filename.equals(".DS_Store")) {
-                            cleanupFilePathList.get(6).add(file.getPath());
+                        final boolean isImageFile = filename.endsWith(".png")
+                                || filename.endsWith(".jpg")
+                                || filename.endsWith(".jpeg")
+                                || filename.endsWith(".JPG");
+                        if (isImageFile
+                                && !filename.startsWith("cover.")
+                                && !file.getParentFile().getName().equals("artwork")) {
+                            cleanupFilePathList.get(4).add(file.getPath());
+                        } else if (filename.equals("Thumbs.db") || filename.startsWith("folder.")) {
+                            cleanupFilePathList.get(5).add(file.getPath());
+                        } else {
+                            if (!isImageFile
+                                    && !filename.equals("done")
+                                    && !filename.equals(".DS_Store")) {
+                                cleanupFilePathList.get(6).add(file.getPath());
+                            }
                         }
                     }
                 }
-
-                // update the results
                 results = "MP3 Files:     " + mp3Count + "\n"
-                                + "Cover Files:   " + coverCount + "\n"
-                                + "ZIP Files:     " + cleanupFilePathList.get(3).size() + "\n"
-                                + "ASD Files:     " + cleanupFilePathList.get(0).size() + "\n"
-                                + "WAV Files:     " + cleanupFilePathList.get(2).size() + "\n"
-                                + "FLAC Files:    " + cleanupFilePathList.get(1).size() + "\n"
-                                + "Image Files:   " + cleanupFilePathList.get(4).size() + "\n"
-                                + "Windows Files: " + cleanupFilePathList.get(5).size() + "\n"
-                                + "Other Files:   " + cleanupFilePathList.get(6).size();
-
-                break;
-
-            case AUDIT:
-
-                // reset everything
+                        + "Cover Files:   " + coverCount + "\n"
+                        + "ZIP Files:     " + cleanupFilePathList.get(3).size() + "\n"
+                        + "ASD Files:     " + cleanupFilePathList.get(0).size() + "\n"
+                        + "WAV Files:     " + cleanupFilePathList.get(2).size() + "\n"
+                        + "FLAC Files:    " + cleanupFilePathList.get(1).size() + "\n"
+                        + "Image Files:   " + cleanupFilePathList.get(4).size() + "\n"
+                        + "Windows Files: " + cleanupFilePathList.get(5).size() + "\n"
+                        + "Other Files:   " + cleanupFilePathList.get(6).size();
+            }
+            case AUDIT -> {
                 clearLists(AUDIT);
-
-                // traverse that list
                 for (File dir : albums) {
-                    if(!checkID3Tags(dir)) {
+                    if (!checkID3Tags(dir)) {
                         auditFilePathList.get(0).add(dir.getPath());
                     }
-                    if(!checkFilenames(dir)) {
+                    if (!checkFilenames(dir)) {
                         auditFilePathList.get(1).add(dir.getPath());
                     }
-                    if(!checkFolderCover(dir)) {
+                    if (!checkFolderCover(dir)) {
                         auditFilePathList.get(2).add(dir.getPath());
                     }
                 }
-
-                // update the results
                 results = "ID3Tags missing:   " + auditFilePathList.get(0).size() + "\n"
-                                + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
-                                + "Cover art missing: " + auditFilePathList.get(2).size();
-
-                break;
+                        + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
+                        + "Cover art missing: " + auditFilePathList.get(2).size();
+            }
         }
         return results;
     }
@@ -205,7 +204,7 @@ public class AuditController {
 
         // arraylist to store all the files
         ArrayList<File> allFiles = new ArrayList<>();
-        allFiles = Utils.listFiles(folder, allFiles);
+        Utils.listFiles(folder, allFiles);
 
         // traverse the list of files and add the albums to the albums ivar list
         for (File file : allFiles) {
@@ -223,7 +222,7 @@ public class AuditController {
         }
 
         // sort them alphabetically
-        Collections.sort(albums, (File o1, File o2) -> {
+        albums.sort((File o1, File o2) -> {
             String filename1 = o1.getPath().replace(folder.getPath(), "");
             String filename2 = o2.getPath().replace(folder.getPath(), "");
             return filename1.compareToIgnoreCase(filename2);
@@ -305,7 +304,7 @@ public class AuditController {
     public void nextAuditFolder() {
 
         // sets the current album as done
-        if (!checkIfDone(albums.get(auditCount))) {
+        if (isNotDone(albums.get(auditCount))) {
             setDone(albums.get(auditCount));
         }
 
@@ -334,15 +333,12 @@ public class AuditController {
     public void previousAuditFolder() {
 
         // sets the current album as done
-        if (!checkIfDone(albums.get(auditCount))) {
+        if (isNotDone(albums.get(auditCount))) {
             setDone(albums.get(auditCount));
         }
 
         // prevent a negative auditCount
-        if (auditCount <= 0) {
-            // do nothing
-        } else {
-
+        if (auditCount >= 0) {
             // update ivars
             auditCount--;
             currentDir = albums.get(auditCount);
@@ -392,7 +388,7 @@ public class AuditController {
      * existing audit
      */
     public boolean checkForExistingAudit() {
-        return albums.stream().anyMatch((album) -> (containsFile(album)));
+        return albums.stream().anyMatch(this::containsFile);
     }
 
     /**
@@ -405,6 +401,7 @@ public class AuditController {
      */
     public boolean containsFile(File dir) {
         File[] filesInAlbum = dir.listFiles();
+        assert filesInAlbum != null;
         for (File file : filesInAlbum) {
             if (file.getName().equals("done")) {
                 return true;
@@ -422,7 +419,9 @@ public class AuditController {
         String path = dir.getPath() + "/done";
         File done = new File(path);
         try {
-            done.createNewFile();
+            if (!done.createNewFile()) {
+                throw new IOException("Couldn't create file in " + dir.getPath());
+            }
         } catch (IOException ex) {
             logger.logError("Error creating done file for auditing in folder: " + path, ex);
         }
@@ -434,14 +433,15 @@ public class AuditController {
      * @param dir, the directory to check
      * @return the result of the check, true for done, false for not done
      */
-    public boolean checkIfDone(File dir) {
+    public boolean isNotDone(File dir) {
         File[] files = dir.listFiles();
+        assert files != null;
         for (File file : files) {
             if (file.getName().equals("done")) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -451,7 +451,7 @@ public class AuditController {
      */
     public int getNextAlbum() {
         for (File album : albums) {
-            if (!checkIfDone(album)) {
+            if (isNotDone(album)) {
                 return albums.indexOf(album);
             }
         }
@@ -462,10 +462,12 @@ public class AuditController {
      * Function used to clear all of the done files from the albums list
      */
     public void clearDoneFiles() {
-        albums.stream().filter((album) -> (containsFile(album))).map((album) -> album.listFiles()).forEachOrdered((files) -> {
+        albums.stream().filter(this::containsFile).map(File::listFiles).filter(Objects::nonNull).forEachOrdered((files) -> {
             for (File file : files) {
                 if (file.getName().equals("done")) {
-                    file.delete();
+                    if (!file.delete()) {
+                        logger.logError("Could not delete done file in " + file.getParentFile().getPath());
+                    }
                 }
             }
         });
@@ -484,83 +486,61 @@ public class AuditController {
 
         // do something based on the type
         switch (type) {
-            case AUDIT:
-
-                // id3tags
+            case AUDIT -> {
                 str = str.concat(" Some ID3Tags missing:\n");
                 for (String path : auditFilePathList.get(ID3)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // filenames
                 str = str.concat(" Some filenames don't match standard:\n");
                 for (String path : auditFilePathList.get(FILENAMES)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // cover art
                 str = str.concat(" Cover art not found in folder:\n");
                 for (String path : auditFilePathList.get(COVER)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-                break;
-            case CLEANUP:
-
-                // mp3.asd files
+            }
+            case CLEANUP -> {
                 str = str.concat(" MP3.ASD FILES:\n");
                 for (String path : cleanupFilePathList.get(MP3ASD)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // flac files
                 str = str.concat(" FLAC FILES:\n");
                 for (String path : cleanupFilePathList.get(FLAC)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // wav files
                 str = str.concat(" WAV FILES:\n");
                 for (String path : cleanupFilePathList.get(WAV)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // zip files
                 str = str.concat(" ZIP FILES:\n");
                 for (String path : cleanupFilePathList.get(ZIP)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // image files
                 str = str.concat(" IMAGE FILES:\n");
                 for (String path : cleanupFilePathList.get(IMG)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // windows files
                 str = str.concat(" WINDOWS FILES:\n");
                 for (String path : cleanupFilePathList.get(WINDOWS)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                // other files
                 str = str.concat(" OTHER FILES:\n");
                 for (String path : cleanupFilePathList.get(OTHER)) {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-
-                break;
+            }
         }
-
         return str;
     }
 
@@ -574,6 +554,7 @@ public class AuditController {
 
         // check the current directory ivar
         File[] files = dir.listFiles();
+        assert files != null;
         for (File file : files) {
             if (file.getName().startsWith("cover")) {
                 return true;
@@ -592,7 +573,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        files = Utils.listFiles(dir, files);
+        Utils.listFiles(dir, files);
 
         // regex to check
         String regex = "\\d\\d ((.)*)";
@@ -619,7 +600,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        files = Utils.listFiles(dir, files);
+        Utils.listFiles(dir, files);
 
         // traverse the file list
         for (File file : files) {
@@ -643,6 +624,7 @@ public class AuditController {
                 }
 
                 // get the id3v2 info
+                assert mp3file != null;
                 String title = mp3file.getId3v2Tag().getTitle();
                 String artist = mp3file.getId3v2Tag().getArtist();
                 String album = mp3file.getId3v2Tag().getAlbum();
@@ -685,10 +667,9 @@ public class AuditController {
      * Deletes all files in the cleanupFilePathList arraylist
      */
     public void deleteAll() {
-        if (!iscleanupFilePathListEmpty()) {
-            cleanupFilePathList.forEach((list) -> {
-                deleteAllFilesInList(list);
-            });
+        if (!isCleanupFilePathListEmpty()) {
+            cleanupFilePathList.forEach(this::deleteAllFilesInList);
+
             // clear all the lists to reset counts
             clearLists(CLEANUP);
             // reset the statistics
@@ -700,46 +681,32 @@ public class AuditController {
     }
 
     /**
-     * Deletes only the checked file types
+     * Deletes only the selected file types
      */
     public void deleteSelected(boolean mp3asd, boolean flac, boolean wav, boolean zip, boolean images, boolean windows, boolean everythingElse) {
 
         boolean nothingToDelete = true;
 
         if (mp3asd) {
-            nothingToDelete = cleanupFilePathList.get(MP3ASD).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(MP3ASD));
-            cleanupFilePathList.get(MP3ASD).clear();
+            nothingToDelete = deleteFiles(MP3ASD);
         }
         if (flac) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(FLAC).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(FLAC));
-            cleanupFilePathList.get(FLAC).clear();
+            nothingToDelete = deleteFiles(FLAC);
         }
         if (wav) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(WAV).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(WAV));
-            cleanupFilePathList.get(WAV).clear();
+            nothingToDelete = deleteFiles(WAV);
         }
         if (zip) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(ZIP).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(ZIP));
-            cleanupFilePathList.get(ZIP).clear();
+            nothingToDelete = deleteFiles(ZIP);
         }
         if (images) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(IMG).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(IMG));
-            cleanupFilePathList.get(IMG).clear();
+            nothingToDelete = deleteFiles(IMG);
         }
         if (windows) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(WINDOWS).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(WINDOWS));
-            cleanupFilePathList.get(WINDOWS).clear();
+            nothingToDelete = deleteFiles(WINDOWS);
         }
         if (everythingElse) {
-            nothingToDelete = nothingToDelete && cleanupFilePathList.get(OTHER).isEmpty();
-            deleteAllFilesInList(cleanupFilePathList.get(OTHER));
-            cleanupFilePathList.get(OTHER).clear();
+            nothingToDelete = deleteFiles(OTHER);
         }
 
         if (nothingToDelete) {
@@ -754,16 +721,28 @@ public class AuditController {
     }
 
     /**
+     * Helper function used by deleteSelected to prevent some code duplication
+     */
+    private boolean deleteFiles(int type) {
+        boolean nothingToDelete = cleanupFilePathList.get(type).isEmpty();
+        deleteAllFilesInList(cleanupFilePathList.get(type));
+        cleanupFilePathList.get(type).clear();
+        return nothingToDelete;
+    }
+
+    /**
      * Helper function used to delete files in a specific list
      *
-     * @param list
+     * @param list, the list of files to delete
      */
     public void deleteAllFilesInList(ArrayList<String> list) {
-        list.stream().map((path) -> new File(path)).forEachOrdered((file) -> {
+        list.stream().map(File::new).forEachOrdered((file) -> {
             if (file.exists()) {
-                file.delete();
+                if (!file.delete()) {
+                    logger.logError("Tried to delete " + file.getPath() + " in cleanup, but couldn't!");
+                }
             } else {
-                logger.logError("Tried to delete file in cleanup, but couldn't!");
+                logger.logError("Tried to delete " + file.getPath() + " in cleanup, but the file didn't exist!");
             }
         });
     }
@@ -775,7 +754,7 @@ public class AuditController {
      */
     public void clearLists(int type) {
         switch (type) {
-            case CLEANUP:
+            case CLEANUP -> {
                 cleanupFilePathList.get(0).clear();
                 cleanupFilePathList.get(1).clear();
                 cleanupFilePathList.get(2).clear();
@@ -783,14 +762,13 @@ public class AuditController {
                 cleanupFilePathList.get(4).clear();
                 cleanupFilePathList.get(5).clear();
                 cleanupFilePathList.get(6).clear();
-                break;
-            case AUDIT:
+            }
+            case AUDIT -> {
                 auditFilePathList.get(0).clear();
                 auditFilePathList.get(1).clear();
                 auditFilePathList.get(2).clear();
-                break;
+            }
         }
-
     }
 
     /**
@@ -798,14 +776,15 @@ public class AuditController {
      *
      * @return the result of the check
      */
-    public boolean iscleanupFilePathListEmpty() {
+    public boolean isCleanupFilePathListEmpty() {
         return (cleanupFilePathList.get(0).isEmpty()
                 && cleanupFilePathList.get(1).isEmpty()
                 && cleanupFilePathList.get(2).isEmpty()
                 && cleanupFilePathList.get(3).isEmpty()
                 && cleanupFilePathList.get(4).isEmpty()
                 && cleanupFilePathList.get(5).isEmpty()
-                && cleanupFilePathList.get(6).isEmpty());
+                && cleanupFilePathList.get(6).isEmpty()
+        );
     }
-    
+
 }
