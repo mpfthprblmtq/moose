@@ -1,5 +1,15 @@
+/*
+   Proj:   Moose
+   File:   AlbumArtFinderService.java
+   Desc:   Service class for the album art finder
+
+   Copyright Pat Ripley 2018
+ */
+
+// package
 package moose.services;
 
+// imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
@@ -8,10 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.imageio.ImageIO;
 
 import moose.utilities.Constants;
@@ -70,7 +77,6 @@ public class AlbumArtFinderService {
     public ImageSearchResponse processImage(ImageSearchResponse isr) {
         if ((isr.getImage().getHeight() != isr.getImage().getWidth())   // if the image isn't square
                 || (isr.getImage().getHeight() < img_size && isr.getImage().getWidth() < img_size)) {   // if the image is smaller than the desired size
-//            toRemove.add(isr);
             return isr;
         } else {
             try {
@@ -86,29 +92,6 @@ public class AlbumArtFinderService {
         return null;
     }
 
-    public void processResponses() {
-//        int img_size = Main.getSettings().getPreferredCoverArtSize();
-
-        List<ImageSearchResponse> toRemove = new ArrayList<>();
-        responses.forEach((isr) -> {
-            if ((isr.getImage().getHeight() != isr.getImage().getWidth())   // if the image isn't square
-                    || (isr.getImage().getHeight() < img_size && isr.getImage().getWidth() < img_size)) {   // if the image is smaller than the desired size
-                toRemove.add(isr);
-            } else {
-                try {
-                    isr.setBImage(ImageIO.read(new URL(isr.getLink())));
-                    if(isr.getBImage() == null) {
-                        toRemove.add(isr);
-                    }
-                } catch (IOException ex) {
-                    logger.logError("IOException when trying to read an image from the url: " + isr.getLink() + ", cause: " + ex.getCause().getMessage(), ex);
-                    toRemove.add(isr);
-                }
-            }
-        });
-        responses.removeAll(toRemove);
-    }
-    
     /**
      * Updates the album art settings
      */
@@ -130,10 +113,10 @@ public class AlbumArtFinderService {
     /**
      * Actually makes the JSON call
      *
-     * @param query
-     * @param width
-     * @param start
-     * @return
+     * @param query, the query to search
+     * @param width, the preferred image size
+     * @param start, the index to start on in the result list
+     * @return a list of ImageSearchReponses
      */
     public static List<ImageSearchResponse> makeJsonCall(String query, String width, int start) {
 
@@ -177,17 +160,13 @@ public class AlbumArtFinderService {
                     Logger.setSystemErrToConsole();
                 }
                 responseList = mapper.readValue(responseString, new TypeReference<List<ImageSearchResponse>>(){});  // parse that bad boy
-                // TODO:  Get rid of "An illegal reflective access operation has occured" ^^^ happens on this line
-                if (Main.getSettings().isInDeveloperMode()) {
-                    
-                }
                 
             // if it's not so good
             } else {
                 ImageSearchResponse errorSearchResponse = new ImageSearchResponse();
                 errorSearchResponse.setMime("error");
                 errorSearchResponse.setLink("Response code: " + responseCode + ", Response message: " + responseMessage);
-                return Arrays.asList(new ImageSearchResponse[]{errorSearchResponse});
+                return Collections.singletonList(errorSearchResponse);
             }
         } catch (MalformedURLException ex) {
             logger.logError("MalformedURLException when trying to create url to search!", ex);
@@ -200,9 +179,9 @@ public class AlbumArtFinderService {
     /**
      * Builds the url to send to googleapi
      *
-     * @param query
-     * @param width
-     * @return
+     * @param query, the query to search on
+     * @param width, the preferred image size
+     * @return a url to search on
      */
     private static String buildUrl(String query, String width, int start) {
         String api_key = Main.getSettings().getAlbumArtFinderApiKey();
@@ -219,23 +198,23 @@ public class AlbumArtFinderService {
         String URL_SEARCH_TYPE_ID = "&searchType=";
         String URL_START_INDEX = "&start=";
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(URL_BASE);
-        builder.append(URL_Q_ID);
-        builder.append(query);
-        builder.append(URL_KEY_ID);
-        builder.append(api_key);
-        builder.append(URL_CSE_ID);
-        builder.append(cse_id);
-        builder.append(URL_SEARCH_TYPE_ID);
-        builder.append(search_type);
-        builder.append(URL_START_INDEX);
-        builder.append(start);
-        builder.append(URL_IMG_SIZE_ID);
-        builder.append(width);
-        builder.append(URL_FIELDS_ID);
-        builder.append(fields);
-        return encodeForUrl(builder.toString());
+        String url =
+                URL_BASE +
+                URL_Q_ID +
+                query +
+                URL_KEY_ID +
+                api_key +
+                URL_CSE_ID +
+                cse_id +
+                URL_SEARCH_TYPE_ID +
+                search_type +
+                URL_START_INDEX +
+                start +
+                URL_IMG_SIZE_ID +
+                width +
+                URL_FIELDS_ID +
+                fields;
+        return encodeForUrl(url);
     }
 
     private static String encodeForUrl(String toEncode) {
@@ -245,18 +224,13 @@ public class AlbumArtFinderService {
     /**
      * Builds the google images search query
      *
-     * @param query
-     * @return
+     * @param query, the query to search on
+     * @return a image search query url
      */
     public static String buildImageSearchQuery(String query) {
         String IMG_QRY_START = "https://www.google.com/search?q=";
         String IMG_QRY_END = "&biw=1680&bih=953&tbm=isch&source=lnt&tbs=isz:l";
-        StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(IMG_QRY_START);
-        stringBuilder.append(encodeForUrl(query));
-        stringBuilder.append(IMG_QRY_END);
-
-        return stringBuilder.toString();
+        return IMG_QRY_START + encodeForUrl(query) + IMG_QRY_END;
     }
 }

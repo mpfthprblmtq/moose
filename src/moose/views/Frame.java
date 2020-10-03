@@ -593,9 +593,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        filesToRemove.forEach((file) -> {
-            files.remove(file);
-        });
+        filesToRemove.forEach(files::remove);
 
         // update the log table when you're done with the file iteration
         if (files.isEmpty()) {
@@ -604,9 +602,9 @@ public class Frame extends javax.swing.JFrame {
             updateConsole(files.size() + " mp3 files loaded!");
         } else if (files.size() == 1) {
             updateConsole("1 mp3 file imported.");
-        } else if (files.size() > 1 && filesToRemove.size() == 1) {
+        } else if (filesToRemove.size() == 1) {
             updateConsole(files.size() + " mp3 files loaded, 1 file wasn't an mp3!");
-        } else if (files.size() > 1 && filesToRemove.size() > 1) {
+        } else {
             updateConsole(files.size() + " mp3 files loaded, " + filesToRemove.size() + " unknown files not loaded!");
         }
     }
