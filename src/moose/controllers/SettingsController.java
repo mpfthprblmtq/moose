@@ -1,9 +1,9 @@
-/**
- *  Proj:   Moose
- *  File:   SettingsController.java
- *  Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   SettingsController.java
+   Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
+
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -21,17 +21,11 @@ import java.io.FileWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonParser;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Paths;
 import moose.objects.Settings;
 
 // class SettingsController
 public class SettingsController {
-
-    // hardened version
-    // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
-    private String version = "1.2.0";
 
     // main settingsFile file
     File settingsFile;
@@ -40,7 +34,6 @@ public class SettingsController {
     Settings settings;
 
     // settingsFile map
-    Map<String, Object> settingsMap = new HashMap<>();
     final ObjectMapper mapper = new ObjectMapper();
 
     // logger object
@@ -51,10 +44,15 @@ public class SettingsController {
     }
 
     public void readSettingsFile() {
+
+        // hardened version
+        // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
+        final String version = "1.2.0";
+
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
             settings = mapper.readValue(jsonString, Settings.class);
-            settings.setVersion(this.version);
+            settings.setVersion(version);
         } catch (IOException e) {
             logger.logError("Exception while reading the settings json!", e);
         }
@@ -65,7 +63,10 @@ public class SettingsController {
         String settingsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/";
         File settingsDir = new File(settingsDir_path);
         if (!settingsDir.exists()) {
-            settingsDir.mkdirs();
+            if (!settingsDir.mkdirs()) {
+                logger.logError("Couldn't create the main Application Support directory in "
+                        + settingsDir.getParentFile().getPath());
+            }
         }
 
         // create the settingsFile file if it doesn't already exist
@@ -73,7 +74,9 @@ public class SettingsController {
         settingsFile = new File(settings_path);
         if (!settingsFile.exists()) {
             try {
-                settingsFile.createNewFile();
+                if (!settingsFile.createNewFile()) {
+                    throw new IOException("IOException when trying to create the settings file " + settings_path);
+                }
 
                 // since we've created a brand new file, fill it with some default values
                 fillDefaults();
@@ -122,11 +125,8 @@ public class SettingsController {
      * Clears the event log
      */
     public void clearEventLog() {
-        if (logger.getEventLog().exists()) {
-            logger.getEventLog().delete();
-        }
         try {
-            logger.getEventLog().createNewFile();
+            Files.newBufferedWriter(Paths.get(logger.getEventLog().getPath()));
         } catch (IOException e) {
             logger.logError("Couldn't clear the event log!", e);
         }
@@ -136,11 +136,8 @@ public class SettingsController {
      * Clears the error log
      */
     public void clearErrorLog() {
-        if (logger.getErrorLog().exists()) {
-            logger.getErrorLog().delete();
-        }
         try {
-            logger.getErrorLog().createNewFile();
+            Files.newBufferedWriter(Paths.get(logger.getErrorLog().getPath()));
         } catch (IOException e) {
             logger.logError("Couldn't clear the error log!", e);
         }
@@ -161,23 +158,5 @@ public class SettingsController {
             logger.logError("Error reading settings file!", ex);
         }
         return false;
-    }
-
-    /**
-     * Lists the genres in a string form
-     * @param genres
-     * @return
-     */
-    public String listGenres(List<String> genres) {
-        String str = "{";
-        for (int i = 0; i < genres.size(); i++) {
-            str = str + genres.get(i);
-            if (i < genres.size() - 1) {
-                str = str + ",";
-            } else {
-                str = str + "}";
-            }
-        }
-        return str;
     }
 }
