@@ -6,8 +6,10 @@
    Copyright Pat Ripley 2018
  */
 
+// package
 package moose.utilities;
 
+// imports
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

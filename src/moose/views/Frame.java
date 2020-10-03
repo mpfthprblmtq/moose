@@ -1,16 +1,19 @@
-/**
- *  Proj:   Moose
- *  File:   Frame.java
- *  Desc:   Main UI class for the JFrame containing the everything.
- *          Works with the SongController to edit albums, this class just handles all the UI.
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   Frame.java
+   Desc:   Main UI class for the JFrame containing the everything.
+           Works with the SongController to edit albums, this class just handles all the UI.
+
+   Copyright Pat Ripley 2018
  */
+
 // package
 package moose.views;
 
 // imports
+
 import java.awt.Component;
+
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Song;
@@ -30,6 +33,7 @@ import java.util.EventObject;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
+
 import moose.services.AutocompleteService;
 
 import static moose.utilities.Constants.*;
@@ -39,9 +43,6 @@ public class Frame extends javax.swing.JFrame {
 
     // logger object
     Logger logger = Main.getLogger();
-
-    // autocomplete service
-    AutocompleteService autocompleteService = new AutocompleteService();
 
     // controller, instantiated in constructor
     public SongController songController;
@@ -119,7 +120,7 @@ public class Frame extends javax.swing.JFrame {
 
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
-        files = Utils.listFiles(folder, files);
+        Utils.listFiles(folder, files);
 //        for (File file : files) {
 //            if (!addFileToTable(file)) {
 //                files.remove(file);
@@ -225,14 +226,14 @@ public class Frame extends javax.swing.JFrame {
             ArrayList<File> fileList = new ArrayList<>();
             for (File file : files) {
                 if (file.isDirectory()) {
-                    fileList = Utils.listFiles(file, fileList);
+                    Utils.listFiles(file, fileList);
                 } else {
                     fileList.add(file);
                 }
             }
 
             // sort the file list
-            Collections.sort(fileList, (File f1, File f2) -> f1.getName().compareTo(f2.getName()));
+            fileList.sort((File f1, File f2) -> f1.getName().compareTo(f2.getName()));
 
             // import them all
             importFiles(fileList);
@@ -252,7 +253,7 @@ public class Frame extends javax.swing.JFrame {
                 int r = tcl.getRow();
                 int c = tcl.getColumn();
 
-                int index = Integer.valueOf(model.getValueAt(r, 12).toString());
+                int index = Integer.parseInt(model.getValueAt(r, 12).toString());
 
                 // switch to see what column changed, and do a task based on that
                 switch (c) {
@@ -270,51 +271,47 @@ public class Frame extends javax.swing.JFrame {
 
                             songController.setFile(index, new_file);
 
-                            old_file.renameTo(new_file);
+                            if (!old_file.renameTo(new_file)) {
+                                logger.logError("Couldn't rename file! Path: " + old_file.getPath());
+                            }
                             model.setValueAt(new_file, r, 1);
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 3:     // title was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setTitle(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 4:     // artist was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setArtist(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 5:     // album was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setAlbum(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 6:     // album artist was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setAlbumArtist(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 7:     // year was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setYear(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 8:     // genre was changed
@@ -322,43 +319,35 @@ public class Frame extends javax.swing.JFrame {
                         // check and see if the genre exists already
                         if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
-                            switch (res) {
-                                case JOptionPane.YES_OPTION:
-                                    // add the genre to the settings
-                                    Main.getSettings().addGenre(genre);
-                                    Main.updateSettings();
-                                    break;
-                                default:
-                                    break;
+                            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
+                                Main.getSettings().addGenre(genre);
+                                Main.updateSettings();
                             }
                         }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setGenre(index, genre);
 
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 9:     // tracks was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setTrack(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 10:     // disks was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             songController.setDisk(index, tcl.getNewValue().toString());
-                        } else {
-                            // do nothing, nothing was changed
                         }
+                        // else do nothing, nothing was changed
                         break;
 
                     case 11:    // artwork was changed
-                    // TODO:  Check to see if we can use this?
-                    //setAlbumImage(index, tcl.getNewValue().toString());
+                        // TODO:  Check to see if we can use this?
+                        //setAlbumImage(index, tcl.getNewValue().toString());
                     default:    // not accounted for
                         logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
                         break;
@@ -374,7 +363,7 @@ public class Frame extends javax.swing.JFrame {
      * Scans all the files and the mp3tags with them and checks to make sure we
      * know the genre
      *
-     * @param files
+     * @param files, the files to check
      */
     public void checkForNewGenres(List<File> files) {
 
@@ -387,7 +376,7 @@ public class Frame extends javax.swing.JFrame {
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
         genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre))).forEachOrdered((genre) -> {
-            if(!newGenres.contains(genre)) {
+            if (!newGenres.contains(genre)) {
                 newGenres.add(genre);
             }
         });
@@ -395,14 +384,9 @@ public class Frame extends javax.swing.JFrame {
         // for each new genre, ask if we want to add that one
         for (String newGenre : newGenres) {
             int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
-            switch (res) {
-                case JOptionPane.YES_OPTION:
-                    // add the genre to the settings and update
-                    Main.getSettings().addGenre(newGenre);
-                    Main.updateSettings();
-                    break;
-                default:
-                    break;
+            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
+                Main.getSettings().addGenre(newGenre);
+                Main.updateSettings();
             }
         }
     }
@@ -426,20 +410,14 @@ public class Frame extends javax.swing.JFrame {
      * Helper function to set the row icon based on the action of the row.
      *
      * @param icon, the icon to set
-     * @param row, the row to set
+     * @param row,  the row to set
      */
     public void setRowIcon(int icon, int row) {
 
         switch (icon) {
-            case DEFAULT:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
-                break;
-            case EDITED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
-                break;
-            case Constants.SAVED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
-                break;
+            case DEFAULT -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
+            case EDITED -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
+            case Constants.SAVED -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
         }
     }
 
@@ -448,7 +426,7 @@ public class Frame extends javax.swing.JFrame {
      * Works with the fileDrop functionality
      *
      * @param file, the file to add
-     * @return
+     * @return the result of the file add
      */
     public boolean addFileToTable(File file) {
 
@@ -465,19 +443,19 @@ public class Frame extends javax.swing.JFrame {
 
             // add the row to the table
             model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
-                s.getFile(), // hidden file object
-                s.getFile().getName().replace(".mp3", ""), // actual editable file name
-                s.getTitle(),
-                s.getArtist(),
-                s.getAlbum(),
-                s.getAlbumArtist(),
-                s.getYear(),
-                s.getGenre(),
-                s.getFullTrackString(),
-                s.getFullDiskString(),
-                (thumbnail_icon != null) ? thumbnail_icon : null, // checks for null value first
-                index // hidden index for the song object
+                    new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
+                    s.getFile(), // hidden file object
+                    s.getFile().getName().replace(".mp3", ""), // actual editable file name
+                    s.getTitle(),
+                    s.getArtist(),
+                    s.getAlbum(),
+                    s.getAlbumArtist(),
+                    s.getYear(),
+                    s.getGenre(),
+                    s.getFullTrackString(),
+                    s.getFullDiskString(),
+                    thumbnail_icon, // checks for null value first
+                    index // hidden index for the song object
             });
         }
 
@@ -510,8 +488,8 @@ public class Frame extends javax.swing.JFrame {
      * Function that selects the cell being edited. Used mainly when pressing
      * tab or enter to navigate.
      *
-     * @param row, the row of the cell
-     * @param column, the column of the cell
+     * @param row,      the row of the cell
+     * @param column,   the column of the cell
      * @param nav_type, the type of navigation
      */
     public void changeSelection(final int row, final int column, int nav_type) {
@@ -623,22 +601,21 @@ public class Frame extends javax.swing.JFrame {
         saveButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
         table = new JTable() {
-            public Component prepareEditor(TableCellEditor editor, int row, int col)
-            {
+            public Component prepareEditor(TableCellEditor editor, int row, int col) {
                 Component result = super.prepareEditor(editor, row, col);
                 if (result instanceof JTextField) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            String originalText = ((JTextField)result).getText();
-                            ((JTextField)result).setDocument(
-                                new AutoCompleteDocument(
-                                    AutocompleteService.getNameService(table.getEditingColumn() == TABLE_COLUMN_GENRE, table),
-                                    ((JTextField)result)
-                                )
+                            String originalText = ((JTextField) result).getText();
+                            ((JTextField) result).setDocument(
+                                    new AutoCompleteDocument(
+                                            AutocompleteService.getNameService(table.getEditingColumn() == TABLE_COLUMN_GENRE, table),
+                                            ((JTextField) result)
+                                    )
                             );
-                            ((JTextField)result).setText(originalText);
-                            ((JTextField)result).requestFocus();
-                            ((JTextField)result).selectAll();
+                            ((JTextField) result).setText(originalText);
+                            ((JTextField) result).requestFocus();
+                            ((JTextField) result).selectAll();
                         }
                     });
                 }
@@ -724,6 +701,7 @@ public class Frame extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tableKeyPressed(evt);
             }
+
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 tableKeyReleased(evt);
             }
@@ -913,87 +891,87 @@ public class Frame extends javax.swing.JFrame {
         javax.swing.GroupLayout multPanelLayout = new javax.swing.GroupLayout(multPanel);
         multPanel.setLayout(multPanelLayout);
         multPanelLayout.setHorizontalGroup(
-            multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, multPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(multPanelLayout.createSequentialGroup()
-                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(L2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(multArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(multAlbum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(multAlbumArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(L8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L9, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(29, 29, 29))
-                    .addGroup(multPanelLayout.createSequentialGroup()
-                        .addComponent(L1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-                    .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, multPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(multPanelLayout.createSequentialGroup()
+                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                        .addComponent(L2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(multArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(multAlbum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(multAlbumArtist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(multTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                        .addComponent(L8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(L9, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                .addComponent(multTrack, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(multDisk, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(29, 29, 29))
+                                        .addGroup(multPanelLayout.createSequentialGroup()
+                                                .addComponent(L1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                                        .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         multPanelLayout.setVerticalGroup(
-            multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(multPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(multPanelLayout.createSequentialGroup()
-                        .addComponent(L1)
-                        .addGap(9, 9, 9)
-                        .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(multPanelLayout.createSequentialGroup()
+                multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(multPanelLayout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(L2)
-                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L3)
-                                    .addComponent(multArtist, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L4)
-                                    .addComponent(multAlbum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(multPanelLayout.createSequentialGroup()
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L6)
-                                    .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L7)
-                                    .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L8)
-                                    .addComponent(multTrack, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(L9)
-                                    .addComponent(multDisk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(multAlbumArtist, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(L5)))))
-                    .addComponent(multImage, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(multUpdateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                                        .addGroup(multPanelLayout.createSequentialGroup()
+                                                .addComponent(L1)
+                                                .addGap(9, 9, 9)
+                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(multPanelLayout.createSequentialGroup()
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(L2)
+                                                                        .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L3)
+                                                                        .addComponent(multArtist, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L4)
+                                                                        .addComponent(multAlbum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                        .addGroup(multPanelLayout.createSequentialGroup()
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L6)
+                                                                        .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L7)
+                                                                        .addComponent(multYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L8)
+                                                                        .addComponent(multTrack, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(L9)
+                                                                        .addComponent(multDisk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(multAlbumArtist, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(L5)))))
+                                        .addComponent(multImage, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(multUpdateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/moose64.png"))); // NOI18N
@@ -1021,46 +999,46 @@ public class Frame extends javax.swing.JFrame {
         javax.swing.GroupLayout containerLayout = new javax.swing.GroupLayout(container);
         container.setLayout(containerLayout);
         containerLayout.setHorizontalGroup(
-            containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(tableSP)
-                    .addGroup(containerLayout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
-                        .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, containerLayout.createSequentialGroup()
+                                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(tableSP)
+                                        .addGroup(containerLayout.createSequentialGroup()
+                                                .addGap(19, 19, 19)
+                                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(openAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, containerLayout.createSequentialGroup()
+                                                .addComponent(consoleSP, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(multPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         containerLayout.setVerticalGroup(
-            containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(containerLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(openAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableSP)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(multPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(consoleSP))
-                .addContainerGap())
+                containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(containerLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(openAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tableSP)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(multPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(consoleSP))
+                                .addContainerGap())
         );
 
         fileMenu.setText("File");
@@ -1197,17 +1175,17 @@ public class Frame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(container, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(container, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         pack();
@@ -1217,7 +1195,7 @@ public class Frame extends javax.swing.JFrame {
      * ActionPerformed methods
      */
     // <editor-fold defaultstate="collapsed" desc="ActionPerformed Methods">   
-    
+
     /**
      * Action for the save button press
      *
@@ -1260,7 +1238,7 @@ public class Frame extends javax.swing.JFrame {
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
 
         table.setCellEditor(editor);
-        
+
         int row = table.rowAtPoint(evt.getPoint());
         int col = table.columnAtPoint(evt.getPoint());
         int rows = table.getSelectedRowCount();
@@ -1271,7 +1249,7 @@ public class Frame extends javax.swing.JFrame {
 
             // if it's a right click
             case java.awt.event.MouseEvent.BUTTON3:
-                
+
                 if (!Utils.intArrayContains(selectedRows, row)) {
                     table.setRowSelectionInterval(row, row);
                 }
@@ -1553,7 +1531,8 @@ public class Frame extends javax.swing.JFrame {
         if (selectedRows.length == 0) {
             JOptionPane.showMessageDialog(this, "No rows selected!");
         } else {
-            showFormatFilenamesDialog(selectedRows);
+//            showFormatFilenamesDialog(selectedRows);
+            JOptionPane.showMessageDialog(this, "Not implemented yet!");
         }
     }//GEN-LAST:event_formatFilenamesMenuItemActionPerformed
 
@@ -1569,91 +1548,81 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_openAllButtonActionPerformed
     // </editor-fold>
-    
+
     /**
      * Performs a command based on the user input
      *
-     * @param command
+     * @param command, the command to execute
      */
     public void doCommand(String command) {
         command = command.toLowerCase();
         switch (command) {
-            case "clear error log":
-                Main.settingsFrame.settingsController.clearErrorLog();
-                break;
-            case "clear event log":
-                Main.settingsFrame.settingsController.clearEventLog();
-                break;
-            case "open error log":
-                Main.settingsFrame.settingsController.openErrorLog();
-                break;
-            case "open event log":
-                Main.settingsFrame.settingsController.openEventLog();
-                break;
-            default:
-                JOptionPane.showMessageDialog(this, "Unknown Command!");
-                break;
+            case "clear error log" -> Main.settingsFrame.settingsController.clearErrorLog();
+            case "clear event log" -> Main.settingsFrame.settingsController.clearEventLog();
+            case "open error log" -> Main.settingsFrame.settingsController.openErrorLog();
+            case "open event log" -> Main.settingsFrame.settingsController.openEventLog();
+            default -> JOptionPane.showMessageDialog(this, "Unknown Command!");
         }
     }
 
-    /**
-     * Formats the file names
-     *
-     * @param selectedRows
-     */
-    public void showFormatFilenamesDialog(int[] selectedRows) {
-        JTextField regexField = new JTextField();
-        JCheckBox smartBox = new JCheckBox();
-        smartBox.setText("Figger it out");
-        Object[] message = {regexField, smartBox};
-        // create a thread to wait until the dialog box pops up
-        (new Thread() {
-            @Override
-            public void run() {
-                try {
-                    sleep(500);
-                } catch (InterruptedException e) {
-                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
-                }
-                regexField.requestFocus();
-            }
-        }).start();
-
-        int option = JOptionPane.showConfirmDialog(this, message, "Format file names", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (option == JOptionPane.OK_OPTION) {
-            String regex = regexField.getText();
-            boolean smart = smartBox.isSelected();
-            formatFilenames(smart, regex, selectedRows);
-        }
-    }
-
-    /**
-     * Actually does the formatting
-     *
-     * @param regexToUse
-     * @param smart
-     * @param selectedRows
-     */
-    public void formatFilenames(boolean smart, String regexToUse, int[] selectedRows) {
-        if (smart) {
-            String regex = "\\d{2}\\. .*\\.mp3";
-            for (int i = 0; i < selectedRows.length; i++) {
-                File file = (File) table.getModel().getValueAt(
-                        selectedRows[i],
-                        table.convertColumnIndexToModel(1)
-                );
-                if (!file.getName().matches(regex)) {
-
-                }
-            }
-        }
-    }
+//    /**
+//     * Formats the file names
+//     *
+//     * @param selectedRows, the rows currently selected on the table
+//     */
+//    public void showFormatFilenamesDialog(int[] selectedRows) {
+//        JTextField regexField = new JTextField();
+//        JCheckBox smartBox = new JCheckBox();
+//        smartBox.setText("Figger it out");
+//        Object[] message = {regexField, smartBox};
+//        // create a thread to wait until the dialog box pops up
+//        (new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    sleep(500);
+//                } catch (InterruptedException e) {
+//                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
+//                }
+//                regexField.requestFocus();
+//            }
+//        }).start();
+//
+//        int option = JOptionPane.showConfirmDialog(this, message, "Format file names", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+//        if (option == JOptionPane.OK_OPTION) {
+//            String regex = regexField.getText();
+//            boolean smart = smartBox.isSelected();
+//            formatFilenames(smart, regex, selectedRows);
+//        }
+//    }
+//
+//    /**
+//     * Actually does the formatting
+//     *
+//     * @param regexToUse, the regex to use
+//     * @param smart, a boolean to see if we want to try it automatically
+//     * @param selectedRows, the rows currently selected on the table
+//     */
+//    public void formatFilenames(boolean smart, String regexToUse, int[] selectedRows) {
+//        if (smart) {
+//            String regex = "\\d{2}\\. .*\\.mp3";
+//            for (int i = 0; i < selectedRows.length; i++) {
+//                File file = (File) table.getModel().getValueAt(
+//                        selectedRows[i],
+//                        table.convertColumnIndexToModel(1)
+//                );
+//                if (!file.getName().matches(regex)) {
+//
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Updates the autocomplete selection for the field
      *
-     * @param component
-     * @param isGenreField
+     * @param component, the text field that we're updating
+     * @param isGenreField, a boolean to see if it's a genre field
      */
     public void updateAutocompleteFields(JTextField component, boolean isGenreField) {
         String text = component.getText();
@@ -1702,23 +1671,23 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Get the changes from the info panel
      *
-     * @param filename
-     * @param title
-     * @param artist
-     * @param album
-     * @param albumartist
-     * @param year
-     * @param genre
-     * @param tracks
-     * @param disks
-     * @param comment
+     * @param filename, the filename to change
+     * @param title, the title to change
+     * @param artist, the artist to change
+     * @param album, the album to change
+     * @param albumArtist, the albumArtist to change
+     * @param year, the year to change
+     * @param genre, the genre to change
+     * @param tracks, the tracks to change
+     * @param disks, the disks to change
+     * @param comment, the comment to change
      */
     public void submitChangesFromInfoFrame(
             String filename,
             String title,
             String artist,
             String album,
-            String albumartist,
+            String albumArtist,
             String year,
             String genre,
             String tracks,
@@ -1735,51 +1704,44 @@ public class Frame extends javax.swing.JFrame {
             old_file.renameTo(new_file);
             model.setValueAt(new_file, row, 1);
             table.setValueAt(filename, row, 1);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 2).equals(title)) {
             songController.setTitle(songController.getIndex(row), title);
             table.setValueAt(title, row, 2);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 3).equals(artist)) {
             songController.setArtist(songController.getIndex(row), artist);
             table.setValueAt(artist, row, 3);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 4).equals(album)) {
             songController.setAlbum(songController.getIndex(row), album);
             table.setValueAt(album, row, 4);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
-        if (!table.getValueAt(row, 5).equals(albumartist)) {
-            songController.setAlbumArtist(songController.getIndex(row), albumartist);
-            table.setValueAt(albumartist, row, 5);
-        } else {
-            // do nothing, nothing was changed
+        if (!table.getValueAt(row, 5).equals(albumArtist)) {
+            songController.setAlbumArtist(songController.getIndex(row), albumArtist);
+            table.setValueAt(albumArtist, row, 5);
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 6).equals(year)) {
             songController.setYear(songController.getIndex(row), year);
             table.setValueAt(year, row, 6);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 7).equals(genre)) {
             songController.setGenre(songController.getIndex(row), genre);
             table.setValueAt(genre, row, 7);
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 8).equals(tracks)) {
             if (!tracks.equals("/")) {
@@ -1789,9 +1751,8 @@ public class Frame extends javax.swing.JFrame {
                 songController.setDisk(songController.getIndex(row), "");
                 table.setValueAt("", row, 8);
             }
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         if (!table.getValueAt(row, 9).equals(disks)) {
             if (!disks.equals("/")) {
@@ -1801,9 +1762,8 @@ public class Frame extends javax.swing.JFrame {
                 songController.setDisk(songController.getIndex(row), "");
                 table.setValueAt("", row, 9);
             }
-        } else {
-            // do nothing, nothing was changed
         }
+        // else do nothing, nothing was changed
 
         songController.setComment(songController.getIndex(row), comment);
 
@@ -1832,7 +1792,7 @@ public class Frame extends javax.swing.JFrame {
         String[] titles = new String[rows];
         String[] artists = new String[rows];
         String[] albums = new String[rows];
-        String[] albumartists = new String[rows];
+        String[] albumArtists = new String[rows];
         String[] genres = new String[rows];
         String[] years = new String[rows];
         String[] tracks = new String[rows];
@@ -1847,7 +1807,7 @@ public class Frame extends javax.swing.JFrame {
             titles[i] = table.getValueAt(selectedRows[i], 2).toString();
             artists[i] = table.getValueAt(selectedRows[i], 3).toString();
             albums[i] = table.getValueAt(selectedRows[i], 4).toString();
-            albumartists[i] = table.getValueAt(selectedRows[i], 5).toString();
+            albumArtists[i] = table.getValueAt(selectedRows[i], 5).toString();
             years[i] = table.getValueAt(selectedRows[i], 6).toString();
             genres[i] = table.getValueAt(selectedRows[i], 7).toString();
             tracks[i] = table.getValueAt(selectedRows[i], 8).toString();
@@ -1874,8 +1834,8 @@ public class Frame extends javax.swing.JFrame {
             multAlbum.setText("-");
         }
 
-        if (songController.checkIfSame(albumartists[0], albumartists)) {
-            multAlbumArtist.setText(albumartists[0]);
+        if (songController.checkIfSame(albumArtists[0], albumArtists)) {
+            multAlbumArtist.setText(albumArtists[0]);
         } else {
             multAlbumArtist.setText("-");
         }
@@ -1939,14 +1899,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the title field needs updated
         if (!title.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(title, selectedRows[i], 2);
+                table.setValueAt(title, row, 2);
 
                 // set the value in the songs array
                 songController.setTitle(index, title);
@@ -1955,14 +1914,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the artist field needs updated
         if (!artist.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(artist, selectedRows[i], 3);
+                table.setValueAt(artist, row, 3);
 
                 // set the value in the songs array
                 songController.setArtist(index, artist);
@@ -1971,14 +1929,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the album field needs updated
         if (!album.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(album, selectedRows[i], 4);
+                table.setValueAt(album, row, 4);
 
                 // set the value in the songs array
                 songController.setAlbum(index, album);
@@ -1987,14 +1944,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the album artist field needs updated
         if (!albumArtist.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(albumArtist, selectedRows[i], 5);
+                table.setValueAt(albumArtist, row, 5);
 
                 // set the value in the songs array
                 songController.setAlbumArtist(index, albumArtist);
@@ -2003,14 +1959,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the year field needs updated
         if (!year.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(year, selectedRows[i], 6);
+                table.setValueAt(year, row, 6);
 
                 // set the value in the songs array
                 songController.setYear(index, year);
@@ -2019,28 +1974,22 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the genre field needs updated
         if (!genre.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // check and see if the genre exists already
                 if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                     int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
-                    switch (res) {
-                        case JOptionPane.OK_OPTION:
-                            // add the genre to the settings
-                            Main.getSettings().addGenre(genre);
-                            Main.updateSettings();
-                            break;
-                        default:
-                            break;
+                    if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
+                        Main.getSettings().addGenre(genre);
+                        Main.updateSettings();
                     }
                 }
 
                 // set the value in the table to the new value
-                table.setValueAt(genre, selectedRows[i], 7);
+                table.setValueAt(genre, row, 7);
 
                 // set the value in the songs array
                 songController.setGenre(index, genre);
@@ -2050,14 +1999,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the track field needs updated
         if (!track.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(track, selectedRows[i], 8);
+                table.setValueAt(track, row, 8);
 
                 // set the value in the songs array
                 songController.setTrack(index, track);
@@ -2066,14 +2014,13 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the disk field needs updated
         if (!disk.equals("-")) {
-            for (int i = 0; i < selectedRows.length; i++) {
+            for (int row : selectedRows) {
 
                 // get the index of the song in the table
-                int row = selectedRows[i];
                 int index = songController.getIndex(row);
 
                 // set the value in the table to the new value
-                table.setValueAt(disk, selectedRows[i], 9);
+                table.setValueAt(disk, row, 9);
 
                 // set the value in the songs array
                 songController.setDisk(index, disk);
@@ -2118,9 +2065,8 @@ public class Frame extends javax.swing.JFrame {
             } else if (result > 0) {
                 JOptionPane.showMessageDialog(null, "Successfully made " + result + " replacements!", "Find and Replace", JOptionPane.PLAIN_MESSAGE);
             }
-        } else {
-            // user changed their mind
         }
+        // else do nothing, nothing was changed
         nav_status = FROM_DIALOG;
     }
 
@@ -2155,7 +2101,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Shows the popup when you click on an album image
      *
-     * @param e
+     * @param e, the event to base the location of the menu on
      */
     void showArtworkPopup(MouseEvent e, int rows) {
         JPopupMenu popup = getBasePopUpMenu(rows);
@@ -2171,7 +2117,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Shows the normal popup
      *
-     * @param e
+     * @param e, the event to base the location of the menu on
      */
     void showRegularPopup(MouseEvent e, int rows) {
         JPopupMenu popup = getBasePopUpMenu(rows);
@@ -2181,7 +2127,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Shows the normal popup with some file options too
      *
-     * @param e
+     * @param e, the event to base the location of the menu on
      */
     void showFilePopup(MouseEvent e, int rows) {
         JPopupMenu popup = getBasePopUpMenu(rows);
@@ -2193,10 +2139,10 @@ public class Frame extends javax.swing.JFrame {
 
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
-    
+
     /**
      * Returns the base popup menu
-     * 
+     *
      * @param rows, the number of rows selected
      * @return the base popup menu
      */
@@ -2221,7 +2167,7 @@ public class Frame extends javax.swing.JFrame {
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Auto-add artwork"));
         item.addActionListener(menuListener);
-        
+
         return popup;
     }
 
@@ -2229,7 +2175,7 @@ public class Frame extends javax.swing.JFrame {
      * Sets the specified column width
      *
      * @param column, the column to set
-     * @param width, width in pixels
+     * @param width,  width in pixels
      */
     private void setColumnWidth(int column, int width) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
@@ -2246,27 +2192,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
- /*
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-         */
-        //</editor-fold>
-
-        /* Create and display the form */
+    public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
 
         });

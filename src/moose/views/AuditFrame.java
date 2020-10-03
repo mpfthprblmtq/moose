@@ -1,10 +1,10 @@
-/**
- *  Proj:   Moose
- *  File:   AuditFrame.java
- *  Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
- *          Works with the AuditController to clean and audit directories, this class just handles all the UI.
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   AuditFrame.java
+   Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
+           Works with the AuditController to clean and audit directories, this class just handles all the UI.
+
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -17,15 +17,8 @@ import moose.controllers.*;
 
 import java.awt.Font;
 import java.io.File;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import java.util.Objects;
+import javax.swing.*;
 
 // class AuditFrame
 public class AuditFrame extends javax.swing.JFrame {
@@ -34,7 +27,7 @@ public class AuditFrame extends javax.swing.JFrame {
     public AuditController auditController = new AuditController();
 
     // logger object
-    Logger logger = Main.getLogger();
+    static Logger logger = Main.getLogger();
 
     /**
      * Creates new form AuditFrame
@@ -525,7 +518,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void auditViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditViewResultsButtonActionPerformed
-        viewResults(auditController.AUDIT);
+        viewResults(Constants.AUDIT);
     }//GEN-LAST:event_auditViewResultsButtonActionPerformed
 
     /**
@@ -544,7 +537,7 @@ public class AuditFrame extends javax.swing.JFrame {
         deleteAllButton.setEnabled(true);
         cleanupResultsTextArea.setEnabled(true);
 
-        cleanupResultsTextArea.setText(auditController.analyze(auditController.CLEANUP));
+        cleanupResultsTextArea.setText(auditController.analyze(Constants.CLEANUP));
 
         // enable the button used for viewing now that we have results
         cleanupViewResultsButton.setEnabled(true);
@@ -597,7 +590,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
-        viewResults(auditController.CLEANUP);
+        viewResults(Constants.CLEANUP);
     }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -633,7 +626,7 @@ public class AuditFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_imagesCheckBoxStateChanged
 
     private void auditAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditAnalyzeButtonActionPerformed
-        auditResultsTextArea.setText(auditController.analyze(auditController.AUDIT));
+        auditResultsTextArea.setText(auditController.analyze(Constants.AUDIT));
         auditViewResultsButton.setEnabled(true);    // enable the button used for viewing now that we have results
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
 
@@ -642,7 +635,8 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void chooseFolder() {
 
-        File folder = Utils.launchJFileChooser("Select a folder to audit/cleanup", "Select", JFileChooser.DIRECTORIES_ONLY, false)[0];
+        File folder = Objects.requireNonNull(
+                Utils.launchJFileChooser("Select a folder to audit/cleanup", "Select", JFileChooser.DIRECTORIES_ONLY, false))[0];
         
         if(folder != null) {
             // set the file ivars in the controllers
@@ -650,9 +644,8 @@ public class AuditFrame extends javax.swing.JFrame {
             // update some graphics
             label1.setEnabled(true);
             pathLabel.setText(folder.getPath());
-        } else {
-            // nothing was chosen
         }
+        // else nothing was chosen
     }
 
     /**
@@ -661,10 +654,10 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param type the type of results needed
      */
     public void viewResults(int type) {
-        if (type == auditController.AUDIT) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(auditController.AUDIT), "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
-        } else if (type == auditController.CLEANUP) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(auditController.CLEANUP), "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
+        if (type == Constants.AUDIT) {
+            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.AUDIT), "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
+        } else if (type == Constants.CLEANUP) {
+            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.CLEANUP), "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
         }
     }
 
@@ -685,12 +678,8 @@ public class AuditFrame extends javax.swing.JFrame {
         ta.setEditable(false);
         ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switch (type) {
-            case AuditController.AUDIT:
-                ta.setText(auditController.exportResultsToString(auditController.AUDIT));
-                break;
-            case AuditController.CLEANUP:
-                ta.setText(auditController.exportResultsToString(auditController.CLEANUP));
-                break;
+            case AuditController.AUDIT -> ta.setText(auditController.exportResultsToString(Constants.AUDIT));
+            case AuditController.CLEANUP -> ta.setText(auditController.exportResultsToString(Constants.CLEANUP));
         }
 
         // add it all to a panel
@@ -792,7 +781,7 @@ public class AuditFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -805,14 +794,8 @@ public class AuditFrame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AuditFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AuditFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AuditFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AuditFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            logger.logError("Exception thrown while adding theme to Swing GUI!", ex);
         }
         //</editor-fold>
 

@@ -40,4 +40,7 @@ public class Constants {
     public static final int TABLE_COLUMN_TRACK = 8;
     public static final int TABLE_COLUMN_DISK = 9;
     public static final int TABLE_COLUMN_ALBUMART = 10;
+
+    public static final int AUDIT = 0;
+    public static final int CLEANUP = 1;
 }
