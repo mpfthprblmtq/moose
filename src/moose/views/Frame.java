@@ -14,10 +14,7 @@ import java.awt.Component;
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Song;
-import moose.utilities.FileDrop;
-import moose.utilities.Logger;
-import moose.utilities.TableCellListener;
-import moose.utilities.Utils;
+import moose.utilities.*;
 
 import java.awt.Dimension;
 import java.awt.Image;
@@ -34,7 +31,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.*;
 import moose.services.AutocompleteService;
-import moose.utilities.AutoCompleteDocument;
+
+import static moose.utilities.Constants.*;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -83,30 +81,6 @@ public class Frame extends javax.swing.JFrame {
             return super.isCellEditable(e);
         }
     };
-
-    // some constants to make life easier
-    public static final int DEFAULT = 0;
-    public static final int EDITED = 1;
-    public static final int SAVED = 2;
-
-    private static final int SHIFT_TAB = 0;
-    private static final int SHIFT_ENTER = 1;
-    private static final int TAB = 2;
-    private static final int ENTER = 3;
-
-    private static final int FROM_DIALOG = 1;
-    private static final int NORMAL_NAV = 2;
-
-    // column constants
-    private static final int TABLE_COLUMN_TITLE = 2;
-    private static final int TABLE_COLUMN_ARTIST = 3;
-    private static final int TABLE_COLUMN_ALBUM = 4;
-    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
-    private static final int TABLE_COLUMN_YEAR = 6;
-    private static final int TABLE_COLUMN_GENRE = 7;
-    private static final int TABLE_COLUMN_TRACK = 8;
-    private static final int TABLE_COLUMN_DISK = 9;
-    private static final int TABLE_COLUMN_ALBUMART = 10;
 
     /**
      * Creates new form Frame
@@ -294,7 +268,7 @@ public class Frame extends javax.swing.JFrame {
                             String fileName = model.getValueAt(r, c).toString();
                             File new_file = new File(path + "//" + fileName + ".mp3");
 
-                            songController.setFile(index, old_file, new_file);
+                            songController.setFile(index, new_file);
 
                             old_file.renameTo(new_file);
                             model.setValueAt(new_file, r, 1);
@@ -463,7 +437,7 @@ public class Frame extends javax.swing.JFrame {
             case EDITED:
                 table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
                 break;
-            case SAVED:
+            case Constants.SAVED:
                 table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
                 break;
         }
@@ -1759,7 +1733,7 @@ public class Frame extends javax.swing.JFrame {
             File old_file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
             String path = old_file.getPath().replace(old_file.getName(), "");
             File new_file = new File(path + "//" + filename + ".mp3");
-            songController.setFile(songController.getIndex(row), old_file, new_file);
+            songController.setFile(songController.getIndex(row), new_file);
             old_file.renameTo(new_file);
             model.setValueAt(new_file, row, 1);
             table.setValueAt(filename, row, 1);
