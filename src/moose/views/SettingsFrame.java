@@ -1,17 +1,16 @@
-/**
- *  Proj:   Moose
- *  File:   SettingsFrame.java
- *  Desc:   Main UI class for the JFrame containing the settings and options.
- *          Works with the SettingsController to load and update settings, this class just handles all the UI.
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   SettingsFrame.java
+   Desc:   Main UI class for the JFrame containing the settings and options.
+           Works with the SettingsController to load and update settings, this class just handles all the UI.
+
+   Copyright Pat Ripley 2018
  */
 
 // package
 package moose.views;
 
 // imports
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import moose.Main;
 import moose.controllers.*;
@@ -596,14 +595,13 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
         System.out.println(genreList.getSelectedIndex());
-        if (genreList.getSelectedValue().contains("<html>")) {
-            // don't show in the text fields cause there's an error I can't be asked to fix
-        } else {
+        if (!genreList.getSelectedValue().contains("<html>")) {
             addGenreButton.setText("Submit");
             deleteGenreButton.setEnabled(true);
             cancelButton.setEnabled(true);
             genreTextField.setText(genreList.getSelectedValue());
         }
+        // else don't show in the text fields cause there's an error I can't be asked to fix
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
@@ -795,7 +793,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         Date dateLastUsed = Utils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
         
         // check to see if date in settings is today
-        if (today.getDay() == dateLastUsed.getDay() && 
+        assert dateLastUsed != null;
+        if (today.getDay() == dateLastUsed.getDay() &&
                 today.getMonth() == dateLastUsed.getMonth() &&
                 today.getYear() == dateLastUsed.getYear()) {
             // date is today, return normally
@@ -824,7 +823,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Removes the genre from the ivar list and the JList model
-     * @param genre
+     * @param genre, the genre to remove
      */
     public void removeGenreFromList(String genre) {
         if (!genreListModel.removeElement(genre)) {
@@ -844,8 +843,8 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Submits the change in the list and in the arraylist
-     * @param oldGenre
-     * @param newGenre
+     * @param oldGenre, the old genre to update
+     * @param newGenre, the new value of the genre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
         oldGenre = oldGenre
@@ -874,28 +873,28 @@ public class SettingsFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
         //</editor-fold>
 
         /* Create and display the form */

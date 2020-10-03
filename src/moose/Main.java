@@ -1,9 +1,9 @@
-/**
- *  Proj:   Moose
- *  File:   Main.java
- *  Desc:   Class that controls everything
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   Main.java
+   Desc:   Class that controls everything
+
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -79,7 +79,7 @@ public class Main {
     
     /**
      * Controls the Frame opening
-     * @param dir
+     * @param dir, the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
         frame = new Frame(dir);
