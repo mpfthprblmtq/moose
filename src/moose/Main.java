@@ -114,5 +114,12 @@ public class Main {
     public static void closeAuditFrame() {
         auditFrame.dispose();
     }
-    
+
+    /**
+     * Returns the auditFrame
+     */
+    public static AuditFrame getAuditFrame() {
+        return auditFrame;
+    }
+
 }
