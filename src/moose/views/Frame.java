@@ -121,12 +121,9 @@ public class Frame extends javax.swing.JFrame {
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
         Utils.listFiles(folder, files);
-//        for (File file : files) {
-//            if (!addFileToTable(file)) {
-//                files.remove(file);
-//            }
-//        }
         importFiles(files);
+        enableMultPanel(true);
+        setMultiplePanelFields();
         checkForNewGenres(files);
     }
 
@@ -1784,9 +1781,20 @@ public class Frame extends javax.swing.JFrame {
      */
     public void setMultiplePanelFields() {
 
-        // get the indices of the selected rows
-        int[] selectedRows = table.getSelectedRows();
-        int rows = table.getSelectedRowCount();
+        // get the selected rows
+        int[] selectedRows;
+        int rows;
+
+        if (table.getSelectedRows().length == 0) {
+            selectedRows = new int[table.getRowCount()];
+            for (int i = 0; i < selectedRows.length; i++) {
+                selectedRows[i] = i;
+            }
+            rows = selectedRows.length;
+        } else {
+            selectedRows = table.getSelectedRows();
+            rows = table.getSelectedRowCount();
+        }
 
         // make the arrays of values
         String[] titles = new String[rows];
@@ -1885,7 +1893,16 @@ public class Frame extends javax.swing.JFrame {
     public void updateMultPanelFields() {
 
         // get the selected rows
-        int[] selectedRows = table.getSelectedRows();
+        int[] selectedRows;
+
+        if (table.getSelectedRows().length == 0) {
+            selectedRows = new int[table.getRowCount()];
+            for (int i = 0; i < selectedRows.length; i++) {
+                selectedRows[i] = i;
+            }
+        } else {
+            selectedRows = table.getSelectedRows();
+        }
 
         // get the fields in the mult panel
         String title = multTitle.getText();
