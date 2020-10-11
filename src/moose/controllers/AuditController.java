@@ -10,10 +10,10 @@
 package moose.controllers;
 
 //imports
-
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import moose.utilities.Constants;
 import moose.views.Frame;
 import moose.utilities.Logger;
 import moose.Main;
@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 // class AuditController
@@ -31,17 +32,17 @@ public class AuditController {
 
     // some ivars
     int auditCount;
-    ArrayList<File> albums = new ArrayList<>();
+    List<File> albums = new ArrayList<>();
     File folder;
     File currentDir;
 
     // Arraylists for results
-    ArrayList<ArrayList<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
+    List<ArrayList<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
             new ArrayList<>(),      // id3
             new ArrayList<>(),      // filenames
             new ArrayList<>()));    // cover art
 
-    ArrayList<ArrayList<String>> cleanupFilePathList = new ArrayList<>(Arrays.asList(
+    List<ArrayList<String>> cleanupFilePathList = new ArrayList<>(Arrays.asList(
             new ArrayList<>(),      // mp3.asd
             new ArrayList<>(),      // flac
             new ArrayList<>(),      // wav
@@ -109,16 +110,8 @@ public class AuditController {
     public String analyze(int type) {
 
         // string to return
-        String results = "";
+        String results = Constants.EMPTY_STRING;
 
-        // reset everything
-        // let's count the mp3s and covers, cause why not
-        // create a list of all files from that directory
-        // traverse that list
-        // update the results
-        // reset everything
-        // traverse that list
-        // update the results
         switch (type) {
             case CLEANUP -> {
                 clearLists(CLEANUP);
@@ -126,6 +119,9 @@ public class AuditController {
                 int coverCount = 0;
                 ArrayList<File> cleanupFiles = new ArrayList<>();
                 Utils.listFiles(folder, cleanupFiles);
+                Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
+                double index = 0;
+                double total = cleanupFiles.size();
                 for (File file : cleanupFiles) {
 
                     // get the filename to check
@@ -138,13 +134,13 @@ public class AuditController {
                     } else if (filename.startsWith("cover.")) {
                         coverCount++;
                     } else if (filename.endsWith(".mp3.asd")) {
-                        cleanupFilePathList.get(0).add(file.getPath());
+                        cleanupFilePathList.get(MP3ASD).add(file.getPath());
                     } else if (filename.endsWith(".flac")) {
-                        cleanupFilePathList.get(1).add(file.getPath());
+                        cleanupFilePathList.get(FLAC).add(file.getPath());
                     } else if (filename.endsWith(".wav")) {
-                        cleanupFilePathList.get(2).add(file.getPath());
+                        cleanupFilePathList.get(WAV).add(file.getPath());
                     } else if (filename.endsWith(".zip")) {
-                        cleanupFilePathList.get(3).add(file.getPath());
+                        cleanupFilePathList.get(ZIP).add(file.getPath());
                     } else {
                         final boolean isImageFile = filename.endsWith(".png")
                                 || filename.endsWith(".jpg")
@@ -153,18 +149,22 @@ public class AuditController {
                         if (isImageFile
                                 && !filename.startsWith("cover.")
                                 && !file.getParentFile().getName().equals("artwork")) {
-                            cleanupFilePathList.get(4).add(file.getPath());
+                            cleanupFilePathList.get(IMG).add(file.getPath());
                         } else if (filename.equals("Thumbs.db") || filename.startsWith("folder.")) {
-                            cleanupFilePathList.get(5).add(file.getPath());
+                            cleanupFilePathList.get(WINDOWS).add(file.getPath());
                         } else {
                             if (!isImageFile
                                     && !filename.equals("done")
                                     && !filename.equals(".DS_Store")) {
-                                cleanupFilePathList.get(6).add(file.getPath());
+                                cleanupFilePathList.get(OTHER).add(file.getPath());
                             }
                         }
                     }
+                    Main.getAuditFrame().updateCleanupProgressBar(formatPercentage(index, total));
+                    index++;
                 }
+                Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+                Main.getAuditFrame().updateCleanupCurrentlyScanningLabel(cleanupFiles.size() + " files successfully scanned!");
                 results = "MP3 Files:     " + mp3Count + "\n"
                         + "Cover Files:   " + coverCount + "\n"
                         + "ZIP Files:     " + cleanupFilePathList.get(3).size() + "\n"
@@ -175,9 +175,14 @@ public class AuditController {
                         + "Windows Files: " + cleanupFilePathList.get(5).size() + "\n"
                         + "Other Files:   " + cleanupFilePathList.get(6).size();
             }
+
             case AUDIT -> {
                 clearLists(AUDIT);
+                Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
+                double index = 0;
+                double total = albums.size();
                 for (File dir : albums) {
+                    Main.getAuditFrame().updateAuditCurrentlyScanningLabel(formatStringForCurrentlyScanningPath(dir.getPath()));
                     if (!checkID3Tags(dir)) {
                         auditFilePathList.get(0).add(dir.getPath());
                     }
@@ -187,7 +192,12 @@ public class AuditController {
                     if (!checkFolderCover(dir)) {
                         auditFilePathList.get(2).add(dir.getPath());
                     }
+
+                    Main.getAuditFrame().updateAuditProgressBar(formatPercentage(index, total));
+                    index++;
                 }
+                Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+                Main.getAuditFrame().updateAuditCurrentlyScanningLabel(albums.size() + " albums successfully scanned!");
                 results = "ID3Tags missing:   " + auditFilePathList.get(0).size() + "\n"
                         + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
                         + "Cover art missing: " + auditFilePathList.get(2).size();
@@ -197,10 +207,30 @@ public class AuditController {
     }
 
     /**
+     * Helper function to format as tring for the currentlyScanningLabel while scanning
+     */
+    private String formatStringForCurrentlyScanningPath(String path) {
+        if (path.length() < 57) {
+            return path;
+        } else {
+            return "..." + path.substring(path.length() - 52);
+        }
+    }
+
+    /**
+     * Helper function to get the percentage for the progressBar
+     */
+    private int formatPercentage(double index, double total) {
+        double ratio = index / total;
+        double percentage = Math.ceil(ratio * 100);
+        return (int) percentage;
+    }
+
+    /**
      * Creates a master list of files from the audit folder, then imports all
      * the albums into the albums ivar list
      */
-    public void importAlbums() {
+    public int importAlbums() {
 
         // arraylist to store all the files
         ArrayList<File> allFiles = new ArrayList<>();
@@ -227,6 +257,8 @@ public class AuditController {
             String filename2 = o2.getPath().replace(folder.getPath(), "");
             return filename1.compareToIgnoreCase(filename2);
         });
+
+        return albums.size();
     }
 
     /**
@@ -277,10 +309,15 @@ public class AuditController {
         auditCount = 0;
         currentDir = albums.get(auditCount);
 
+        // update the currentlyScanningLabel to show where we are numerically
+        Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+        Main.getAuditFrame().updateAuditCurrentlyScanningLabel("Album " + auditCount + " of " + albums.size());
+
         // open up a new Frame with the album preloaded
         Main.frame.dispose();
         Main.frame = new Frame(albums.get(auditCount));
-        Main.launchFrame();
+        Main.launchFrame(currentDir);
+        Main.getAuditFrame().refreshAuditFrame();
     }
 
     /**
@@ -292,10 +329,14 @@ public class AuditController {
         auditCount = getNextAlbum();
         currentDir = albums.get(auditCount);
 
+        // update graphics
+        updateLabelAndProgressBarForAudit();
+
         // open up a new Frame with the next album preloaded
         Main.frame.dispose();
         Main.frame = new Frame(currentDir);
-        Main.launchFrame();
+        Main.launchFrame(currentDir);
+        Main.getAuditFrame().refreshAuditFrame();
     }
 
     /**
@@ -312,6 +353,9 @@ public class AuditController {
         auditCount++;
         currentDir = albums.get(auditCount);
 
+        // update graphics
+        updateLabelAndProgressBarForAudit();
+
         // save the tracks here instead of forcing the user to save it in the main frame form
         Main.frame.songController.saveAll();
 
@@ -320,7 +364,8 @@ public class AuditController {
             // close the current frame and open a new one with the new album preloaded
             Main.frame.dispose();
             Main.frame = new Frame(currentDir);
-            Main.launchFrame();
+            Main.launchFrame(currentDir);
+            Main.getAuditFrame().refreshAuditFrame();
         } else {
             // audit is done
             finishAudit();
@@ -339,14 +384,35 @@ public class AuditController {
 
         // prevent a negative auditCount
         if (auditCount >= 0) {
+
+            // update the progress bar
+            double index = auditCount;
+            double total = albums.size();
+            Main.getAuditFrame().updateAuditProgressBar(formatPercentage(index, total));
+
             // update ivars
             auditCount--;
             currentDir = albums.get(auditCount);
 
             Main.frame.dispose();
             Main.frame = new Frame(currentDir);
-            Main.launchFrame();
+            Main.launchFrame(currentDir);
+            Main.getAuditFrame().refreshAuditFrame();
         }
+    }
+
+    /**
+     * Helper function to update some graphics for auditing
+     */
+    private void updateLabelAndProgressBarForAudit() {
+        // update the currentlyScanningLabel to show where we are numerically
+        Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+        Main.getAuditFrame().updateAuditCurrentlyScanningLabel("Album " + auditCount + " of " + albums.size());
+
+        // update the progress bar
+        double index = auditCount;
+        double total = albums.size();
+        Main.getAuditFrame().updateAuditProgressBar(formatPercentage(index, total));
     }
 
     /**
@@ -628,7 +694,7 @@ public class AuditController {
                 String title = mp3file.getId3v2Tag().getTitle();
                 String artist = mp3file.getId3v2Tag().getArtist();
                 String album = mp3file.getId3v2Tag().getAlbum();
-                String albumartist = mp3file.getId3v2Tag().getAlbumArtist();
+                String albumArtist = mp3file.getId3v2Tag().getAlbumArtist();
                 String genre = mp3file.getId3v2Tag().getGenreDescription();
                 String year = mp3file.getId3v2Tag().getYear();
                 String track = mp3file.getId3v2Tag().getTrack();
@@ -640,7 +706,7 @@ public class AuditController {
                     if (title == null
                             || artist == null
                             || album == null
-                            || albumartist == null
+                            || albumArtist == null
                             || genre == null
                             || artwork_bytes == null) {
                         return false;
@@ -649,7 +715,7 @@ public class AuditController {
                     if (title == null
                             || artist == null
                             || album == null
-                            || albumartist == null
+                            || albumArtist == null
                             || genre == null
                             || year == null
                             || track == null
