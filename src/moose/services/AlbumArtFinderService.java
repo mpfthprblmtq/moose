@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import moose.objects.Settings;
 import moose.utilities.Constants;
 import moose.utilities.Logger;
 import moose.Main;
@@ -96,18 +97,21 @@ public class AlbumArtFinderService {
      * Updates the album art settings
      */
     public void updateAlbumArtSettings() {
+        // get the old settings to update
+        Settings settings = Main.getSettings();
+
         // check if date matches today
-        String settingsDate = Main.getSettings().getAlbumArtFinderSearchCountDate();
+        String settingsDate = settings.getAlbumArtFinderSearchCountDate();
         String todaysDate = Utils.formatDate(new Date());
         if (settingsDate.equals(todaysDate)) {
             // date is today, just increment call count
-            Main.getSettings().setAlbumArtFinderSearchCount(Main.getSettings().getAlbumArtFinderSearchCount() + 1);
+            settings.setAlbumArtFinderSearchCount(Main.getSettings().getAlbumArtFinderSearchCount() + 1);
         } else {
             // date is not today, set the new date and set the new count to 1
-            Main.getSettings().setAlbumArtFinderSearchCountDate(todaysDate);
-            Main.getSettings().setAlbumArtFinderSearchCount(1);
+            settings.setAlbumArtFinderSearchCountDate(todaysDate);
+            settings.setAlbumArtFinderSearchCount(1);
         }
-        Main.updateSettings();
+        Main.updateSettings(settings);
     }
 
     /**
