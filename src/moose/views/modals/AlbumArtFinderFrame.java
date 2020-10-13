@@ -79,13 +79,13 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 currentIconIndex = 0;
                 nextButton.setEnabled(true);
                 prevButton.setEnabled(false);
-                searchButton.setText("Search");
+                searchButton.setEnabled(true);
             } else if (icons.size() == 1) {
                 albumArtImageLabel.setIcon(icons.get(0));
                 currentIconIndex = 0;
                 nextButton.setEnabled(false);
                 prevButton.setEnabled(false);
-                searchButton.setText("Search");
+                searchButton.setEnabled(true);
             } else {
                 albumArtImageLabel.setIcon(null);
                 currentIconIndex = -1;
@@ -93,7 +93,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 prevButton.setEnabled(false);
                 statusLabel.setText("No results found!");
                 loadingLabel.setIcon(null);
-                searchButton.setText("Search");
+                searchButton.setEnabled(true);
                 return null;
             }
 
@@ -319,7 +319,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_confirmButtonActionPerformed
 
     private void queryTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_queryTextFieldKeyReleased
-        confirmButton.setEnabled(!queryTextField.getText().equals(""));
+        searchButton.setEnabled(!queryTextField.getText().equals(""));
     }//GEN-LAST:event_queryTextFieldKeyReleased
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
@@ -364,11 +364,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_googleImagesButtonActionPerformed
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-        if (searchButton.getText().equals("Search")) {
-            doSearch();
-        } else if (searchButton.getText().equals("Cancel")) {
-            worker.cancel(true);
-        }
+        doSearch();
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void queryTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_queryTextFieldKeyPressed
@@ -399,7 +395,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             sizeLabel.setText("");
             statusLabel.setText("Searching...");
             loadingLabel.setIcon(new ImageIcon(this.getClass().getResource("/resources/loading-icon-2.gif")));
-            searchButton.setText("Cancel");
+            searchButton.setEnabled(false);
             confirmButton.setEnabled(false);
             googleImagesButton.setEnabled(false);
 
