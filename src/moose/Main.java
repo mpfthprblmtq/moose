@@ -61,8 +61,8 @@ public class Main {
     /**
      * Sends a command to update the settings file with the settings object
      */
-    public static boolean updateSettings() {
-        return settingsFrame.settingsController.writeSettingsFile();
+    public static boolean updateSettings(Settings settings) {
+        return settingsFrame.settingsController.writeSettingsFile(settings);
     }
 
     /**
