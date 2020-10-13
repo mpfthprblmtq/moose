@@ -367,7 +367,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         if (searchButton.getText().equals("Search")) {
             doSearch();
         } else if (searchButton.getText().equals("Cancel")) {
-            worker.cancel(false);
+            worker.cancel(true);
         }
     }//GEN-LAST:event_searchButtonActionPerformed
 
@@ -378,6 +378,17 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_queryTextFieldKeyPressed
 
     public void doSearch() {
+
+        // check to see if we have a valid api key and cse id
+        if (Utils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
+                || Utils.isEmpty(Main.getSettings().getAlbumArtFinderCseId())) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid/Missing API key or CSE ID, open Settings to configure.",
+                    "Error with Album Art Finder",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         // check to make sure we're below the allowed search threshold
         if (AlbumArtFinderService.checkIfBelowLimit()) {

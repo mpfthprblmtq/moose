@@ -761,8 +761,12 @@ public class AuditFrame extends javax.swing.JFrame {
         ta.setEditable(false);
         ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switch (type) {
-            case AuditController.AUDIT -> ta.setText(auditController.exportResultsToString(Constants.AUDIT));
-            case AuditController.CLEANUP -> ta.setText(auditController.exportResultsToString(Constants.CLEANUP));
+            case AuditController.AUDIT:
+                ta.setText(auditController.exportResultsToString(Constants.AUDIT));
+                break;
+            case AuditController.CLEANUP:
+                ta.setText(auditController.exportResultsToString(Constants.CLEANUP));
+                break;
         }
 
         // add it all to a panel

@@ -16,6 +16,7 @@ import java.awt.Component;
 
 import moose.*;
 import moose.controllers.SongController;
+import moose.objects.Settings;
 import moose.objects.Song;
 import moose.utilities.*;
 
@@ -28,7 +29,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 import javax.swing.*;
@@ -317,8 +317,9 @@ public class Frame extends javax.swing.JFrame {
                         if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Main.getSettings().addGenre(genre);
-                                Main.updateSettings();
+                                Settings settings = Main.getSettings();
+                                settings.addGenre(genre);
+                                Main.updateSettings(settings);
                             }
                         }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
@@ -382,8 +383,9 @@ public class Frame extends javax.swing.JFrame {
         for (String newGenre : newGenres) {
             int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
-                Main.getSettings().addGenre(newGenre);
-                Main.updateSettings();
+                Settings settings = Main.getSettings();
+                settings.addGenre(newGenre);
+                Main.updateSettings(settings);
             }
         }
     }
@@ -410,11 +412,16 @@ public class Frame extends javax.swing.JFrame {
      * @param row,  the row to set
      */
     public void setRowIcon(int icon, int row) {
-
         switch (icon) {
-            case DEFAULT -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
-            case EDITED -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
-            case Constants.SAVED -> table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
+            case DEFAULT:
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
+                break;
+            case EDITED:
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
+                break;
+            case Constants.SAVED:
+                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
+                break;
         }
     }
 
@@ -1566,11 +1573,21 @@ public class Frame extends javax.swing.JFrame {
     public void doCommand(String command) {
         command = command.toLowerCase();
         switch (command) {
-            case "clear error log" -> Main.settingsFrame.settingsController.clearErrorLog();
-            case "clear event log" -> Main.settingsFrame.settingsController.clearEventLog();
-            case "open error log" -> Main.settingsFrame.settingsController.openErrorLog();
-            case "open event log" -> Main.settingsFrame.settingsController.openEventLog();
-            default -> JOptionPane.showMessageDialog(this, "Unknown Command!");
+            case "clear error log":
+                Main.settingsFrame.settingsController.clearErrorLog();
+                break;
+            case "clear event log":
+                Main.settingsFrame.settingsController.clearEventLog();
+                break;
+            case "open error log":
+                Main.settingsFrame.settingsController.openErrorLog();
+                break;
+            case "open event log":
+                Main.settingsFrame.settingsController.openEventLog();
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown Command!");
+                break;
         }
     }
 
@@ -2012,8 +2029,9 @@ public class Frame extends javax.swing.JFrame {
                 if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
                     int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
                     if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
-                        Main.getSettings().addGenre(genre);
-                        Main.updateSettings();
+                        Settings settings = Main.getSettings();
+                        settings.addGenre(genre);
+                        Main.updateSettings(settings);
                     }
                 }
 
