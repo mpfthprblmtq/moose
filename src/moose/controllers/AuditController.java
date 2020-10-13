@@ -112,16 +112,19 @@ public class AuditController {
         // string to return
         String results = Constants.EMPTY_STRING;
 
+        double index = 0;
+        double total;
+
         switch (type) {
-            case CLEANUP -> {
+            case CLEANUP:
                 clearLists(CLEANUP);
                 int mp3Count = 0;
                 int coverCount = 0;
                 ArrayList<File> cleanupFiles = new ArrayList<>();
                 Utils.listFiles(folder, cleanupFiles);
                 Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
-                double index = 0;
-                double total = cleanupFiles.size();
+                total = cleanupFiles.size();
+
                 for (File file : cleanupFiles) {
 
                     // get the filename to check
@@ -174,13 +177,13 @@ public class AuditController {
                         + "Image Files:   " + cleanupFilePathList.get(4).size() + "\n"
                         + "Windows Files: " + cleanupFilePathList.get(5).size() + "\n"
                         + "Other Files:   " + cleanupFilePathList.get(6).size();
-            }
+                break;
 
-            case AUDIT -> {
+            case AUDIT:
                 clearLists(AUDIT);
                 Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
-                double index = 0;
-                double total = albums.size();
+                total = albums.size();
+
                 for (File dir : albums) {
                     Main.getAuditFrame().updateAuditCurrentlyScanningLabel(formatStringForCurrentlyScanningPath(dir.getPath()));
                     if (!checkID3Tags(dir)) {
@@ -201,7 +204,7 @@ public class AuditController {
                 results = "ID3Tags missing:   " + auditFilePathList.get(0).size() + "\n"
                         + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
                         + "Cover art missing: " + auditFilePathList.get(2).size();
-            }
+                break;
         }
         return results;
     }
@@ -552,7 +555,7 @@ public class AuditController {
 
         // do something based on the type
         switch (type) {
-            case AUDIT -> {
+            case AUDIT:
                 str = str.concat(" Some ID3Tags missing:\n");
                 for (String path : auditFilePathList.get(ID3)) {
                     str = str.concat(" \t" + path + " \n");
@@ -568,8 +571,8 @@ public class AuditController {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-            }
-            case CLEANUP -> {
+                break;
+            case CLEANUP:
                 str = str.concat(" MP3.ASD FILES:\n");
                 for (String path : cleanupFilePathList.get(MP3ASD)) {
                     str = str.concat(" \t" + path + " \n");
@@ -605,7 +608,7 @@ public class AuditController {
                     str = str.concat(" \t" + path + " \n");
                 }
                 str = str.concat("\n");
-            }
+                break;
         }
         return str;
     }
@@ -820,7 +823,7 @@ public class AuditController {
      */
     public void clearLists(int type) {
         switch (type) {
-            case CLEANUP -> {
+            case CLEANUP:
                 cleanupFilePathList.get(0).clear();
                 cleanupFilePathList.get(1).clear();
                 cleanupFilePathList.get(2).clear();
@@ -828,12 +831,12 @@ public class AuditController {
                 cleanupFilePathList.get(4).clear();
                 cleanupFilePathList.get(5).clear();
                 cleanupFilePathList.get(6).clear();
-            }
-            case AUDIT -> {
+                break;
+            case AUDIT:
                 auditFilePathList.get(0).clear();
                 auditFilePathList.get(1).clear();
                 auditFilePathList.get(2).clear();
-            }
+                break;
         }
     }
 

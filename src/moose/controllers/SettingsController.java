@@ -92,11 +92,26 @@ public class SettingsController {
      */
     public boolean fillDefaults() {
         settings = new Settings();
-        return writeSettingsFile();
+        return writeSettingsFile(settings);
     }
 
     public Settings getSettings() {
         return this.settings;
+    }
+
+    public Settings copySettings() {
+        Settings tempSettings = new Settings();
+        Settings actualSettings = getSettings();
+        tempSettings.setGenres(actualSettings.getGenres());
+        tempSettings.setDebugMode(actualSettings.isInDebugMode());
+        tempSettings.setDeveloperMode(actualSettings.isInDeveloperMode());
+        tempSettings.setLibraryLocation(actualSettings.getLibraryLocation());
+        tempSettings.setAlbumArtFinderCseId(actualSettings.getAlbumArtFinderCseId());
+        tempSettings.setAlbumArtFinderApiKey(actualSettings.getAlbumArtFinderApiKey());
+        tempSettings.setAlbumArtFinderSearchCount(actualSettings.getAlbumArtFinderSearchCount());
+        tempSettings.setAlbumArtFinderSearchCountDate(actualSettings.getAlbumArtFinderSearchCountDate());
+        tempSettings.setPreferredCoverArtSize(actualSettings.getPreferredCoverArtSize());
+        return tempSettings;
     }
 
     /**
@@ -146,7 +161,7 @@ public class SettingsController {
     /**
      * Writes the settingsFile file from the ivars that were set in the program
      */
-    public boolean writeSettingsFile() {
+    public boolean writeSettingsFile(Settings settings) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settingsFile));
             bufferedWriter.write(mapper.writeValueAsString(settings));

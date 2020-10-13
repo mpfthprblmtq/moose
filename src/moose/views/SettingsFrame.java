@@ -11,9 +11,11 @@
 package moose.views;
 
 // imports
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import moose.Main;
 import moose.controllers.*;
+import moose.objects.Settings;
 import moose.utilities.*;
 
 import java.io.File;
@@ -34,11 +36,18 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
+
+    // temporary settings object, which gets sent to be updated
+    Settings settings;
     
     // starting states
     boolean debugEdited = false;
     boolean developerModeEdited = false;
     int genresDeleted = 0;
+
+    // some html constants
+    final String HTML_PREFIX = "<html><b><i>";
+    final String HTML_SUFFIX = "</i></b></html>";
 
     /**
      * Creates new form SettingsFrame
@@ -50,9 +59,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         // initially load the settings
         settingsController.readSettingsFile();
 
+        // set the temp settings with the actual settings
+        settings = settingsController.copySettings();
+
         // init the components
         initComponents();
-
     }
 
     /**
@@ -101,8 +112,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         timesUsedTodayLabel = new javax.swing.JLabel();
         timesUsedTodayField = new javax.swing.JLabel();
         preferredCoverArtSizeLabel = new javax.swing.JLabel();
-        preferredCoverArtSizeTextField = new javax.swing.JTextField();
         separator2 = new javax.swing.JSeparator();
+        preferredCoverArtSizeSpinner = new javax.swing.JSpinner();
         statusLabel = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         defaultButton = new javax.swing.JButton();
@@ -422,13 +433,10 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         preferredCoverArtSizeLabel.setText("Preferred cover art size:");
 
-        preferredCoverArtSizeTextField.setText(String.valueOf(this.settingsController.getSettings().getPreferredCoverArtSize()));
-        preferredCoverArtSizeTextField.setMaximumSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.setMinimumSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.setPreferredSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                preferredCoverArtSizeTextFieldKeyReleased(evt);
+        preferredCoverArtSizeSpinner.setValue(this.settingsController.getSettings().getPreferredCoverArtSize());
+        preferredCoverArtSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                preferredCoverArtSizeSpinnerStateChanged(evt);
             }
         });
 
@@ -455,7 +463,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addGroup(apiPanelLayout.createSequentialGroup()
                         .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(preferredCoverArtSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -480,11 +488,11 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addComponent(timesUsedTodayField))
                 .addGap(18, 18, 18)
                 .addComponent(separator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(preferredCoverArtSizeLabel)
-                    .addComponent(preferredCoverArtSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(76, Short.MAX_VALUE))
+                    .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("API Config", apiPanel);
@@ -594,14 +602,12 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt, the event
      */
     private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
-        System.out.println(genreList.getSelectedIndex());
-        if (!genreList.getSelectedValue().contains("<html>")) {
-            addGenreButton.setText("Submit");
-            deleteGenreButton.setEnabled(true);
-            cancelButton.setEnabled(true);
-            genreTextField.setText(genreList.getSelectedValue());
-        }
-        // else don't show in the text fields cause there's an error I can't be asked to fix
+        addGenreButton.setText("Submit");
+        deleteGenreButton.setEnabled(true);
+        cancelButton.setEnabled(true);
+        genreTextField.setText(genreList.getSelectedValue()
+                .replace(HTML_PREFIX, Constants.EMPTY_STRING)
+                .replace(HTML_SUFFIX, Constants.EMPTY_STRING));
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
@@ -614,7 +620,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         } else {
             debugCheckBox.setForeground(Constants.BLACK);
         }
-        settingsController.getSettings().setDebugMode(debugCheckBox.isSelected());
+        settings.setDebugMode(debugCheckBox.isSelected());
         debugEdited = !debugEdited;
         statusLabel.setText(Constants.EMPTY_STRING);
     }//GEN-LAST:event_debugCheckBoxActionPerformed
@@ -629,7 +635,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         } else {
             developerModeCheckBox.setForeground(Constants.BLACK);
         }
-        settingsController.getSettings().setDeveloperMode(developerModeCheckBox.isSelected());
+        settings.setDeveloperMode(developerModeCheckBox.isSelected());
         developerModeEdited = !developerModeEdited;
         statusLabel.setText(Constants.EMPTY_STRING);
     }//GEN-LAST:event_developerModeCheckBoxActionPerformed
@@ -695,7 +701,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                         JFileChooser.DIRECTORIES_ONLY,
                         false))[0];
         if(dir != null) {
-            settingsController.getSettings().setLibraryLocation(dir.getAbsolutePath() + "/");
+            settings.setLibraryLocation(dir.getAbsolutePath() + "/");
             libraryLocationField.setForeground(Constants.GREEN);
             libraryLocationField.setText(settingsController.getSettings().getLibraryLocation());
             statusLabel.setText(Constants.EMPTY_STRING);
@@ -706,6 +712,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         String originalValue = Main.getSettings().getAlbumArtFinderCseId();
         if (!cseTextField.getText().equals(originalValue)) {
             cseTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderCseId(cseTextField.getText());
         } else {
             cseTextField.setForeground(Constants.BLACK);
         }
@@ -715,19 +722,23 @@ public class SettingsFrame extends javax.swing.JFrame {
         String originalValue = Main.getSettings().getAlbumArtFinderApiKey();
         if (!apiKeyTextField.getText().equals(originalValue)) {
             apiKeyTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
         } else {
             apiKeyTextField.setForeground(Constants.BLACK);
         }
     }//GEN-LAST:event_apiKeyTextFieldKeyTyped
 
-    private void preferredCoverArtSizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeTextFieldKeyTyped
-        String originalValue = String.valueOf(Main.getSettings().getPreferredCoverArtSize());
-        if (!preferredCoverArtSizeTextField.getText().equals(originalValue)) {
-            preferredCoverArtSizeTextField.setForeground(Constants.GREEN);
+    private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
+        int originalValue = Main.getSettings().getPreferredCoverArtSize();
+        if (!preferredCoverArtSizeSpinner.getValue().equals(originalValue)) {
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.GREEN);
+            settings.setPreferredCoverArtSize((Integer) preferredCoverArtSizeSpinner.getValue());
         } else {
-            preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.BLACK);
         }
-    }//GEN-LAST:event_preferredCoverArtSizeTextFieldKeyTyped
+    }//GEN-LAST:event_preferredCoverArtSizeSpinnerStateChanged
 
     /**
      * Event for the default button
@@ -757,10 +768,11 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt, the event
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        if(Main.updateSettings()) {
+        if(Main.updateSettings(settings)) {
             statusLabel.setForeground(Constants.GREEN);
             statusLabel.setText("Settings saved!");
             resetUI();
+            settings = Main.getSettings();
         } else {
             statusLabel.setForeground(Constants.RED);
             statusLabel.setText("Problem updating Settings...");
@@ -801,7 +813,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         } else {
             // date was not today, set the times used today to 0
             this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
-            this.settingsController.writeSettingsFile();
+            this.settingsController.writeSettingsFile(settings);
         }
         return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
                 .concat("/")
@@ -813,8 +825,8 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        if (!Main.getSettings().getGenres().contains(genre) && !genreTextField.getText().equals(Constants.EMPTY_STRING)) {
-            settingsController.getSettings().addGenre(genre);
+        if (settings.getGenres().contains(genre) && !genreTextField.getText().equals(Constants.EMPTY_STRING)) {
+            settings.addGenre(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
             genreTextField.setText(Constants.EMPTY_STRING);
             statusLabel.setText(Constants.EMPTY_STRING);
@@ -829,7 +841,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         if (!genreListModel.removeElement(genre)) {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            settingsController.getSettings().removeGenre(genre);
+            settings.removeGenre(genre);
             genreTextField.setText(Constants.EMPTY_STRING);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
@@ -847,10 +859,21 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param newGenre, the new value of the genre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
-        oldGenre = oldGenre
-                .replace("<html><b><i>", Constants.EMPTY_STRING)
-                .replace("</i></b></html>", Constants.EMPTY_STRING);
-        settingsController.getSettings().getGenres().set(settingsController.getSettings().getGenres().indexOf(oldGenre), newGenre);
+
+        // the alreadyEdited mess is to check if the list entry was edited already, so I need to worry about the
+        // html tags showing up or not, since I need to index the array based on the value
+        // just don't worry about it, it works lol
+        boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
+        if (alreadyEdited) {
+            String oldGenre_withoutHtml = oldGenre
+                    .replace(HTML_PREFIX, Constants.EMPTY_STRING)
+                    .replace(HTML_SUFFIX, Constants.EMPTY_STRING);
+            genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
+            oldGenre = oldGenre_withoutHtml;
+        }
+
+        settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
+        newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
         statusLabel.setText(Constants.EMPTY_STRING);
     }
@@ -865,7 +888,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         libraryLocationField.setForeground(Constants.BLACK);
         cseTextField.setForeground(Constants.BLACK);
         apiKeyTextField.setForeground(Constants.BLACK);
-        preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
+        preferredCoverArtSizeSpinner.setForeground(Constants.BLACK);
         debugEdited = false;
         developerModeEdited = false;
     }
@@ -874,28 +897,6 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
@@ -938,7 +939,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JButton openErrorLogButton;
     private javax.swing.JButton openEventLogButton;
     private javax.swing.JLabel preferredCoverArtSizeLabel;
-    private javax.swing.JTextField preferredCoverArtSizeTextField;
+    private javax.swing.JSpinner preferredCoverArtSizeSpinner;
     private javax.swing.JButton saveButton;
     private javax.swing.JSeparator separator1;
     private javax.swing.JSeparator separator2;

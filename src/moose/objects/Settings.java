@@ -22,10 +22,10 @@ public class Settings {
     private String version;
     private boolean inDebugMode;
     private boolean inDeveloperMode;
-    private final List<String> genres;
+    private List<String> genres;
     private String libraryLocation;
-    private final int preferredCoverArtSize;
-    private final String albumArtFinderApiKey;
+    private int preferredCoverArtSize;
+    private String albumArtFinderApiKey;
     private String albumArtFinderCseId;
     private int albumArtFinderSearchCount;
     private String albumArtFinderSearchCountDate;
@@ -83,8 +83,16 @@ public class Settings {
         return genres;
     }
 
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
+    }
+
     public int getPreferredCoverArtSize() {
         return preferredCoverArtSize;
+    }
+
+    public void setPreferredCoverArtSize(int preferredCoverArtSize) {
+        this.preferredCoverArtSize = preferredCoverArtSize;
     }
 
     public String getLibraryLocation() {
@@ -97,6 +105,10 @@ public class Settings {
 
     public String getAlbumArtFinderApiKey() {
         return albumArtFinderApiKey;
+    }
+
+    public void setAlbumArtFinderApiKey(String albumArtFinderApiKey) {
+        this.albumArtFinderApiKey = albumArtFinderApiKey;
     }
 
     public String getAlbumArtFinderCseId() {
