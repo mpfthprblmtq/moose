@@ -17,8 +17,10 @@ import moose.utilities.Logger;
 import moose.utilities.Utils;
 import moose.views.modals.AlbumArtFinderFrame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -276,13 +278,44 @@ public class AutoTaggingService {
         }
 
         File[] files = folder.listFiles();      // get all the files
+        List<File> images = new ArrayList<>();
         assert files != null;
         for (File file : files) {
+            if (file.getName().endsWith(".png") || file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")) {
+                images.add(file);
+            }
             if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
                 return file;
             }
         }
-        // if we reach this point, then the cover wasn't found
+
+        // if we reach this point, an image file named cover.* wasn't found
+        // now we check to see if a single image file exists
+        if (images.size() == 1) {
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = ImageIO.read(images.get(0));
+            } catch (IOException ex) {
+                logger.logError("IOException while trying to reach buffered image: ".concat(images.get(0).getPath()));
+            }
+            if (bufferedImage != null) {
+                // check to see if it is the same width/height
+                if (bufferedImage.getWidth() != bufferedImage.getHeight()) {
+                    return null;
+                }
+            }
+
+            String parent = images.get(0).getParentFile().getPath();
+            String type = images.get(0).getName().split("\\.")[1];
+            File rename_to = new File(parent.concat("/cover").concat(".").concat(type));
+
+            if (!images.get(0).renameTo(rename_to)) {
+                logger.logError("Error while renaming image file: ".concat(rename_to.getPath()));
+            }
+            return rename_to;
+        }
+
+        // if we reach this point, no image files exist in that directory
         // perform one final check and recursively call itself
         if (folder.getParentFile().getName().matches(regex)) {
             return folderContainsCover(folder.getParentFile());
