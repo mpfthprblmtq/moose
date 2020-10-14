@@ -10,6 +10,7 @@
 package moose.controllers;
 
 // imports
+
 import com.mpatric.mp3agic.*;
 
 import moose.services.AutoTaggingService;
@@ -200,7 +201,7 @@ public class SongController {
     /**
      * Helper function to set the file of the song file in the songs arraylist.
      *
-     * @param index, the index of the song
+     * @param index,    the index of the song
      * @param new_file, the new file to set
      */
     public void setFile(int index, File new_file) {
@@ -222,7 +223,7 @@ public class SongController {
     /**
      * Helper function to set the artist of the song in the songs arraylist.
      *
-     * @param index, the index of the song
+     * @param index,  the index of the song
      * @param artist, the artist to set
      */
     public void setArtist(int index, String artist) {
@@ -245,7 +246,7 @@ public class SongController {
      * Helper function to set the album artist of the song in the songs
      * arraylist.
      *
-     * @param index, the index of the song
+     * @param index,       the index of the song
      * @param albumartist, the albumartist to set
      */
     public void setAlbumArtist(int index, String albumartist) {
@@ -268,7 +269,7 @@ public class SongController {
      * Helper function to set the year of the song in the songs arraylist.
      *
      * @param index, the index of the song
-     * @param year, the year to set
+     * @param year,  the year to set
      */
     public void setYear(int index, String year) {
         songs.get(index).setYear(year);
@@ -290,7 +291,7 @@ public class SongController {
      * Helper function to set the disk of the song in the songs arraylist.
      *
      * @param index, the index of the song
-     * @param disk, the disk to set
+     * @param disk,  the disk to set
      */
     public void setDisk(int index, String disk) {
         songs.get(index).setDisk(disk);
@@ -312,7 +313,7 @@ public class SongController {
     /**
      * Helper function to set the comment of the song in the songs arraylist.
      *
-     * @param index, the index of the song
+     * @param index,   the index of the song
      * @param comment, the comment to set
      */
     public void setComment(int index, String comment) {
@@ -422,7 +423,7 @@ public class SongController {
      * Saves an individual file
      *
      * @param mp3file, the mp3 file to source the information from
-     * @param file, the actual file to save as
+     * @param file,    the actual file to save as
      */
     public void save(Mp3File mp3file, File file) {
         try {
@@ -449,10 +450,10 @@ public class SongController {
     /**
      * Does the finding and replacing from showFindAndReplaceDialog()
      *
-     * @param find, the string to find
-     * @param replace, the string to replace
+     * @param find,         the string to find
+     * @param replace,      the string to replace
      * @param includeFiles, a boolean to check if we're including the file names
-     * in the search
+     *                      in the search
      * @return the results of the replace, true if there was something to
      * replace, false if not
      */
@@ -573,8 +574,13 @@ public class SongController {
      */
     public void moveFiles(int[] selectedRows) {
 
-        File directory = Objects.requireNonNull(
-                Utils.launchJFileChooser("Choose the destination folder...", "Select", JFileChooser.DIRECTORIES_ONLY, false))[0];
+        File directory = Objects.requireNonNull(Utils.launchJFileChooser(
+                "Choose the destination folder...",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
         if (directory != null) {
             for (int selectedRow : selectedRows) {
                 File old_file = (File) table.getModel().getValueAt(selectedRow, 1);
@@ -587,8 +593,8 @@ public class SongController {
     /**
      * Function that actually moves the file
      *
-     * @param row, the row on the table
-     * @param old_file, the file to move
+     * @param row,          the row on the table
+     * @param old_file,     the file to move
      * @param new_location, the destination file to move it to
      */
     public void moveFile(int row, File old_file, File new_location) {
@@ -641,7 +647,7 @@ public class SongController {
      * Helper Function Checks if a byte array is the same throughout an array
      *
      * @param bytes, the byte array to check
-     * @param arr, the array of byte arrays
+     * @param arr,   the array of byte arrays
      * @return the result of the check
      */
     public boolean checkIfSame(byte[] bytes, byte[][] arr) {
