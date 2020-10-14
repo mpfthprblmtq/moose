@@ -1220,7 +1220,13 @@ public class Frame extends javax.swing.JFrame {
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
 
         // select some file(s)
-        File[] dirs = Utils.launchJFileChooser("Select a folder to open...", "Open", JFileChooser.DIRECTORIES_ONLY, true);
+        File[] dirs = Utils.launchJFileChooser(
+                "Select a folder to open...",
+                "Open",
+                JFileChooser.DIRECTORIES_ONLY,
+                true,
+                null,
+                null);
 
         if (dirs != null) {
             // create an arraylist of files
