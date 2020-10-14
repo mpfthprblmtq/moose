@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static moose.utilities.Constants.*;
 
@@ -202,14 +203,14 @@ public class AutoTaggingService {
 
             // only show the JFileChooser on the first go
             if (i == 0) {
-                JFileChooser fc = new JFileChooser(new File(file.getAbsolutePath()));
-                fc.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif"));
-
-                // result of the file choosing
-                int returnVal = fc.showOpenDialog(null);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    img_file = fc.getSelectedFile();
-                } else {
+                img_file = Objects.requireNonNull(Utils.launchJFileChooser(
+                        "Select an image to use",
+                        "Select",
+                        JFileChooser.FILES_ONLY,
+                        false,
+                        file,
+                        new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
+                if (img_file == null) {
                     return;
                 }
             }

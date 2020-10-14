@@ -718,8 +718,13 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void chooseFolder() {
 
-        File folder = Objects.requireNonNull(
-                Utils.launchJFileChooser("Select a folder to audit/cleanup", "Select", JFileChooser.DIRECTORIES_ONLY, false))[0];
+        File folder = Objects.requireNonNull(Utils.launchJFileChooser(
+                "Select a folder to audit/cleanup",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
         
         if(folder != null) {
             // set the file ivars in the controllers

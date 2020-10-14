@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import moose.Main;
 
 public class Utils {
@@ -204,9 +206,11 @@ public class Utils {
      * @param approveButtonText, the text to show on the approve button
      * @param selectionMode, the mode for selecting files
      * @param multipleSelection, a boolean for allowing multiple file selection in the window
+     * @param openAt, an optional-ish parameter to open the JFileChooser at a certain location
+     * @param fileNameExtensionFilter, an optional-ish parameter to set the filter to look at files on
      * @return a file array of the selected file(s)
      */
-    public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection) {
+    public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection, File openAt, FileNameExtensionFilter fileNameExtensionFilter) {
 
         // create it
         JFileChooser jfc = new JFileChooser() {
@@ -221,16 +225,27 @@ public class Utils {
         };
 
         // configure it
-        File library;
-        if (Utils.isLibraryLocationSet()) {
-            library = new File(Main.getSettings().getLibraryLocation());
-        } else {
-            library = new File(System.getProperty("user.home"));
+
+        // if the parameter openAt is null, open the library location by default if its set
+        // if it's not set, open the user.home
+        if (openAt == null) {
+            if (Utils.isLibraryLocationSet()) {
+                openAt = new File(Main.getSettings().getLibraryLocation());
+            } else {
+                openAt = new File(System.getProperty("user.home"));
+            }
         }
-        jfc.setCurrentDirectory(library);
+        jfc.setCurrentDirectory(openAt);
+
+        // some normal fields
         jfc.setDialogTitle(title);
         jfc.setMultiSelectionEnabled(multipleSelection);
         jfc.setFileSelectionMode(selectionMode);
+
+        // filter the files based on the extensions
+        if (fileNameExtensionFilter != null) {
+            jfc.setFileFilter(fileNameExtensionFilter);
+        }
 
         // launch it
         int returnVal = jfc.showDialog(null, approveButtonText);
