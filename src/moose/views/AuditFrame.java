@@ -30,7 +30,7 @@ public class AuditFrame extends javax.swing.JFrame {
     static Logger logger = Main.getLogger();
 
     SwingWorker<Void, Void> // make a swing worker do the image search in a separate thread so I can update the GUI
-            worker = new SwingWorker<>() {
+            worker = new SwingWorker<Void, Void>() {
         @Override
         protected Void doInBackground() {
 

@@ -11,6 +11,8 @@ package moose.objects;
 
 // imports
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 // class Song
 public class Song {
@@ -311,6 +313,36 @@ public class Song {
      */
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Song song = (Song) o;
+        return Objects.equals(file, song.file) &&
+                Objects.equals(title, song.title) &&
+                Objects.equals(artist, song.artist) &&
+                Objects.equals(album, song.album) &&
+                Objects.equals(albumArtist, song.albumArtist) &&
+                Objects.equals(genre, song.genre) &&
+                Objects.equals(year, song.year) &&
+                Objects.equals(track, song.track) &&
+                Objects.equals(totalTracks, song.totalTracks) &&
+                Objects.equals(disk, song.disk) &&
+                Objects.equals(totalDisks, song.totalDisks) &&
+                Arrays.equals(artwork_bytes, song.artwork_bytes) &&
+                Objects.equals(bitrate, song.bitrate) &&
+                Objects.equals(sampleRate, song.sampleRate) &&
+                Objects.equals(length, song.length) &&
+                Objects.equals(comment, song.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(file, title, artist, album, albumArtist, genre, year, track, totalTracks, disk, totalDisks, bitrate, sampleRate, length, comment);
+        result = 31 * result + Arrays.hashCode(artwork_bytes);
+        return result;
     }
 
     @Override
