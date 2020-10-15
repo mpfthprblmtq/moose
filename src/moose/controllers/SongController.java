@@ -23,10 +23,7 @@ import moose.utilities.Utils;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 // class SongController
 public class SongController {
@@ -66,6 +63,17 @@ public class SongController {
      */
     public HashMap<Integer, Song> getSongs() {
         return songs;
+    }
+
+    /**
+     * Returns a list of all the files in the table currently
+     */
+    public List<File> getAllFiles() {
+        List<File> files = new ArrayList<>();
+        for (Song song : getSongs().values()) {
+            files.add(song.getFile());
+        }
+        return files;
     }
 
     /**
@@ -152,9 +160,24 @@ public class SongController {
         int index = songs.size();
 
         // add the song to the list
-        songs.put(index, s);
+        addSong(index, s);
 
         return s;
+    }
+
+    /**
+     * Adds a song to the map
+     * @param index, the index key
+     * @param s, the song to add
+     */
+    private void addSong(int index, Song s) {
+        Collection<Song> existingSongs = getSongs().values();
+        for (Song song : existingSongs) {
+            if (song.equals(s)) {
+                return;
+            }
+        }
+        songs.put(index, s);
     }
 
     /**
