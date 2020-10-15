@@ -33,7 +33,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     AlbumArtFinderService albumArtFinderService = new AlbumArtFinderService();
 
     SwingWorker<Void, Void> // make a swing worker do the image search in a separate thread so I can update the GUI
-            worker = new SwingWorker<>() {
+            worker = new SwingWorker<Void, Void>() {
         @Override
         protected Void doInBackground() {
 
