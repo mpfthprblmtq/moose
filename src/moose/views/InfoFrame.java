@@ -10,16 +10,17 @@
 package moose.views;
 
 // imports
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import javax.swing.Icon;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
+
 import moose.Main;
 import moose.controllers.SongController;
 import moose.objects.Song;
+import moose.utilities.Constants;
 import moose.utilities.Utils;
 
 // class InfoFrame
@@ -32,18 +33,34 @@ public class InfoFrame extends javax.swing.JFrame {
     
     // songcontroller object
     SongController songController;
+
+    // the song in the thingy
+    Song song;
+
+    // edited globals
+    boolean edited;
+    boolean editModeEnabled;
+    Component lastEditedField;
     
     /**
      * Creates new form InfoFrame
      * @param s, the song to source the info from
      * @param row, the row on the table
      */
-    public InfoFrame(Song s, int row) {
+    public InfoFrame(Song s, int row, boolean editModeEnabled, Component focusedField) {
         initComponents();
+        this.setTitle(s.getArtist() + " - " + s.getTitle());
+        this.song = s;
         setFields(s);
         setNavigationButtons(row);
+        setFieldsEditable(editModeEnabled);
+        if (editModeEnabled) {
+            editSubmitButton.setText("Submit");
+            getFocusedField(focusedField);
+        }
         
         this.row = row;
+        this.editModeEnabled = editModeEnabled;
         songController = Main.frame.songController;
         
         // listener for the context menu when you right click on a row
@@ -64,6 +81,54 @@ public class InfoFrame extends javax.swing.JFrame {
                     break;
             }
         }; // end menuListener
+    }
+
+    /**
+     * Sets the focused field
+     */
+    private void getFocusedField(Component focusedField) {
+        if(focusedField == null) {
+            return;
+        }
+
+        switch (focusedField.getName()) {
+            case "filename":
+                filenameField.requestFocus();
+                break;
+            case "title":
+                titleField.requestFocus();
+                break;
+            case "artist":
+                artistField.requestFocus();
+                break;
+            case "album":
+                albumField.requestFocus();
+                break;
+            case "albumArtist":
+                albumArtistField.requestFocus();
+                break;
+            case "year":
+                yearField.requestFocus();
+                break;
+            case "genre":
+                genreField.requestFocus();
+                break;
+            case "track1":
+                track1Field.requestFocus();
+                break;
+            case "track2":
+                track2Field.requestFocus();
+                break;
+            case "disk1":
+                disk1Field.requestFocus();
+                break;
+            case "disk2":
+                disk2Field.requestFocus();
+                break;
+            case "comment":
+                commentField.requestFocus();
+                break;
+        }
     }
 
     /**
@@ -112,6 +177,7 @@ public class InfoFrame extends javax.swing.JFrame {
         previousButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
         jLabel18 = new javax.swing.JLabel();
+        editedLabel = new javax.swing.JLabel();
 
         jLabel1.setText("jLabel1");
 
@@ -141,6 +207,7 @@ public class InfoFrame extends javax.swing.JFrame {
         filenameField.setEditable(false);
         filenameField.setMaximumSize(new java.awt.Dimension(200, 26));
         filenameField.setMinimumSize(new java.awt.Dimension(200, 26));
+        filenameField.setName("filename"); // NOI18N
         filenameField.setNextFocusableComponent(titleField);
         filenameField.setPreferredSize(new java.awt.Dimension(200, 26));
         filenameField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -152,109 +219,120 @@ public class InfoFrame extends javax.swing.JFrame {
         titleField.setEditable(false);
         titleField.setMaximumSize(new java.awt.Dimension(200, 26));
         titleField.setMinimumSize(new java.awt.Dimension(200, 26));
+        titleField.setName("title"); // NOI18N
         titleField.setNextFocusableComponent(artistField);
         titleField.setPreferredSize(new java.awt.Dimension(200, 26));
         titleField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                titleFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                titleFieldKeyReleased(evt);
             }
         });
 
         artistField.setEditable(false);
         artistField.setMaximumSize(new java.awt.Dimension(200, 26));
         artistField.setMinimumSize(new java.awt.Dimension(200, 26));
+        artistField.setName("artist"); // NOI18N
         artistField.setNextFocusableComponent(albumField);
         artistField.setPreferredSize(new java.awt.Dimension(200, 26));
         artistField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                artistFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                artistFieldKeyReleased(evt);
             }
         });
 
         albumField.setEditable(false);
         albumField.setMaximumSize(new java.awt.Dimension(200, 26));
         albumField.setMinimumSize(new java.awt.Dimension(200, 26));
+        albumField.setName("album"); // NOI18N
         albumField.setNextFocusableComponent(albumArtistField);
         albumField.setPreferredSize(new java.awt.Dimension(200, 26));
         albumField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                albumFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                albumFieldKeyReleased(evt);
             }
         });
 
         albumArtistField.setEditable(false);
         albumArtistField.setMaximumSize(new java.awt.Dimension(200, 26));
         albumArtistField.setMinimumSize(new java.awt.Dimension(200, 26));
+        albumArtistField.setName("albumArtist"); // NOI18N
         albumArtistField.setNextFocusableComponent(yearField);
         albumArtistField.setPreferredSize(new java.awt.Dimension(200, 26));
         albumArtistField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                albumartistFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                albumArtistFieldKeyReleased(evt);
             }
         });
 
         yearField.setEditable(false);
         yearField.setMaximumSize(new java.awt.Dimension(85, 26));
         yearField.setMinimumSize(new java.awt.Dimension(85, 26));
+        yearField.setName("year"); // NOI18N
         yearField.setNextFocusableComponent(genreField);
         yearField.setPreferredSize(new java.awt.Dimension(85, 26));
         yearField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                yearFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                yearFieldKeyReleased(evt);
             }
         });
 
+        genreField.setEditable(false);
         genreField.setMaximumSize(new java.awt.Dimension(200, 26));
         genreField.setMinimumSize(new java.awt.Dimension(200, 26));
+        genreField.setName("genre"); // NOI18N
         genreField.setNextFocusableComponent(track1Field);
         genreField.setPreferredSize(new java.awt.Dimension(200, 26));
         genreField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                genreFieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                genreFieldKeyReleased(evt);
             }
         });
 
         track1Field.setEditable(false);
         track1Field.setMaximumSize(new java.awt.Dimension(30, 26));
         track1Field.setMinimumSize(new java.awt.Dimension(30, 26));
+        track1Field.setName("track1"); // NOI18N
         track1Field.setNextFocusableComponent(track2Field);
         track1Field.setPreferredSize(new java.awt.Dimension(30, 26));
         track1Field.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                track1FieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                track1FieldKeyReleased(evt);
             }
         });
 
         track2Field.setEditable(false);
         track2Field.setMaximumSize(new java.awt.Dimension(30, 26));
         track2Field.setMinimumSize(new java.awt.Dimension(30, 26));
+        track2Field.setName("track2"); // NOI18N
         track2Field.setNextFocusableComponent(disk1Field);
         track2Field.setPreferredSize(new java.awt.Dimension(30, 26));
         track2Field.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                track2FieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                track2FieldKeyReleased(evt);
             }
         });
 
         disk1Field.setEditable(false);
         disk1Field.setMaximumSize(new java.awt.Dimension(30, 26));
         disk1Field.setMinimumSize(new java.awt.Dimension(30, 26));
+        disk1Field.setName("disk1"); // NOI18N
         disk1Field.setNextFocusableComponent(disk2Field);
         disk1Field.setPreferredSize(new java.awt.Dimension(30, 26));
         disk1Field.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                disk1FieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                disk1FieldKeyReleased(evt);
             }
         });
 
         disk2Field.setEditable(false);
         disk2Field.setMaximumSize(new java.awt.Dimension(30, 26));
         disk2Field.setMinimumSize(new java.awt.Dimension(30, 26));
+        disk2Field.setName("disk2"); // NOI18N
         disk2Field.setNextFocusableComponent(commentField);
         disk2Field.setPreferredSize(new java.awt.Dimension(30, 26));
         disk2Field.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                disk2FieldKeyPressed(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                disk2FieldKeyReleased(evt);
             }
         });
 
@@ -300,11 +378,15 @@ public class InfoFrame extends javax.swing.JFrame {
         commentField.setEditable(false);
         commentField.setColumns(20);
         commentField.setRows(5);
+        commentField.setName("comment"); // NOI18N
         commentField.setNextFocusableComponent(filenameField);
         commentField.setPreferredSize(new java.awt.Dimension(250, 80));
         commentField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 commentFieldKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                commentFieldKeyReleased(evt);
             }
         });
         jScrollPane1.setViewportView(commentField);
@@ -348,6 +430,8 @@ public class InfoFrame extends javax.swing.JFrame {
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel18.setText("Genre:");
 
+        editedLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -377,6 +461,8 @@ public class InfoFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(nextButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(editedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(editSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -498,10 +584,12 @@ public class InfoFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(coverLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(editSubmitButton)
-                    .addComponent(previousButton)
-                    .addComponent(nextButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(editSubmitButton)
+                        .addComponent(previousButton)
+                        .addComponent(nextButton))
+                    .addComponent(editedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -524,91 +612,146 @@ public class InfoFrame extends javax.swing.JFrame {
             editSubmitButton.setText("Edit");
             setFieldsEditable(false);
             submit();
+            this.editModeEnabled = false;
         }
     }//GEN-LAST:event_editSubmitButtonActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         setFieldsEditable(false);
+        Main.frame.setEnabled(true);
     }//GEN-LAST:event_formWindowClosed
 
     private void filenameFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_filenameFieldKeyReleased
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
+        if (!song.getFile().getName().equals(filenameField.getText())) {
+            edited = true;
+        }
+        lastEditedField = filenameField;
     }//GEN-LAST:event_filenameFieldKeyReleased
-
-    private void titleFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_titleFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_titleFieldKeyPressed
-
-    private void artistFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_artistFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_artistFieldKeyPressed
-
-    private void albumFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_albumFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_albumFieldKeyPressed
-
-    private void albumartistFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_albumartistFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_albumartistFieldKeyPressed
-
-    private void yearFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_yearFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_yearFieldKeyPressed
-
-    private void genreFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_genreFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_genreFieldKeyPressed
-
-    private void track1FieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_track1FieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_track1FieldKeyPressed
-
-    private void track2FieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_track2FieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_track2FieldKeyPressed
-
-    private void disk1FieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_disk1FieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_disk1FieldKeyPressed
-
-    private void disk2FieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_disk2FieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        }
-    }//GEN-LAST:event_disk2FieldKeyPressed
-
-    private void commentFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commentFieldKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            editSubmitButton.doClick();
-        } else if (evt.getKeyCode() == KeyEvent.VK_TAB) {
-            commentField.transferFocus();
-            evt.consume();  // consume prilosec
-        }
-    }//GEN-LAST:event_commentFieldKeyPressed
 
     private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
         showArtworkPopup(evt);
     }//GEN-LAST:event_coverLabelMouseClicked
+
+    private void titleFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_titleFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getTitle().equals(titleField.getText())) {
+            edited = true;
+            editedLabel.setIcon(new ImageIcon(getClass().getResource("/resources/edit.png")));
+        }
+        lastEditedField = titleField;
+    }//GEN-LAST:event_titleFieldKeyReleased
+
+    private void artistFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_artistFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getArtist().equals(artistField.getText())) {
+            edited = true;
+            editedLabel.setIcon(new ImageIcon(getClass().getResource("/resources/edit.png")));
+        }
+        lastEditedField = artistField;
+    }//GEN-LAST:event_artistFieldKeyReleased
+
+    private void albumFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_albumFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getAlbum().equals(albumField.getText())) {
+            edited = true;
+        }
+        lastEditedField = albumField;
+    }//GEN-LAST:event_albumFieldKeyReleased
+
+    private void albumArtistFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_albumArtistFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getAlbumArtist().equals(albumArtistField.getText())) {
+            edited = true;
+        }
+        lastEditedField = albumArtistField;
+    }//GEN-LAST:event_albumArtistFieldKeyReleased
+
+    private void yearFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_yearFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getYear().equals(yearField.getText())) {
+            edited = true;
+        }
+        lastEditedField = yearField;
+    }//GEN-LAST:event_yearFieldKeyReleased
+
+    private void genreFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_genreFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getGenre().equals(genreField.getText())) {
+            edited = true;
+        }
+        lastEditedField = genreField;
+    }//GEN-LAST:event_genreFieldKeyReleased
+
+    private void track1FieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_track1FieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getTrack().equals(track1Field.getText())) {
+            edited = true;
+        }
+        lastEditedField = track1Field;
+    }//GEN-LAST:event_track1FieldKeyReleased
+
+    private void track2FieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_track2FieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getTotalTracks().equals(track2Field.getText())) {
+            edited = true;
+        }
+        lastEditedField = track2Field;
+    }//GEN-LAST:event_track2FieldKeyReleased
+
+    private void disk1FieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_disk1FieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getDisk().equals(disk1Field.getText())) {
+            edited = true;
+        }
+        lastEditedField = disk1Field;
+    }//GEN-LAST:event_disk1FieldKeyReleased
+
+    private void disk2FieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_disk2FieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        }
+        if (!song.getTotalDisks().equals(disk2Field.getText())) {
+            edited = true;
+        }
+        lastEditedField = disk2Field;
+    }//GEN-LAST:event_disk2FieldKeyReleased
+
+    private void commentFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commentFieldKeyReleased
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            editSubmitButton.doClick();
+        } else if (!song.getComment().equals(commentField.getText())) {
+            edited = true;
+        }
+        lastEditedField = commentField;
+    }//GEN-LAST:event_commentFieldKeyReleased
+
+    private void commentFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commentFieldKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+            commentField.transferFocus();
+            evt.consume();  // consume prilosec
+        }
+    }//GEN-LAST:event_commentFieldKeyPressed
 
     /**
      * Gets the album art from the table and puts it on the more info frame
@@ -630,18 +773,26 @@ public class InfoFrame extends javax.swing.JFrame {
      * Goes to the next song
      */
     public void next() {
+        if (editSubmitButton.getText().equals("Submit")) {
+            this.editModeEnabled = true;
+        }
+        submit();
         this.dispose();
-        Main.frame.next();
+        Main.frame.next(this.editModeEnabled, lastEditedField);
     }
     
     /**
      * Goes to the previous song
      */
     public void previous() {
+        if (editSubmitButton.getText().equals("Submit")) {
+            this.editModeEnabled = true;
+        }
+        submit();
         this.dispose();
-        Main.frame.previous();
+        Main.frame.previous(this.editModeEnabled, lastEditedField);
     }
-    
+
     /**
      * Sets the navigation buttons based on the row selected in the table
      * @param row, the row to check against
@@ -705,17 +856,20 @@ public class InfoFrame extends javax.swing.JFrame {
      * Submits the changes of the editing
      */
     public void submit() {
-        Main.frame.submitChangesFromInfoFrame(
-                filenameField.getText(),
-                titleField.getText(),
-                artistField.getText(),
-                albumField.getText(),
-                albumArtistField.getText(),
-                yearField.getText(),
-                genreField.getText(),
-                track1Field.getText() + "/" + track2Field.getText(),
-                disk1Field.getText() + "/" + disk2Field.getText(),
-                commentField.getText());
+        if (edited) {
+            Main.frame.submitChangesFromInfoFrame(
+                    filenameField.getText().replace(".mp3", Constants.EMPTY_STRING),
+                    titleField.getText(),
+                    artistField.getText(),
+                    albumField.getText(),
+                    albumArtistField.getText(),
+                    yearField.getText(),
+                    genreField.getText(),
+                    track1Field.getText() + "/" + track2Field.getText(),
+                    disk1Field.getText() + "/" + disk2Field.getText(),
+                    commentField.getText());
+        }
+        this.edited = false;
     }
     
     /**
@@ -768,8 +922,8 @@ public class InfoFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField albumField;
     private javax.swing.JTextField albumArtistField;
+    private javax.swing.JTextField albumField;
     private javax.swing.JTextField artistField;
     private javax.swing.JTextField bitrateField;
     private javax.swing.JTextArea commentField;
@@ -777,6 +931,7 @@ public class InfoFrame extends javax.swing.JFrame {
     private javax.swing.JTextField disk1Field;
     private javax.swing.JTextField disk2Field;
     private javax.swing.JButton editSubmitButton;
+    private javax.swing.JLabel editedLabel;
     private javax.swing.JTextField filenameField;
     private javax.swing.JTextField genreField;
     private javax.swing.JLabel jLabel1;
