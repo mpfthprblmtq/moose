@@ -147,7 +147,7 @@ public class Frame extends javax.swing.JFrame {
             // switch based on the option selected
             switch (event.getActionCommand()) {
                 case "More info...":
-                    openMoreInfo();
+                    openMoreInfo(false, null);
                     break;
                 case "Remove from list":
                     removeRows(selectedRows);
@@ -573,6 +573,7 @@ public class Frame extends javax.swing.JFrame {
     public List<File> importFiles(ArrayList<File> files) {
 
         List<File> filesToRemove = new ArrayList<>();
+        List<File> hiddenFilesToIgnore = new ArrayList<>();
         AtomicInteger duplicateFiles = new AtomicInteger();
 
         // iterate through the files and try to add them
@@ -585,12 +586,16 @@ public class Frame extends javax.swing.JFrame {
                     duplicateFiles.getAndIncrement();
                     filesToRemove.add(file);
                 }
+            } else if (file.getName().startsWith(".")) {
+                // just straight up skip it
+                hiddenFilesToIgnore.add(file);
             } else {
                 filesToRemove.add(file);
             }
         });
 
         filesToRemove.forEach(files::remove);
+        hiddenFilesToIgnore.forEach(files::remove);
         int duplicates = duplicateFiles.get();
 
         // update the log table when you're done with the file iteration
@@ -1746,29 +1751,32 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Gets the info for a song
      */
-    public void openMoreInfo() {
+    public void openMoreInfo(boolean editModeEnabled, Component focusedField) {
         Song s = songController.getSongs().get(songController.getIndex(table.getSelectedRow()));
-        InfoFrame infoFrame = new InfoFrame(s, table.getSelectedRow());
+        InfoFrame infoFrame = new InfoFrame(s, table.getSelectedRow(), editModeEnabled, focusedField);
         infoFrame.setLocationRelativeTo(this);
         infoFrame.setVisible(true);
+        this.setEnabled(false);
     }
 
     /**
      * Moves to the next song
      */
-    public void next() {
+    public void next(boolean editModeEnabled, Component focusedField) {
         int row = table.getSelectedRow();
         table.setRowSelectionInterval(row + 1, row + 1);
-        openMoreInfo();
+        openMoreInfo(editModeEnabled, focusedField);
+        this.setEnabled(false);
     }
 
     /**
      * Moves to the previous song
      */
-    public void previous() {
+    public void previous(boolean editModeEnabled, Component focusedField) {
         int row = table.getSelectedRow();
         table.setRowSelectionInterval(row - 1, row - 1);
-        openMoreInfo();
+        openMoreInfo(editModeEnabled, focusedField);
+        this.setEnabled(false);
     }
 
     /**
@@ -2241,11 +2249,30 @@ public class Frame extends javax.swing.JFrame {
      * @param e, the event to base the location of the menu on
      */
     void showArtworkPopup(MouseEvent e, int rows) {
-        JPopupMenu popup = getBasePopUpMenu(rows);
+        JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
-        popup.add(item = new JMenuItem("Add artwork"));
+        popup.add(item = new JMenuItem("Add cover..."));
         item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Remove artwork"));
+        popup.add(item = new JMenuItem("Remove cover"));
+        item.addActionListener(menuListener);
+        popup.addSeparator();
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
+        popup.add(item = new JMenuItem("Remove from list"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Play"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Save"));
+        item.addActionListener(menuListener);
+        popup.addSeparator();
+        popup.add(item = new JMenuItem("Autotag"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Auto-add track numbers"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Auto-add artwork"));
         item.addActionListener(menuListener);
 
         popup.show(e.getComponent(), e.getX(), e.getY());
