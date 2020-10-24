@@ -23,10 +23,10 @@ import javax.imageio.ImageIO;
 
 import moose.objects.Settings;
 import moose.utilities.Constants;
-import moose.utilities.Logger;
+import moose.utilities.DateUtils;
+import moose.utilities.logger.Logger;
 import moose.Main;
 import moose.objects.ImageSearchResponse;
-import moose.utilities.Utils;
 
 import static moose.utilities.Constants.LARGE;
 import static moose.utilities.Constants.XLARGE;
@@ -102,7 +102,7 @@ public class AlbumArtFinderService {
 
         // check if date matches today
         String settingsDate = settings.getAlbumArtFinderSearchCountDate();
-        String todaysDate = Utils.formatDate(new Date());
+        String todaysDate = DateUtils.formatDate(new Date());
         if (settingsDate.equals(todaysDate)) {
             // date is today, just increment call count
             settings.setAlbumArtFinderSearchCount(Main.getSettings().getAlbumArtFinderSearchCount() + 1);

@@ -3,7 +3,6 @@ package moose.utilities;
 import java.awt.Color;
 
 public class Constants {
-    public static final String EMPTY_STRING = "";
 
     public static final String LARGE = "large";
     public static final String XLARGE = "xlarge";
@@ -45,4 +44,11 @@ public class Constants {
 
     public static final int AUDIT = 0;
     public static final int CLEANUP = 1;
+
+    public static final int GENRE = 0;
+    public static final int LOGGING = 1;
+    public static final int FILES = 2;
+    public static final int API = 3;
+
+    public static final int CLEAR_ALL = 0;
 }

@@ -27,15 +27,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.*;
 
 import moose.services.AutocompleteService;
+import moose.utilities.logger.Logger;
+import moose.utilities.viewUtils.AutoCompleteDocument;
+import moose.utilities.viewUtils.FileDrop;
+import moose.utilities.viewUtils.TableCellListener;
 
 import static moose.utilities.Constants.*;
 
@@ -121,11 +125,15 @@ public class Frame extends javax.swing.JFrame {
 
         // add the songs in the folder param to start
         ArrayList<File> files = new ArrayList<>();
-        Utils.listFiles(folder, files);
-        importFiles(files);
-        enableMultPanel(true);
-        setMultiplePanelFields();
-        checkForNewGenres(files);
+        FileUtils.listFiles(folder, files);
+
+        if (!importFiles(files).isEmpty()) {
+            setActionsEnabled(true);
+            enableMultPanel(true);
+            setMultiplePanelFields();
+            checkForNewGenres(files);
+        }
+
     }
 
     public void init() {
@@ -164,6 +172,7 @@ public class Frame extends javax.swing.JFrame {
                     break;
                 case "Auto-add track numbers":
                     songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
+                    setMultiplePanelFields();
                     break;
                 case "Auto-add artwork":
                     songController.autoTaggingService.autoAddCoverArt(selectedRows);
@@ -224,7 +233,7 @@ public class Frame extends javax.swing.JFrame {
             ArrayList<File> fileList = new ArrayList<>();
             for (File file : files) {
                 if (file.isDirectory()) {
-                    Utils.listFiles(file, fileList);
+                    FileUtils.listFiles(file, fileList);
                 } else {
                     fileList.add(file);
                 }
@@ -235,6 +244,9 @@ public class Frame extends javax.swing.JFrame {
 
             // import them all
             List<File> successfullyAddedFiles = importFiles(fileList);
+
+            // check to see if the actions can be enabled
+            setActionsEnabled(!successfullyAddedFiles.isEmpty());
 
             // check for new genres
             checkForNewGenres(successfullyAddedFiles);
@@ -315,7 +327,7 @@ public class Frame extends javax.swing.JFrame {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
+                        if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
                                 Settings settings = Main.getSettings();
@@ -374,7 +386,39 @@ public class Frame extends javax.swing.JFrame {
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
-        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre))).forEachOrdered((genre) -> {
+        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
+            if (!newGenres.contains(genre)) {
+                newGenres.add(genre);
+            }
+        });
+
+        // for each new genre, ask if we want to add that one
+        for (String newGenre : newGenres) {
+            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
+                Settings settings = Main.getSettings();
+                settings.addGenre(newGenre);
+                Main.updateSettings(settings);
+            }
+        }
+    }
+
+    /**
+     * Scans all the songs to check to make sure we know the genre
+     *
+     * @param songs, the songs to check
+     */
+    public void checkForNewGenresFromSongs(List<Song> songs) {
+
+        // get all the songs, then the genres from the list of files
+        List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
+//        songs.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
+//            genres.add(s.getGenre());
+//        });
+
+        // create a list of all the genres that don't exist already
+        List<String> newGenres = new ArrayList<>();
+        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
             if (!newGenres.contains(genre)) {
                 newGenres.add(genre);
             }
@@ -404,6 +448,8 @@ public class Frame extends javax.swing.JFrame {
         }
         // update some graphics
         enableMultPanel(false);
+
+        setActionsEnabled(table.getRowCount() > 0);
     }
 
     /**
@@ -450,7 +496,7 @@ public class Frame extends javax.swing.JFrame {
         Song s = songController.getSongFromFile(file);
 
         // getting the image to put on the table
-        Icon thumbnail_icon = Utils.getScaledImage(s.getArtwork_bytes(), 100);
+        Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
 
         // add the row to the table
         model.addRow(new Object[]{
@@ -1276,7 +1322,7 @@ public class Frame extends javax.swing.JFrame {
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
 
         // select some file(s)
-        File[] dirs = Utils.launchJFileChooser(
+        File[] dirs = FileUtils.launchJFileChooser(
                 "Select a folder to open...",
                 "Open",
                 JFileChooser.DIRECTORIES_ONLY,
@@ -1288,11 +1334,11 @@ public class Frame extends javax.swing.JFrame {
             // create an arraylist of files
             ArrayList<File> files = new ArrayList<>();
             for (File dir : dirs) {
-                files = Utils.listFiles(dir, files);
+                FileUtils.listFiles(dir, files);
             }
 
             // import the files
-            importFiles(files);
+            setActionsEnabled(!importFiles(files).isEmpty());
 
         } else {
             // no files chose, update console
@@ -1306,7 +1352,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void multUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multUpdateButtonActionPerformed
-        updateMultPanelFields();
+        updateTableFromMultPanelFields();
     }//GEN-LAST:event_multUpdateButtonActionPerformed
 
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
@@ -1324,7 +1370,7 @@ public class Frame extends javax.swing.JFrame {
             // if it's a right click
             case java.awt.event.MouseEvent.BUTTON3:
 
-                if (!Utils.intArrayContains(selectedRows, row)) {
+                if (!MiscUtils.intArrayContains(selectedRows, row)) {
                     table.setRowSelectionInterval(row, row);
                 }
                 if (row >= 0 && col >= 0) {
@@ -1362,12 +1408,8 @@ public class Frame extends javax.swing.JFrame {
             case java.awt.event.MouseEvent.BUTTON2:
                 File file = null;
                 for (int i = 0; i < selectedRows.length; i++) {
-                    try {
-                        file = songController.autoTaggingService.getFile(selectedRows[i]);
-                        Utils.openFile(file);
-                    } catch (IOException ex) {
-                        logger.logError("Exception trying to open file: " + file.getName(), ex);
-                    }
+                    file = songController.autoTaggingService.getFile(selectedRows[i]);
+                    FileUtils.openFile(file);
                 }
                 break;
 
@@ -1424,6 +1466,7 @@ public class Frame extends javax.swing.JFrame {
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             songController.autoTaggingService.addTrackAndDiskNumbers(table.getSelectedRows());
+            setMultiplePanelFields();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -1628,22 +1671,17 @@ public class Frame extends javax.swing.JFrame {
 
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
         for (int i = 0; i < table.getRowCount(); i++) {
-            File file = null;
-            try {
-                file = songController.autoTaggingService.getFile(i);
-                Utils.openFile(file);
-            } catch (IOException ex) {
-                logger.logError("Exception trying to open file: " + file.getName(), ex);
-            }
+            File file = songController.autoTaggingService.getFile(i);
+            FileUtils.openFile(file);
         }
     }//GEN-LAST:event_openAllButtonActionPerformed
 
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
-        Utils.openPage(Constants.MOOSE_WIKI);
+        WebUtils.openPage(Constants.MOOSE_WIKI);
     }//GEN-LAST:event_wikiMenuItemActionPerformed
 
     private void tablePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablePropertyChange
-        setActionsEnabled(table.getRowCount() > 0);
+//        setActionsEnabled(table.getRowCount() > 0);
     }//GEN-LAST:event_tablePropertyChange
     // </editor-fold>
 
@@ -1740,12 +1778,30 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Clears the table
+     * Shows a dialog first, as long as the user wants it
      */
     public void clearAll() {
-        model.setRowCount(0);
-        table.removeAll();
-        songController.getSongs().clear();
-        enableMultPanel(false);
+        if (Main.getSettings().isAskBeforeClearAll()) {
+            Boolean result = DialogUtils.showClearAllDialog(this);
+            if (result != null) {
+                boolean dontAskAgain = result;
+                if (dontAskAgain) {
+                    Main.getSettings().setAskBeforeClearAll(false);
+                    Main.settingsFrame.settingsController.writeSettingsFile(Main.getSettings());
+                }
+                model.setRowCount(0);
+                table.removeAll();
+                songController.getSongs().clear();
+                enableMultPanel(false);
+                setActionsEnabled(false);
+            }
+        } else {
+            model.setRowCount(0);
+            table.removeAll();
+            songController.getSongs().clear();
+            enableMultPanel(false);
+            setActionsEnabled(false);
+        }
     }
 
     /**
@@ -2004,7 +2060,7 @@ public class Frame extends javax.swing.JFrame {
      * Updates the fields in the table with the fields in the mult panel Gets
      * called when the update button is pressed
      */
-    public void updateMultPanelFields() {
+    public void updateTableFromMultPanelFields() {
 
         // get the selected rows
         int[] selectedRows;
@@ -2105,20 +2161,21 @@ public class Frame extends javax.swing.JFrame {
 
         // check if the genre field needs updated
         if (!genre.equals("-")) {
+            List<Song> songsToGenreCheck = new ArrayList<>();
             for (int row : selectedRows) {
 
                 // get the index of the song in the table
                 int index = songController.getIndex(row);
 
                 // check and see if the genre exists already
-                if (!Main.getSettings().getGenres().contains(genre) && !Utils.isEmpty(genre)) {
-                    int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
-                    if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
-                        Settings settings = Main.getSettings();
-                        settings.addGenre(genre);
-                        Main.updateSettings(settings);
-                    }
-                }
+//                if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
+//                    int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
+//                    if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
+//                        Settings settings = Main.getSettings();
+//                        settings.addGenre(genre);
+//                        Main.updateSettings(settings);
+//                    }
+//                }
 
                 // set the value in the table to the new value
                 table.setValueAt(genre, row, 7);
@@ -2126,7 +2183,13 @@ public class Frame extends javax.swing.JFrame {
                 // set the value in the songs array
                 songController.setGenre(index, genre);
 
+                // get the file from the row to add in the genre checker
+                songsToGenreCheck.add(songController.getSongs().get(index));
+
             }
+
+            // check for any new genres
+            checkForNewGenresFromSongs(songsToGenreCheck);
         }
 
         // check if the track field needs updated

@@ -6,7 +6,7 @@
 package moose.controllers;
 
 import java.io.File;
-import moose.utilities.Logger;
+import moose.utilities.logger.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

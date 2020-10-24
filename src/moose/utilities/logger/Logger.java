@@ -7,7 +7,7 @@
  */
 
 // package
-package moose.utilities;
+package moose.utilities.logger;
 
 // imports
 import java.io.File;

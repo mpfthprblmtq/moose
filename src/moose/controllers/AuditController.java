@@ -13,11 +13,10 @@ package moose.controllers;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
-import moose.utilities.Constants;
+import moose.utilities.*;
 import moose.views.Frame;
-import moose.utilities.Logger;
+import moose.utilities.logger.Logger;
 import moose.Main;
-import moose.utilities.Utils;
 
 import javax.swing.*;
 import java.io.File;
@@ -110,7 +109,7 @@ public class AuditController {
     public String analyze(int type) {
 
         // string to return
-        String results = Constants.EMPTY_STRING;
+        String results = StringUtils.EMPTY_STRING;
 
         double index = 0;
         double total;
@@ -121,7 +120,7 @@ public class AuditController {
                 int mp3Count = 0;
                 int coverCount = 0;
                 ArrayList<File> cleanupFiles = new ArrayList<>();
-                Utils.listFiles(folder, cleanupFiles);
+                FileUtils.listFiles(folder, cleanupFiles);
                 Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
                 total = cleanupFiles.size();
 
@@ -237,7 +236,7 @@ public class AuditController {
 
         // arraylist to store all the files
         ArrayList<File> allFiles = new ArrayList<>();
-        Utils.listFiles(folder, allFiles);
+        FileUtils.listFiles(folder, allFiles);
 
         // traverse the list of files and add the albums to the albums ivar list
         for (File file : allFiles) {
@@ -642,7 +641,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        Utils.listFiles(dir, files);
+        FileUtils.listFiles(dir, files);
 
         // regex to check
         String regex = "\\d\\d ((.)*)";
@@ -651,7 +650,7 @@ public class AuditController {
         // also checks if the album artist is a label, since those files aren't formatted the same
         for (File file : files) {
             if (file.getName().endsWith(".mp3")) {
-                if (!file.getName().matches(regex) && !Utils.isPartOfALabel(file)) {
+                if (!file.getName().matches(regex) && !SongUtils.isPartOfALabel(file)) {
                     return false;
                 }
             }
@@ -669,7 +668,7 @@ public class AuditController {
 
         // create a list of all files from that directory
         ArrayList<File> files = new ArrayList<>();
-        Utils.listFiles(dir, files);
+        FileUtils.listFiles(dir, files);
 
         // traverse the file list
         for (File file : files) {
@@ -705,7 +704,7 @@ public class AuditController {
                 byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
 
                 // check if it's a label, since those mp3s don't need as much information
-                if (Utils.isPartOfALabel(dir)) {
+                if (SongUtils.isPartOfALabel(dir)) {
                     if (title == null
                             || artist == null
                             || album == null
