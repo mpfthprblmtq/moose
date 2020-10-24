@@ -15,10 +15,10 @@ import com.mpatric.mp3agic.*;
 
 import moose.services.AutoTaggingService;
 import moose.utilities.Constants;
-import moose.utilities.Logger;
+import moose.utilities.FileUtils;
+import moose.utilities.logger.Logger;
 import moose.Main;
 import moose.objects.Song;
-import moose.utilities.Utils;
 
 import javax.swing.*;
 import java.io.File;
@@ -597,7 +597,7 @@ public class SongController {
      */
     public void moveFiles(int[] selectedRows) {
 
-        File directory = Objects.requireNonNull(Utils.launchJFileChooser(
+        File directory = Objects.requireNonNull(FileUtils.launchJFileChooser(
                 "Choose the destination folder...",
                 "Select",
                 JFileChooser.DIRECTORIES_ONLY,
@@ -642,11 +642,7 @@ public class SongController {
         for (int selectedRow : selectedRows) {
             int row = table.convertRowIndexToModel(selectedRow);    // get the row
             File file = (File) table.getModel().getValueAt(row, 1);
-            try {
-                Utils.openFile(file);
-            } catch (IOException ex) {
-                logger.logError("Couldn't play file " + file.getName(), ex);
-            }
+            FileUtils.openFile(file);
         }
     }
 
