@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
 import moose.Main;
-import moose.utilities.NameService;
+import moose.utilities.viewUtils.NameService;
 
 import static moose.utilities.Constants.*;
 

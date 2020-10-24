@@ -8,7 +8,7 @@
  */
 
 // package
-package moose.utilities;
+package moose.utilities.viewUtils;
 
 // imports
 import javax.swing.text.*;

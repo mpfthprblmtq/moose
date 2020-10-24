@@ -21,8 +21,10 @@ import moose.Main;
 import moose.objects.ImageSearchQuery;
 import moose.objects.ImageSearchResponse;
 import moose.services.AlbumArtFinderService;
-import moose.utilities.Logger;
-import moose.utilities.Utils;
+import moose.utilities.ImageUtils;
+import moose.utilities.StringUtils;
+import moose.utilities.WebUtils;
+import moose.utilities.logger.Logger;
 
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
@@ -359,7 +361,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_prevButtonActionPerformed
 
     private void googleImagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleImagesButtonActionPerformed
-        Utils.openPage(AlbumArtFinderService.buildImageSearchQuery(queryTextField.getText()));
+        WebUtils.openPage(AlbumArtFinderService.buildImageSearchQuery(queryTextField.getText()));
         this.dispose();
     }//GEN-LAST:event_googleImagesButtonActionPerformed
 
@@ -376,8 +378,8 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     public void doSearch() {
 
         // check to see if we have a valid api key and cse id
-        if (Utils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
-                || Utils.isEmpty(Main.getSettings().getAlbumArtFinderCseId())) {
+        if (StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
+                || StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderCseId())) {
             JOptionPane.showMessageDialog(
                     this,
                     "Invalid/Missing API key or CSE ID, open Settings to configure.",
@@ -418,8 +420,8 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     private List<Icon> getIconsFromImages(List<ImageSearchResponse> responses) {
         List<Icon> scaledIcons = new ArrayList<>();
         for (ImageSearchResponse isr : responses) {
-            byte[] bytes = Utils.getBytesFromBufferedImage(isr.getBImage());
-            scaledIcons.add(Utils.getScaledImage(bytes, 250));
+            byte[] bytes = ImageUtils.getBytesFromBufferedImage(isr.getBImage());
+            scaledIcons.add(ImageUtils.getScaledImage(bytes, 250));
         }
         return scaledIcons;
     }
@@ -427,7 +429,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     private void confirmImage() {
         foundCover = responses.get(currentIconIndex).getBImage();
         int dim = Main.getSettings().getPreferredCoverArtSize();
-        File outputFile = Utils.createImageFile(foundCover, dir, dim);
+        File outputFile = ImageUtils.createImageFile(foundCover, dir, dim);
         assert outputFile != null;
         if (outputFile.exists()) {
             for (Integer row : this.rows) {

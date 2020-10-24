@@ -14,6 +14,7 @@ package moose.views;
 import moose.Main;
 import moose.utilities.*;
 import moose.controllers.*;
+import moose.utilities.logger.Logger;
 
 import java.awt.Font;
 import java.io.File;
@@ -695,7 +696,7 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public String populatePathLabel() {
         if (Main.getSettings().getLibraryLocation().isEmpty()) {
-            return Constants.EMPTY_STRING;
+            return StringUtils.EMPTY_STRING;
         } else {
             auditController.setFolder(new File(Main.getSettings().getLibraryLocation()));
             label1.setEnabled(true);
@@ -718,7 +719,7 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void chooseFolder() {
 
-        File folder = Objects.requireNonNull(Utils.launchJFileChooser(
+        File folder = Objects.requireNonNull(FileUtils.launchJFileChooser(
                 "Select a folder to audit/cleanup",
                 "Select",
                 JFileChooser.DIRECTORIES_ONLY,
