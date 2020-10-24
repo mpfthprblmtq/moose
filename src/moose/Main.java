@@ -11,7 +11,7 @@ package moose;
 
 import java.io.File;
 import moose.objects.Settings;
-import moose.utilities.Logger;
+import moose.utilities.logger.Logger;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 import moose.views.SettingsFrame;

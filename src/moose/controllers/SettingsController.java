@@ -10,6 +10,7 @@
 package moose.controllers;
 
 // imports
+import com.fasterxml.jackson.databind.SerializationFeature;
 import moose.Main;
 import moose.utilities.*;
 
@@ -22,7 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonParser;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+
 import moose.objects.Settings;
+import moose.utilities.logger.Logger;
 
 // class SettingsController
 public class SettingsController {
@@ -33,7 +37,7 @@ public class SettingsController {
     // main settings object
     Settings settings;
 
-    // settingsFile map
+    // settings json mapper
     final ObjectMapper mapper = new ObjectMapper();
 
     // logger object
@@ -41,6 +45,7 @@ public class SettingsController {
 
     public SettingsController() {
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
     public void readSettingsFile() {
@@ -48,6 +53,7 @@ public class SettingsController {
         // hardened version
         // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
         final String version = "1.2.0";
+        // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE PREVIOUS LINE
 
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
@@ -95,6 +101,42 @@ public class SettingsController {
         return writeSettingsFile(settings);
     }
 
+    public boolean defaultGenres() {
+        settings.setGenres(new ArrayList<>());
+        writeSettingsFile(settings);
+
+        // check if successful
+        return Main.getSettings().getGenres().isEmpty();
+    }
+
+    public boolean defaultLogging() {
+        settings.setDeveloperMode(false);
+        settings.setDebugMode(false);
+        writeSettingsFile(settings);
+
+        // check if successful
+        return !Main.getSettings().isInDebugMode() && !Main.getSettings().isInDeveloperMode();
+    }
+
+    public boolean defaultFiles() {
+        settings.setLibraryLocation(StringUtils.EMPTY_STRING);
+        writeSettingsFile(settings);
+
+        // check if successful
+        return StringUtils.isEmpty(Main.getSettings().getLibraryLocation());
+    }
+
+    public boolean defaultApi() {
+        settings.setAlbumArtFinderApiKey(StringUtils.EMPTY_STRING);
+        settings.setAlbumArtFinderCseId(StringUtils.EMPTY_STRING);
+        settings.setPreferredCoverArtSize(640);
+        writeSettingsFile(settings);
+
+        // check if successful
+        return StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
+                && StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderCseId());
+    }
+
     public Settings getSettings() {
         return this.settings;
     }
@@ -106,6 +148,7 @@ public class SettingsController {
         tempSettings.setDebugMode(actualSettings.isInDebugMode());
         tempSettings.setDeveloperMode(actualSettings.isInDeveloperMode());
         tempSettings.setLibraryLocation(actualSettings.getLibraryLocation());
+        tempSettings.setAskBeforeClearAll(actualSettings.isAskBeforeClearAll());
         tempSettings.setAlbumArtFinderCseId(actualSettings.getAlbumArtFinderCseId());
         tempSettings.setAlbumArtFinderApiKey(actualSettings.getAlbumArtFinderApiKey());
         tempSettings.setAlbumArtFinderSearchCount(actualSettings.getAlbumArtFinderSearchCount());
@@ -118,22 +161,14 @@ public class SettingsController {
      * Opens the event log
      */
     public void openEventLog() {
-        try {
-            Utils.openFile(Main.logger.getEventLog());
-        } catch (IOException ex) {
-            logger.logError("Couldn't open the event log!", ex);
-        }
+        FileUtils.openFile(Main.logger.getEventLog());
     }
 
     /**
      * Opens the error log
      */
     public void openErrorLog() {
-        try {
-            Utils.openFile(Main.logger.getErrorLog());
-        } catch (IOException ex) {
-            logger.logError("Couldn't open the error log!", ex);
-        }
+        FileUtils.openFile(Main.logger.getErrorLog());
     }
 
     /**
@@ -166,6 +201,7 @@ public class SettingsController {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(settingsFile));
             bufferedWriter.write(mapper.writeValueAsString(settings));
             bufferedWriter.flush();
+            this.settings = settings;
             return true;
         } catch (FileNotFoundException ex) {
             logger.logError("Couldn't find settings file!", ex);

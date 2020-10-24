@@ -12,6 +12,7 @@ package moose.views;
 
 // imports
 
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -19,10 +20,12 @@ import moose.Main;
 import moose.controllers.*;
 import moose.objects.Settings;
 import moose.utilities.*;
+import moose.utilities.logger.Logger;
 
 import java.io.File;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentNavigableMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -573,7 +576,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            genreTextField.setText(Constants.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
         }
     }//GEN-LAST:event_addGenreButtonActionPerformed
 
@@ -597,7 +600,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         addGenreButton.setText("Add");
         deleteGenreButton.setEnabled(false);
         cancelButton.setEnabled(false);
-        genreTextField.setText(Constants.EMPTY_STRING);
+        genreTextField.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
@@ -611,8 +614,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         deleteGenreButton.setEnabled(true);
         cancelButton.setEnabled(true);
         genreTextField.setText(genreList.getSelectedValue()
-                .replace(HTML_PREFIX, Constants.EMPTY_STRING)
-                .replace(HTML_SUFFIX, Constants.EMPTY_STRING));
+                .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
+                .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING));
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
@@ -628,7 +631,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDebugMode(debugCheckBox.isSelected());
         debugEdited = !debugEdited;
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
@@ -644,7 +647,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDeveloperMode(developerModeCheckBox.isSelected());
         developerModeEdited = !developerModeEdited;
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_developerModeCheckBoxActionPerformed
 
     /**
@@ -706,7 +709,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         // get the folder through a JFileChooser
-        File dir = Objects.requireNonNull(Utils.launchJFileChooser(
+        File dir = Objects.requireNonNull(FileUtils.launchJFileChooser(
                 "Choose the directory you want to store music in...",
                 "Select",
                 JFileChooser.DIRECTORIES_ONLY,
@@ -715,9 +718,11 @@ public class SettingsFrame extends javax.swing.JFrame {
                 null))[0];
         if (dir != null) {
             settings.setLibraryLocation(dir.getAbsolutePath() + "/");
-            libraryLocationField.setForeground(Constants.GREEN);
-            libraryLocationField.setText(settingsController.getSettings().getLibraryLocation());
-            statusLabel.setText(Constants.EMPTY_STRING);
+            if (!Main.getSettings().getLibraryLocation().equals(settings.getLibraryLocation())) {
+                libraryLocationField.setForeground(Constants.GREEN);
+                libraryLocationField.setText(settings.getLibraryLocation());
+            }
+            statusLabel.setText(StringUtils.EMPTY_STRING);
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -759,22 +764,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt, the event
      */
     private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to clear your settings?",
-                "Confirm Default",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (returnVal == 0) {
-            if (settingsController.fillDefaults()) {
-                statusLabel.setForeground(Constants.GREEN);
-                statusLabel.setText("Settings successfully reset!");
-                resetUI();
-            } else {
-                statusLabel.setForeground(Constants.RED);
-                statusLabel.setText("Problem updating settings...");
-            }
-        }
+        defaultSettings();
     }//GEN-LAST:event_defaultButtonActionPerformed
 
     /**
@@ -819,7 +809,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public String populateTimesUsedTodayField() {
         Date today = new Date();
-        Date dateLastUsed = Utils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+        Date dateLastUsed = DateUtils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
 
         // check to see if date in settings is today
         assert dateLastUsed != null;
@@ -843,11 +833,11 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        if (settings.getGenres().contains(genre) && !genreTextField.getText().equals(Constants.EMPTY_STRING)) {
+        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY_STRING)) {
             settings.addGenre(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
-            genreTextField.setText(Constants.EMPTY_STRING);
-            statusLabel.setText(Constants.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY_STRING);
         }
     }
 
@@ -861,11 +851,11 @@ public class SettingsFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             settings.removeGenre(genre);
-            genreTextField.setText(Constants.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            statusLabel.setText(Constants.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY_STRING);
             genreStatusLabel.setForeground(Constants.GREEN);
             genresDeleted++;
             genreStatusLabel.setText(genresDeleted + " genres deleted!");
@@ -886,8 +876,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
         if (alreadyEdited) {
             String oldGenre_withoutHtml = oldGenre
-                    .replace(HTML_PREFIX, Constants.EMPTY_STRING)
-                    .replace(HTML_SUFFIX, Constants.EMPTY_STRING);
+                    .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
+                    .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING);
             genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
             oldGenre = oldGenre_withoutHtml;
         }
@@ -895,7 +885,86 @@ public class SettingsFrame extends javax.swing.JFrame {
         settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
         newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
+    }
+
+    /**
+     * Method that runs the default action on the settings based on what the user wants to do
+     */
+    public void defaultSettings() {
+        // get which settings the user wants to reset
+        Map<Integer, Boolean> settingsToReset = DialogUtils.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
+
+        // go through the map we get back and reset those settings
+        if (settingsToReset != null) {
+
+            if (!settingsToReset.get(Constants.GENRE)
+                    && !settingsToReset.get(Constants.LOGGING)
+                    && !settingsToReset.get(Constants.FILES)
+                    && !settingsToReset.get(Constants.API)) {
+                statusLabel.setForeground(Constants.BLACK);
+                statusLabel.setText("No settings to reset!");
+                return;
+            }
+
+            Map<Integer, Boolean> success = new HashMap<>();
+            if (settingsToReset.containsKey(Constants.GENRE) && settingsToReset.get(Constants.GENRE)) {
+                success.put(Constants.GENRE, this.settingsController.defaultGenres());
+            }
+            if (settingsToReset.containsKey(Constants.LOGGING) && settingsToReset.get(Constants.LOGGING)) {
+                success.put(Constants.LOGGING, this.settingsController.defaultLogging());
+            }
+            if (settingsToReset.containsKey(Constants.FILES) && settingsToReset.get(Constants.FILES)) {
+                success.put(Constants.FILES, this.settingsController.defaultFiles());
+            }
+            if (settingsToReset.containsKey(Constants.API) && settingsToReset.get(Constants.API)) {
+                success.put(Constants.API, this.settingsController.defaultApi());
+            }
+
+            // build the message to show to the user based on the success map
+            String message = StringUtils.EMPTY_STRING;
+            if (success.containsKey(Constants.GENRE)) {
+                message = "Genres";
+            }
+            if (success.containsKey(Constants.LOGGING)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "Logging";
+                } else {
+                    message = message.concat(", Logging");
+                }
+            }
+            if (success.containsKey(Constants.FILES)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "Files";
+                } else {
+                    message = message.concat(", Files");
+                }
+            }
+            if (success.containsKey(Constants.API)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "API Config";
+                } else {
+                    message = message.concat(", API Config");
+                }
+            }
+
+            // set the status label
+            if (StringUtils.isEmpty(message)) {
+                statusLabel.setForeground(Constants.RED);
+                statusLabel.setText("Problem updating settings...");
+            } else {
+                statusLabel.setForeground(Constants.GREEN);
+                if (success.size() == 4) {
+                    message = "All settings reset!";
+                } else {
+                    message = message.concat(" settings reset!");
+                }
+                statusLabel.setText(message);
+            }
+
+            // reset graphics
+            resetUI();
+        }
     }
 
     /**
@@ -904,13 +973,17 @@ public class SettingsFrame extends javax.swing.JFrame {
     private void resetUI() {
         genreList.setModel(getGenreListModel());
         debugCheckBox.setForeground(Constants.BLACK);
+        debugCheckBox.setSelected(Main.getSettings().isInDebugMode());
         developerModeCheckBox.setForeground(Constants.BLACK);
+        developerModeCheckBox.setSelected(Main.getSettings().isInDeveloperMode());
         libraryLocationField.setForeground(Constants.BLACK);
+        libraryLocationField.setText(Main.getSettings().getLibraryLocation());
         cseTextField.setForeground(Constants.BLACK);
+        cseTextField.setText(Main.getSettings().getAlbumArtFinderCseId());
         apiKeyTextField.setForeground(Constants.BLACK);
-        preferredCoverArtSizeSpinner.setForeground(Constants.BLACK);
-        debugEdited = false;
-        developerModeEdited = false;
+        apiKeyTextField.setText(Main.getSettings().getAlbumArtFinderApiKey());
+        preferredCoverArtSizeSpinner.getEditor().getComponent(0).setForeground(Constants.BLACK);
+        preferredCoverArtSizeSpinner.setValue(Main.getSettings().getPreferredCoverArtSize());
     }
 
     /**

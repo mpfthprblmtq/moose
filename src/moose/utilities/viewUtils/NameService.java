@@ -8,7 +8,7 @@
  */
 
 // package
-package moose.utilities;
+package moose.utilities.viewUtils;
 
 import java.util.List;
 

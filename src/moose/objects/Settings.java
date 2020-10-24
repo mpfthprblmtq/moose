@@ -13,8 +13,8 @@ package moose.objects;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import moose.utilities.Constants;
-import moose.utilities.Utils;
+import moose.utilities.DateUtils;
+import moose.utilities.StringUtils;
 
 // class Settings
 public class Settings {
@@ -22,6 +22,7 @@ public class Settings {
     private String version;
     private boolean inDebugMode;
     private boolean inDeveloperMode;
+    private boolean askBeforeClearAll;
     private List<String> genres;
     private String libraryLocation;
     private int preferredCoverArtSize;
@@ -36,13 +37,14 @@ public class Settings {
     public Settings() {
         this.inDebugMode = false;
         this.inDeveloperMode = false;
+        this.askBeforeClearAll = true;
         this.genres = new ArrayList<>();
-        this.libraryLocation = Constants.EMPTY_STRING;
+        this.libraryLocation = StringUtils.EMPTY_STRING;
         this.preferredCoverArtSize = 640;
-        this.albumArtFinderApiKey = Constants.EMPTY_STRING;
-        this.albumArtFinderCseId = Constants.EMPTY_STRING;
+        this.albumArtFinderApiKey = StringUtils.EMPTY_STRING;
+        this.albumArtFinderCseId = StringUtils.EMPTY_STRING;
         this.albumArtFinderSearchCount = 0;
-        this.albumArtFinderSearchCountDate = Utils.formatDate(new Date());
+        this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
     }
     
     /**
@@ -141,5 +143,13 @@ public class Settings {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public boolean isAskBeforeClearAll() {
+        return askBeforeClearAll;
+    }
+
+    public void setAskBeforeClearAll(boolean askBeforeClearAll) {
+        this.askBeforeClearAll = askBeforeClearAll;
     }
 }

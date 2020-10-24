@@ -20,8 +20,8 @@ import javax.swing.*;
 import moose.Main;
 import moose.controllers.SongController;
 import moose.objects.Song;
-import moose.utilities.Constants;
-import moose.utilities.Utils;
+import moose.utilities.ImageUtils;
+import moose.utilities.StringUtils;
 
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
@@ -758,7 +758,7 @@ public class InfoFrame extends javax.swing.JFrame {
      */
     public void addAlbumArt() {
         byte[] bytes = songController.getSongs().get(songController.getIndex(row)).getArtwork_bytes();
-        Icon artwork_icon = Utils.getScaledImage(bytes, 150);
+        Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
         coverLabel.setIcon(artwork_icon);
     }
     
@@ -827,7 +827,7 @@ public class InfoFrame extends javax.swing.JFrame {
         bitrateField.setText(s.getBitrate());
         sampleRateField.setText(s.getSampleRate());
         commentField.setText(s.getComment());
-        coverLabel.setIcon(Utils.getScaledImage(s.getArtwork_bytes(), 150));
+        coverLabel.setIcon(ImageUtils.getScaledImage(s.getArtwork_bytes(), 150));
     }
     
     /**
@@ -858,7 +858,7 @@ public class InfoFrame extends javax.swing.JFrame {
     public void submit() {
         if (edited) {
             Main.frame.submitChangesFromInfoFrame(
-                    filenameField.getText().replace(".mp3", Constants.EMPTY_STRING),
+                    filenameField.getText().replace(".mp3", StringUtils.EMPTY_STRING),
                     titleField.getText(),
                     artistField.getText(),
                     albumField.getText(),

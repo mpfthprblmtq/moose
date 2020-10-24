@@ -12,9 +12,9 @@ package moose.services;
 // imports
 import moose.Main;
 import moose.objects.ImageSearchQuery;
-import moose.utilities.Constants;
-import moose.utilities.Logger;
-import moose.utilities.Utils;
+import moose.objects.Song;
+import moose.utilities.*;
+import moose.utilities.logger.Logger;
 import moose.views.modals.AlbumArtFinderFrame;
 
 import javax.imageio.ImageIO;
@@ -63,7 +63,7 @@ public class AutoTaggingService {
             table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
             // artist
-            if (!Utils.isPartOfALabel(file)) {
+            if (!SongUtils.isPartOfALabel(file)) {
                 Main.frame.songController.setArtist(index, artist);
                 table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
             }
@@ -81,7 +81,7 @@ public class AutoTaggingService {
             table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
             // genre
-            if (Utils.isPartOfALabel(file)) {
+            if (SongUtils.isPartOfALabel(file)) {
                 Main.frame.songController.setGenre(index, genre);
                 table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
             }
@@ -162,7 +162,7 @@ public class AutoTaggingService {
             Main.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
 
             // update graphics
-            Icon thumbnail_icon = Utils.getScaledImage(bytes, 100);
+            Icon thumbnail_icon = ImageUtils.getScaledImage(bytes, 100);
 
             // set the image on the row
             table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
@@ -172,7 +172,7 @@ public class AutoTaggingService {
 
             // if there's multiple rows selected, also add it to the multiple fields panel
             if (table.getSelectedRowCount() > 1) {
-                Icon artwork_icon = Utils.getScaledImage(bytes, 150);
+                Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
                 Main.frame.multImage.setIcon(artwork_icon);
             }
 
@@ -203,7 +203,7 @@ public class AutoTaggingService {
 
             // only show the JFileChooser on the first go
             if (i == 0) {
-                img_file = Objects.requireNonNull(Utils.launchJFileChooser(
+                img_file = Objects.requireNonNull(FileUtils.launchJFileChooser(
                         "Select an image to use",
                         "Select",
                         JFileChooser.FILES_ONLY,
@@ -272,7 +272,8 @@ public class AutoTaggingService {
      */
     public File folderContainsCover(File folder) {
         String regex = "\\[\\d{4}] .*";
-        if (!folder.getName().matches(regex)) {
+        // if the folder isn't an album or part of the label
+        if (!folder.getName().matches(regex) && !SongUtils.isPartOfALabel(folder)) {
             return null;
         } else if (folder.getName().startsWith("CD")) {
             folder = folder.getParentFile();
@@ -307,8 +308,9 @@ public class AutoTaggingService {
             }
 
             String parent = images.get(0).getParentFile().getPath();
-            String type = images.get(0).getName().split("\\.")[1];
-            File rename_to = new File(parent.concat("/cover").concat(".").concat(type));
+            String filename = images.get(0).getName();
+            String type = filename.substring(filename.lastIndexOf("."));
+            File rename_to = new File(parent.concat("/cover").concat(type));
 
             if (!images.get(0).renameTo(rename_to)) {
                 logger.logError("Error while renaming image file: ".concat(rename_to.getPath()));
@@ -354,7 +356,7 @@ public class AutoTaggingService {
      * @return a string track title
      */
     public String getTitleFromFile(File file) {
-        if (Utils.isAGenrePartOfALabel(file)) {
+        if (SongUtils.isAGenrePartOfALabel(file)) {
             return file.getName().replace(".mp3", "");
         } else {
             String regex = "\\d{2} .*\\.mp3";
@@ -373,8 +375,8 @@ public class AutoTaggingService {
      * @return a string artist
      */
     public String getArtistFromFile(File file) {
-        if (Utils.isAnEPPartOfALabel(file)) {
-            return EMPTY_STRING;
+        if (SongUtils.isAnEPPartOfALabel(file)) {
+            return StringUtils.EMPTY_STRING;
         }
         return getArtist(file);
     }
@@ -386,7 +388,7 @@ public class AutoTaggingService {
      * @return a string album
      */
     public String getAlbumFromFile(File file) {
-        if (Utils.isAGenrePartOfALabel(file)) {
+        if (SongUtils.isAGenrePartOfALabel(file)) {
             return getGenreFromFile(file);
         } else {
             File dir = file.getParentFile();
@@ -400,7 +402,7 @@ public class AutoTaggingService {
                     return dir.getName().substring(6).trim();
                 }
             }
-            return EMPTY_STRING;
+            return StringUtils.EMPTY_STRING;
         }
     }
 
@@ -411,7 +413,7 @@ public class AutoTaggingService {
      * @return a string album artist
      */
     public String getAlbumArtistFromFile(File file) {
-        if (Utils.isPartOfALabel(file)) {
+        if (SongUtils.isPartOfALabel(file)) {
             File dir = file.getParentFile().getParentFile().getParentFile();
             return dir.getName();
         }
@@ -435,7 +437,7 @@ public class AutoTaggingService {
             dir = dir.getParentFile().getParentFile();
             return dir.getName();
         } else {
-            return EMPTY_STRING;
+            return StringUtils.EMPTY_STRING;
         }
     }
 
@@ -461,7 +463,7 @@ public class AutoTaggingService {
                 return dir.getName().substring(1, 5).trim();
             }
         }
-        return EMPTY_STRING;
+        return StringUtils.EMPTY_STRING;
     }
 
     /**
@@ -534,7 +536,7 @@ public class AutoTaggingService {
             int totalDisks = getTotalDisksFromFolder(dir);
             return dir.getName().substring(2) + "/" + totalDisks;
         } else {
-            return EMPTY_STRING;
+            return StringUtils.EMPTY_STRING;
         }
     }
 
@@ -565,8 +567,8 @@ public class AutoTaggingService {
      * @return a genre string
      */
     public String getGenreFromFile(File file) {
-        if (!Utils.isAGenrePartOfALabel(file)) {
-            return EMPTY_STRING;
+        if (!SongUtils.isAGenrePartOfALabel(file)) {
+            return StringUtils.EMPTY_STRING;
         }
         return file.getParentFile().getName();
     }
