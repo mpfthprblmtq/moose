@@ -1,7 +1,7 @@
 # Moose
 A music management system capable of reading and modifying dynamic id3 tags.
 
-![Generic badge](https://img.shields.io/badge/version-1.2.0-brightgreen.svg)
+![Generic badge](https://img.shields.io/badge/version-1.2.1-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 [View project on Github](https://www.github.com/mpfthprblmtq/moose)
@@ -14,61 +14,55 @@ Compatible with:
 * OS X (Mac)
 * ~~Windows~~ *(Coming soon to a future release near you)*
 
----
-
-### Building and Packaging Moose
-
-__Prerequisites__ *These are the versions I've tested with, it may work with more combinations*
-* Apache Ant *(v. 1.10.8)*
-* JavaPackager *(v. 10.0.2) (Comes with Java 10.0.2)* 
-
-
-Run the `terminal-deploy.bash` file.  That's it.  There were more steps, like building the app into a single .jar, then 
-moving some files around, then running a javapackager command, but I used my big brain noggin and put it all into one nice script.
-
-The script does the following:
-1. Displays a super cool ASCII art of a moose that I totally created myself (Totally).
-2. Prints the current versions of the tools it uses.
-3. Asks you if this deployment is a new version. ( [Y/N] )
-    - If it is a new version, will display the current version of the app (sourced from `SettingsController.java`)
-    - If it isn't a new version, skips any versioning
-4. Runs the command `ant -f $APP_PATH package-for-deploy` which runs the package-for-deploy target in the build.xml file.  (`$APP_PATH` your project folder's path)
-5. Runs the command `javapackager -deploy -native $packageType -name Moose \
-                        -BappVersion=1.1.3 -Bicon=package/macosx/moose.icns \
-                        -srcdir . -srcfiles moose.jar -appclass moose.Main \
-                        -outdir out -v`, which packages the app into the specified package type (.pkg or .dmg) with the specified app version.
-6. Cleans up any extra files.
-7. Asks you politely if you'd like to run your newly created .pkg or .dmg in the `deploy` folder.
+<br/>
 
 ---
+
+<br/>
+
+## What *is* Moose?
+
+The moose (North America) or elk (Eurasia), *Alces alces*, is a member of the New World deer subfamily and is the largest and heaviest extant species in the deer family. Most adult male moose have distinctive broad, palmate ("open-hand shaped") antlers; most other members of the deer family have antlers with a dendritic ("twig-like") configuration. Moose typically inhabit boreal forests and temperate broadleaf and mixed forests of the Northern Hemisphere in temperate to subarctic climates.
+
+But that doesn't really have anything to do with this project does it?  The better question is probably *"What is __this__ project?"*
+
+<br/>
+
+## What is this project?
+
+Moose is my pet project from college that turned out to be more useful than I anticipated.  It's basically just a mp3 information editor, where you can edit the Title, Artist, Album, Year, Genre, etc. for mp3 files.  There are a few different apps out there that do this same thing, but I've found that:
+* I have to pay for them *(gross)*
+* If they're free, they usually have features stripped away and they'll ask you 17 times while using it over the course of 5 minutes if you want to try the paid version, usually followed by "If you don't pay for it, my kids can't eat!" or something like that.
+* Most apps out there are very simple.  They only provide the ability to edit files one at a time, or just simply changing information about those files, with no automatic functionality.
+
+I solved a lot of these problems I've seen with other applications by creating my own application!
+
+<img alt="moose-main-preview" src="https://prblmtq.com/projects/moose/images/main-frame-preview.png">
+
+<br/>
+
+<br/>
 
 ## Running the project
 
-To install Moose, run the installer file you created in the previous section.  Once installed, you should be able to run the app.
+The easiest way to get started with Moose is to just [download a fully working .dmg file](https://www.prblmtq.com/projects/moose/download) from my website.
 
-[Or you could just download a fully working .dmg file from my website.](https://www.prblmtq.com/projects/moose/download)
+*(I don't have a developer key yet to sign the app, so you'll just have to trust me for now.)*  
+*(But chances are if you're here, I probably know you...)*
 
-*(I don't have a developer key yet to sign the app, so you'll just have to trust me for now)*
+If you don't want to download a .dmg file, and you're a nerdy developer like me, you try importing the project into your favorite IDE.
+I have a walkthrough for [IntelliJ IDEA](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-intellij) and [Apache Netbeans](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-netbeans) in my Wiki.
 
-### Configuring the album art finder
+<br/>
 
-I have some functionality built in to automatically use Google's CSE (Custom Search Engine) and Google's search API to search for images.  You will need to configure this in a few steps:
-1.  Go to https://cse.google.com and create a new Custom Search Engine.  Name it whatever you want, like "Moose" for example.  Under "Sites to Search," just put www.google.com.
-2.  On the next screen, click on the Control Panel button on the "Modify your search engine" field.
-3.  You can give a description for your search engine here, as well as provide key words to search by.  I chose "spotify" and "open.spotify" since I want to prioritize spotify's images over others.
-4.  Flip the "Image search" slider to ON.
-5.  Take note of the Search Engine ID field, we'll need that later.
+---
 
-Now we need to create an API key so your searches are authenticated with Google.
-1.  Go to https://console.developers.google.com/apis/credentials and click "+ Create Credentials" near the top.  This will generate a new API key.
-2.  Name it whatever you want, like "Moose" for example.
-3.  Under API Restrictions, select the "Restrict Key" radio button.  Under the new dropdown, choose "Custom Search API" and hit Save.
-4.  Take note of your new API key, we'll need that later.
+<br/>
 
-Now that we have both the CSE ID and your API key, we can go into Moose and set it up!
-1.  Open Moose.
-2.  Open the Settings window (CMD + ,)
-3.  Go to the API Config tab.
-4.  Put in your CSE ID and API key in the fields and hit Save.
+## Using Moose
 
-You're ready to use Moose's built in album art finder!
+I encourage you to check out the [Wiki](https://github.com/mpfthprblmtq/moose/wiki/) in this project.  A good starting point is the [Using Moose](https://github.com/mpfthprblmtq/moose/wiki/Using-Moose) article, it'll give you a few starting points.
+
+
+
+
