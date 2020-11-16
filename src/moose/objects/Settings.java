@@ -46,6 +46,11 @@ public class Settings {
         this.albumArtFinderSearchCount = 0;
         this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
     }
+
+    public Settings withVersionNumber(String version) {
+        this.setVersion(version);
+        return this;
+    }
     
     /**
      * Adds a genre to the genre list

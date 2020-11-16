@@ -31,6 +31,11 @@ import moose.utilities.logger.Logger;
 // class SettingsController
 public class SettingsController {
 
+    // hardened version
+    // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
+    final String version = "1.2.1";
+    // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE PREVIOUS LINE
+
     // main settingsFile file
     File settingsFile;
 
@@ -50,15 +55,9 @@ public class SettingsController {
 
     public void readSettingsFile() {
 
-        // hardened version
-        // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
-        final String version = "1.2.1";
-        // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE PREVIOUS LINE
-
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
             settings = mapper.readValue(jsonString, Settings.class);
-            settings.setVersion(version);
         } catch (IOException e) {
             logger.logError("Exception while reading the settings json!", e);
         }
@@ -138,7 +137,7 @@ public class SettingsController {
     }
 
     public Settings getSettings() {
-        return this.settings;
+        return this.settings.withVersionNumber(version);
     }
 
     public Settings copySettings() {
