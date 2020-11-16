@@ -1,13 +1,13 @@
-/**
- *  Proj:   Moose
- *  File:   Logger.java
- *  Desc:   Custom logger class used to... log...
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   Logger.java
+   Desc:   Custom logger class used to... log...
+
+   Copyright Pat Ripley 2018
  */
 
 // package
-package moose.utilities;
+package moose.utilities.logger;
 
 // imports
 import java.io.File;
@@ -21,6 +21,8 @@ import moose.Main;
 
 // class Logger
 public class Logger {
+
+    Logger logger = Main.getLogger();
 
     // streams
     static PrintStream errorStream;
@@ -44,7 +46,9 @@ public class Logger {
         String logsDir_path = appSupportPath + "Logs/";
         File logsDir = new File(logsDir_path);
         if (!logsDir.exists()) {
-            logsDir.mkdirs();
+            if (!logsDir.mkdirs()) {
+                logger.logError("Couldn't create the logs directory!  Path: " + logsDir_path);
+            }
         }
 
         // create the error log
@@ -52,7 +56,9 @@ public class Logger {
         errorLog = new File(errorLog_path);
         if (!errorLog.exists()) {
             try {
-                errorLog.createNewFile();
+                if (!errorLog.createNewFile()) {
+                    throw new IOException("IOException thrown trying to create the error log!");
+                }
             } catch (IOException ex) {
                 logError("Couldn't create error log!  Well, this is redundant...", ex);
             }
@@ -63,7 +69,9 @@ public class Logger {
         eventLog = new File(eventLog_path);
         if (!eventLog.exists()) {
             try {
-                eventLog.createNewFile();
+                if (!eventLog.createNewFile()) {
+                    throw new IOException("IOException thrown trying to create the event log!");
+                }
             } catch (IOException ex) {
                 logError("Couldn't create eventLog!", ex);
             }
@@ -74,8 +82,7 @@ public class Logger {
             errorStream = new PrintStream(new FileOutputStream(errorLog, true));
             eventStream = new PrintStream(new FileOutputStream(eventLog, true));
         } catch (FileNotFoundException ex) {
-            System.err.println(ex);
-            //log(ex.getLocalizedMessage(), ERROR);
+            logger.logError("Couldn't set the print streams to error log and event log!", ex);
         }
 
         // by default, setting the System.out to the errorStream just in case I missed catches
@@ -188,9 +195,9 @@ public class Logger {
         
         // output the statement
         System.out.printf("%-22s", dateStr);
-        System.out.printf(str + "\n");
+        System.out.print(str + "\n");
         
-        // put it back to errorstream by default
+        // put it back to errorStream by default
         System.setOut(errorStream);
     }
 

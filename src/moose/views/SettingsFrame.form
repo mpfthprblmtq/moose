@@ -549,10 +549,10 @@
                                   <Component id="timesUsedTodayField" alignment="1" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="preferredCoverArtSizeLabel" min="-2" pref="175" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="preferredCoverArtSizeTextField" min="-2" pref="70" max="-2" attributes="0"/>
+                              <Component id="preferredCoverArtSizeSpinner" min="-2" pref="70" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -583,12 +583,12 @@
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="separator2" min="-2" pref="10" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="preferredCoverArtSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="preferredCoverArtSizeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="preferredCoverArtSizeSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="76" max="32767" attributes="0"/>
+                      <EmptySpace pref="82" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -672,26 +672,17 @@
                 <Property name="text" type="java.lang.String" value="Preferred cover art size:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="preferredCoverArtSizeTextField">
+            <Component class="javax.swing.JSeparator" name="separator2">
+            </Component>
+            <Component class="javax.swing.JSpinner" name="preferredCoverArtSizeSpinner">
               <Properties>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="String.valueOf(this.settingsController.getSettings().getPreferredCoverArtSize())" type="code"/>
-                </Property>
-                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 26]"/>
-                </Property>
-                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 26]"/>
-                </Property>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[70, 26]"/>
+                <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="this.settingsController.getSettings().getPreferredCoverArtSize()" type="code"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="preferredCoverArtSizeTextFieldKeyTyped"/>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="preferredCoverArtSizeSpinnerStateChanged"/>
               </Events>
-            </Component>
-            <Component class="javax.swing.JSeparator" name="separator2">
             </Component>
           </SubComponents>
         </Container>

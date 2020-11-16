@@ -1,16 +1,23 @@
+/*
+   Proj:   Moose
+   File:   ImageSearchQuery.java
+   Desc:   Pojo for a bundle of search information to provide to the Album Art Finder service
+
+   Copyright Pat Ripley 2018
+ */
+
+// package
 package moose.objects;
 
+// imports
 import java.io.File;
 import java.util.List;
 
+// class ImageSearchQuery
 public class ImageSearchQuery {
     private String query;
     private File dir;
     private List<Integer> rows;
-
-    public ImageSearchQuery() {
-
-    }
 
     public ImageSearchQuery(String query, File dir, List<Integer> rows) {
         this.setQuery(query);
@@ -43,8 +50,8 @@ public class ImageSearchQuery {
     }
 
     public static boolean contains(List<ImageSearchQuery> queries, String query) {
-        for (int i = 0; i < queries.size(); i++) {
-            if (queries.get(i).getQuery().equals(query)) {
+        for (ImageSearchQuery imageSearchQuery : queries) {
+            if (imageSearchQuery.getQuery().equals(query)) {
                 return true;
             }
         }

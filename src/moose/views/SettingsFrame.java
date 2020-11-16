@@ -1,25 +1,31 @@
-/**
- *  Proj:   Moose
- *  File:   SettingsFrame.java
- *  Desc:   Main UI class for the JFrame containing the settings and options.
- *          Works with the SettingsController to load and update settings, this class just handles all the UI.
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   SettingsFrame.java
+   Desc:   Main UI class for the JFrame containing the settings and options.
+           Works with the SettingsController to load and update settings, this class just handles all the UI.
+
+   Copyright Pat Ripley 2018
  */
 
 // package
 package moose.views;
 
 // imports
-import java.awt.Color;
+
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
+
 import moose.Main;
 import moose.controllers.*;
+import moose.objects.Settings;
 import moose.utilities.*;
+import moose.utilities.logger.Logger;
 
 import java.io.File;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentNavigableMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -35,11 +41,18 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
-    
+
+    // temporary settings object, which gets sent to be updated
+    Settings settings;
+
     // starting states
     boolean debugEdited = false;
     boolean developerModeEdited = false;
     int genresDeleted = 0;
+
+    // some html constants
+    final String HTML_PREFIX = "<html><b><i>";
+    final String HTML_SUFFIX = "</i></b></html>";
 
     /**
      * Creates new form SettingsFrame
@@ -51,9 +64,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         // initially load the settings
         settingsController.readSettingsFile();
 
+        // set the temp settings with the actual settings
+        settings = settingsController.copySettings();
+
         // init the components
         initComponents();
-
     }
 
     /**
@@ -102,8 +117,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         timesUsedTodayLabel = new javax.swing.JLabel();
         timesUsedTodayField = new javax.swing.JLabel();
         preferredCoverArtSizeLabel = new javax.swing.JLabel();
-        preferredCoverArtSizeTextField = new javax.swing.JTextField();
         separator2 = new javax.swing.JSeparator();
+        preferredCoverArtSizeSpinner = new javax.swing.JSpinner();
         statusLabel = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         defaultButton = new javax.swing.JButton();
@@ -167,52 +182,52 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout genrePanelLayout = new javax.swing.GroupLayout(genrePanel);
         genrePanel.setLayout(genrePanelLayout);
         genrePanelLayout.setHorizontalGroup(
-            genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(genrePanelLayout.createSequentialGroup()
-                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(genrePanelLayout.createSequentialGroup()
-                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(genrePanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(genresHeaderLabel))
-                            .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, genrePanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                            .addComponent(cancelButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(genrePanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(genreToAddLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(genreStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(genresScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(genresHeaderLabel))
+                                                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, genrePanelLayout.createSequentialGroup()
+                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                                        .addComponent(cancelButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(genreToAddLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(genreStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(genresScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         genrePanelLayout.setVerticalGroup(
-            genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(genrePanelLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(genresScrollPane)
-                    .addGroup(genrePanelLayout.createSequentialGroup()
-                        .addComponent(genresHeaderLabel)
-                        .addGap(34, 34, 34)
-                        .addComponent(genreToAddLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(addGenreButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteGenreButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
-                        .addComponent(genreStatusLabel)))
-                .addContainerGap())
+                genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(genresScrollPane)
+                                        .addGroup(genrePanelLayout.createSequentialGroup()
+                                                .addComponent(genresHeaderLabel)
+                                                .addGap(34, 34, 34)
+                                                .addComponent(genreToAddLabel)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(addGenreButton)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(deleteGenreButton)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(cancelButton)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                                                .addComponent(genreStatusLabel)))
+                                .addContainerGap())
         );
 
         tabbedPane.addTab("Genres", genrePanel);
@@ -284,56 +299,56 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout loggingPanelLayout = new javax.swing.GroupLayout(loggingPanel);
         loggingPanel.setLayout(loggingPanelLayout);
         loggingPanelLayout.setHorizontalGroup(
-            loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loggingPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(loggingPanelLayout.createSequentialGroup()
-                        .addComponent(openEventLogButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
-                        .addComponent(clearEventLogButton))
-                    .addGroup(loggingPanelLayout.createSequentialGroup()
-                        .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(clearErrorLogButton))
-                    .addGroup(loggingPanelLayout.createSequentialGroup()
-                        .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(loggingHeaderLabel)
-                            .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(loggingPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(loggingPanelLayout.createSequentialGroup()
+                                                .addComponent(openEventLogButton)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                                                .addComponent(clearEventLogButton))
+                                        .addGroup(loggingPanelLayout.createSequentialGroup()
+                                                .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(clearErrorLogButton))
+                                        .addGroup(loggingPanelLayout.createSequentialGroup()
+                                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(loggingHeaderLabel)
+                                                        .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         loggingPanelLayout.setVerticalGroup(
-            loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loggingPanelLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(debuggingHeaderLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(debugCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(developerModeCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(loggingHeaderLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(openEventLogButton)
-                    .addComponent(clearEventLogButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(openErrorLogButton)
-                    .addComponent(clearErrorLogButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(loggingPanelLayout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(debuggingHeaderLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(debugCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(developerModeCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(loggingHeaderLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(openEventLogButton)
+                                        .addComponent(clearEventLogButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(openErrorLogButton)
+                                        .addComponent(clearErrorLogButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Logging", loggingPanel);
@@ -360,28 +375,28 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout filesPanelLayout = new javax.swing.GroupLayout(filesPanel);
         filesPanel.setLayout(filesPanelLayout);
         filesPanelLayout.setHorizontalGroup(
-            filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(filesPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(filesPanelLayout.createSequentialGroup()
-                        .addComponent(libraryLocationHeaderLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                        .addComponent(browseButton))
-                    .addGroup(filesPanelLayout.createSequentialGroup()
-                        .addComponent(libraryLocationField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(filesPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(filesPanelLayout.createSequentialGroup()
+                                                .addComponent(libraryLocationHeaderLabel)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                                                .addComponent(browseButton))
+                                        .addGroup(filesPanelLayout.createSequentialGroup()
+                                                .addComponent(libraryLocationField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addContainerGap())))
         );
         filesPanelLayout.setVerticalGroup(
-            filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(filesPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(libraryLocationHeaderLabel)
-                    .addComponent(browseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(243, Short.MAX_VALUE))
+                filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(filesPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(libraryLocationHeaderLabel)
+                                        .addComponent(browseButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(243, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Files", filesPanel);
@@ -423,69 +438,66 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         preferredCoverArtSizeLabel.setText("Preferred cover art size:");
 
-        preferredCoverArtSizeTextField.setText(String.valueOf(this.settingsController.getSettings().getPreferredCoverArtSize()));
-        preferredCoverArtSizeTextField.setMaximumSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.setMinimumSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.setPreferredSize(new java.awt.Dimension(70, 26));
-        preferredCoverArtSizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                preferredCoverArtSizeTextFieldKeyReleased(evt);
+        preferredCoverArtSizeSpinner.setValue(this.settingsController.getSettings().getPreferredCoverArtSize());
+        preferredCoverArtSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                preferredCoverArtSizeSpinnerStateChanged(evt);
             }
         });
 
         javax.swing.GroupLayout apiPanelLayout = new javax.swing.GroupLayout(apiPanel);
         apiPanel.setLayout(apiPanelLayout);
         apiPanelLayout.setHorizontalGroup(
-            apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(apiPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(separator2)
-                    .addComponent(cseLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(apiKeyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(apiKeyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cseTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(timesUsedTodayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(preferredCoverArtSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(apiPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(separator2)
+                                        .addComponent(cseLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(apiKeyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(apiKeyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(cseTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(apiPanelLayout.createSequentialGroup()
+                                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                        .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(timesUsedTodayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addGroup(apiPanelLayout.createSequentialGroup()
+                                                .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         apiPanelLayout.setVerticalGroup(
-            apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(apiPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(cseLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(apiKeyLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dateLastUsedLabel)
-                    .addComponent(dateLastUsedField))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(timesUsedTodayLabel)
-                    .addComponent(timesUsedTodayField))
-                .addGap(18, 18, 18)
-                .addComponent(separator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(preferredCoverArtSizeLabel)
-                    .addComponent(preferredCoverArtSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(76, Short.MAX_VALUE))
+                apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(apiPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(cseLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(apiKeyLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(dateLastUsedLabel)
+                                        .addComponent(dateLastUsedField))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(timesUsedTodayLabel)
+                                        .addComponent(timesUsedTodayField))
+                                .addGap(18, 18, 18)
+                                .addComponent(separator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(preferredCoverArtSizeLabel)
+                                        .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("API Config", apiPanel);
@@ -512,46 +524,47 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(defaultButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(saveButton))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(defaultButton)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(saveButton))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(statusLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(saveButton)
-                    .addComponent(defaultButton))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(statusLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(saveButton)
+                                        .addComponent(defaultButton))
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * Event for addButton 
+     * Event for addButton
      * Checks if you're adding a new value or editing an existing value
+     *
      * @param evt
      */
     private void addGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGenreButtonActionPerformed
@@ -563,12 +576,13 @@ public class SettingsFrame extends javax.swing.JFrame {
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            genreTextField.setText(Constants.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
         }
     }//GEN-LAST:event_addGenreButtonActionPerformed
 
     /**
      * Event for deleteButton
+     *
      * @param evt, the event
      */
     private void deleteGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteGenreButtonActionPerformed
@@ -586,28 +600,27 @@ public class SettingsFrame extends javax.swing.JFrame {
         addGenreButton.setText("Add");
         deleteGenreButton.setEnabled(false);
         cancelButton.setEnabled(false);
-        genreTextField.setText(Constants.EMPTY_STRING);
+        genreTextField.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * Event for the JList click
      * Sets the value of the text field and changes the button text to reflect the current action
+     *
      * @param evt, the event
      */
     private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
-        System.out.println(genreList.getSelectedIndex());
-        if (genreList.getSelectedValue().contains("<html>")) {
-            // don't show in the text fields cause there's an error I can't be asked to fix
-        } else {
-            addGenreButton.setText("Submit");
-            deleteGenreButton.setEnabled(true);
-            cancelButton.setEnabled(true);
-            genreTextField.setText(genreList.getSelectedValue());
-        }
+        addGenreButton.setText("Submit");
+        deleteGenreButton.setEnabled(true);
+        cancelButton.setEnabled(true);
+        genreTextField.setText(genreList.getSelectedValue()
+                .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
+                .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING));
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
      * Event for the debuggingMode checkbox
+     *
      * @param evt, the event
      */
     private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
@@ -616,13 +629,14 @@ public class SettingsFrame extends javax.swing.JFrame {
         } else {
             debugCheckBox.setForeground(Constants.BLACK);
         }
-        settingsController.getSettings().setDebugMode(debugCheckBox.isSelected());
+        settings.setDebugMode(debugCheckBox.isSelected());
         debugEdited = !debugEdited;
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
      * Event for the developerMode checkbox
+     *
      * @param evt, the event
      */
     private void developerModeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_developerModeCheckBoxActionPerformed
@@ -631,13 +645,14 @@ public class SettingsFrame extends javax.swing.JFrame {
         } else {
             developerModeCheckBox.setForeground(Constants.BLACK);
         }
-        settingsController.getSettings().setDeveloperMode(developerModeCheckBox.isSelected());
+        settings.setDeveloperMode(developerModeCheckBox.isSelected());
         developerModeEdited = !developerModeEdited;
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
     }//GEN-LAST:event_developerModeCheckBoxActionPerformed
 
     /**
      * Event for the open eventlog button
+     *
      * @param evt, the event
      */
     private void openEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openEventLogButtonActionPerformed
@@ -646,6 +661,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Event for the open errorlog button
+     *
      * @param evt, the event
      */
     private void openErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openErrorLogButtonActionPerformed
@@ -654,53 +670,59 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Event for the clear eventlog button
+     *
      * @param evt, the event
      */
     private void clearEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearEventLogButtonActionPerformed
         int returnVal = JOptionPane.showConfirmDialog(
-                null, 
-                "Are you sure you want to clear the event log?", 
-                "Confirm Clear", 
-                JOptionPane.YES_NO_OPTION, 
+                null,
+                "Are you sure you want to clear the event log?",
+                "Confirm Clear",
+                JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-        if(returnVal == 0) {
+        if (returnVal == 0) {
             settingsController.clearEventLog();
         }
     }//GEN-LAST:event_clearEventLogButtonActionPerformed
 
     /**
      * Event for the clear errorlog button
+     *
      * @param evt, the event
      */
     private void clearErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearErrorLogButtonActionPerformed
         int returnVal = JOptionPane.showConfirmDialog(
-                null, 
-                "Are you sure you want to clear the error log?", 
-                "Confirm Clear", 
-                JOptionPane.YES_NO_OPTION, 
+                null,
+                "Are you sure you want to clear the error log?",
+                "Confirm Clear",
+                JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-        if(returnVal == 0) {
+        if (returnVal == 0) {
             settingsController.clearErrorLog();
         }
     }//GEN-LAST:event_clearErrorLogButtonActionPerformed
 
     /**
      * Event for the browse button on the files tab
+     *
      * @param evt, the event
      */
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         // get the folder through a JFileChooser
-        File dir = Objects.requireNonNull(
-                Utils.launchJFileChooser(
-                        "Choose the directory you want to store music in...",
-                        "Select",
-                        JFileChooser.DIRECTORIES_ONLY,
-                        false))[0];
-        if(dir != null) {
-            settingsController.getSettings().setLibraryLocation(dir.getAbsolutePath() + "/");
-            libraryLocationField.setForeground(Constants.GREEN);
-            libraryLocationField.setText(settingsController.getSettings().getLibraryLocation());
-            statusLabel.setText(Constants.EMPTY_STRING);
+        File dir = Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Choose the directory you want to store music in...",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
+        if (dir != null) {
+            settings.setLibraryLocation(dir.getAbsolutePath() + "/");
+            if (!Main.getSettings().getLibraryLocation().equals(settings.getLibraryLocation())) {
+                libraryLocationField.setForeground(Constants.GREEN);
+                libraryLocationField.setText(settings.getLibraryLocation());
+            }
+            statusLabel.setText(StringUtils.EMPTY_STRING);
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -708,6 +730,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         String originalValue = Main.getSettings().getAlbumArtFinderCseId();
         if (!cseTextField.getText().equals(originalValue)) {
             cseTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderCseId(cseTextField.getText());
         } else {
             cseTextField.setForeground(Constants.BLACK);
         }
@@ -717,52 +740,44 @@ public class SettingsFrame extends javax.swing.JFrame {
         String originalValue = Main.getSettings().getAlbumArtFinderApiKey();
         if (!apiKeyTextField.getText().equals(originalValue)) {
             apiKeyTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
         } else {
             apiKeyTextField.setForeground(Constants.BLACK);
         }
     }//GEN-LAST:event_apiKeyTextFieldKeyTyped
 
-    private void preferredCoverArtSizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeTextFieldKeyTyped
-        String originalValue = String.valueOf(Main.getSettings().getPreferredCoverArtSize());
-        if (!preferredCoverArtSizeTextField.getText().equals(originalValue)) {
-            preferredCoverArtSizeTextField.setForeground(Constants.GREEN);
+    private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
+        int originalValue = Main.getSettings().getPreferredCoverArtSize();
+        if (!preferredCoverArtSizeSpinner.getValue().equals(originalValue)) {
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.GREEN);
+            settings.setPreferredCoverArtSize((Integer) preferredCoverArtSizeSpinner.getValue());
         } else {
-            preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.BLACK);
         }
-    }//GEN-LAST:event_preferredCoverArtSizeTextFieldKeyTyped
+    }//GEN-LAST:event_preferredCoverArtSizeSpinnerStateChanged
 
     /**
      * Event for the default button
+     *
      * @param evt, the event
      */
     private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to clear your settings?",
-                "Confirm Default",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if(returnVal == 0) {
-            if (settingsController.fillDefaults()) {
-                statusLabel.setForeground(Constants.GREEN);
-                statusLabel.setText("Settings successfully reset!");
-                resetUI();
-            } else {
-                statusLabel.setForeground(Constants.RED);
-                statusLabel.setText("Problem updating settings...");
-            }
-        }
+        defaultSettings();
     }//GEN-LAST:event_defaultButtonActionPerformed
 
     /**
      * Event for the save button
+     *
      * @param evt, the event
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        if(Main.updateSettings()) {
+        if (Main.updateSettings(settings)) {
             statusLabel.setForeground(Constants.GREEN);
             statusLabel.setText("Settings saved!");
             resetUI();
+            settings = Main.getSettings();
         } else {
             statusLabel.setForeground(Constants.RED);
             statusLabel.setText("Problem updating Settings...");
@@ -771,6 +786,7 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Gets the list of genres and fill a DefaultListModel for the view
+     *
      * @return the listModel for the JList
      */
     public DefaultListModel<String> getGenreListModel() {
@@ -784,25 +800,27 @@ public class SettingsFrame extends javax.swing.JFrame {
             return new DefaultListModel<>();
         }
     }
-    
+
     /**
      * Populates the times used today field
      * Checks to see if the date matches today, to set the counter back to 0
+     *
      * @return the times used today
      */
     public String populateTimesUsedTodayField() {
         Date today = new Date();
-        Date dateLastUsed = Utils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
-        
+        Date dateLastUsed = DateUtils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+
         // check to see if date in settings is today
-        if (today.getDay() == dateLastUsed.getDay() && 
+        assert dateLastUsed != null;
+        if (today.getDay() == dateLastUsed.getDay() &&
                 today.getMonth() == dateLastUsed.getMonth() &&
                 today.getYear() == dateLastUsed.getYear()) {
             // date is today, return normally
         } else {
             // date was not today, set the times used today to 0
             this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
-            this.settingsController.writeSettingsFile();
+            this.settingsController.writeSettingsFile(settings);
         }
         return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
                 .concat("/")
@@ -811,31 +829,33 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Adds the genre to the ivar list and the JList model
+     *
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        if (!Main.getSettings().getGenres().contains(genre) && !genreTextField.getText().equals(Constants.EMPTY_STRING)) {
-            settingsController.getSettings().addGenre(genre);
+        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY_STRING)) {
+            settings.addGenre(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
-            genreTextField.setText(Constants.EMPTY_STRING);
-            statusLabel.setText(Constants.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY_STRING);
         }
     }
 
     /**
      * Removes the genre from the ivar list and the JList model
-     * @param genre
+     *
+     * @param genre, the genre to remove
      */
     public void removeGenreFromList(String genre) {
         if (!genreListModel.removeElement(genre)) {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            settingsController.getSettings().removeGenre(genre);
-            genreTextField.setText(Constants.EMPTY_STRING);
+            settings.removeGenre(genre);
+            genreTextField.setText(StringUtils.EMPTY_STRING);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            statusLabel.setText(Constants.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY_STRING);
             genreStatusLabel.setForeground(Constants.GREEN);
             genresDeleted++;
             genreStatusLabel.setText(genresDeleted + " genres deleted!");
@@ -844,16 +864,107 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     /**
      * Submits the change in the list and in the arraylist
-     * @param oldGenre
-     * @param newGenre
+     *
+     * @param oldGenre, the old genre to update
+     * @param newGenre, the new value of the genre
      */
     public void submitGenreChange(String oldGenre, String newGenre) {
-        oldGenre = oldGenre
-                .replace("<html><b><i>", Constants.EMPTY_STRING)
-                .replace("</i></b></html>", Constants.EMPTY_STRING);
-        settingsController.getSettings().getGenres().set(settingsController.getSettings().getGenres().indexOf(oldGenre), newGenre);
+
+        // the alreadyEdited mess is to check if the list entry was edited already, so I need to worry about the
+        // html tags showing up or not, since I need to index the array based on the value
+        // just don't worry about it, it works lol
+        boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
+        if (alreadyEdited) {
+            String oldGenre_withoutHtml = oldGenre
+                    .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
+                    .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING);
+            genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
+            oldGenre = oldGenre_withoutHtml;
+        }
+
+        settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
+        newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
-        statusLabel.setText(Constants.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY_STRING);
+    }
+
+    /**
+     * Method that runs the default action on the settings based on what the user wants to do
+     */
+    public void defaultSettings() {
+        // get which settings the user wants to reset
+        Map<Integer, Boolean> settingsToReset = DialogUtils.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
+
+        // go through the map we get back and reset those settings
+        if (settingsToReset != null) {
+
+            if (!settingsToReset.get(Constants.GENRE)
+                    && !settingsToReset.get(Constants.LOGGING)
+                    && !settingsToReset.get(Constants.FILES)
+                    && !settingsToReset.get(Constants.API)) {
+                statusLabel.setForeground(Constants.BLACK);
+                statusLabel.setText("No settings to reset!");
+                return;
+            }
+
+            Map<Integer, Boolean> success = new HashMap<>();
+            if (settingsToReset.containsKey(Constants.GENRE) && settingsToReset.get(Constants.GENRE)) {
+                success.put(Constants.GENRE, this.settingsController.defaultGenres());
+            }
+            if (settingsToReset.containsKey(Constants.LOGGING) && settingsToReset.get(Constants.LOGGING)) {
+                success.put(Constants.LOGGING, this.settingsController.defaultLogging());
+            }
+            if (settingsToReset.containsKey(Constants.FILES) && settingsToReset.get(Constants.FILES)) {
+                success.put(Constants.FILES, this.settingsController.defaultFiles());
+            }
+            if (settingsToReset.containsKey(Constants.API) && settingsToReset.get(Constants.API)) {
+                success.put(Constants.API, this.settingsController.defaultApi());
+            }
+
+            // build the message to show to the user based on the success map
+            String message = StringUtils.EMPTY_STRING;
+            if (success.containsKey(Constants.GENRE)) {
+                message = "Genres";
+            }
+            if (success.containsKey(Constants.LOGGING)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "Logging";
+                } else {
+                    message = message.concat(", Logging");
+                }
+            }
+            if (success.containsKey(Constants.FILES)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "Files";
+                } else {
+                    message = message.concat(", Files");
+                }
+            }
+            if (success.containsKey(Constants.API)) {
+                if (message.equals(StringUtils.EMPTY_STRING)) {
+                    message = "API Config";
+                } else {
+                    message = message.concat(", API Config");
+                }
+            }
+
+            // set the status label
+            if (StringUtils.isEmpty(message)) {
+                statusLabel.setForeground(Constants.RED);
+                statusLabel.setText("Problem updating settings...");
+            } else {
+                statusLabel.setForeground(Constants.GREEN);
+                if (success.size() == 4) {
+                    message = "All settings reset!";
+                } else {
+                    message = message.concat(" settings reset!");
+                }
+                statusLabel.setText(message);
+            }
+
+            // reset graphics
+            resetUI();
+        }
     }
 
     /**
@@ -862,41 +973,23 @@ public class SettingsFrame extends javax.swing.JFrame {
     private void resetUI() {
         genreList.setModel(getGenreListModel());
         debugCheckBox.setForeground(Constants.BLACK);
+        debugCheckBox.setSelected(Main.getSettings().isInDebugMode());
         developerModeCheckBox.setForeground(Constants.BLACK);
+        developerModeCheckBox.setSelected(Main.getSettings().isInDeveloperMode());
         libraryLocationField.setForeground(Constants.BLACK);
+        libraryLocationField.setText(Main.getSettings().getLibraryLocation());
         cseTextField.setForeground(Constants.BLACK);
+        cseTextField.setText(Main.getSettings().getAlbumArtFinderCseId());
         apiKeyTextField.setForeground(Constants.BLACK);
-        preferredCoverArtSizeTextField.setForeground(Constants.BLACK);
-        debugEdited = false;
-        developerModeEdited = false;
+        apiKeyTextField.setText(Main.getSettings().getAlbumArtFinderApiKey());
+        preferredCoverArtSizeSpinner.getEditor().getComponent(0).setForeground(Constants.BLACK);
+        preferredCoverArtSizeSpinner.setValue(Main.getSettings().getPreferredCoverArtSize());
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SettingsFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    public static void main(String[] args) {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
@@ -939,7 +1032,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JButton openErrorLogButton;
     private javax.swing.JButton openEventLogButton;
     private javax.swing.JLabel preferredCoverArtSizeLabel;
-    private javax.swing.JTextField preferredCoverArtSizeTextField;
+    private javax.swing.JSpinner preferredCoverArtSizeSpinner;
     private javax.swing.JButton saveButton;
     private javax.swing.JSeparator separator1;
     private javax.swing.JSeparator separator2;

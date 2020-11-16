@@ -1,9 +1,9 @@
-/**
- *  Proj:   Moose
- *  File:   Song.java
- *  Desc:   Object class for the Song object
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   Song.java
+   Desc:   Object class for the Song object
+
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -11,6 +11,8 @@ package moose.objects;
 
 // imports
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 // class Song
 public class Song {
@@ -19,32 +21,28 @@ public class Song {
     private String title;
     private String artist;
     private String album;
-    private String albumartist;
+    private String albumArtist;
     private String genre;
     private String year;
     private String track;
-    private String totaltracks;
+    private final String totalTracks;
     private String disk;
-    private String totaldisks;
+    private final String totalDisks;
     private byte[] artwork_bytes;
     
-    private String bitrate;
-    private String samplerate;
+    private final String bitrate;
+    private String sampleRate;
     private String length;
     private String comment;
 
-    public Song() {
-        // default constructor
-    }
-
-    public Song(File file, String title, String artist, String album, String albumartist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int samplerate, long len, String comment) {
+    public Song(File file, String title, String artist, String album, String albumArtist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int sampleRate, long len, String comment) {
 
         // standard string stuff
         this.file = file;
         this.title = title;
         this.artist = artist;
         this.album = album;
-        this.albumartist = albumartist;
+        this.albumArtist = albumArtist;
         this.genre = genre;
         this.year = year;
 
@@ -52,25 +50,25 @@ public class Song {
         if (track != null && track.contains("/")) {
             String[] t = track.split("/");
             this.track = t[0];
-            this.totaltracks = t[1];
+            this.totalTracks = t[1];
         } else {
             this.track = "";
-            this.totaltracks = "";
+            this.totalTracks = "";
         }
         if (disk != null && disk.contains("/")) {
             String[] d = disk.split("/");
             this.disk = d[0];
-            this.totaldisks = d[1];
+            this.totalDisks = d[1];
         } else {
             this.disk = "";
-            this.totaldisks = "";
+            this.totalDisks = "";
         }
 
         this.artwork_bytes = artwork_bytes;
         
         // parsing some ints and longs
         this.bitrate = bitrate + " Kbps";
-        this.samplerate = samplerate + " Hz";
+        this.sampleRate = sampleRate + " Hz";
         this.length = getLengthString(len);
         
         this.comment = comment;
@@ -86,7 +84,7 @@ public class Song {
         String seconds;
         minutes = String.valueOf((len - (len % 60))/60);
         seconds = String.valueOf(len % 60);
-        if(Integer.valueOf(seconds) < 10) {
+        if(Integer.parseInt(seconds) < 10) {
             seconds = "0" + seconds;
         }
         return minutes + ":" + seconds;
@@ -96,10 +94,10 @@ public class Song {
      * @return the full track string
      */
     public String getFullTrackString() {
-        if (track.equals("") && totaltracks.equals("")) {
+        if (track.equals("") && totalTracks.equals("")) {
             return "";
         } else {
-            return track + "/" + totaltracks;
+            return track + "/" + totalTracks;
         }
     }
 
@@ -107,10 +105,10 @@ public class Song {
      * @return the full disk string
      */
     public String getFullDiskString() {
-        if (disk.equals("") && totaldisks.equals("")) {
+        if (disk.equals("") && totalDisks.equals("")) {
             return "";
         } else {
-            return disk + "/" + totaldisks;
+            return disk + "/" + totalDisks;
         }
     }
 
@@ -157,17 +155,17 @@ public class Song {
     }
 
     /**
-     * @return the albumartist
+     * @return the albumArtist
      */
-    public String getAlbumartist() {
-        return albumartist;
+    public String getAlbumArtist() {
+        return albumArtist;
     }
 
     /**
-     * @param albumartist the albumartist to set
+     * @param albumArtist the albumArtist to set
      */
-    public void setAlbumartist(String albumartist) {
-        this.albumartist = albumartist;
+    public void setAlbumArtist(String albumArtist) {
+        this.albumArtist = albumArtist;
     }
 
     /**
@@ -199,17 +197,10 @@ public class Song {
     }
 
     /**
-     * @return the totaltracks
+     * @return the totalTracks
      */
-    public String getTotaltracks() {
-        return totaltracks;
-    }
-
-    /**
-     * @param totaltracks the totaltracks to set
-     */
-    public void setTotaltracks(String totaltracks) {
-        this.totaltracks = totaltracks;
+    public String getTotalTracks() {
+        return totalTracks;
     }
 
     /**
@@ -227,17 +218,10 @@ public class Song {
     }
 
     /**
-     * @return the totaldisks
+     * @return the totalDisks
      */
-    public String getTotaldisks() {
-        return totaldisks;
-    }
-
-    /**
-     * @param totaldisks the totaldisks to set
-     */
-    public void setTotaldisks(String totaldisks) {
-        this.totaldisks = totaldisks;
+    public String getTotalDisks() {
+        return totalDisks;
     }
 
     /**
@@ -268,18 +252,6 @@ public class Song {
         this.artwork_bytes = artwork_bytes;
     }
     
-    public void setFullTrack(String t) {
-        String[] arr = t.split("/");
-        this.track = arr[0];
-        this.totaltracks = arr[1];
-    }
-    
-    public void setFullDisk(String d) {
-        String[] arr = d.split("/");
-        this.disk = arr[0];
-        this.totaldisks = arr[1];
-    }
-
     /**
      * @return the year
      */
@@ -302,24 +274,17 @@ public class Song {
     }
 
     /**
-     * @param bitrate the bitrate to set
+     * @return the sampleRate
      */
-    public void setBitrate(String bitrate) {
-        this.bitrate = bitrate;
+    public String getSampleRate() {
+        return sampleRate;
     }
 
     /**
-     * @return the samplerate
+     * @param sampleRate the sampleRate to set
      */
-    public String getSamplerate() {
-        return samplerate;
-    }
-
-    /**
-     * @param samplerate the samplerate to set
-     */
-    public void setSamplerate(String samplerate) {
-        this.samplerate = samplerate;
+    public void setSampleRate(String sampleRate) {
+        this.sampleRate = sampleRate;
     }
 
     /**
@@ -351,8 +316,38 @@ public class Song {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Song song = (Song) o;
+        return Objects.equals(file, song.file) &&
+                Objects.equals(title, song.title) &&
+                Objects.equals(artist, song.artist) &&
+                Objects.equals(album, song.album) &&
+                Objects.equals(albumArtist, song.albumArtist) &&
+                Objects.equals(genre, song.genre) &&
+                Objects.equals(year, song.year) &&
+                Objects.equals(track, song.track) &&
+                Objects.equals(totalTracks, song.totalTracks) &&
+                Objects.equals(disk, song.disk) &&
+                Objects.equals(totalDisks, song.totalDisks) &&
+                Arrays.equals(artwork_bytes, song.artwork_bytes) &&
+                Objects.equals(bitrate, song.bitrate) &&
+                Objects.equals(sampleRate, song.sampleRate) &&
+                Objects.equals(length, song.length) &&
+                Objects.equals(comment, song.comment);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(file, title, artist, album, albumArtist, genre, year, track, totalTracks, disk, totalDisks, bitrate, sampleRate, length, comment);
+        result = 31 * result + Arrays.hashCode(artwork_bytes);
+        return result;
+    }
+
+    @Override
     public String toString() {
-        return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumartist + ", gen=" + genre + ", t=" + track + ", tt=" + totaltracks + ", d=" + disk + ", td=" + totaldisks + '}';
+        return "Song{" + "tit=" + title + ", art=" + artist + ", alb=" + album + ", aa=" + albumArtist + ", gen=" + genre + ", t=" + track + ", tt=" + totalTracks + ", d=" + disk + ", td=" + totalDisks + '}';
         //return this.file.getName();
     }
 }

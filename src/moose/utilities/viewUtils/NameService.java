@@ -1,9 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+   Proj:   Moose
+   File:   NameService.java
+   Desc:   Service class for autocomplete
+
+   Copyright Samuel Sjoberg
+   Copyright Pat Ripley 2018
  */
-package moose.utilities;
+
+// package
+package moose.utilities.viewUtils;
 
 import java.util.List;
 
@@ -19,7 +24,7 @@ public class NameService implements CompletionService<String> {
 
     /**
      * Create a new <code>NameService</code> and populate it.
-     * @param data
+     * @param data, the data to create the NameService with
      */
     public NameService(List<String> data) {
         this.data = data;
@@ -28,9 +33,7 @@ public class NameService implements CompletionService<String> {
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
-        data.forEach((o) -> {
-            b.append(o).append("\n");
-        });
+        data.forEach((o) -> b.append(o).append("\n"));
         return b.toString();
     }
 

@@ -26,6 +26,7 @@
                   <KeyStroke key="Meta+S"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Save Track"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveTrackMenuItemActionPerformed"/>
@@ -37,6 +38,7 @@
                   <KeyStroke key="Shift+Meta+S"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Save All"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMenuItem">
@@ -86,6 +88,7 @@
                   <KeyStroke key="Shift+Meta+T"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="AutoTag"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoTagMenuItemActionPerformed"/>
@@ -97,6 +100,7 @@
                   <KeyStroke key="Shift+Meta+A"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Add Covers"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addCoversMenuItemActionPerformed"/>
@@ -108,6 +112,7 @@
                   <KeyStroke key="Shift+Meta+H"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Find and Replace"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="findAndReplaceMenuItemActionPerformed"/>
@@ -116,6 +121,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="addTrackNumbersMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Add Track Numbers"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addTrackNumbersMenuItemActionPerformed"/>
@@ -127,6 +133,7 @@
                   <KeyStroke key="Shift+Meta+F"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Format Filenames"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="formatFilenamesMenuItemActionPerformed"/>
@@ -147,6 +154,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aboutMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="wikiMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Wiki..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="wikiMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="commandMenuItem">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
@@ -163,7 +178,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Meta+COMMA"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Preferences"/>
+                <Property name="text" type="java.lang.String" value="Settings"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="settingsMenuItemActionPerformed"/>
@@ -321,6 +336,7 @@
               </Properties>
               <Events>
                 <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMousePressed"/>
+                <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="tablePropertyChange"/>
                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableKeyPressed"/>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableKeyReleased"/>
               </Events>
