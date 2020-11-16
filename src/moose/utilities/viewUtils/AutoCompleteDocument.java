@@ -1,14 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package moose.utilities;
+   Proj:   Moose
+   File:   AutoCompleteDocument.java
+   Desc:   Service class for auto tagging
 
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.PlainDocument;
+   Copyright Samuel Sjoberg
+   Copyright Pat Ripley 2018
+ */
+
+// package
+package moose.utilities.viewUtils;
+
+// imports
+import javax.swing.text.*;
 
 /**
  * A {@link Document} performing auto completion on the inserted text. This

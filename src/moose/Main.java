@@ -1,9 +1,9 @@
-/**
- *  Proj:   Moose
- *  File:   Main.java
- *  Desc:   Class that controls everything
- *
- *  Copyright Pat Ripley 2018
+/*
+   Proj:   Moose
+   File:   Main.java
+   Desc:   Class that controls everything
+
+   Copyright Pat Ripley 2018
  */
 
 // package
@@ -11,7 +11,7 @@ package moose;
 
 import java.io.File;
 import moose.objects.Settings;
-import moose.utilities.Logger;
+import moose.utilities.logger.Logger;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 import moose.views.SettingsFrame;
@@ -61,8 +61,8 @@ public class Main {
     /**
      * Sends a command to update the settings file with the settings object
      */
-    public static boolean updateSettings() {
-        return settingsFrame.settingsController.writeSettingsFile();
+    public static boolean updateSettings(Settings settings) {
+        return settingsFrame.settingsController.writeSettingsFile(settings);
     }
 
     /**
@@ -79,7 +79,7 @@ public class Main {
     
     /**
      * Controls the Frame opening
-     * @param dir
+     * @param dir, the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
         frame = new Frame(dir);
@@ -114,5 +114,12 @@ public class Main {
     public static void closeAuditFrame() {
         auditFrame.dispose();
     }
-    
+
+    /**
+     * Returns the auditFrame
+     */
+    public static AuditFrame getAuditFrame() {
+        return auditFrame;
+    }
+
 }

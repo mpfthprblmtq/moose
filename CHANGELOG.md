@@ -1,12 +1,46 @@
 # Changelog
 
-### 1.2.1 (The Navigation and Code Cleanup update)
+### 1.2.1 (The "Too many Bugfixes and Documentation" Update) (AKA The Halloween Update)
 
-**Release Date:** Upcoming
+**Release Date:** 31 October 2020 🎃
 
-- Better keyboard navigation
-- Code cleanup (Lint, standards, etc.)
-- Maybe a feature or two?  Not sure yet.
+**Features:**
+- Improved the Album Art Finder Frame visuals
+    - Added a progress bar so that you can see how long the search will take
+    - Throw an error and display to the user if you try to search with no API key or CSE id set in your settings
+    - Disabled the search button while a search is being performed so you can't spam click it
+- Improved the Audit Frame visuals
+    - Added a progress bar so that you can see the progress of the library scan for audit and cleanup
+- Improved functionality of the More Info Frame
+    - Made it save the currently editing track when using the right and left arrow buttons
+- Improved the process for opening tracks in the table
+    - Hidden files and folders don't show up in the file count in the status log
+- Improved the album art auto add process
+    - If you have a single image file in a directory, it'll rename that image file to cover.* and use that as the cover art
+- Improved logistics of the main interface
+    - When you hit "Clear All," it'll ask you if you're sure, including a "don't ask me again" checkbox
+    - Disabled auto actions and other things if there's no tracks in the table
+- Improved functionality of the Settings Frame
+    - Even more reactability, and fixed some broken reactability
+    - When you hit "Restore Defaults," it'll ask you which sections you want to default so you don't do them all each time
+
+**Bug Fixes:**
+- SO MANY BUGFIXES
+  - When you submitted a new genre change through the Multiple Editor genre field, it would ask you if you want to add that genre to your list many times
+  - You could pull in the same songs/albums multiple times, fixed it so there's no duplicate files in the table at any time
+  - Changed verbage of "Preferences" to "Settings" in the menu bar
+  - File Choosers now open to the library location by default if it's set, else it just opens your "user.home"
+  - When you auto add track numbers, the Multiple Track Editor now updates to reflect that
+  - The "Add Artwork" and "Remove Artwork" are at the top of the pop up menu when you click on the album art in the table
+  - So many more tiny things that I couldn't possibly list out
+
+**Code Enhancements:**
+- Ran Lint analysis and fixed the vast majority of things it was complaining about
+- Broke up the monolith Utils file into respective, use-case based Utils files
+
+**The Moose kingdom is prospering:**
+- With the success in the great war, the kingdom has seen a new age of flourishing wealth and happiness
+- This can only mean one thing...
 
 ### 1.2.0 (The "Holy moly there's new functionality" update)
 

@@ -1,37 +1,35 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+   Proj:   Moose
+   File:   AutoCompleteService.java
+   Desc:   Pojo for a bundle of search information to provide to the Album Art Finder service
+
+   Copyright Pat Ripley 2018
  */
+
+// package
 package moose.services;
 
+// imports
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
 import moose.Main;
-import moose.utilities.NameService;
+import moose.utilities.viewUtils.NameService;
 
-/**
- *
- * @author pat
- */
+import static moose.utilities.Constants.*;
+
 public class AutocompleteService {
 
-    // column constants
-    private static final int TABLE_COLUMN_TITLE = 2;
-    private static final int TABLE_COLUMN_ARTIST = 3;
-    private static final int TABLE_COLUMN_ALBUM = 4;
-    private static final int TABLE_COLUMN_ALBUMARTIST = 5;
-    private static final int TABLE_COLUMN_YEAR = 6;
-    private static final int TABLE_COLUMN_GENRE = 7;
-    private static final int TABLE_COLUMN_TRACK = 8;
-    private static final int TABLE_COLUMN_DISK = 9;
-    private static final int TABLE_COLUMN_ALBUMART = 10;
-    
+    /**
+     * Gets the name service based on the column
+     *
+     * @param isGenreField, a boolean to pre-check if it's a genre
+     * @param table, the table to search on
+     * @return the NameService to use
+     */
     public static NameService getNameService(boolean isGenreField, JTable table) {
-        List<String> list = new ArrayList<>();
         if(isGenreField) {
-            list.addAll(Main.getSettings().getGenres());
+            List<String> list = new ArrayList<>(Main.getSettings().getGenres());
             return new NameService(list);
         } else {
             if(table.getEditingColumn() == TABLE_COLUMN_TITLE
@@ -45,7 +43,13 @@ public class AutocompleteService {
             }
         }
     }
-    
+
+    /**
+     * Gets all of the fields in the column we're typing in so we can create the NameService based on them
+     *
+     * @param table, the table to search on
+     * @return a list of all strings in that column
+     */
     private static List<String> getAllColumnFields(JTable table) {
         List<String> list = new ArrayList<>();
         for (int i = 0; i < table.getModel().getRowCount(); i++) {

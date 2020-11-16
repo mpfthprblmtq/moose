@@ -69,7 +69,7 @@ then
   echo
   # put in new version in source code for hardened version
   cd src/moose/controllers/ || exit
-  sed -i '' "s/private String version = \"${oldVersion}\";/private String version = \"${newVersion}\";/g" SettingsController.java
+  sed -i '' "s/final String version = \"${oldVersion}\";/final String version = \"${newVersion}\";/g" SettingsController.java
 
   # verify new version in Settings.java
   verifyVersion=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' SettingsController.java)
