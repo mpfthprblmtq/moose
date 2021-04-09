@@ -412,9 +412,6 @@ public class Frame extends javax.swing.JFrame {
 
         // get all the songs, then the genres from the list of files
         List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
-//        songs.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
-//            genres.add(s.getGenre());
-//        });
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
@@ -492,6 +489,10 @@ public class Frame extends javax.swing.JFrame {
             return false;
         }
 
+        String cleanedFileName = file.getName()
+                .replace(".mp3", StringUtils.EMPTY_STRING)
+                .replace(":", "/");
+
         int index = songController.getSongs().size();
         Song s = songController.getSongFromFile(file);
 
@@ -502,7 +503,7 @@ public class Frame extends javax.swing.JFrame {
         model.addRow(new Object[]{
                 new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
-                s.getFile().getName().replace(".mp3", ""), // actual editable file name
+                 cleanedFileName, // actual editable file name
                 s.getTitle(),
                 s.getArtist(),
                 s.getAlbum(),

@@ -361,7 +361,11 @@ public class AutoTaggingService {
         } else {
             String regex = "\\d{2} .*\\.mp3";
             if (file.getName().matches(regex)) {
-                return file.getName().substring(3).replace(".mp3", "").trim();
+                return file.getName()
+                        .substring(3)
+                        .replace(".mp3", StringUtils.EMPTY_STRING)
+                        .replace(":", "/")
+                        .trim();
             } else {
                 return "";
             }
