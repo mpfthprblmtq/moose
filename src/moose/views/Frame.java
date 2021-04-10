@@ -12,7 +12,7 @@ package moose.views;
 
 // imports
 
-import java.awt.Component;
+import java.awt.*;
 
 import moose.*;
 import moose.controllers.SongController;
@@ -20,8 +20,6 @@ import moose.objects.Settings;
 import moose.objects.Song;
 import moose.utilities.*;
 
-import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -368,6 +366,20 @@ public class Frame extends javax.swing.JFrame {
 
         // declare the TCL for use
         TableCellListener tcl = new TableCellListener(table, action);
+
+        // keyboard listener that detects key presses
+        // just listens for CMD + A to select all the rows in the table
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent e) -> {
+            this.requestFocus();
+            if (this.isFocusOwner()) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    if (e.getKeyCode() == KeyEvent.VK_A && e.isMetaDown()) {
+                        table.selectAll();
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     /**
