@@ -12,7 +12,7 @@ package moose.views;
 
 // imports
 
-import java.awt.Component;
+import java.awt.*;
 
 import moose.*;
 import moose.controllers.SongController;
@@ -20,8 +20,6 @@ import moose.objects.Settings;
 import moose.objects.Song;
 import moose.utilities.*;
 
-import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -368,6 +366,20 @@ public class Frame extends javax.swing.JFrame {
 
         // declare the TCL for use
         TableCellListener tcl = new TableCellListener(table, action);
+
+        // keyboard listener that detects key presses
+        // just listens for CMD + A to select all the rows in the table
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent e) -> {
+            this.requestFocus();
+            if (this.isFocusOwner()) {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    if (e.getKeyCode() == KeyEvent.VK_A && e.isMetaDown()) {
+                        table.selectAll();
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     /**
@@ -412,9 +424,6 @@ public class Frame extends javax.swing.JFrame {
 
         // get all the songs, then the genres from the list of files
         List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
-//        songs.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
-//            genres.add(s.getGenre());
-//        });
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
@@ -492,6 +501,10 @@ public class Frame extends javax.swing.JFrame {
             return false;
         }
 
+        String cleanedFileName = file.getName()
+                .replace(".mp3", StringUtils.EMPTY_STRING)
+                .replace(":", "/");
+
         int index = songController.getSongs().size();
         Song s = songController.getSongFromFile(file);
 
@@ -502,7 +515,7 @@ public class Frame extends javax.swing.JFrame {
         model.addRow(new Object[]{
                 new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
                 s.getFile(), // hidden file object
-                s.getFile().getName().replace(".mp3", ""), // actual editable file name
+                 cleanedFileName, // actual editable file name
                 s.getTitle(),
                 s.getArtist(),
                 s.getAlbum(),
