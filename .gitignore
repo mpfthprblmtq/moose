@@ -20,7 +20,7 @@ out/
 *.class
 
 # Package Files #
-# *.jar
+*.jar
 *.war
 *.ear
 lib/nblibraries.properties
