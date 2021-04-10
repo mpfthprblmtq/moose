@@ -366,20 +366,6 @@ public class Frame extends javax.swing.JFrame {
 
         // declare the TCL for use
         TableCellListener tcl = new TableCellListener(table, action);
-
-        // keyboard listener that detects key presses
-        // just listens for CMD + A to select all the rows in the table
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent e) -> {
-            this.requestFocus();
-            if (this.isFocusOwner()) {
-                if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    if (e.getKeyCode() == KeyEvent.VK_A && e.isMetaDown()) {
-                        table.selectAll();
-                    }
-                }
-            }
-            return false;
-        });
     }
 
     /**
@@ -769,6 +755,7 @@ public class Frame extends javax.swing.JFrame {
         exitMenuItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
         refreshMenuItem = new javax.swing.JMenuItem();
+        selectAllMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
         auditMenuItem = new javax.swing.JMenuItem();
         autoTagMenuItem = new javax.swing.JMenuItem();
@@ -1202,6 +1189,10 @@ public class Frame extends javax.swing.JFrame {
             }
         });
         viewMenu.add(refreshMenuItem);
+
+        selectAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.META_DOWN_MASK));
+        selectAllMenuItem.setText("Select All");
+        viewMenu.add(selectAllMenuItem);
 
         jMenuBar1.add(viewMenu);
 
@@ -2491,6 +2482,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveAllMenuItem;
     private javax.swing.JButton saveButton;
     private javax.swing.JMenuItem saveTrackMenuItem;
+    private javax.swing.JMenuItem selectAllMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
     public javax.swing.JTable table;
     private javax.swing.JScrollPane tableSP;
