@@ -24,8 +24,6 @@ import moose.utilities.logger.Logger;
 
 import java.io.File;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.ConcurrentNavigableMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -576,7 +574,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            genreTextField.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
         }
     }//GEN-LAST:event_addGenreButtonActionPerformed
 
@@ -600,7 +598,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         addGenreButton.setText("Add");
         deleteGenreButton.setEnabled(false);
         cancelButton.setEnabled(false);
-        genreTextField.setText(StringUtils.EMPTY_STRING);
+        genreTextField.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
@@ -614,8 +612,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         deleteGenreButton.setEnabled(true);
         cancelButton.setEnabled(true);
         genreTextField.setText(genreList.getSelectedValue()
-                .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
-                .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING));
+                .replace(HTML_PREFIX, StringUtils.EMPTY)
+                .replace(HTML_SUFFIX, StringUtils.EMPTY));
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
@@ -631,7 +629,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDebugMode(debugCheckBox.isSelected());
         debugEdited = !debugEdited;
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
@@ -647,7 +645,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDeveloperMode(developerModeCheckBox.isSelected());
         developerModeEdited = !developerModeEdited;
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_developerModeCheckBoxActionPerformed
 
     /**
@@ -722,7 +720,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 libraryLocationField.setForeground(Constants.GREEN);
                 libraryLocationField.setText(settings.getLibraryLocation());
             }
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY);
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -833,11 +831,11 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY_STRING)) {
+        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY)) {
             settings.addGenre(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
-            genreTextField.setText(StringUtils.EMPTY_STRING);
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
+            statusLabel.setText(StringUtils.EMPTY);
         }
     }
 
@@ -851,11 +849,11 @@ public class SettingsFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             settings.removeGenre(genre);
-            genreTextField.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY);
             genreStatusLabel.setForeground(Constants.GREEN);
             genresDeleted++;
             genreStatusLabel.setText(genresDeleted + " genres deleted!");
@@ -876,8 +874,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
         if (alreadyEdited) {
             String oldGenre_withoutHtml = oldGenre
-                    .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
-                    .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING);
+                    .replace(HTML_PREFIX, StringUtils.EMPTY)
+                    .replace(HTML_SUFFIX, StringUtils.EMPTY);
             genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
             oldGenre = oldGenre_withoutHtml;
         }
@@ -885,7 +883,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
         newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }
 
     /**
@@ -922,26 +920,26 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
 
             // build the message to show to the user based on the success map
-            String message = StringUtils.EMPTY_STRING;
+            String message = StringUtils.EMPTY;
             if (success.containsKey(Constants.GENRE)) {
                 message = "Genres";
             }
             if (success.containsKey(Constants.LOGGING)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "Logging";
                 } else {
                     message = message.concat(", Logging");
                 }
             }
             if (success.containsKey(Constants.FILES)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "Files";
                 } else {
                     message = message.concat(", Files");
                 }
             }
             if (success.containsKey(Constants.API)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "API Config";
                 } else {
                     message = message.concat(", API Config");
