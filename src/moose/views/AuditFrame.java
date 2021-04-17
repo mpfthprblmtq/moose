@@ -13,6 +13,7 @@ package moose.views;
 // imports
 import moose.Main;
 import moose.controllers.AuditController;
+import moose.controllers.CleanupController;
 import moose.services.IconService;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
@@ -28,6 +29,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
     public AuditController auditController;
+    public CleanupController cleanupController;
 
     // services
     public IconService iconService = new IconService();
@@ -41,15 +43,15 @@ public class AuditFrame extends javax.swing.JFrame {
     public AuditFrame() {
         initComponents();
 
-        // initialize the audit controller
+        // initialize the controllers
         auditController = new AuditController(this, Main.getFrame().songController);
+        cleanupController = new CleanupController(this);
 
         init();
     }
 
     private void init() {
         pathLabel.setText(populatePathLabel());
-        this.setAlwaysOnTop(true);
     }
 
     /**
@@ -103,11 +105,6 @@ public class AuditFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Audit Music");
         setResizable(false);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
-        });
 
         auditCurrentlyScanningLabel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
         auditCurrentlyScanningLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -570,7 +567,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            auditController.deleteAll();
+            cleanupController.deleteAll();
         }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
@@ -587,7 +584,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            auditController.deleteSelected(
+            cleanupController.deleteSelected(
                     mp3asdCheckBox.isSelected(),
                     flacCheckBox.isSelected(),
                     wavCheckBox.isSelected(),
@@ -606,10 +603,6 @@ public class AuditFrame extends javax.swing.JFrame {
     private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
         viewResults(Constants.CLEANUP);
     }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
-
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-//        resetAuditFrame();
-    }//GEN-LAST:event_formWindowClosed
 
     private void wavCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_wavCheckBoxStateChanged
         deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
@@ -648,7 +641,7 @@ public class AuditFrame extends javax.swing.JFrame {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
-                auditResultsTextArea.setText(auditController.analyzeForAudit());
+                auditResultsTextArea.setText(auditController.analyze());
                 auditViewResultsButton.setEnabled(true);    // enable the buttons used for audit now that we have results
                 auditStartButton.setEnabled(true);
                 return null;    // don't return anything since we're just playing with threads
@@ -724,7 +717,7 @@ public class AuditFrame extends javax.swing.JFrame {
         imagesCheckBox.setEnabled(true);
         deleteAllButton.setEnabled(true);
         cleanupResultsTextArea.setEnabled(true);
-        cleanupResultsTextArea.setText(auditController.analyzeForCleanup());
+        cleanupResultsTextArea.setText(cleanupController.analyze());
 
         // enable the button used for viewing now that we have results
         cleanupViewResultsButton.setEnabled(true);
@@ -785,10 +778,10 @@ public class AuditFrame extends javax.swing.JFrame {
         ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switch (type) {
             case Constants.AUDIT:
-                ta.setText(auditController.getResults(Constants.AUDIT));
+                ta.setText(auditController.getResults());
                 break;
             case Constants.CLEANUP:
-                ta.setText(auditController.getResults(Constants.CLEANUP));
+                ta.setText(cleanupController.getResults());
                 break;
         }
 
