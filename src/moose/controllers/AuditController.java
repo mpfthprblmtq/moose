@@ -3,6 +3,7 @@ package moose.controllers;
 import moose.Main;
 import moose.services.AuditService;
 import moose.services.DialogService;
+import moose.utilities.AuditCleanupUtils;
 import moose.utilities.Constants;
 import moose.utilities.StringUtils;
 import moose.views.AuditFrame;
@@ -32,20 +33,11 @@ public class AuditController {
     // list of albums for the audit
     List<File> albums = new ArrayList<>();
 
-    // Arraylists for results
+    // lists for results
     List<List<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
             new ArrayList<>(),      // id3
             new ArrayList<>(),      // filenames
             new ArrayList<>()));    // cover art
-
-    List<List<String>> cleanupFilePathList = new ArrayList<>(Arrays.asList(
-            new ArrayList<>(),      // mp3.asd
-            new ArrayList<>(),      // flac
-            new ArrayList<>(),      // wav
-            new ArrayList<>(),      // zip
-            new ArrayList<>(),      // image files
-            new ArrayList<>(),      // windows files
-            new ArrayList<>()));    // other files
 
     public AuditController(AuditFrame auditFrame, SongController songController) {
         this.auditFrame = auditFrame;
@@ -53,8 +45,8 @@ public class AuditController {
         this.songController = songController;
     }
 
-    public String analyzeForAudit() {
-        auditService.clearListOfLists(auditFilePathList);
+    public String analyze() {
+        AuditCleanupUtils.clearLists(auditFilePathList);
         albums = auditService.importAlbums(folder);
         return auditService.analyzeForAudit(albums, auditFilePathList);
     }
@@ -183,34 +175,13 @@ public class AuditController {
         return auditService.formatStringForCurrentlyScanningPath(currentDir);
     }
 
-    public String analyzeForCleanup() {
-        auditService.clearListOfLists(cleanupFilePathList);
-        return auditService.analyzeForCleanup(folder, cleanupFilePathList);
-    }
-
-    public void deleteAll() {
-        auditService.deleteAll(cleanupFilePathList);
-        // TODO reset statistics
-    }
-
-    public void deleteSelected(boolean mp3asd, boolean flac, boolean wav, boolean zip, boolean images, boolean windows, boolean everythingElse) {
-        auditService.deleteSelected(cleanupFilePathList, mp3asd, flac, wav, zip, images, windows, everythingElse);
-        // TODO reset statistics
-    }
-
-    public String getResults(int type) {
-        switch(type) {
-            case Constants.AUDIT:
-                return auditService.exportAuditResultsToString(auditFilePathList);
-            case Constants.CLEANUP:
-                return auditService.exportCleanupResultsToString(cleanupFilePathList);
-        }
-        return StringUtils.EMPTY;
+    public String getResults() {
+        return auditService.exportAuditResultsToString(auditFilePathList);
     }
 
     /**
      * Sets the folder
-     * @param folder
+     * @param folder the folder to set
      */
     public void setFolder(File folder) {
         this.folder = folder;
