@@ -39,10 +39,10 @@ public class Settings {
         this.inDeveloperMode = false;
         this.askBeforeClearAll = true;
         this.genres = new ArrayList<>();
-        this.libraryLocation = StringUtils.EMPTY_STRING;
+        this.libraryLocation = StringUtils.EMPTY;
         this.preferredCoverArtSize = 640;
-        this.albumArtFinderApiKey = StringUtils.EMPTY_STRING;
-        this.albumArtFinderCseId = StringUtils.EMPTY_STRING;
+        this.albumArtFinderApiKey = StringUtils.EMPTY;
+        this.albumArtFinderCseId = StringUtils.EMPTY;
         this.albumArtFinderSearchCount = 0;
         this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
     }

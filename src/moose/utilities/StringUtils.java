@@ -2,7 +2,7 @@ package moose.utilities;
 
 public class StringUtils {
 
-    public static final String EMPTY_STRING = "";
+    public static final String EMPTY = "";
     public static final String NEW_LINE = "\n";
 
     /**
@@ -15,6 +15,6 @@ public class StringUtils {
         if (str == null) {
             return true;
         }
-        return str.equals(EMPTY_STRING);
+        return str.equals(EMPTY);
     }
 }

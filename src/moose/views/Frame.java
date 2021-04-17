@@ -109,6 +109,7 @@ public class Frame extends javax.swing.JFrame {
      * @param folder, the folder we want to start with
      */
     public Frame(File folder) {
+
         // init the components
         // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
         if (SwingUtilities.isEventDispatchThread()) {
@@ -502,7 +503,7 @@ public class Frame extends javax.swing.JFrame {
         }
 
         String cleanedFileName = file.getName()
-                .replace(".mp3", StringUtils.EMPTY_STRING)
+                .replace(".mp3", StringUtils.EMPTY)
                 .replace(":", "/");
 
         int index = songController.getSongs().size();
@@ -641,7 +642,7 @@ public class Frame extends javax.swing.JFrame {
             if (file.getName().endsWith(".mp3")) {
 
                 // check to make sure it's a valid mp3 file (not blank file name)
-                if (StringUtils.isEmpty(file.getName().replace(".mp3", StringUtils.EMPTY_STRING))) {
+                if (StringUtils.isEmpty(file.getName().replace(".mp3", StringUtils.EMPTY))) {
                     hiddenFilesToIgnore.add(file);
                 } else {
                     // try to add it to the table
