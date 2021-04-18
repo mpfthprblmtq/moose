@@ -44,7 +44,7 @@ public class AuditFrame extends javax.swing.JFrame {
         initComponents();
 
         // initialize the controllers
-        auditController = new AuditController(this, Main.getFrame().songController);
+        auditController = new AuditController(Main.getFrame(), this, Main.getFrame().songController);
         cleanupController = new CleanupController(this);
 
         init();

@@ -10,16 +10,14 @@
 package moose.services;
 
 //imports
-import com.mpatric.mp3agic.InvalidDataException;
-import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.UnsupportedTagException;
+import moose.objects.Song;
 import moose.utilities.*;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 import moose.utilities.logger.Logger;
 import moose.Main;
 
-import javax.swing.*;
+import javax.swing.SwingConstants;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +60,7 @@ public class AuditService {
                 auditFilePathList.get(Constants.COVER).add(dir.getPath());
             }
 
-            Main.getAuditFrame().updateAuditProgressBar(formatPercentage(index, total));
+            Main.getAuditFrame().updateAuditProgressBar(AuditCleanupUtils.formatPercentage(index, total));
             index++;
         }
         Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
@@ -131,7 +129,7 @@ public class AuditService {
     }
 
     /**
-     * Returns the check results on each aspect of the album (ID3 tags, filenames, album cover
+     * Returns the check results on each aspect of the album (ID3 tags, filenames, and album cover)
      */
     private List<Boolean> getCheckResults(File album) {
         List<Boolean> results = new ArrayList<>();
@@ -150,34 +148,22 @@ public class AuditService {
         auditFrame.updateAuditCurrentlyScanningLabel("Album " + (index + 1) + " of " + total);
 
         // update the progress bar
-        auditFrame.updateAuditProgressBar(formatPercentage(index, total));
+        auditFrame.updateAuditProgressBar(AuditCleanupUtils.formatPercentage(index, total));
     }
 
     /**
-     * Helper function to get the percentage for the progressBar
-     */
-    private int formatPercentage(double index, double total) {
-        if (index + 1 == total) {
-            return 100;
-        }
-        double ratio = (index + 1) / total;
-        double percentage = Math.ceil(ratio * 100);
-        return (int) percentage;
-    }
-
-    /**
-     * Function used to create a done file in the specified folder
+     * Function used to create a .done file in the specified folder
      * @param dir, the directory to create the file in
      */
     public void setDone(File dir) {
-        String path = dir.getPath() + "/done";
+        String path = dir.getPath() + "/.done";
         File done = new File(path);
         try {
             if (!done.createNewFile()) {
-                throw new IOException("Couldn't create file in " + dir.getPath());
+                throw new IOException("Couldn't create .done file in " + dir.getPath());
             }
         } catch (IOException ex) {
-            logger.logError("Error creating done file for auditing in folder: " + path, ex);
+            logger.logError("Error creating .done file for auditing in folder: " + path, ex);
         }
     }
 
@@ -190,7 +176,7 @@ public class AuditService {
         File[] files = dir.listFiles();
         assert files != null;
         for (File file : files) {
-            if (file.getName().equals("done")) {
+            if (file.getName().equals(".done")) {
                 return false;
             }
         }
@@ -212,15 +198,15 @@ public class AuditService {
     }
 
     /**
-     * Function used to clear all of the done files from the albums list
+     * Function used to clear all of the .done files from the albums list
      * @param albums, the file list of all albums
      */
     public void clearDoneFiles(List<File> albums) {
         albums.stream().filter(this::containsFile).map(File::listFiles).filter(Objects::nonNull).forEachOrdered((files) -> {
             for (File file : files) {
-                if (file.getName().equals("done")) {
+                if (file.getName().equals(".done")) {
                     if (!file.delete()) {
-                        logger.logError("Could not delete done file in " + file.getParentFile().getPath());
+                        logger.logError("Could not delete .done file in " + file.getParentFile().getPath());
                     }
                 }
             }
@@ -236,7 +222,7 @@ public class AuditService {
     }
 
     /**
-     * Helper function used to see if there's a done file in the specified folder
+     * Helper function used to see if there's a .done file in the specified folder
      * @param dir, the directory to check
      * @return the result of the search, true for file found, false for file not found
      */
@@ -244,7 +230,7 @@ public class AuditService {
         File[] filesInAlbum = dir.listFiles();
         assert filesInAlbum != null;
         for (File file : filesInAlbum) {
-            if (file.getName().equals("done")) {
+            if (file.getName().equals(".done")) {
                 return true;
             }
         }
@@ -281,9 +267,7 @@ public class AuditService {
 
     /**
      * Checks the album/folder for a cover.* file (image file)
-     *
-     * @return the result of the check, true for a cover file exists, false for
-     * a cover file doesn't exist
+     * @return the result of the check, true for a cover file exists, false for a cover file doesn't exist
      */
     public boolean checkFolderCover(File dir) {
 
@@ -291,7 +275,7 @@ public class AuditService {
         File[] files = dir.listFiles();
         assert files != null;
         for (File file : files) {
-            if (file.getName().startsWith("cover")) {
+            if (file.getName().startsWith("cover.")) {
                 return true;
             }
         }
@@ -300,9 +284,7 @@ public class AuditService {
 
     /**
      * Checks all the files in a folder for the standardized file name
-     *
-     * @return the result of the check, true if all files are good, false if one
-     * or more doesn't match
+     * @return the result of the check, true if all files are good, false if one or more doesn't match
      */
     public boolean checkFilenames(File dir) {
 
@@ -310,14 +292,11 @@ public class AuditService {
         ArrayList<File> files = new ArrayList<>();
         FileUtils.listFiles(dir, files);
 
-        // regex to check
-        String regex = "\\d\\d ((.)*)";
-
         // check all files in that list
         // also checks if the album artist is a label, since those files aren't formatted the same
         for (File file : files) {
             if (file.getName().endsWith(".mp3")) {
-                if (!file.getName().matches(regex) && !SongUtils.isPartOfALabel(file)) {
+                if (!file.getName().matches(Constants.TRACK_FILENAME_REGEX) && !SongUtils.isPartOfALabel(file)) {
                     return false;
                 }
             }
@@ -327,8 +306,7 @@ public class AuditService {
 
     /**
      * Checks all the mp3s in a folder for all the necessary id3 tags
-     * @return the result of the check, true if all mp3s are good, false if one
-     * or more doesn't have all information needed
+     * @return the result of the check, true if all mp3s are good, false if one or more doesn't have all information needed
      */
     public boolean checkID3Tags(File dir) {
 
@@ -342,53 +320,31 @@ public class AuditService {
             // check if it's an mp3
             if (file.getName().endsWith(".mp3")) {
 
-                // mp3agic Mp3File object, used for the id3tags
-                Mp3File mp3file;
-                try {
-                    // create the mp3file from the file's path
-                    mp3file = new Mp3File(file.getAbsolutePath());
-
-                    // if the mp3file doesn't have an id3tag
-                    if (!mp3file.hasId3v2Tag()) {
-                        return false;
-                    }
-                } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-                    logger.logError("Exception when checking if an mp3 has id3 information!", ex);
-                    mp3file = null;
+                Song song = SongUtils.getSongFromFile(file);
+                if (song == null) {
+                    return false;
                 }
-
-                // get the id3v2 info
-                assert mp3file != null;
-                String title = mp3file.getId3v2Tag().getTitle();
-                String artist = mp3file.getId3v2Tag().getArtist();
-                String album = mp3file.getId3v2Tag().getAlbum();
-                String albumArtist = mp3file.getId3v2Tag().getAlbumArtist();
-                String genre = mp3file.getId3v2Tag().getGenreDescription();
-                String year = mp3file.getId3v2Tag().getYear();
-                String track = mp3file.getId3v2Tag().getTrack();
-                String disk = mp3file.getId3v2Tag().getPartOfSet();
-                byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
 
                 // check if it's a label, since those mp3s don't need as much information
                 if (SongUtils.isPartOfALabel(dir)) {
-                    if (title == null
-                            || artist == null
-                            || album == null
-                            || albumArtist == null
-                            || genre == null
-                            || artwork_bytes == null) {
+                    if (song.getTitle() == null
+                            || song.getArtist() == null
+                            || song.getAlbum() == null
+                            || song.getAlbumArtist() == null
+                            || song.getGenre() == null
+                            || song.getArtwork_bytes() == null) {
                         return false;
                     }
                 } else {
-                    if (title == null
-                            || artist == null
-                            || album == null
-                            || albumArtist == null
-                            || genre == null
-                            || year == null
-                            || track == null
-                            || disk == null
-                            || artwork_bytes == null) {
+                    if (song.getTitle() == null
+                            || song.getArtist() == null
+                            || song.getAlbum() == null
+                            || song.getAlbumArtist() == null
+                            || song.getGenre() == null
+                            || song.getYear() == null
+                            || song.getTrack() == null
+                            || song.getDisk() == null
+                            || song.getArtwork_bytes() == null) {
                         return false;
                     }
                 }
