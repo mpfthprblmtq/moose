@@ -26,4 +26,19 @@ public class StringUtils {
     public static String validateString(String s) {
         return isEmpty(s) ? EMPTY : s;
     }
+
+    /**
+     * Checks if a string is the same throughout an array
+     * @param str, the string to check
+     * @param arr, the array of strings
+     * @return the result of the check
+     */
+    public static boolean checkIfSame(String str, String[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            if (!arr[i].equals(str)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

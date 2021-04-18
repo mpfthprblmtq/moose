@@ -4,6 +4,8 @@ import java.awt.Color;
 
 public class Constants {
 
+    public static final String DASH = "-";
+
     public static final String LARGE = "large";
     public static final String XLARGE = "xlarge";
     public static final int IMAGE_LIMIT = 100;

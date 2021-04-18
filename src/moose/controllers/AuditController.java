@@ -2,10 +2,8 @@ package moose.controllers;
 
 import moose.Main;
 import moose.services.AuditService;
-import moose.services.DialogService;
 import moose.utilities.AuditCleanupUtils;
-import moose.utilities.Constants;
-import moose.utilities.StringUtils;
+import moose.services.DialogService;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 

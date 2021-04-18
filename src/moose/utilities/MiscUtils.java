@@ -44,4 +44,19 @@ public class MiscUtils {
     public static boolean intArrayContains(int[] arr, int key) {
         return Arrays.stream(arr).anyMatch(i -> i == key);
     }
+
+    /**
+     * Checks if a byte array is the same throughout an array
+     * @param bytes, the byte array to check
+     * @param arr,   the array of byte arrays
+     * @return the result of the check
+     */
+    public static boolean checkIfSame(byte[] bytes, byte[][] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            if (!Arrays.equals(arr[i], bytes)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

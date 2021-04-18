@@ -97,7 +97,7 @@ public class Main {
      */
     public static void launchSettingsFrame() {
         settingsFrame = new SettingsFrame();
-        settingsFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
+        settingsFrame.setLocationRelativeTo(null);
         settingsFrame.setVisible(true);
     }
     
