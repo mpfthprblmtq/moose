@@ -15,14 +15,11 @@ public class FileUtils {
     static Logger logger = Main.getLogger();
 
     /**
-     * Helper Function that lists and stores all of the files in a directory and
-     * subdirectories
-     *
+     * Helper Function that lists and stores all of the files in a directory and subdirectories
      * @param directory, the directory to list files from
      * @param files, the arrayList to store the files in
-     * @return a list of all the files in the directory
      */
-    public static ArrayList<File> listFiles(File directory, ArrayList<File> files) {
+    public static void listFiles(File directory, ArrayList<File> files) {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
@@ -34,12 +31,10 @@ public class FileUtils {
                 listFiles(file, files);     // this file is a directory, recursively call itself
             }
         }
-        return files;
     }
 
     /**
      * Opens a file
-     *
      * @param file, the file to open
      */
     public static void openFile(File file) {
@@ -48,7 +43,7 @@ public class FileUtils {
             try {
                 desktop.open(file);
             } catch (IOException ex) {
-                logger.logError("Couldn't open the event log!", ex);
+                logger.logError("Couldn't open the file: " + file.getName(), ex);
             }
         } else {
             logger.logError("Tried to open file, but " + file.getName() + " doesn't exist!");
@@ -58,7 +53,6 @@ public class FileUtils {
     /**
      * Creates a JFileChooser, configures it, and launches it
      * Returns a single index array if there's only one file returned
-     *
      * @param title, the title of the window
      * @param approveButtonText, the text to show on the approve button
      * @param selectionMode, the mode for selecting files
@@ -117,5 +111,4 @@ public class FileUtils {
             return null;
         }
     }
-
 }

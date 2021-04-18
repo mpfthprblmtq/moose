@@ -118,7 +118,7 @@ public class SettingsController {
     }
 
     public boolean defaultFiles() {
-        settings.setLibraryLocation(StringUtils.EMPTY_STRING);
+        settings.setLibraryLocation(StringUtils.EMPTY);
         writeSettingsFile(settings);
 
         // check if successful
@@ -126,8 +126,8 @@ public class SettingsController {
     }
 
     public boolean defaultApi() {
-        settings.setAlbumArtFinderApiKey(StringUtils.EMPTY_STRING);
-        settings.setAlbumArtFinderCseId(StringUtils.EMPTY_STRING);
+        settings.setAlbumArtFinderApiKey(StringUtils.EMPTY);
+        settings.setAlbumArtFinderCseId(StringUtils.EMPTY);
         settings.setPreferredCoverArtSize(640);
         writeSettingsFile(settings);
 

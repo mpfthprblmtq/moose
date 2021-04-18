@@ -858,7 +858,7 @@ public class InfoFrame extends javax.swing.JFrame {
     public void submit() {
         if (edited) {
             Main.frame.submitChangesFromInfoFrame(
-                    filenameField.getText().replace(".mp3", StringUtils.EMPTY_STRING),
+                    filenameField.getText().replace(".mp3", StringUtils.EMPTY),
                     titleField.getText(),
                     artistField.getText(),
                     albumField.getText(),

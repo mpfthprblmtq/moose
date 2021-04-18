@@ -1,4 +1,8 @@
-package moose.utilities;
+package moose.services;
+
+import moose.Main;
+import moose.utilities.Constants;
+import moose.utilities.StringUtils;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -7,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DialogUtils {
+public class DialogService {
 
     /**
      * Utility function that shows a dialog when clearing the main song list
@@ -72,5 +76,22 @@ public class DialogUtils {
             return boxes;
         }
         return null;
+    }
+
+    public static void showMessageDialog(Component component, String message, String title, int messageType) {
+        JOptionPane.showMessageDialog(component, message, title, messageType);
+    }
+
+    public static int showExistingAuditDialog() {
+        Object[] options = new Object[]{"Cancel", "Start New", "Continue"};
+        return JOptionPane.showOptionDialog(
+                Main.auditFrame,
+                "An existing audit is in process, do you want to continue?",
+                "Existing audit found",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                options,
+                null);
     }
 }
