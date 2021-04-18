@@ -14,6 +14,8 @@ public class Constants {
 
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
 
+    public static final String TRACK_FILENAME_REGEX = "\\d\\d ((.)*)";
+
     public static final int UNDETERMINED = -1;
     public static final int YES = 0;
     public static final int NO = 1;
@@ -63,6 +65,4 @@ public class Constants {
     public static final int FILES = 2;
     public static final int API = 3;
     public static final int FEATURES = 4;
-
-    public static final int CLEAR_ALL = 0;
 }

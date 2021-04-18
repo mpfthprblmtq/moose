@@ -30,6 +30,7 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -492,7 +493,7 @@ public class Frame extends javax.swing.JFrame {
     public boolean addFileToTable(File file) {
 
         // check to make sure we're not adding duplicate files
-        List<File> filesInTable = songController.getAllFiles();
+        List<File> filesInTable = songController.getAllFilesInTable();
         if (filesInTable.contains(file)) {
             return false;
         }
@@ -1337,7 +1338,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        songController.saveAll();
+        songController.saveTracks(IntStream.range(0, getRowCount()).toArray());
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
@@ -1730,6 +1731,14 @@ public class Frame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
                 break;
         }
+    }
+
+    /**
+     * Gets the total number of rows
+     * @return the total number of rows in the table
+     */
+    public int getRowCount() {
+        return table.getRowCount();
     }
 
 //    /**

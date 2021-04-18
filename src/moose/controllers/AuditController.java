@@ -14,13 +14,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class AuditController {
 
     // service
     AuditService auditService;
 
-    // frame
+    // frames
+    Frame frame;
     AuditFrame auditFrame;
 
     // controller
@@ -39,7 +41,8 @@ public class AuditController {
             new ArrayList<>(),      // filenames
             new ArrayList<>()));    // cover art
 
-    public AuditController(AuditFrame auditFrame, SongController songController) {
+    public AuditController(Frame frame, AuditFrame auditFrame, SongController songController) {
+        this.frame = frame;
         this.auditFrame = auditFrame;
         this.auditService = new AuditService(this.auditFrame);
         this.songController = songController;
@@ -100,7 +103,7 @@ public class AuditController {
         }
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
-        songController.saveAll();
+        songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
 
         // check if the audit is done
         if (currentIndex + 2 == albums.size()) {
@@ -127,7 +130,7 @@ public class AuditController {
         }
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
-        Main.frame.songController.saveAll();
+        Main.frame.songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
 
         // prevent a negative index
         if (currentIndex >= 0) {
