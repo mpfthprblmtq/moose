@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 import moose.Main;
 import moose.controllers.*;
 import moose.objects.Settings;
+import moose.services.DialogService;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
 
@@ -891,7 +892,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public void defaultSettings() {
         // get which settings the user wants to reset
-        Map<Integer, Boolean> settingsToReset = DialogUtils.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
+        Map<Integer, Boolean> settingsToReset = DialogService.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
 
         // go through the map we get back and reset those settings
         if (settingsToReset != null) {

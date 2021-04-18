@@ -18,6 +18,8 @@ import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Settings;
 import moose.objects.Song;
+import moose.services.DialogService;
+import moose.services.IconService;
 import moose.utilities.*;
 
 import java.awt.event.ActionEvent;
@@ -50,6 +52,9 @@ public class Frame extends javax.swing.JFrame {
 
     // controller, instantiated in constructor
     public SongController songController;
+
+    // services
+    public IconService iconService;
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -144,6 +149,9 @@ public class Frame extends javax.swing.JFrame {
         // set up the song controller
         songController = new SongController();
         songController.setTable(table);
+
+        // set up services
+        iconService = new IconService();
 
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -376,7 +384,9 @@ public class Frame extends javax.swing.JFrame {
             if (this.isFocusOwner()) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
                     if (e.getKeyCode() == KeyEvent.VK_A && e.isMetaDown()) {
-                        table.selectAll();
+                        if (table.getRowCount() > 0) {
+                            table.selectAll();
+                        }
                     }
                 }
             }
@@ -472,13 +482,13 @@ public class Frame extends javax.swing.JFrame {
     public void setRowIcon(int icon, int row) {
         switch (icon) {
             case DEFAULT:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
+                table.setValueAt(iconService.get(IconService.DEFAULT), row, 0);
                 break;
             case EDITED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
+                table.setValueAt(iconService.get(IconService.EDITED), row, 0);
                 break;
             case Constants.SAVED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
+                table.setValueAt(iconService.get(IconService.SAVED), row, 0);
                 break;
         }
     }
@@ -515,7 +525,7 @@ public class Frame extends javax.swing.JFrame {
 
         // add the row to the table
         model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
+                iconService.get(IconService.DEFAULT), // adds the default status icon
                 s.getFile(), // hidden file object
                  cleanedFileName, // actual editable file name
                 s.getTitle(),
@@ -532,7 +542,7 @@ public class Frame extends javax.swing.JFrame {
 
 
         // sorts the table on the filename, then the album by default
-        DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
+        @SuppressWarnings("rawtypes") DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
         ArrayList<RowSorter.SortKey> list = new ArrayList<>();
 
         list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
@@ -549,7 +559,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to update the UI's console, just appends a string
-     *
      * @param s, the string to append
      */
     public void updateConsole(String s) {
@@ -557,10 +566,8 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Function that selects the cell being edited. Used mainly when pressing
-     * tab or enter to navigate.
+     * Function that selects the cell being edited. Used mainly when pressing tab or enter to navigate.
      * This is one of those methods that just works, and it's best not to mess with it.
-     *
      * @param row,      the row of the cell
      * @param column,   the column of the cell
      * @param nav_type, the type of navigation
@@ -668,7 +675,7 @@ public class Frame extends javax.swing.JFrame {
         int duplicates = duplicateFiles.get();
 
         // update the log table when you're done with the file iteration
-        // including all possible iterations of file combinations
+        // including all possible iterations of file combinations, because I hate myself
         if (!files.isEmpty() && filesToRemove.isEmpty() && duplicates == 0) {
             // all files were mp3s
             updateConsole(files.size() + " mp3 file(s) loaded!");
@@ -1327,7 +1334,7 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
+    /*
      * ActionPerformed methods
      */
     // <editor-fold defaultstate="collapsed" desc="ActionPerformed Methods">   
@@ -1741,59 +1748,6 @@ public class Frame extends javax.swing.JFrame {
         return table.getRowCount();
     }
 
-//    /**
-//     * Formats the file names
-//     *
-//     * @param selectedRows, the rows currently selected on the table
-//     */
-//    public void showFormatFilenamesDialog(int[] selectedRows) {
-//        JTextField regexField = new JTextField();
-//        JCheckBox smartBox = new JCheckBox();
-//        smartBox.setText("Figger it out");
-//        Object[] message = {regexField, smartBox};
-//        // create a thread to wait until the dialog box pops up
-//        (new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    sleep(500);
-//                } catch (InterruptedException e) {
-//                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
-//                }
-//                regexField.requestFocus();
-//            }
-//        }).start();
-//
-//        int option = JOptionPane.showConfirmDialog(this, message, "Format file names", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-//        if (option == JOptionPane.OK_OPTION) {
-//            String regex = regexField.getText();
-//            boolean smart = smartBox.isSelected();
-//            formatFilenames(smart, regex, selectedRows);
-//        }
-//    }
-//
-//    /**
-//     * Actually does the formatting
-//     *
-//     * @param regexToUse, the regex to use
-//     * @param smart, a boolean to see if we want to try it automatically
-//     * @param selectedRows, the rows currently selected on the table
-//     */
-//    public void formatFilenames(boolean smart, String regexToUse, int[] selectedRows) {
-//        if (smart) {
-//            String regex = "\\d{2}\\. .*\\.mp3";
-//            for (int i = 0; i < selectedRows.length; i++) {
-//                File file = (File) table.getModel().getValueAt(
-//                        selectedRows[i],
-//                        table.convertColumnIndexToModel(1)
-//                );
-//                if (!file.getName().matches(regex)) {
-//
-//                }
-//            }
-//        }
-//    }
-
     /**
      * Updates the autocomplete selection for the field
      *
@@ -1812,7 +1766,7 @@ public class Frame extends javax.swing.JFrame {
      */
     public void clearAll() {
         if (Main.getSettings().isAskBeforeClearAll()) {
-            Boolean result = DialogUtils.showClearAllDialog(this);
+            Boolean result = DialogService.showClearAllDialog(this);
             if (result != null) {
                 boolean dontAskAgain = result;
                 if (dontAskAgain) {
@@ -1898,7 +1852,9 @@ public class Frame extends javax.swing.JFrame {
             String path = old_file.getPath().replace(old_file.getName(), "");
             File new_file = new File(path + "//" + filename + ".mp3");
             songController.setFile(songController.getIndex(row), new_file);
-            old_file.renameTo(new_file);
+            if (!old_file.renameTo(new_file)) {
+                logger.logError("Error renaming file: " + old_file.getName() + " to: " + new_file.getName());
+            }
             model.setValueAt(new_file, row, 1);
             table.setValueAt(filename, row, 1);
         }
@@ -1970,10 +1926,9 @@ public class Frame extends javax.swing.JFrame {
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
-                "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
+                "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
     }
 
     /**
@@ -2024,63 +1979,17 @@ public class Frame extends javax.swing.JFrame {
         }
 
         // fill the fields
-        if (songController.checkIfSame(titles[0], titles)) {
-            multTitle.setText(titles[0]);
-        } else {
-            multTitle.setText("-");
-        }
+        multTitle.setText(StringUtils.checkIfSame(titles[0], titles) ? titles[0] : Constants.DASH);
+        multArtist.setText(StringUtils.checkIfSame(artists[0], artists) ? artists[0] : Constants.DASH);
+        multAlbum.setText(StringUtils.checkIfSame(albums[0], albums) ? albums[0] : Constants.DASH);
+        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists[0], albumArtists) ? albumArtists[0] : Constants.DASH);
+        multGenre.setText(StringUtils.checkIfSame(genres[0], genres) ? genres[0] : Constants.DASH);
+        multYear.setText(StringUtils.checkIfSame(years[0], years) ? years[0] : Constants.DASH);
+        multTrack.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
+        multDisk.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
 
-        if (songController.checkIfSame(artists[0], artists)) {
-            multArtist.setText(artists[0]);
-        } else {
-            multArtist.setText("-");
-        }
-
-        if (songController.checkIfSame(albums[0], albums)) {
-            multAlbum.setText(albums[0]);
-        } else {
-            multAlbum.setText("-");
-        }
-
-        if (songController.checkIfSame(albumArtists[0], albumArtists)) {
-            multAlbumArtist.setText(albumArtists[0]);
-        } else {
-            multAlbumArtist.setText("-");
-        }
-
-        if (songController.checkIfSame(genres[0], genres)) {
-            multGenre.setText(genres[0]);
-        } else {
-            multGenre.setText("-");
-        }
-
-        if (songController.checkIfSame(years[0], years)) {
-            multYear.setText(years[0]);
-        } else {
-            multYear.setText("-");
-        }
-
-        if (songController.checkIfSame(tracks[0], tracks)) {
-            multTrack.setText(tracks[0]);
-        } else {
-            multTrack.setText("-");
-        }
-
-        if (songController.checkIfSame(disks[0], disks)) {
-            multDisk.setText(disks[0]);
-        } else {
-            multDisk.setText("-");
-        }
-
-        if (songController.checkIfSame(images[0], images) && images[0] != null) {
-
-            // getting the image from the byte array
-            ImageIcon icon = new ImageIcon(images[0]);
-            Image img = icon.getImage();
-            Image thumbnail = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
-            ImageIcon artwork_icon = new ImageIcon(thumbnail);
-            multImage.setIcon(artwork_icon);
-
+        if (MiscUtils.checkIfSame(images[0], images) && images[0] != null) {
+            multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
         } else {
             multImage.setIcon(null);
         }
@@ -2196,16 +2105,6 @@ public class Frame extends javax.swing.JFrame {
 
                 // get the index of the song in the table
                 int index = songController.getIndex(row);
-
-                // check and see if the genre exists already
-//                if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
-//                    int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
-//                    if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
-//                        Settings settings = Main.getSettings();
-//                        settings.addGenre(genre);
-//                        Main.updateSettings(settings);
-//                    }
-//                }
 
                 // set the value in the table to the new value
                 table.setValueAt(genre, row, 7);

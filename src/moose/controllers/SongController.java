@@ -534,34 +534,4 @@ public class SongController {
             FileUtils.openFile(file);
         }
     }
-
-    /**
-     * Checks if a string is the same throughout an array
-     * @param str, the string to check
-     * @param arr, the array of strings
-     * @return the result of the check
-     */
-    public boolean checkIfSame(String str, String[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (!arr[i].equals(str)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Checks if a byte array is the same throughout an array
-     * @param bytes, the byte array to check
-     * @param arr,   the array of byte arrays
-     * @return the result of the check
-     */
-    public boolean checkIfSame(byte[] bytes, byte[][] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (!Arrays.equals(arr[i], bytes)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
