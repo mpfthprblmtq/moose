@@ -12,12 +12,15 @@ package moose.views;
 
 // imports
 import moose.Main;
+import moose.controllers.AuditController;
+import moose.controllers.CleanupController;
+import moose.services.IconService;
 import moose.utilities.*;
-import moose.controllers.*;
 import moose.utilities.logger.Logger;
 
 import java.awt.Font;
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 
@@ -25,28 +28,30 @@ import javax.swing.*;
 public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
-    public AuditController auditController = new AuditController();
+    public AuditController auditController;
+    public CleanupController cleanupController;
+
+    // services
+    public IconService iconService = new IconService();
 
     // logger object
     static Logger logger = Main.getLogger();
-
-    SwingWorker<Void, Void> // make a swing worker do the image search in a separate thread so I can update the GUI
-            worker = new SwingWorker<Void, Void>() {
-        @Override
-        protected Void doInBackground() {
-
-            auditResultsTextArea.setText(auditController.analyze(Constants.AUDIT));
-            auditViewResultsButton.setEnabled(true);    // enable the button used for viewing now that we have results
-
-            return null;    // don't return anything since we're just playing with threads
-        }
-    };
 
     /**
      * Creates new form AuditFrame
      */
     public AuditFrame() {
         initComponents();
+
+        // initialize the controllers
+        auditController = new AuditController(Main.getFrame(), this, Main.getFrame().songController);
+        cleanupController = new CleanupController(this);
+
+        init();
+    }
+
+    private void init() {
+        pathLabel.setText(populatePathLabel());
     }
 
     /**
@@ -100,11 +105,6 @@ public class AuditFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Audit Music");
         setResizable(false);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
-        });
 
         auditCurrentlyScanningLabel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
         auditCurrentlyScanningLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -174,7 +174,8 @@ public class AuditFrame extends javax.swing.JFrame {
             }
         });
 
-        currentDirLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        currentDirLabel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        currentDirLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         currentDirLabel.setText(" ");
         currentDirLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         currentDirLabel.setMaximumSize(new java.awt.Dimension(17, 339));
@@ -455,7 +456,6 @@ public class AuditFrame extends javax.swing.JFrame {
         });
 
         pathLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        pathLabel.setText(populatePathLabel());
         pathLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         label1.setText("Audit/Cleanup Folder:");
@@ -492,13 +492,9 @@ public class AuditFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Handles the next folder/album button press
-     *
-     * @param evt
-     */
     private void nextFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextFolderButtonActionPerformed
-        auditController.nextAuditFolder();
+        auditController.nextFolder();
+        this.toFront();
         this.requestFocus();
     }//GEN-LAST:event_nextFolderButtonActionPerformed
 
@@ -508,7 +504,8 @@ public class AuditFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void previousFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousFolderButtonActionPerformed
-        auditController.previousAuditFolder();
+        auditController.previousFolder();
+        this.toFront();
         this.requestFocus();
     }//GEN-LAST:event_previousFolderButtonActionPerformed
 
@@ -522,9 +519,7 @@ public class AuditFrame extends javax.swing.JFrame {
         
         if(auditController.getFolder() != null) {
             auditAnalyzeButton.setEnabled(true);
-            auditStartButton.setEnabled(true);
             cleanupAnalyzeButton.setEnabled(true);
-            auditController.importAlbums();
         }
     }//GEN-LAST:event_chooseFolderButtonActionPerformed
 
@@ -572,7 +567,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            auditController.deleteAll();
+            cleanupController.deleteAll();
         }
     }//GEN-LAST:event_deleteAllButtonActionPerformed
 
@@ -589,7 +584,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (returnVal == 0) {
-            auditController.deleteSelected(
+            cleanupController.deleteSelected(
                     mp3asdCheckBox.isSelected(),
                     flacCheckBox.isSelected(),
                     wavCheckBox.isSelected(),
@@ -608,10 +603,6 @@ public class AuditFrame extends javax.swing.JFrame {
     private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
         viewResults(Constants.CLEANUP);
     }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
-
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        resetAuditFrame();
-    }//GEN-LAST:event_formWindowClosed
 
     private void wavCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_wavCheckBoxStateChanged
         deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
@@ -642,8 +633,51 @@ public class AuditFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_imagesCheckBoxStateChanged
 
     private void auditAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditAnalyzeButtonActionPerformed
-        worker.execute();
+        startAuditAnalysis();
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
+
+    public void startAuditAnalysis() {
+        // make a swing worker do the image search in a separate thread so I can update the GUI
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                auditResultsTextArea.setText(auditController.analyze());
+                auditViewResultsButton.setEnabled(true);    // enable the buttons used for audit now that we have results
+                auditStartButton.setEnabled(true);
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+
+        // e x e c u t e
+        worker.execute();
+    }
+
+    /**
+     * Function to get the folder to audit/cleanup
+     * Sets the folder ivar in the auditController
+     */
+    public void chooseFolder() {
+
+        // choose a folder
+        File folder = Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Select a folder to audit/cleanup",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
+
+        if(folder != null) {
+            // set the file ivar in the controller
+            auditController.setFolder(folder);
+
+            // update some graphics
+            label1.setEnabled(true);
+            pathLabel.setText(folder.getPath());
+            resetAuditFrame();
+        }
+        // else nothing was chosen
+    }
 
     /**
      * Starts the audit
@@ -657,7 +691,6 @@ public class AuditFrame extends javax.swing.JFrame {
         label3.setEnabled(true);
         label4.setEnabled(true);
         label5.setEnabled(true);
-//        refreshAuditFrame();
         auditController.startAudit();
     }
 
@@ -684,8 +717,7 @@ public class AuditFrame extends javax.swing.JFrame {
         imagesCheckBox.setEnabled(true);
         deleteAllButton.setEnabled(true);
         cleanupResultsTextArea.setEnabled(true);
-
-        cleanupResultsTextArea.setText(auditController.analyze(Constants.CLEANUP));
+        cleanupResultsTextArea.setText(cleanupController.analyze());
 
         // enable the button used for viewing now that we have results
         cleanupViewResultsButton.setEnabled(true);
@@ -696,45 +728,23 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public String populatePathLabel() {
         if (Main.getSettings().getLibraryLocation().isEmpty()) {
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         } else {
             auditController.setFolder(new File(Main.getSettings().getLibraryLocation()));
             label1.setEnabled(true);
 
             auditAnalyzeButton.setEnabled(true);
-            auditStartButton.setEnabled(true);
             cleanupAnalyzeButton.setEnabled(true);
-            int albums = auditController.importAlbums();
-
-            // display the result of importing albums
-            updateAuditCurrentlyScanningLabel(albums + " albums to scan!");
-            updateCleanupCurrentlyScanningLabel(albums + " albums to scan!");
             
             return Main.getSettings().getLibraryLocation();
         }
     }
 
     /**
-     * Function to get the folder to audit and sets the auditFolder ivar
+     * Sets the next button text
      */
-    public void chooseFolder() {
-
-        File folder = Objects.requireNonNull(FileUtils.launchJFileChooser(
-                "Select a folder to audit/cleanup",
-                "Select",
-                JFileChooser.DIRECTORIES_ONLY,
-                false,
-                null,
-                null))[0];
-        
-        if(folder != null) {
-            // set the file ivars in the controllers
-            auditController.setFolder(folder);
-            // update some graphics
-            label1.setEnabled(true);
-            pathLabel.setText(folder.getPath());
-        }
-        // else nothing was chosen
+    public void setNextButtonText(String text) {
+        nextFolderButton.setText(text);
     }
 
     /**
@@ -767,11 +777,11 @@ public class AuditFrame extends javax.swing.JFrame {
         ta.setEditable(false);
         ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
         switch (type) {
-            case AuditController.AUDIT:
-                ta.setText(auditController.exportResultsToString(Constants.AUDIT));
+            case Constants.AUDIT:
+                ta.setText(auditController.getResults());
                 break;
-            case AuditController.CLEANUP:
-                ta.setText(auditController.exportResultsToString(Constants.CLEANUP));
+            case Constants.CLEANUP:
+                ta.setText(cleanupController.getResults());
                 break;
         }
 
@@ -790,23 +800,26 @@ public class AuditFrame extends javax.swing.JFrame {
      * Refreshes the three checks and the current directory when a new album is
      * loaded
      */
-    public void refreshAuditFrame() {
-        if (auditController.checkID3Tags(auditController.getCurrentDir())) {
-            ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
-        } else {
-            ID3TagCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
+    public void refreshAuditFrame(List<Boolean> checkResults, String currentDirectory) {
+
+        if (!checkResults.isEmpty()) {
+            if (checkResults.get(Constants.ID3)) {
+                ID3TagCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
+            } else {
+                ID3TagCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
+            }
+            if (checkResults.get(Constants.FILENAMES)) {
+                filenameCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
+            } else {
+                filenameCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
+            }
+            if (checkResults.get(Constants.COVER)) {
+                coverArtCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
+            } else {
+                coverArtCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
+            }
         }
-        if (auditController.checkFilenames(auditController.getCurrentDir())) {
-            filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
-        } else {
-            filenameCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
-        }
-        if (auditController.checkFolderCover(auditController.getCurrentDir())) {
-            coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/check2.png")));
-        } else {
-            coverArtCheck.setIcon(new ImageIcon(this.getClass().getResource("/resources/error.png")));
-        }
-        currentDirLabel.setText(auditController.getCurrentDir().getPath());
+        currentDirLabel.setText(auditController.getCurrentDirString(currentDirectory));
     }
 
     /**
@@ -870,44 +883,49 @@ public class AuditFrame extends javax.swing.JFrame {
      * Sets the audit frame back to disabled
      */
     public void resetAuditFrame() {
-        tabbedPane.setSelectedIndex(0);
+
+        // random labels
         label1.setEnabled(false);
         label2.setEnabled(false);
         label3.setEnabled(false);
         label4.setEnabled(false);
         label5.setEnabled(false);
+
+        // audit fields
+        auditCurrentlyScanningLabel.setText(StringUtils.EMPTY);
+        auditProgressBar.setValue(0);
+        auditStartButton.setEnabled(false);
+        auditStartButton.setText("Start Audit");
+        auditViewResultsButton.setEnabled(false);
+        auditResultsTextArea.setText(StringUtils.EMPTY);
         ID3TagCheck.setIcon(null);
         filenameCheck.setIcon(null);
         coverArtCheck.setIcon(null);
+        currentDirLabel.setText(StringUtils.EMPTY);
         previousFolderButton.setEnabled(false);
         nextFolderButton.setEnabled(false);
-        currentDirLabel.setText("");
-        pathLabel.setText("");
-        auditAnalyzeButton.setEnabled(false);
-        auditResultsTextArea.setText("");
-        auditResultsTextArea.setEnabled(false);
-        cleanupResultsTextArea.setText("");
-        cleanupResultsTextArea.setEnabled(false);
-        auditStartButton.setEnabled(false);
-        auditViewResultsButton.setEnabled(false);
-        cleanupAnalyzeButton.setEnabled(false);
+        nextFolderButton.setText("Save & Next -->");
+
+        // cleanup fields
         cleanupViewResultsButton.setEnabled(false);
-        deleteAllButton.setEnabled(false);
-        deleteSelectedButton.setEnabled(false);
-        mp3asdCheckBox.setSelected(false);
-        mp3asdCheckBox.setEnabled(false);
+        cleanupResultsTextArea.setText(StringUtils.EMPTY);
         wavCheckBox.setSelected(false);
         wavCheckBox.setEnabled(false);
+        mp3asdCheckBox.setSelected(false);
+        mp3asdCheckBox.setEnabled(false);
+        windowsCheckBox.setSelected(false);
+        windowsCheckBox.setEnabled(false);
         flacCheckBox.setSelected(false);
         flacCheckBox.setEnabled(false);
         zipCheckBox.setSelected(false);
         zipCheckBox.setEnabled(false);
-        windowsCheckBox.setSelected(false);
-        windowsCheckBox.setEnabled(false);
         everythingElseCheckBox.setSelected(false);
         everythingElseCheckBox.setEnabled(false);
         imagesCheckBox.setSelected(false);
         imagesCheckBox.setEnabled(false);
+        deleteAllButton.setEnabled(false);
+        deleteSelectedButton.setEnabled(false);
+        this.toFront();
         this.requestFocus();
     }
 

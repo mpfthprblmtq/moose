@@ -71,9 +71,7 @@ public class Main {
      */
     public static void launchFrame() {
         frame = new Frame();
-        // TODO: Find out why this doesn't work anymore
-        //frame.setLocationRelativeTo(null); 
-        frame.setLocation(100, 100);
+        frame.setLocation(20, 20);
         frame.setVisible(true);
     }
     
@@ -83,12 +81,17 @@ public class Main {
      */
     public static void launchFrame(File dir) {
         frame = new Frame(dir);
-        // TODO: Find out why this doesn't work anymore
-        //frame.setLocationRelativeTo(null); 
-        frame.setLocation(100, 100);
+        frame.setLocation(20, 20);
         frame.setVisible(true);
     }
-    
+
+    /**
+     * Returns the main frame
+     */
+    public static Frame getFrame() {
+        return frame;
+    }
+
     /**
      * Controls the SettingsFrame opening and closing
      */

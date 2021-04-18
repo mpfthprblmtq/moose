@@ -43,8 +43,8 @@ public class Settings {
         this.libraryLocation = StringUtils.EMPTY_STRING;
         this.removeCommentOnAutoTagging = false;
         this.preferredCoverArtSize = 640;
-        this.albumArtFinderApiKey = StringUtils.EMPTY_STRING;
-        this.albumArtFinderCseId = StringUtils.EMPTY_STRING;
+        this.albumArtFinderApiKey = StringUtils.EMPTY;
+        this.albumArtFinderCseId = StringUtils.EMPTY;
         this.albumArtFinderSearchCount = 0;
         this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
     }
