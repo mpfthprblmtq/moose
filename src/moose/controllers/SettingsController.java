@@ -147,6 +147,7 @@ public class SettingsController {
         tempSettings.setDebugMode(actualSettings.isInDebugMode());
         tempSettings.setDeveloperMode(actualSettings.isInDeveloperMode());
         tempSettings.setLibraryLocation(actualSettings.getLibraryLocation());
+        tempSettings.setRemoveCommentOnAutoTagging(actualSettings.getRemoveCommentOnAutoTagging());
         tempSettings.setAskBeforeClearAll(actualSettings.isAskBeforeClearAll());
         tempSettings.setAlbumArtFinderCseId(actualSettings.getAlbumArtFinderCseId());
         tempSettings.setAlbumArtFinderApiKey(actualSettings.getAlbumArtFinderApiKey());

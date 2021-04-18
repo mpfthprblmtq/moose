@@ -92,6 +92,11 @@ public class AutoTaggingService {
             // disks
             Main.frame.songController.setDisk(index, disks);
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
+
+            // comment
+            if (Main.getSettings().getRemoveCommentOnAutoTagging()) {
+                Main.frame.songController.setComment(index, StringUtils.EMPTY_STRING);
+            }
         }
 
         // album art

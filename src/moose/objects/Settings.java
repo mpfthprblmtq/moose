@@ -25,6 +25,7 @@ public class Settings {
     private boolean askBeforeClearAll;
     private List<String> genres;
     private String libraryLocation;
+    private boolean removeCommentOnAutoTagging;
     private int preferredCoverArtSize;
     private String albumArtFinderApiKey;
     private String albumArtFinderCseId;
@@ -39,7 +40,8 @@ public class Settings {
         this.inDeveloperMode = false;
         this.askBeforeClearAll = true;
         this.genres = new ArrayList<>();
-        this.libraryLocation = StringUtils.EMPTY;
+        this.libraryLocation = StringUtils.EMPTY_STRING;
+        this.removeCommentOnAutoTagging = false;
         this.preferredCoverArtSize = 640;
         this.albumArtFinderApiKey = StringUtils.EMPTY;
         this.albumArtFinderCseId = StringUtils.EMPTY;
@@ -156,5 +158,13 @@ public class Settings {
 
     public void setAskBeforeClearAll(boolean askBeforeClearAll) {
         this.askBeforeClearAll = askBeforeClearAll;
+    }
+
+    public boolean getRemoveCommentOnAutoTagging() {
+        return removeCommentOnAutoTagging;
+    }
+
+    public void setRemoveCommentOnAutoTagging(boolean removeCommentOnAutoTagging) {
+        this.removeCommentOnAutoTagging = removeCommentOnAutoTagging;
     }
 }
