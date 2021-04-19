@@ -113,6 +113,19 @@ public class AuditService {
     }
 
     /**
+     * Gets all of the albums from the filePathList
+     */
+    public List<File> getAllMarkedAlbums(List<List<String>> filePathList) {
+        List<File> albums = new ArrayList<>();
+        for (List<String> list : filePathList) {
+            for (String path : list) {
+                albums.add(new File(path));
+            }
+        }
+        return albums;
+    }
+
+    /**
      * Does the audit
      */
     public void openAuditWindow(List<File> albums, int index) {
@@ -327,23 +340,23 @@ public class AuditService {
 
                 // check if it's a label, since those mp3s don't need as much information
                 if (SongUtils.isPartOfALabel(dir)) {
-                    if (song.getTitle() == null
-                            || song.getArtist() == null
-                            || song.getAlbum() == null
-                            || song.getAlbumArtist() == null
-                            || song.getGenre() == null
+                    if (StringUtils.isEmpty(song.getTitle())
+                            || StringUtils.isEmpty(song.getArtist())
+                            || StringUtils.isEmpty(song.getAlbum())
+                            || StringUtils.isEmpty(song.getAlbumArtist())
+                            || StringUtils.isEmpty(song.getGenre())
                             || song.getArtwork_bytes() == null) {
                         return false;
                     }
                 } else {
-                    if (song.getTitle() == null
-                            || song.getArtist() == null
-                            || song.getAlbum() == null
-                            || song.getAlbumArtist() == null
-                            || song.getGenre() == null
-                            || song.getYear() == null
-                            || song.getTrack() == null
-                            || song.getDisk() == null
+                    if (StringUtils.isEmpty(song.getTitle())
+                            || StringUtils.isEmpty(song.getArtist())
+                            || StringUtils.isEmpty(song.getAlbum())
+                            || StringUtils.isEmpty(song.getAlbumArtist())
+                            || StringUtils.isEmpty(song.getGenre())
+                            || StringUtils.isEmpty(song.getYear())
+                            || StringUtils.isEmpty(song.getTrack())
+                            || StringUtils.isEmpty(song.getDisk())
                             || song.getArtwork_bytes() == null) {
                         return false;
                     }

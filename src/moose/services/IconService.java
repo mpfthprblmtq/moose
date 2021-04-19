@@ -19,6 +19,15 @@ public class IconService {
     public Icon get(int type) {
         if (this.getClass() != null) {
             switch(type) {
+                case DEFAULT:
+                    return new ImageIcon(Objects.requireNonNull(
+                            this.getClass().getResource("/resources/default.png")));
+                case EDITED:
+                    return new ImageIcon(Objects.requireNonNull(
+                            this.getClass().getResource("/resources/edit.png")));
+                case SAVED:
+                    return new ImageIcon(Objects.requireNonNull(
+                            this.getClass().getResource("/resources/check.png")));
                 case MOOSE_128:
                     return new ImageIcon(Objects.requireNonNull(
                             this.getClass().getResource("/resources/moose128.png")));
