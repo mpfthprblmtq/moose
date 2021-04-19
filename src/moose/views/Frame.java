@@ -52,10 +52,10 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = Moose.getLogger();
 
     // controller, instantiated in constructor
-    public SongController songController;
+    public SongController songController = new SongController();
 
     // services
-    public IconService iconService;
+    public IconService iconService = new IconService();
 
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
@@ -85,6 +85,10 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
+
+        // set up the song controller
+        songController = new SongController();
+        songController.setTable(table);
     }
 
     /**
@@ -99,37 +103,46 @@ public class Frame extends javax.swing.JFrame {
         if (SwingUtilities.isEventDispatchThread()) {
             initComponents();
             init();
+
+            // set up the song controller
+            songController.setTable(table);
+
+            // add the songs in the folder param to start
+            ArrayList<File> files = new ArrayList<>();
+            FileUtils.listFiles(folder, files);
+
+            if (!importFiles(files).isEmpty()) {
+                setActionsEnabled(true);
+                enableMultPanel(true);
+                setMultiplePanelFields();
+                checkForNewGenres(files);
+            }
         } else {
             SwingUtilities.invokeLater(() -> {
                 initComponents();
                 init();
+
+                // set up the song controller
+                songController.setTable(table);
+
+                // add the songs in the folder param to start
+                ArrayList<File> files = new ArrayList<>();
+                FileUtils.listFiles(folder, files);
+
+                if (!importFiles(files).isEmpty()) {
+                    setActionsEnabled(true);
+                    enableMultPanel(true);
+                    setMultiplePanelFields();
+                    checkForNewGenres(files);
+                }
             });
         }
-
-        // add the songs in the folder param to start
-        ArrayList<File> files = new ArrayList<>();
-        FileUtils.listFiles(folder, files);
-
-        if (!importFiles(files).isEmpty()) {
-            setActionsEnabled(true);
-            enableMultPanel(true);
-            setMultiplePanelFields();
-            checkForNewGenres(files);
-        }
-
     }
 
     public void init() {
 
         // set the table's model to the custom model
         table.setModel(model);
-
-        // set up the song controller
-        songController = new SongController();
-        songController.setTable(table);
-
-        // set up services
-        iconService = new IconService();
 
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -397,19 +410,6 @@ public class Frame extends javax.swing.JFrame {
                 index // hidden index for the song object
         });
 
-
-        // sorts the table on the filename, then the album by default
-        @SuppressWarnings("rawtypes") DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
-        ArrayList<RowSorter.SortKey> list = new ArrayList<>();
-
-        list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
-        sorter.setSortKeys(list);
-        sorter.sort();
-
-        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
-        sorter.setSortKeys(list);
-        sorter.sort();
-
         // all is well in the world
         return true;
     }
@@ -530,6 +530,18 @@ public class Frame extends javax.swing.JFrame {
         filesToRemove.forEach(files::remove);
         hiddenFilesToIgnore.forEach(files::remove);
         int duplicates = duplicateFiles.get();
+
+        // sorts the table on the filename, then the album by default
+        @SuppressWarnings("rawtypes") DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
+        ArrayList<RowSorter.SortKey> list = new ArrayList<>();
+
+        list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sorter.setSortKeys(list);
+        sorter.sort();
+
+        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
+        sorter.setSortKeys(list);
+        sorter.sort();
 
         // update the log table when you're done with the file iteration
         // including all possible iterations of file combinations, because I hate myself
@@ -1742,7 +1754,11 @@ public class Frame extends javax.swing.JFrame {
 
         if (!table.getValueAt(row, 8).equals(tracks)) {
             if (!tracks.equals("/")) {
-                songController.setTrack(songController.getIndex(row), tracks);
+                String[] arr = tracks.split("/");
+                String track = arr[0];
+                String totalTracks = arr[1];
+                songController.setTrack(songController.getIndex(row), track);
+                songController.setTotalTracks(songController.getIndex(row), totalTracks);
                 table.setValueAt(tracks, row, 8);
             } else {
                 songController.setDisk(songController.getIndex(row), "");
@@ -1753,7 +1769,11 @@ public class Frame extends javax.swing.JFrame {
 
         if (!table.getValueAt(row, 9).equals(disks)) {
             if (!disks.equals("/")) {
-                songController.setDisk(songController.getIndex(row), disks);
+                String[] arr = disks.split("/");
+                String disk = arr[0];
+                String totalDisks = arr[1];
+                songController.setDisk(songController.getIndex(row), disk);
+                songController.setTotalDisks(songController.getIndex(row), totalDisks);
                 table.setValueAt(disks, row, 9);
             } else {
                 songController.setDisk(songController.getIndex(row), "");
