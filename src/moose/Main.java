@@ -109,7 +109,7 @@ public class Main {
      * Controls the AuditFrame opening and closing
      */
     public static void launchAuditFrame() {
-        auditFrame = new AuditFrame();
+        auditFrame = new AuditFrame(frame, frame.songController);
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
     }

@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,6 +44,7 @@ import moose.utilities.viewUtils.FileDrop;
 import moose.utilities.viewUtils.TableCellListener;
 
 import static moose.utilities.Constants.*;
+import static org.junit.Assert.assertNotNull;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -64,33 +66,10 @@ public class Frame extends javax.swing.JFrame {
     int nav_status = -1;  // keeps track of the navigation status
 
     // table model used, with some customizations and overrides
-    DefaultTableModel model = new DefaultTableModel() {
-        @Override   // returns a certain type of class based on the column index
-        public Class getColumnClass(int column) {
-            if (column == 11 || column == 0) {
-                return ImageIcon.class;
-            } else {
-                return Object.class;
-            }
-        }
+    DefaultTableModel model = ViewUtils.getTableModel();
 
-        @Override   // returns if the cell is editable based on the column index
-        public boolean isCellEditable(int row, int column) {
-            return !(column == 11 || column == 0);
-        }
-    };
-
-    DefaultCellEditor editor = new DefaultCellEditor(new JTextField()) {
-        @Override
-        public boolean isCellEditable(EventObject e) {
-            if (e instanceof MouseEvent) {
-                if (((MouseEvent) e).getClickCount() == 2) {
-                    return true;
-                }
-            }
-            return super.isCellEditable(e);
-        }
-    };
+    // cell editor used, with customizations and overrides
+    DefaultCellEditor editor = ViewUtils.getCellEditor();
 
     /**
      * Creates new form Frame
@@ -248,7 +227,7 @@ public class Frame extends javax.swing.JFrame {
             }
 
             // sort the file list
-            fileList.sort((File f1, File f2) -> f1.getName().compareTo(f2.getName()));
+            fileList.sort(Comparator.comparing(File::getName));
 
             // import them all
             List<File> successfullyAddedFiles = importFiles(fileList);
@@ -260,138 +239,17 @@ public class Frame extends javax.swing.JFrame {
             checkForNewGenres(successfullyAddedFiles);
         });
 
-        // listener for editing cells
-        // uses custom class TableCellListener to get the row, col, before and after values
-        Action action = new AbstractAction() {
+        // create a table cell listener
+        TableCellListener tcl = ViewUtils.createTCLAction(table, songController);
+        assertNotNull(tcl);     // this line is really just to get rid of the "unused var" warning
+    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TableCellListener tcl = (TableCellListener) e.getSource();
-
-                int r = tcl.getRow();
-                int c = tcl.getColumn();
-
-                int index = Integer.parseInt(model.getValueAt(r, 12).toString());
-
-                // switch to see what column changed, and do a task based on that
-                switch (c) {
-                    case 0:
-
-                        break;
-                    case 2:     // filename was changed
-                        // with the filename changing, this changes automatically without hitting save
-                        // this functionality might change
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            File old_file = (File) model.getValueAt(r, 1);
-                            String path = old_file.getPath().replace(old_file.getName(), "");
-                            String fileName = model.getValueAt(r, c).toString();
-                            File new_file = new File(path + "//" + fileName + ".mp3");
-
-                            songController.setFile(index, new_file);
-
-                            if (!old_file.renameTo(new_file)) {
-                                logger.logError("Couldn't rename file! Path: " + old_file.getPath());
-                            }
-                            model.setValueAt(new_file, r, 1);
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 3:     // title was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setTitle(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 4:     // artist was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setArtist(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 5:     // album was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setAlbum(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 6:     // album artist was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setAlbumArtist(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 7:     // year was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setYear(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 8:     // genre was changed
-                        String genre = tcl.getNewValue().toString();
-                        // check and see if the genre exists already
-                        if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
-                            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
-                            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Settings settings = Main.getSettings();
-                                settings.addGenre(genre);
-                                Main.updateSettings(settings);
-                            }
-                        }
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setGenre(index, genre);
-
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 9:     // tracks was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setTrack(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 10:     // disks was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setDisk(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 11:    // artwork was changed
-                        // TODO:  Check to see if we can use this?
-                        //setAlbumImage(index, tcl.getNewValue().toString());
-                    default:    // not accounted for
-                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
-                        break;
-                }
-            }
-        };
-
-        // declare the TCL for use
-        TableCellListener tcl = new TableCellListener(table, action);
-
-        // keyboard listener that detects key presses
-        // just listens for CMD + A to select all the rows in the table
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher((KeyEvent e) -> {
-            this.requestFocus();
-            if (this.isFocusOwner()) {
-                if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    if (e.getKeyCode() == KeyEvent.VK_A && e.isMetaDown()) {
-                        if (table.getRowCount() > 0) {
-                            table.selectAll();
-                        }
-                    }
-                }
-            }
-            return false;
-        });
+    /**
+     * Returns the song controller
+     * @return the song controller
+     */
+    public SongController getSongController() {
+        return this.songController;
     }
 
     /**
@@ -822,11 +680,6 @@ public class Frame extends javax.swing.JFrame {
                 tableMousePressed(evt);
             }
         });
-        table.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                tablePropertyChange(evt);
-            }
-        });
         table.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tableKeyPressed(evt);
@@ -967,11 +820,6 @@ public class Frame extends javax.swing.JFrame {
         multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
         multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
-        multTrack.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                multTrackFocusGained(evt);
-            }
-        });
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
@@ -983,11 +831,6 @@ public class Frame extends javax.swing.JFrame {
         multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
         multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
-        multDisk.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                multDiskFocusGained(evt);
-            }
-        });
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -1215,6 +1058,11 @@ public class Frame extends javax.swing.JFrame {
 
         selectAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.META_DOWN_MASK));
         selectAllMenuItem.setText("Select All");
+        selectAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectAllMenuItemActionPerformed(evt);
+            }
+        });
         viewMenu.add(selectAllMenuItem);
 
         jMenuBar1.add(viewMenu);
@@ -1673,14 +1521,6 @@ public class Frame extends javax.swing.JFrame {
         updateAutocompleteFields(multYear, false);
     }//GEN-LAST:event_multYearFocusGained
 
-    private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
-//        updateAutocompleteFields(multTrack);
-    }//GEN-LAST:event_multTrackFocusGained
-
-    private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
-//        updateAutocompleteFields(multDisk);
-    }//GEN-LAST:event_multDiskFocusGained
-
     private void refreshMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshMenuItemActionPerformed
         int res = JOptionPane.showConfirmDialog(this, "Are you sure you want to clear your current list and reset?");
         switch (res) {
@@ -1693,10 +1533,15 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_refreshMenuItemActionPerformed
 
+    private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshMenuItemActionPerformed
+        if (table.getRowCount() > 0) {
+            table.selectAll();
+        }
+    }//GEN-LAST:event_refreshMenuItemActionPerformed
+
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
         int[] selectedRows = table.getSelectedRows();
         if (selectedRows.length > 0) {
-//            showFormatFilenamesDialog(selectedRows);
             JOptionPane.showMessageDialog(this, "Not implemented yet!");
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -1713,11 +1558,6 @@ public class Frame extends javax.swing.JFrame {
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
         WebUtils.openPage(Constants.MOOSE_WIKI);
     }//GEN-LAST:event_wikiMenuItemActionPerformed
-
-    private void tablePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablePropertyChange
-//        setActionsEnabled(table.getRowCount() > 0);
-    }//GEN-LAST:event_tablePropertyChange
-    // </editor-fold>
 
     /**
      * Performs a command based on the user input

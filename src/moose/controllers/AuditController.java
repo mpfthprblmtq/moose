@@ -34,7 +34,7 @@ public class AuditController {
     List<File> albums = new ArrayList<>();
 
     // lists for results
-    List<List<String>> auditFilePathList = new ArrayList<>(Arrays.asList(
+    List<List<String>> filePathList = new ArrayList<>(Arrays.asList(
             new ArrayList<>(),      // id3
             new ArrayList<>(),      // filenames
             new ArrayList<>()));    // cover art
@@ -47,16 +47,35 @@ public class AuditController {
     }
 
     public String analyze() {
-        AuditCleanupUtils.clearLists(auditFilePathList);
+        AuditCleanupUtils.clearLists(filePathList);
         albums = auditService.importAlbums(folder);
-        return auditService.analyzeForAudit(albums, auditFilePathList);
+        return auditService.analyzeForAudit(albums, filePathList);
     }
 
     /**
-     * Checks if an audit is already in process first,
-     * then user decides to either start a new audit or continue that existing audit
+     * Checks if an audit is already in process first, then user decides to either start a new audit or continue that existing audit
      */
     public void startAudit() {
+
+        // check what type of audit we want to do
+        switch(DialogService.showShouldAuditAllDialog()) {
+            case 2:     // all albums
+                break;
+            case 1:     // only marked albums
+                albums = auditService.getAllMarkedAlbums(filePathList);
+                if (!albums.isEmpty()) {
+                    if (albums.size() == 1) {
+                        auditFrame.setNextButtonText("Finish Audit");
+                    }
+                    newAudit();
+                } else {
+                    finishAudit();
+                }
+                return;
+            default:
+                return;
+        }
+
         // check for audit in process
         if (auditService.checkForExistingAudit(albums)) {
             switch (DialogService.showExistingAuditDialog()) {
@@ -95,10 +114,18 @@ public class AuditController {
      * Goes to the next folder
      */
     public void nextFolder() {
+
         // sets the current album as done
         if (auditService.isNotDone(albums.get(currentIndex))) {
             auditService.setDone(albums.get(currentIndex));
         }
+
+        // get the most up to date frame and song controller since the frame updates on each album
+        this.frame = Main.getFrame();
+        this.songController = Main.getFrame().getSongController();
+
+        // update the table in the songController
+        songController.setTable(frame.table);
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
         songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
@@ -177,7 +204,7 @@ public class AuditController {
     }
 
     public String getResults() {
-        return auditService.exportAuditResultsToString(auditFilePathList);
+        return auditService.exportAuditResultsToString(filePathList);
     }
 
     /**

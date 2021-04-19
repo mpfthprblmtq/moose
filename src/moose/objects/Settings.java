@@ -40,7 +40,7 @@ public class Settings {
         this.inDeveloperMode = false;
         this.askBeforeClearAll = true;
         this.genres = new ArrayList<>();
-        this.libraryLocation = StringUtils.EMPTY_STRING;
+        this.libraryLocation = StringUtils.EMPTY;
         this.removeCommentOnAutoTagging = false;
         this.preferredCoverArtSize = 640;
         this.albumArtFinderApiKey = StringUtils.EMPTY;
