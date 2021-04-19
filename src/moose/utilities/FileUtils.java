@@ -64,16 +64,17 @@ public class FileUtils {
     public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection, File openAt, FileNameExtensionFilter fileNameExtensionFilter) {
 
         // create it
-        JFileChooser jfc = new JFileChooser() {
-            // overriding to prevent a user selecting nothing inside a directory
-            @Override
-            public void approveSelection() {
-                File file = this.getSelectedFile();
-                if (file.isDirectory()) {
-                    super.approveSelection();
-                }
-            }
-        };
+//        JFileChooser jfc = new JFileChooser() {
+//            // overriding to prevent a user selecting nothing inside a directory
+//            @Override
+//            public void approveSelection() {
+//                File file = this.getSelectedFile();
+//                if (file.isDirectory()) {
+//                    super.approveSelection();
+//                }
+//            }
+//        };
+        JFileChooser jfc = new JFileChooser();
 
         // configure it
 
