@@ -14,6 +14,7 @@ package moose.views;
 import moose.Main;
 import moose.controllers.AuditController;
 import moose.controllers.CleanupController;
+import moose.controllers.SongController;
 import moose.services.IconService;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
@@ -40,11 +41,11 @@ public class AuditFrame extends javax.swing.JFrame {
     /**
      * Creates new form AuditFrame
      */
-    public AuditFrame() {
+    public AuditFrame(Frame frame, SongController songController) {
         initComponents();
 
         // initialize the controllers
-        auditController = new AuditController(Main.getFrame(), this, Main.getFrame().songController);
+        auditController = new AuditController(frame, this, songController);
         cleanupController = new CleanupController(this);
 
         init();
@@ -668,8 +669,9 @@ public class AuditFrame extends javax.swing.JFrame {
                 null))[0];
 
         if(folder != null) {
-            // set the file ivar in the controller
+            // set the file ivar in the controllers
             auditController.setFolder(folder);
+            cleanupController.setFolder(folder);
 
             // update some graphics
             label1.setEnabled(true);
@@ -683,7 +685,8 @@ public class AuditFrame extends javax.swing.JFrame {
      * Starts the audit
      */
     private void startAudit() {
-        auditStartButton.setEnabled(false);
+        auditAnalyzeButton.setEnabled(false);
+        chooseFolderButton.setEnabled(false);
         auditViewResultsButton.setEnabled(true);
         nextFolderButton.setEnabled(true);
         previousFolderButton.setEnabled(true);
@@ -691,6 +694,10 @@ public class AuditFrame extends javax.swing.JFrame {
         label3.setEnabled(true);
         label4.setEnabled(true);
         label5.setEnabled(true);
+        cleanupAnalyzeButton.setEnabled(false);
+        cleanupViewResultsButton.setEnabled(false);
+        deleteAllButton.setEnabled(false);
+        deleteSelectedButton.setEnabled(false);
         auditController.startAudit();
     }
 
@@ -731,6 +738,7 @@ public class AuditFrame extends javax.swing.JFrame {
             return StringUtils.EMPTY;
         } else {
             auditController.setFolder(new File(Main.getSettings().getLibraryLocation()));
+            cleanupController.setFolder(new File(Main.getSettings().getLibraryLocation()));
             label1.setEnabled(true);
 
             auditAnalyzeButton.setEnabled(true);
@@ -891,6 +899,9 @@ public class AuditFrame extends javax.swing.JFrame {
         label4.setEnabled(false);
         label5.setEnabled(false);
 
+        // choose folder
+        chooseFolderButton.setEnabled(true);
+
         // audit fields
         auditCurrentlyScanningLabel.setText(StringUtils.EMPTY);
         auditProgressBar.setValue(0);
@@ -907,6 +918,7 @@ public class AuditFrame extends javax.swing.JFrame {
         nextFolderButton.setText("Save & Next -->");
 
         // cleanup fields
+        cleanupAnalyzeButton.setEnabled(true);
         cleanupViewResultsButton.setEnabled(false);
         cleanupResultsTextArea.setText(StringUtils.EMPTY);
         wavCheckBox.setSelected(false);

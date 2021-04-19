@@ -94,4 +94,18 @@ public class DialogService {
                 options,
                 null);
     }
+
+    public static int showShouldAuditAllDialog() {
+        Object[] options = new Object[]{"Cancel", "Only Marked Albums", "All Albums"};
+        return JOptionPane.showOptionDialog(
+                Main.auditFrame,
+                "Would you like to audit all of the albums, or just the ones marked in the audit?",
+                "Audit",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                "Only Marked Albums"
+        );
+    }
 }

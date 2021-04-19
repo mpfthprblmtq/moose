@@ -267,13 +267,15 @@ public class SongController {
     public void saveTracks(int[] selectedRows) {
 
         int count = 0;
-
         // traverse the array of rows and play each file sequentially
         for (int selectedRow : selectedRows) {
             int row = table.convertRowIndexToModel(selectedRow);    // get the row
             int index = getIndex(row);
-            save(index);
-            count++;
+            // return if the song somehow isn't in the edited songs list
+            if (edited_songs.contains(index)) {
+                save(index);
+                count++;
+            }
         }
         Main.frame.updateConsole(count + " file(s) updated!");
     }
@@ -283,11 +285,6 @@ public class SongController {
      * @param index, the index of the song to save in the songs map
      */
     public void save(int index) {
-
-        // return if the song somehow isn't in the edited songs list
-        if (!edited_songs.contains(index)) {
-            return;
-        }
 
         Song s = songs.get(index);
         File file = s.getFile();
