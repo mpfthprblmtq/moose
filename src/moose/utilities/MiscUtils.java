@@ -10,29 +10,15 @@
 package moose.utilities;
 
 // imports
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 public class MiscUtils {
 
     // logger
-    static Logger logger = Main.logger;
+    static Logger logger = Moose.logger;
     
     /**
      * Checks if int[] contains a certain int

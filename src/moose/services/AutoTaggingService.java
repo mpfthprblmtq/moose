@@ -10,7 +10,7 @@
 package moose.services;
 
 // imports
-import moose.Main;
+import moose.Moose;
 import moose.objects.ImageSearchQuery;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
@@ -31,8 +31,8 @@ import static moose.utilities.Constants.*;
 
 public class AutoTaggingService {
 
-    JTable table = Main.frame.table;
-    Logger logger = Main.getLogger();
+    JTable table = Moose.frame.table;
+    Logger logger = Moose.getLogger();
 
     /**
      * Function that actually does the autotagging
@@ -58,44 +58,44 @@ public class AutoTaggingService {
             int index = getIndex(row);
 
             // title
-            Main.frame.songController.setTitle(index, title);
+            Moose.frame.songController.setTitle(index, title);
             table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
             // artist
             if (!SongUtils.isPartOfALabel(file)) {
-                Main.frame.songController.setArtist(index, artist);
+                Moose.frame.songController.setArtist(index, artist);
                 table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
             }
 
             // album
-            Main.frame.songController.setAlbum(index, album);
+            Moose.frame.songController.setAlbum(index, album);
             table.setValueAt(album, row, TABLE_COLUMN_ALBUM);
 
             // album artist
-            Main.frame.songController.setAlbumArtist(index, albumArtist);
+            Moose.frame.songController.setAlbumArtist(index, albumArtist);
             table.setValueAt(albumArtist, row, TABLE_COLUMN_ALBUMARTIST);
 
             // year
-            Main.frame.songController.setYear(index, year);
+            Moose.frame.songController.setYear(index, year);
             table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
             // genre
             if (SongUtils.isPartOfALabel(file)) {
-                Main.frame.songController.setGenre(index, genre);
+                Moose.frame.songController.setGenre(index, genre);
                 table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
             }
 
             // tracks
-            Main.frame.songController.setTrack(index, tracks);
+            Moose.frame.songController.setTrack(index, tracks);
             table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
             // disks
-            Main.frame.songController.setDisk(index, disks);
+            Moose.frame.songController.setDisk(index, disks);
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
 
             // comment
-            if (Main.getSettings().getRemoveCommentOnAutoTagging()) {
-                Main.frame.songController.setComment(index, StringUtils.EMPTY);
+            if (Moose.getSettings().getRemoveCommentOnAutoTagging()) {
+                Moose.frame.songController.setComment(index, StringUtils.EMPTY);
             }
         }
 
@@ -163,7 +163,7 @@ public class AutoTaggingService {
             }
 
             // update the track in the songs array
-            Main.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
+            Moose.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
 
             // update graphics
             Icon thumbnail_icon = ImageUtils.getScaledImage(bytes, 100);
@@ -172,12 +172,12 @@ public class AutoTaggingService {
             table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
 
             // song was edited, add it to the list
-            Main.frame.songController.songEdited(index);
+            Moose.frame.songController.songEdited(index);
 
             // if there's multiple rows selected, also add it to the multiple fields panel
             if (table.getSelectedRowCount() > 1) {
                 Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
-                Main.frame.multImage.setIcon(artwork_icon);
+                Moose.frame.multImage.setIcon(artwork_icon);
             }
 
         } catch (IOException ex) {
@@ -203,7 +203,7 @@ public class AutoTaggingService {
             int index = Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
 
             // get the file to use as the starting point for choosing an image
-            File file = Main.frame.songController.getSongs().get(index).getFile();
+            File file = Moose.frame.songController.getSongs().get(index).getFile();
 
             // only show the JFileChooser on the first go
             if (i == 0) {
@@ -229,7 +229,7 @@ public class AutoTaggingService {
      */
     public int confirmUserWantsAlbumArtFinder() {
         return JOptionPane.showConfirmDialog(
-                Main.frame,
+                Moose.frame,
                 "Cover art wasn't automatically found, would you like\n"
                     + "to use the Album Art Finder service in Moose?",
                 "Album Art Finder Service",
@@ -245,12 +245,12 @@ public class AutoTaggingService {
     public void showAlbumArtWindow(ImageSearchQuery query) {
         if (SwingUtilities.isEventDispatchThread()) {
             AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
-            albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+            albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
             albumArtFinderFrame.setVisible(true);
         } else {
             SwingUtilities.invokeLater(() -> {
                 AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
-                albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+                albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
                 albumArtFinderFrame.setVisible(true);
             });
         }
@@ -606,11 +606,11 @@ public class AutoTaggingService {
         String disks = getDisksFromFile(file);
 
         // tracks
-        Main.frame.songController.setTrack(index, tracks);
+        Moose.frame.songController.setTrack(index, tracks);
         table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
         // disks
-        Main.frame.songController.setDisk(index, disks);
+        Moose.frame.songController.setDisk(index, disks);
         table.setValueAt(disks, row, TABLE_COLUMN_DISK);
     }
 

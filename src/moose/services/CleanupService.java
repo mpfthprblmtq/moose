@@ -1,6 +1,6 @@
 package moose.services;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.AuditCleanupUtils;
 import moose.utilities.Constants;
 import moose.utilities.FileUtils;
@@ -14,7 +14,7 @@ import java.util.List;
 public class CleanupService {
 
     // logger
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     /**
      * Analysis function for cleanup
@@ -27,7 +27,7 @@ public class CleanupService {
         int coverCount = 0;
         ArrayList<File> cleanupFiles = new ArrayList<>();
         FileUtils.listFiles(folder, cleanupFiles);
-        Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
+        Moose.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
         int total = cleanupFiles.size();
         double index = 0;
 
@@ -69,11 +69,11 @@ public class CleanupService {
                     }
                 }
             }
-            Main.getAuditFrame().updateCleanupProgressBar(AuditCleanupUtils.formatPercentage(index, total));
+            Moose.getAuditFrame().updateCleanupProgressBar(AuditCleanupUtils.formatPercentage(index, total));
             index++;
         }
-        Main.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
-        Main.getAuditFrame().updateCleanupCurrentlyScanningLabel(cleanupFiles.size() + " files successfully scanned!");
+        Moose.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+        Moose.getAuditFrame().updateCleanupCurrentlyScanningLabel(cleanupFiles.size() + " files successfully scanned!");
         return "MP3 Files:     " + mp3Count + "\n"
                 + "Cover Files:   " + coverCount + "\n"
                 + "ZIP Files:     " + filePathList.get(3).size() + "\n"

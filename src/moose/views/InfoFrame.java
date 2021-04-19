@@ -17,7 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
-import moose.Main;
+import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Song;
 import moose.utilities.ImageUtils;
@@ -61,7 +61,7 @@ public class InfoFrame extends javax.swing.JFrame {
         
         this.row = row;
         this.editModeEnabled = editModeEnabled;
-        songController = Main.frame.songController;
+        songController = Moose.frame.songController;
         
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -618,7 +618,7 @@ public class InfoFrame extends javax.swing.JFrame {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         setFieldsEditable(false);
-        Main.frame.setEnabled(true);
+        Moose.frame.setEnabled(true);
     }//GEN-LAST:event_formWindowClosed
 
     private void filenameFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_filenameFieldKeyReleased
@@ -778,7 +778,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Main.frame.next(this.editModeEnabled, lastEditedField);
+        Moose.frame.next(this.editModeEnabled, lastEditedField);
     }
     
     /**
@@ -790,7 +790,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Main.frame.previous(this.editModeEnabled, lastEditedField);
+        Moose.frame.previous(this.editModeEnabled, lastEditedField);
     }
 
     /**
@@ -798,7 +798,7 @@ public class InfoFrame extends javax.swing.JFrame {
      * @param row, the row to check against
      */
     public void setNavigationButtons(int row) {
-        if(row == Main.frame.table.getRowCount() - 1) {
+        if(row == Moose.frame.table.getRowCount() - 1) {
             previousButton.setEnabled(true);
             nextButton.setEnabled(false);
         } else if (row == 0) {
@@ -857,7 +857,7 @@ public class InfoFrame extends javax.swing.JFrame {
      */
     public void submit() {
         if (edited) {
-            Main.frame.submitChangesFromInfoFrame(
+            Moose.frame.submitChangesFromInfoFrame(
                     filenameField.getText().replace(".mp3", StringUtils.EMPTY),
                     titleField.getText(),
                     artistField.getText(),

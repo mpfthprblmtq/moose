@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class FileUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Helper Function that lists and stores all of the files in a directory and subdirectories
@@ -80,8 +80,8 @@ public class FileUtils {
         // if the parameter openAt is null, open the library location by default if its set
         // if it's not set, open the user.home
         if (openAt == null) {
-            if (StringUtils.isEmpty(Main.getSettings().getLibraryLocation())) {
-                openAt = new File(Main.getSettings().getLibraryLocation());
+            if (StringUtils.isEmpty(Moose.getSettings().getLibraryLocation())) {
+                openAt = new File(Moose.getSettings().getLibraryLocation());
             } else {
                 openAt = new File(System.getProperty("user.home"));
             }

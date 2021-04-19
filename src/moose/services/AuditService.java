@@ -10,12 +10,12 @@
 package moose.services;
 
 //imports
+import moose.Moose;
 import moose.objects.Song;
 import moose.utilities.*;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 import moose.utilities.logger.Logger;
-import moose.Main;
 
 import javax.swing.SwingConstants;
 import java.io.File;
@@ -31,7 +31,7 @@ public class AuditService {
     AuditFrame auditFrame;
 
     // logger object
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     public AuditService(AuditFrame auditFrame) {
         this.auditFrame = auditFrame;
@@ -44,12 +44,12 @@ public class AuditService {
      * @return a formatted string with the results of the analysis
      */
     public String analyzeForAudit(List<File> albums, List<List<String>> auditFilePathList) {
-        Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
+        Moose.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
         int total = albums.size();
         double index = 0;
 
         for (File dir : albums) {
-            Main.getAuditFrame().updateAuditCurrentlyScanningLabel(formatStringForCurrentlyScanningPath(dir.getPath()));
+            Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(formatStringForCurrentlyScanningPath(dir.getPath()));
             if (!checkID3Tags(dir)) {
                 auditFilePathList.get(Constants.ID3).add(dir.getPath());
             }
@@ -60,11 +60,11 @@ public class AuditService {
                 auditFilePathList.get(Constants.COVER).add(dir.getPath());
             }
 
-            Main.getAuditFrame().updateAuditProgressBar(AuditCleanupUtils.formatPercentage(index, total));
+            Moose.getAuditFrame().updateAuditProgressBar(AuditCleanupUtils.formatPercentage(index, total));
             index++;
         }
-        Main.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
-        Main.getAuditFrame().updateAuditCurrentlyScanningLabel(albums.size() + " albums successfully scanned!");
+        Moose.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
+        Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(albums.size() + " albums successfully scanned!");
         return "ID3Tags missing:   " + auditFilePathList.get(0).size() + "\n"
                 + "Filename issues:   " + auditFilePathList.get(1).size() + "\n"
                 + "Cover art missing: " + auditFilePathList.get(2).size();
@@ -134,10 +134,10 @@ public class AuditService {
         updateLabelAndProgressBarForAudit(index, albums.size());
 
         // open up a new Frame with the album preloaded
-        Main.frame.dispose();
-        Main.frame = new Frame(albums.get(index));
-        Main.launchFrame(albums.get(index));
-        auditFrame = Main.getAuditFrame();
+        Moose.frame.dispose();
+        Moose.frame = new Frame(albums.get(index));
+        Moose.launchFrame(albums.get(index));
+        auditFrame = Moose.getAuditFrame();
         auditFrame.refreshAuditFrame(getCheckResults(albums.get(index)), albums.get(index).getPath());
     }
 

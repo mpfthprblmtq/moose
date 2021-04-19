@@ -16,7 +16,7 @@ package moose.views;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-import moose.Main;
+import moose.Moose;
 import moose.controllers.*;
 import moose.objects.Settings;
 import moose.services.DialogService;
@@ -36,7 +36,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     public SettingsController settingsController = new SettingsController();
 
     // logger object
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     // JList model
     DefaultListModel<String> genreListModel = new DefaultListModel<>();
@@ -756,7 +756,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 null))[0];
         if (dir != null) {
             settings.setLibraryLocation(dir.getAbsolutePath() + "/");
-            if (!Main.getSettings().getLibraryLocation().equals(settings.getLibraryLocation())) {
+            if (!Moose.getSettings().getLibraryLocation().equals(settings.getLibraryLocation())) {
                 libraryLocationField.setForeground(Constants.GREEN);
                 libraryLocationField.setText(settings.getLibraryLocation());
             }
@@ -765,7 +765,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_browseButtonActionPerformed
 
     private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyTyped
-        String originalValue = Main.getSettings().getAlbumArtFinderCseId();
+        String originalValue = Moose.getSettings().getAlbumArtFinderCseId();
         if (!cseTextField.getText().equals(originalValue)) {
             cseTextField.setForeground(Constants.GREEN);
             settings.setAlbumArtFinderCseId(cseTextField.getText());
@@ -775,7 +775,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_cseTextFieldKeyTyped
 
     private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyTyped
-        String originalValue = Main.getSettings().getAlbumArtFinderApiKey();
+        String originalValue = Moose.getSettings().getAlbumArtFinderApiKey();
         if (!apiKeyTextField.getText().equals(originalValue)) {
             apiKeyTextField.setForeground(Constants.GREEN);
             settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
@@ -785,7 +785,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_apiKeyTextFieldKeyTyped
 
     private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
-        int originalValue = Main.getSettings().getPreferredCoverArtSize();
+        int originalValue = Moose.getSettings().getPreferredCoverArtSize();
         if (!preferredCoverArtSizeSpinner.getValue().equals(originalValue)) {
             Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
             c.setForeground(Constants.GREEN);
@@ -811,11 +811,11 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param evt, the event
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        if (Main.updateSettings(settings)) {
+        if (Moose.updateSettings(settings)) {
             statusLabel.setForeground(Constants.GREEN);
             statusLabel.setText("Settings saved!");
             resetUI();
-            settings = Main.getSettings();
+            settings = Moose.getSettings();
         } else {
             statusLabel.setForeground(Constants.RED);
             statusLabel.setText("Problem updating Settings...");
@@ -1022,19 +1022,19 @@ public class SettingsFrame extends javax.swing.JFrame {
     private void resetUI() {
         genreList.setModel(getGenreListModel());
         debugCheckBox.setForeground(Constants.BLACK);
-        debugCheckBox.setSelected(Main.getSettings().isInDebugMode());
+        debugCheckBox.setSelected(Moose.getSettings().isInDebugMode());
         developerModeCheckBox.setForeground(Constants.BLACK);
-        developerModeCheckBox.setSelected(Main.getSettings().isInDeveloperMode());
+        developerModeCheckBox.setSelected(Moose.getSettings().isInDeveloperMode());
         libraryLocationField.setForeground(Constants.BLACK);
-        libraryLocationField.setText(Main.getSettings().getLibraryLocation());
+        libraryLocationField.setText(Moose.getSettings().getLibraryLocation());
         removeCommentCheckBox.setForeground(Constants.BLACK);
-        removeCommentCheckBox.setSelected(Main.getSettings().getRemoveCommentOnAutoTagging());
+        removeCommentCheckBox.setSelected(Moose.getSettings().getRemoveCommentOnAutoTagging());
         cseTextField.setForeground(Constants.BLACK);
-        cseTextField.setText(Main.getSettings().getAlbumArtFinderCseId());
+        cseTextField.setText(Moose.getSettings().getAlbumArtFinderCseId());
         apiKeyTextField.setForeground(Constants.BLACK);
-        apiKeyTextField.setText(Main.getSettings().getAlbumArtFinderApiKey());
+        apiKeyTextField.setText(Moose.getSettings().getAlbumArtFinderApiKey());
         preferredCoverArtSizeSpinner.getEditor().getComponent(0).setForeground(Constants.BLACK);
-        preferredCoverArtSizeSpinner.setValue(Main.getSettings().getPreferredCoverArtSize());
+        preferredCoverArtSizeSpinner.setValue(Moose.getSettings().getPreferredCoverArtSize());
     }
 
     /**
