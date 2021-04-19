@@ -25,9 +25,9 @@ public class Song {
     private String genre;
     private String year;
     private String track;
-    private final String totalTracks;
+    private String totalTracks;
     private String disk;
-    private final String totalDisks;
+    private String totalDisks;
     private byte[] artwork_bytes;
     
     private final String bitrate;
@@ -204,6 +204,13 @@ public class Song {
     }
 
     /**
+     * @param totalTracks the totalTracks to set
+     */
+    public void setTotalTracks(String totalTracks) {
+        this.totalTracks = totalTracks;
+    }
+
+    /**
      * @return the disk
      */
     public String getDisk() {
@@ -222,6 +229,13 @@ public class Song {
      */
     public String getTotalDisks() {
         return totalDisks;
+    }
+
+    /**
+     * @param totalDisks the totalDisks to set
+     */
+    public void setTotalDisks(String totalDisks) {
+        this.totalDisks = totalDisks;
     }
 
     /**

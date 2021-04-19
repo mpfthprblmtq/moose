@@ -230,12 +230,32 @@ public class SongController {
     }
 
     /**
+     * Helper function to set the total tracks of the song in the songs list.
+     * @param index, the index of the song
+     * @param totalTracks, the totalTracks to set
+     */
+    public void setTotalTracks(int index, String totalTracks) {
+        songs.get(index).setTotalTracks(totalTracks);
+        songEdited(index);
+    }
+
+    /**
      * Helper function to set the disk of the song in the songs list.
      * @param index, the index of the song
      * @param disk, the disk to set
      */
     public void setDisk(int index, String disk) {
         songs.get(index).setDisk(disk);
+        songEdited(index);
+    }
+
+    /**
+     * Helper function to set the total disks of the song in the songs list.
+     * @param index, the index of the song
+     * @param totalDisks, the totalDisks to set
+     */
+    public void setTotalDisks(int index, String totalDisks) {
+        songs.get(index).setTotalDisks(totalDisks);
         songEdited(index);
     }
 
@@ -475,6 +495,7 @@ public class SongController {
      * @param selectedRows, the rows selected on the table
      */
     public void autoTagFiles(int[] selectedRows) {
+        autoTaggingService.setTable(table);
         autoTaggingService.autoTag(selectedRows);
     }
 
