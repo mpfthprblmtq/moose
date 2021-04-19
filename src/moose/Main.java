@@ -71,9 +71,7 @@ public class Main {
      */
     public static void launchFrame() {
         frame = new Frame();
-        // TODO: Find out why this doesn't work anymore
-        //frame.setLocationRelativeTo(null); 
-        frame.setLocation(100, 100);
+        frame.setLocation(20, 20);
         frame.setVisible(true);
     }
     
@@ -83,12 +81,17 @@ public class Main {
      */
     public static void launchFrame(File dir) {
         frame = new Frame(dir);
-        // TODO: Find out why this doesn't work anymore
-        //frame.setLocationRelativeTo(null); 
-        frame.setLocation(100, 100);
+        frame.setLocation(20, 20);
         frame.setVisible(true);
     }
-    
+
+    /**
+     * Returns the main frame
+     */
+    public static Frame getFrame() {
+        return frame;
+    }
+
     /**
      * Controls the SettingsFrame opening and closing
      */
@@ -106,7 +109,7 @@ public class Main {
      * Controls the AuditFrame opening and closing
      */
     public static void launchAuditFrame() {
-        auditFrame = new AuditFrame();
+        auditFrame = new AuditFrame(frame, frame.songController);
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
     }

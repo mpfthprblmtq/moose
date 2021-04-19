@@ -19,13 +19,12 @@ import java.awt.event.KeyEvent;
 import moose.Main;
 import moose.controllers.*;
 import moose.objects.Settings;
+import moose.services.DialogService;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
 
 import java.io.File;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.ConcurrentNavigableMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -48,6 +47,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     // starting states
     boolean debugEdited = false;
     boolean developerModeEdited = false;
+    boolean removeCommentEdited = false;
     int genresDeleted = 0;
 
     // some html constants
@@ -119,6 +119,9 @@ public class SettingsFrame extends javax.swing.JFrame {
         preferredCoverArtSizeLabel = new javax.swing.JLabel();
         separator2 = new javax.swing.JSeparator();
         preferredCoverArtSizeSpinner = new javax.swing.JSpinner();
+        featuresPanel = new javax.swing.JPanel();
+        removeCommentCheckBox = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         defaultButton = new javax.swing.JButton();
@@ -182,52 +185,52 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout genrePanelLayout = new javax.swing.GroupLayout(genrePanel);
         genrePanel.setLayout(genrePanelLayout);
         genrePanelLayout.setHorizontalGroup(
-                genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addComponent(genresHeaderLabel))
-                                                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, genrePanelLayout.createSequentialGroup()
-                                                .addGap(0, 0, Short.MAX_VALUE)
-                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                                                        .addComponent(cancelButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(genreToAddLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(genreStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(genresScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(genrePanelLayout.createSequentialGroup()
+                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(genrePanelLayout.createSequentialGroup()
+                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(genrePanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(genresHeaderLabel))
+                            .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, genrePanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(cancelButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(genrePanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(genreToAddLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(genreStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(genresScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         genrePanelLayout.setVerticalGroup(
-                genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(genresScrollPane)
-                                        .addGroup(genrePanelLayout.createSequentialGroup()
-                                                .addComponent(genresHeaderLabel)
-                                                .addGap(34, 34, 34)
-                                                .addComponent(genreToAddLabel)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(addGenreButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(deleteGenreButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cancelButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
-                                                .addComponent(genreStatusLabel)))
-                                .addContainerGap())
+            genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(genrePanelLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(genresScrollPane)
+                    .addGroup(genrePanelLayout.createSequentialGroup()
+                        .addComponent(genresHeaderLabel)
+                        .addGap(34, 34, 34)
+                        .addComponent(genreToAddLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(genreTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(addGenreButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteGenreButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                        .addComponent(genreStatusLabel)))
+                .addContainerGap())
         );
 
         tabbedPane.addTab("Genres", genrePanel);
@@ -299,56 +302,56 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout loggingPanelLayout = new javax.swing.GroupLayout(loggingPanel);
         loggingPanel.setLayout(loggingPanelLayout);
         loggingPanelLayout.setHorizontalGroup(
-                loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(loggingPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addGroup(loggingPanelLayout.createSequentialGroup()
-                                                .addComponent(openEventLogButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
-                                                .addComponent(clearEventLogButton))
-                                        .addGroup(loggingPanelLayout.createSequentialGroup()
-                                                .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(clearErrorLogButton))
-                                        .addGroup(loggingPanelLayout.createSequentialGroup()
-                                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(loggingHeaderLabel)
-                                                        .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+            loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(loggingPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(loggingPanelLayout.createSequentialGroup()
+                        .addComponent(openEventLogButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                        .addComponent(clearEventLogButton))
+                    .addGroup(loggingPanelLayout.createSequentialGroup()
+                        .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(clearErrorLogButton))
+                    .addGroup(loggingPanelLayout.createSequentialGroup()
+                        .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(loggingHeaderLabel)
+                            .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         loggingPanelLayout.setVerticalGroup(
-                loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(loggingPanelLayout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addComponent(debuggingHeaderLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(debugCheckBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(developerModeCheckBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(loggingHeaderLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(openEventLogButton)
-                                        .addComponent(clearEventLogButton))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(openErrorLogButton)
-                                        .addComponent(clearErrorLogButton))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(14, Short.MAX_VALUE))
+            loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(loggingPanelLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(debuggingHeaderLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(debugCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(developerModeCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(loggingHeaderLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(openEventLogButton)
+                    .addComponent(clearEventLogButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(openErrorLogButton)
+                    .addComponent(clearErrorLogButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Logging", loggingPanel);
@@ -375,28 +378,28 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout filesPanelLayout = new javax.swing.GroupLayout(filesPanel);
         filesPanel.setLayout(filesPanelLayout);
         filesPanelLayout.setHorizontalGroup(
-                filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(filesPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(filesPanelLayout.createSequentialGroup()
-                                                .addComponent(libraryLocationHeaderLabel)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                                                .addComponent(browseButton))
-                                        .addGroup(filesPanelLayout.createSequentialGroup()
-                                                .addComponent(libraryLocationField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addContainerGap())))
+            filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(filesPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(filesPanelLayout.createSequentialGroup()
+                        .addComponent(libraryLocationHeaderLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                        .addComponent(browseButton))
+                    .addGroup(filesPanelLayout.createSequentialGroup()
+                        .addComponent(libraryLocationField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         filesPanelLayout.setVerticalGroup(
-                filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(filesPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(libraryLocationHeaderLabel)
-                                        .addComponent(browseButton))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(243, Short.MAX_VALUE))
+            filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(filesPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(libraryLocationHeaderLabel)
+                    .addComponent(browseButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(243, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Files", filesPanel);
@@ -448,59 +451,94 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout apiPanelLayout = new javax.swing.GroupLayout(apiPanel);
         apiPanel.setLayout(apiPanelLayout);
         apiPanelLayout.setHorizontalGroup(
-                apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(apiPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(separator2)
-                                        .addComponent(cseLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(apiKeyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(apiKeyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(cseTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(apiPanelLayout.createSequentialGroup()
-                                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(timesUsedTodayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                        .addGroup(apiPanelLayout.createSequentialGroup()
-                                                .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+            apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(apiPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(separator2)
+                    .addComponent(cseLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(apiKeyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(apiKeyTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cseTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(apiPanelLayout.createSequentialGroup()
+                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(timesUsedTodayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(apiPanelLayout.createSequentialGroup()
+                        .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         apiPanelLayout.setVerticalGroup(
-                apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(apiPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(cseLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(apiKeyLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(dateLastUsedLabel)
-                                        .addComponent(dateLastUsedField))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(timesUsedTodayLabel)
-                                        .addComponent(timesUsedTodayField))
-                                .addGap(18, 18, 18)
-                                .addComponent(separator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(preferredCoverArtSizeLabel)
-                                        .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(82, Short.MAX_VALUE))
+            apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(apiPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cseLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(apiKeyLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(dateLastUsedLabel)
+                    .addComponent(dateLastUsedField))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(timesUsedTodayLabel)
+                    .addComponent(timesUsedTodayField))
+                .addGap(18, 18, 18)
+                .addComponent(separator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(preferredCoverArtSizeLabel)
+                    .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("API Config", apiPanel);
+
+        removeCommentCheckBox.setSelected(settingsController.getSettings().getRemoveCommentOnAutoTagging());
+        removeCommentCheckBox.setText("Remove comments on AutoTagging");
+        removeCommentCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeCommentCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("AutoTagging:");
+
+        javax.swing.GroupLayout featuresPanelLayout = new javax.swing.GroupLayout(featuresPanel);
+        featuresPanel.setLayout(featuresPanelLayout);
+        featuresPanelLayout.setHorizontalGroup(
+            featuresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(featuresPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(featuresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(featuresPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(removeCommentCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        featuresPanelLayout.setVerticalGroup(
+            featuresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(featuresPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(removeCommentCheckBox)
+                .addContainerGap(267, Short.MAX_VALUE))
+        );
+
+        tabbedPane.addTab("Features", featuresPanel);
 
         statusLabel.setForeground(new java.awt.Color(0, 130, 47));
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -524,38 +562,38 @@ public class SettingsFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(6, 6, 6)
-                                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(defaultButton)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                .addComponent(saveButton))
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                .addGap(0, 0, Short.MAX_VALUE)
-                                                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                                .addContainerGap())))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(defaultButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(saveButton))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(statusLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(saveButton)
-                                        .addComponent(defaultButton))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveButton)
+                    .addComponent(defaultButton))
+                .addContainerGap())
         );
 
         pack();
@@ -576,7 +614,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            genreTextField.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
         }
     }//GEN-LAST:event_addGenreButtonActionPerformed
 
@@ -600,7 +638,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         addGenreButton.setText("Add");
         deleteGenreButton.setEnabled(false);
         cancelButton.setEnabled(false);
-        genreTextField.setText(StringUtils.EMPTY_STRING);
+        genreTextField.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
@@ -614,8 +652,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         deleteGenreButton.setEnabled(true);
         cancelButton.setEnabled(true);
         genreTextField.setText(genreList.getSelectedValue()
-                .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
-                .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING));
+                .replace(HTML_PREFIX, StringUtils.EMPTY)
+                .replace(HTML_SUFFIX, StringUtils.EMPTY));
     }//GEN-LAST:event_genreListMouseClicked
 
     /**
@@ -631,7 +669,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDebugMode(debugCheckBox.isSelected());
         debugEdited = !debugEdited;
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_debugCheckBoxActionPerformed
 
     /**
@@ -647,7 +685,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setDeveloperMode(developerModeCheckBox.isSelected());
         developerModeEdited = !developerModeEdited;
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_developerModeCheckBoxActionPerformed
 
     /**
@@ -722,7 +760,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 libraryLocationField.setForeground(Constants.GREEN);
                 libraryLocationField.setText(settings.getLibraryLocation());
             }
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY);
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
@@ -784,6 +822,17 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveButtonActionPerformed
 
+    private void removeCommentCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeCommentCheckBoxActionPerformed
+        if (!removeCommentEdited) {
+            removeCommentCheckBox.setForeground(Constants.GREEN);
+        } else {
+            removeCommentCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.setRemoveCommentOnAutoTagging(removeCommentCheckBox.isSelected());
+        removeCommentEdited = !removeCommentEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_removeCommentCheckBoxActionPerformed
+
     /**
      * Gets the list of genres and fill a DefaultListModel for the view
      *
@@ -833,11 +882,11 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @param genre the genre to add
      */
     public void addGenreToList(String genre) {
-        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY_STRING)) {
+        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY)) {
             settings.addGenre(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
-            genreTextField.setText(StringUtils.EMPTY_STRING);
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
+            statusLabel.setText(StringUtils.EMPTY);
         }
     }
 
@@ -851,11 +900,11 @@ public class SettingsFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             settings.removeGenre(genre);
-            genreTextField.setText(StringUtils.EMPTY_STRING);
+            genreTextField.setText(StringUtils.EMPTY);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
             cancelButton.setEnabled(false);
-            statusLabel.setText(StringUtils.EMPTY_STRING);
+            statusLabel.setText(StringUtils.EMPTY);
             genreStatusLabel.setForeground(Constants.GREEN);
             genresDeleted++;
             genreStatusLabel.setText(genresDeleted + " genres deleted!");
@@ -876,8 +925,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
         if (alreadyEdited) {
             String oldGenre_withoutHtml = oldGenre
-                    .replace(HTML_PREFIX, StringUtils.EMPTY_STRING)
-                    .replace(HTML_SUFFIX, StringUtils.EMPTY_STRING);
+                    .replace(HTML_PREFIX, StringUtils.EMPTY)
+                    .replace(HTML_SUFFIX, StringUtils.EMPTY);
             genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
             oldGenre = oldGenre_withoutHtml;
         }
@@ -885,7 +934,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
         newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
         genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }
 
     /**
@@ -893,7 +942,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public void defaultSettings() {
         // get which settings the user wants to reset
-        Map<Integer, Boolean> settingsToReset = DialogUtils.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
+        Map<Integer, Boolean> settingsToReset = DialogService.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
 
         // go through the map we get back and reset those settings
         if (settingsToReset != null) {
@@ -922,26 +971,26 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
 
             // build the message to show to the user based on the success map
-            String message = StringUtils.EMPTY_STRING;
+            String message = StringUtils.EMPTY;
             if (success.containsKey(Constants.GENRE)) {
                 message = "Genres";
             }
             if (success.containsKey(Constants.LOGGING)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "Logging";
                 } else {
                     message = message.concat(", Logging");
                 }
             }
             if (success.containsKey(Constants.FILES)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "Files";
                 } else {
                     message = message.concat(", Files");
                 }
             }
             if (success.containsKey(Constants.API)) {
-                if (message.equals(StringUtils.EMPTY_STRING)) {
+                if (message.equals(StringUtils.EMPTY)) {
                     message = "API Config";
                 } else {
                     message = message.concat(", API Config");
@@ -978,6 +1027,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         developerModeCheckBox.setSelected(Main.getSettings().isInDeveloperMode());
         libraryLocationField.setForeground(Constants.BLACK);
         libraryLocationField.setText(Main.getSettings().getLibraryLocation());
+        removeCommentCheckBox.setForeground(Constants.BLACK);
+        removeCommentCheckBox.setSelected(Main.getSettings().getRemoveCommentOnAutoTagging());
         cseTextField.setForeground(Constants.BLACK);
         cseTextField.setText(Main.getSettings().getAlbumArtFinderCseId());
         apiKeyTextField.setForeground(Constants.BLACK);
@@ -1017,6 +1068,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox developerModeCheckBox;
     private javax.swing.JLabel errorLogFileLocationLabel;
     private javax.swing.JLabel eventLogFileLocationLabel;
+    private javax.swing.JPanel featuresPanel;
     private javax.swing.JPanel filesPanel;
     private javax.swing.JList<String> genreList;
     private javax.swing.JPanel genrePanel;
@@ -1025,6 +1077,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel genreToAddLabel;
     private javax.swing.JLabel genresHeaderLabel;
     private javax.swing.JScrollPane genresScrollPane;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel libraryLocationField;
     private javax.swing.JLabel libraryLocationHeaderLabel;
     private javax.swing.JLabel loggingHeaderLabel;
@@ -1033,6 +1086,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JButton openEventLogButton;
     private javax.swing.JLabel preferredCoverArtSizeLabel;
     private javax.swing.JSpinner preferredCoverArtSizeSpinner;
+    private javax.swing.JCheckBox removeCommentCheckBox;
     private javax.swing.JButton saveButton;
     private javax.swing.JSeparator separator1;
     private javax.swing.JSeparator separator2;

@@ -12,26 +12,28 @@ package moose.views;
 
 // imports
 
-import java.awt.Component;
+import java.awt.*;
 
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Settings;
 import moose.objects.Song;
+import moose.services.DialogService;
+import moose.services.IconService;
 import moose.utilities.*;
 
-import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -42,6 +44,7 @@ import moose.utilities.viewUtils.FileDrop;
 import moose.utilities.viewUtils.TableCellListener;
 
 import static moose.utilities.Constants.*;
+import static org.junit.Assert.assertNotNull;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -52,6 +55,9 @@ public class Frame extends javax.swing.JFrame {
     // controller, instantiated in constructor
     public SongController songController;
 
+    // services
+    public IconService iconService;
+
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
 
@@ -60,33 +66,10 @@ public class Frame extends javax.swing.JFrame {
     int nav_status = -1;  // keeps track of the navigation status
 
     // table model used, with some customizations and overrides
-    DefaultTableModel model = new DefaultTableModel() {
-        @Override   // returns a certain type of class based on the column index
-        public Class getColumnClass(int column) {
-            if (column == 11 || column == 0) {
-                return ImageIcon.class;
-            } else {
-                return Object.class;
-            }
-        }
+    DefaultTableModel model = ViewUtils.getTableModel();
 
-        @Override   // returns if the cell is editable based on the column index
-        public boolean isCellEditable(int row, int column) {
-            return !(column == 11 || column == 0);
-        }
-    };
-
-    DefaultCellEditor editor = new DefaultCellEditor(new JTextField()) {
-        @Override
-        public boolean isCellEditable(EventObject e) {
-            if (e instanceof MouseEvent) {
-                if (((MouseEvent) e).getClickCount() == 2) {
-                    return true;
-                }
-            }
-            return super.isCellEditable(e);
-        }
-    };
+    // cell editor used, with customizations and overrides
+    DefaultCellEditor editor = ViewUtils.getCellEditor();
 
     /**
      * Creates new form Frame
@@ -111,6 +94,7 @@ public class Frame extends javax.swing.JFrame {
      * @param folder, the folder we want to start with
      */
     public Frame(File folder) {
+
         // init the components
         // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
         if (SwingUtilities.isEventDispatchThread()) {
@@ -144,6 +128,9 @@ public class Frame extends javax.swing.JFrame {
         // set up the song controller
         songController = new SongController();
         songController.setTable(table);
+
+        // set up services
+        iconService = new IconService();
 
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
@@ -240,7 +227,7 @@ public class Frame extends javax.swing.JFrame {
             }
 
             // sort the file list
-            fileList.sort((File f1, File f2) -> f1.getName().compareTo(f2.getName()));
+            fileList.sort(Comparator.comparing(File::getName));
 
             // import them all
             List<File> successfullyAddedFiles = importFiles(fileList);
@@ -252,122 +239,17 @@ public class Frame extends javax.swing.JFrame {
             checkForNewGenres(successfullyAddedFiles);
         });
 
-        // listener for editing cells
-        // uses custom class TableCellListener to get the row, col, before and after values
-        Action action = new AbstractAction() {
+        // create a table cell listener
+        TableCellListener tcl = ViewUtils.createTCLAction(table, songController);
+        assertNotNull(tcl);     // this line is really just to get rid of the "unused var" warning
+    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TableCellListener tcl = (TableCellListener) e.getSource();
-
-                int r = tcl.getRow();
-                int c = tcl.getColumn();
-
-                int index = Integer.parseInt(model.getValueAt(r, 12).toString());
-
-                // switch to see what column changed, and do a task based on that
-                switch (c) {
-                    case 0:
-
-                        break;
-                    case 2:     // filename was changed
-                        // with the filename changing, this changes automatically without hitting save
-                        // this functionality might change
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            File old_file = (File) model.getValueAt(r, 1);
-                            String path = old_file.getPath().replace(old_file.getName(), "");
-                            String fileName = model.getValueAt(r, c).toString();
-                            File new_file = new File(path + "//" + fileName + ".mp3");
-
-                            songController.setFile(index, new_file);
-
-                            if (!old_file.renameTo(new_file)) {
-                                logger.logError("Couldn't rename file! Path: " + old_file.getPath());
-                            }
-                            model.setValueAt(new_file, r, 1);
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 3:     // title was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setTitle(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 4:     // artist was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setArtist(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 5:     // album was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setAlbum(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 6:     // album artist was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setAlbumArtist(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 7:     // year was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setYear(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 8:     // genre was changed
-                        String genre = tcl.getNewValue().toString();
-                        // check and see if the genre exists already
-                        if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
-                            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
-                            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Settings settings = Main.getSettings();
-                                settings.addGenre(genre);
-                                Main.updateSettings(settings);
-                            }
-                        }
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setGenre(index, genre);
-
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 9:     // tracks was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setTrack(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 10:     // disks was changed
-                        if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setDisk(index, tcl.getNewValue().toString());
-                        }
-                        // else do nothing, nothing was changed
-                        break;
-
-                    case 11:    // artwork was changed
-                        // TODO:  Check to see if we can use this?
-                        //setAlbumImage(index, tcl.getNewValue().toString());
-                    default:    // not accounted for
-                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
-                        break;
-                }
-            }
-        };
-
-        // declare the TCL for use
-        TableCellListener tcl = new TableCellListener(table, action);
+    /**
+     * Returns the song controller
+     * @return the song controller
+     */
+    public SongController getSongController() {
+        return this.songController;
     }
 
     /**
@@ -412,9 +294,6 @@ public class Frame extends javax.swing.JFrame {
 
         // get all the songs, then the genres from the list of files
         List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
-//        songs.stream().map((file) -> songController.getSongFromFile(file)).forEachOrdered((s) -> {
-//            genres.add(s.getGenre());
-//        });
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
@@ -461,13 +340,13 @@ public class Frame extends javax.swing.JFrame {
     public void setRowIcon(int icon, int row) {
         switch (icon) {
             case DEFAULT:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/default.jpg")), row, 0);
+                table.setValueAt(iconService.get(IconService.DEFAULT), row, 0);
                 break;
             case EDITED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/edit.png")), row, 0);
+                table.setValueAt(iconService.get(IconService.EDITED), row, 0);
                 break;
             case Constants.SAVED:
-                table.setValueAt(new ImageIcon(this.getClass().getResource("/resources/check.png")), row, 0);
+                table.setValueAt(iconService.get(IconService.SAVED), row, 0);
                 break;
         }
     }
@@ -482,7 +361,7 @@ public class Frame extends javax.swing.JFrame {
     public boolean addFileToTable(File file) {
 
         // check to make sure we're not adding duplicate files
-        List<File> filesInTable = songController.getAllFiles();
+        List<File> filesInTable = songController.getAllFilesInTable();
         if (filesInTable.contains(file)) {
             return false;
         }
@@ -492,6 +371,10 @@ public class Frame extends javax.swing.JFrame {
             return false;
         }
 
+        String cleanedFileName = file.getName()
+                .replace(".mp3", StringUtils.EMPTY)
+                .replace(":", "/");
+
         int index = songController.getSongs().size();
         Song s = songController.getSongFromFile(file);
 
@@ -500,9 +383,9 @@ public class Frame extends javax.swing.JFrame {
 
         // add the row to the table
         model.addRow(new Object[]{
-                new ImageIcon(this.getClass().getResource("/resources/default.png")), // adds the default status icon
+                iconService.get(IconService.DEFAULT), // adds the default status icon
                 s.getFile(), // hidden file object
-                s.getFile().getName().replace(".mp3", ""), // actual editable file name
+                 cleanedFileName, // actual editable file name
                 s.getTitle(),
                 s.getArtist(),
                 s.getAlbum(),
@@ -517,7 +400,7 @@ public class Frame extends javax.swing.JFrame {
 
 
         // sorts the table on the filename, then the album by default
-        DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
+        @SuppressWarnings("rawtypes") DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
         ArrayList<RowSorter.SortKey> list = new ArrayList<>();
 
         list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
@@ -534,7 +417,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Helper function to update the UI's console, just appends a string
-     *
      * @param s, the string to append
      */
     public void updateConsole(String s) {
@@ -542,10 +424,8 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Function that selects the cell being edited. Used mainly when pressing
-     * tab or enter to navigate.
+     * Function that selects the cell being edited. Used mainly when pressing tab or enter to navigate.
      * This is one of those methods that just works, and it's best not to mess with it.
-     *
      * @param row,      the row of the cell
      * @param column,   the column of the cell
      * @param nav_type, the type of navigation
@@ -628,7 +508,7 @@ public class Frame extends javax.swing.JFrame {
             if (file.getName().endsWith(".mp3")) {
 
                 // check to make sure it's a valid mp3 file (not blank file name)
-                if (StringUtils.isEmpty(file.getName().replace(".mp3", StringUtils.EMPTY_STRING))) {
+                if (StringUtils.isEmpty(file.getName().replace(".mp3", StringUtils.EMPTY))) {
                     hiddenFilesToIgnore.add(file);
                 } else {
                     // try to add it to the table
@@ -653,7 +533,7 @@ public class Frame extends javax.swing.JFrame {
         int duplicates = duplicateFiles.get();
 
         // update the log table when you're done with the file iteration
-        // including all possible iterations of file combinations
+        // including all possible iterations of file combinations, because I hate myself
         if (!files.isEmpty() && filesToRemove.isEmpty() && duplicates == 0) {
             // all files were mp3s
             updateConsole(files.size() + " mp3 file(s) loaded!");
@@ -756,6 +636,7 @@ public class Frame extends javax.swing.JFrame {
         exitMenuItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
         refreshMenuItem = new javax.swing.JMenuItem();
+        selectAllMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
         auditMenuItem = new javax.swing.JMenuItem();
         autoTagMenuItem = new javax.swing.JMenuItem();
@@ -797,11 +678,6 @@ public class Frame extends javax.swing.JFrame {
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
-            }
-        });
-        table.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                tablePropertyChange(evt);
             }
         });
         table.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -944,11 +820,6 @@ public class Frame extends javax.swing.JFrame {
         multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
         multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
-        multTrack.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                multTrackFocusGained(evt);
-            }
-        });
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
@@ -960,11 +831,6 @@ public class Frame extends javax.swing.JFrame {
         multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
         multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
-        multDisk.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                multDiskFocusGained(evt);
-            }
-        });
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -1190,6 +1056,15 @@ public class Frame extends javax.swing.JFrame {
         });
         viewMenu.add(refreshMenuItem);
 
+        selectAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.META_DOWN_MASK));
+        selectAllMenuItem.setText("Select All");
+        selectAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectAllMenuItemActionPerformed(evt);
+            }
+        });
+        viewMenu.add(selectAllMenuItem);
+
         jMenuBar1.add(viewMenu);
 
         macroMenu.setText("Actions");
@@ -1312,7 +1187,7 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
+    /*
      * ActionPerformed methods
      */
     // <editor-fold defaultstate="collapsed" desc="ActionPerformed Methods">   
@@ -1323,7 +1198,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        songController.saveAll();
+        songController.saveTracks(IntStream.range(0, getRowCount()).toArray());
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
@@ -1646,14 +1521,6 @@ public class Frame extends javax.swing.JFrame {
         updateAutocompleteFields(multYear, false);
     }//GEN-LAST:event_multYearFocusGained
 
-    private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
-//        updateAutocompleteFields(multTrack);
-    }//GEN-LAST:event_multTrackFocusGained
-
-    private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
-//        updateAutocompleteFields(multDisk);
-    }//GEN-LAST:event_multDiskFocusGained
-
     private void refreshMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshMenuItemActionPerformed
         int res = JOptionPane.showConfirmDialog(this, "Are you sure you want to clear your current list and reset?");
         switch (res) {
@@ -1666,10 +1533,15 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_refreshMenuItemActionPerformed
 
+    private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshMenuItemActionPerformed
+        if (table.getRowCount() > 0) {
+            table.selectAll();
+        }
+    }//GEN-LAST:event_refreshMenuItemActionPerformed
+
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
         int[] selectedRows = table.getSelectedRows();
         if (selectedRows.length > 0) {
-//            showFormatFilenamesDialog(selectedRows);
             JOptionPane.showMessageDialog(this, "Not implemented yet!");
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -1686,11 +1558,6 @@ public class Frame extends javax.swing.JFrame {
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
         WebUtils.openPage(Constants.MOOSE_WIKI);
     }//GEN-LAST:event_wikiMenuItemActionPerformed
-
-    private void tablePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablePropertyChange
-//        setActionsEnabled(table.getRowCount() > 0);
-    }//GEN-LAST:event_tablePropertyChange
-    // </editor-fold>
 
     /**
      * Performs a command based on the user input
@@ -1718,58 +1585,13 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
-//    /**
-//     * Formats the file names
-//     *
-//     * @param selectedRows, the rows currently selected on the table
-//     */
-//    public void showFormatFilenamesDialog(int[] selectedRows) {
-//        JTextField regexField = new JTextField();
-//        JCheckBox smartBox = new JCheckBox();
-//        smartBox.setText("Figger it out");
-//        Object[] message = {regexField, smartBox};
-//        // create a thread to wait until the dialog box pops up
-//        (new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    sleep(500);
-//                } catch (InterruptedException e) {
-//                    logger.logError("Exception with threading when opening the find and replace dialog.", e);
-//                }
-//                regexField.requestFocus();
-//            }
-//        }).start();
-//
-//        int option = JOptionPane.showConfirmDialog(this, message, "Format file names", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-//        if (option == JOptionPane.OK_OPTION) {
-//            String regex = regexField.getText();
-//            boolean smart = smartBox.isSelected();
-//            formatFilenames(smart, regex, selectedRows);
-//        }
-//    }
-//
-//    /**
-//     * Actually does the formatting
-//     *
-//     * @param regexToUse, the regex to use
-//     * @param smart, a boolean to see if we want to try it automatically
-//     * @param selectedRows, the rows currently selected on the table
-//     */
-//    public void formatFilenames(boolean smart, String regexToUse, int[] selectedRows) {
-//        if (smart) {
-//            String regex = "\\d{2}\\. .*\\.mp3";
-//            for (int i = 0; i < selectedRows.length; i++) {
-//                File file = (File) table.getModel().getValueAt(
-//                        selectedRows[i],
-//                        table.convertColumnIndexToModel(1)
-//                );
-//                if (!file.getName().matches(regex)) {
-//
-//                }
-//            }
-//        }
-//    }
+    /**
+     * Gets the total number of rows
+     * @return the total number of rows in the table
+     */
+    public int getRowCount() {
+        return table.getRowCount();
+    }
 
     /**
      * Updates the autocomplete selection for the field
@@ -1789,7 +1611,7 @@ public class Frame extends javax.swing.JFrame {
      */
     public void clearAll() {
         if (Main.getSettings().isAskBeforeClearAll()) {
-            Boolean result = DialogUtils.showClearAllDialog(this);
+            Boolean result = DialogService.showClearAllDialog(this);
             if (result != null) {
                 boolean dontAskAgain = result;
                 if (dontAskAgain) {
@@ -1875,7 +1697,9 @@ public class Frame extends javax.swing.JFrame {
             String path = old_file.getPath().replace(old_file.getName(), "");
             File new_file = new File(path + "//" + filename + ".mp3");
             songController.setFile(songController.getIndex(row), new_file);
-            old_file.renameTo(new_file);
+            if (!old_file.renameTo(new_file)) {
+                logger.logError("Error renaming file: " + old_file.getName() + " to: " + new_file.getName());
+            }
             model.setValueAt(new_file, row, 1);
             table.setValueAt(filename, row, 1);
         }
@@ -1947,10 +1771,9 @@ public class Frame extends javax.swing.JFrame {
      * Show the about dialog, includes name, version, and copyright
      */
     public void showAboutDialog() {
-        Icon icon = new ImageIcon(this.getClass().getResource("/resources/moose128.png"));
         JOptionPane.showMessageDialog(null,
                 "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
-                "About Moose", JOptionPane.PLAIN_MESSAGE, icon);
+                "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
     }
 
     /**
@@ -2001,63 +1824,17 @@ public class Frame extends javax.swing.JFrame {
         }
 
         // fill the fields
-        if (songController.checkIfSame(titles[0], titles)) {
-            multTitle.setText(titles[0]);
-        } else {
-            multTitle.setText("-");
-        }
+        multTitle.setText(StringUtils.checkIfSame(titles[0], titles) ? titles[0] : Constants.DASH);
+        multArtist.setText(StringUtils.checkIfSame(artists[0], artists) ? artists[0] : Constants.DASH);
+        multAlbum.setText(StringUtils.checkIfSame(albums[0], albums) ? albums[0] : Constants.DASH);
+        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists[0], albumArtists) ? albumArtists[0] : Constants.DASH);
+        multGenre.setText(StringUtils.checkIfSame(genres[0], genres) ? genres[0] : Constants.DASH);
+        multYear.setText(StringUtils.checkIfSame(years[0], years) ? years[0] : Constants.DASH);
+        multTrack.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
+        multDisk.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
 
-        if (songController.checkIfSame(artists[0], artists)) {
-            multArtist.setText(artists[0]);
-        } else {
-            multArtist.setText("-");
-        }
-
-        if (songController.checkIfSame(albums[0], albums)) {
-            multAlbum.setText(albums[0]);
-        } else {
-            multAlbum.setText("-");
-        }
-
-        if (songController.checkIfSame(albumArtists[0], albumArtists)) {
-            multAlbumArtist.setText(albumArtists[0]);
-        } else {
-            multAlbumArtist.setText("-");
-        }
-
-        if (songController.checkIfSame(genres[0], genres)) {
-            multGenre.setText(genres[0]);
-        } else {
-            multGenre.setText("-");
-        }
-
-        if (songController.checkIfSame(years[0], years)) {
-            multYear.setText(years[0]);
-        } else {
-            multYear.setText("-");
-        }
-
-        if (songController.checkIfSame(tracks[0], tracks)) {
-            multTrack.setText(tracks[0]);
-        } else {
-            multTrack.setText("-");
-        }
-
-        if (songController.checkIfSame(disks[0], disks)) {
-            multDisk.setText(disks[0]);
-        } else {
-            multDisk.setText("-");
-        }
-
-        if (songController.checkIfSame(images[0], images) && images[0] != null) {
-
-            // getting the image from the byte array
-            ImageIcon icon = new ImageIcon(images[0]);
-            Image img = icon.getImage();
-            Image thumbnail = img.getScaledInstance(150, 150, java.awt.Image.SCALE_SMOOTH);
-            ImageIcon artwork_icon = new ImageIcon(thumbnail);
-            multImage.setIcon(artwork_icon);
-
+        if (MiscUtils.checkIfSame(images[0], images) && images[0] != null) {
+            multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
         } else {
             multImage.setIcon(null);
         }
@@ -2173,16 +1950,6 @@ public class Frame extends javax.swing.JFrame {
 
                 // get the index of the song in the table
                 int index = songController.getIndex(row);
-
-                // check and see if the genre exists already
-//                if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
-//                    int res = JOptionPane.showConfirmDialog(this, genre + " isn't in your list, would you like to add it?");
-//                    if (res == JOptionPane.OK_OPTION) {// add the genre to the settings
-//                        Settings settings = Main.getSettings();
-//                        settings.addGenre(genre);
-//                        Main.updateSettings(settings);
-//                    }
-//                }
 
                 // set the value in the table to the new value
                 table.setValueAt(genre, row, 7);
@@ -2478,6 +2245,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveAllMenuItem;
     private javax.swing.JButton saveButton;
     private javax.swing.JMenuItem saveTrackMenuItem;
+    private javax.swing.JMenuItem selectAllMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
     public javax.swing.JTable table;
     private javax.swing.JScrollPane tableSP;
