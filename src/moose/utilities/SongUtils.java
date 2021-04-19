@@ -5,7 +5,7 @@ import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import com.mpatric.mp3agic.InvalidDataException;
-import moose.Main;
+import moose.Moose;
 import moose.objects.Song;
 import moose.utilities.logger.Logger;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class SongUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Check if a directory is from a label

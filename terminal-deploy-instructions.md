@@ -18,7 +18,7 @@ The script does the following:
 4. Runs the command `ant -f $APP_PATH package-for-deploy` which runs the package-for-deploy target in the build.xml file.  (`$APP_PATH` your project folder's path)
 5. Runs the command `javapackager -deploy -native $packageType -name Moose \
                         -BappVersion=1.1.3 -Bicon=package/macosx/moose.icns \
-                        -srcdir . -srcfiles moose.jar -appclass moose.Main \
+                        -srcdir . -srcfiles moose.jar -appclass moose.Moose \
                         -outdir out -v`, which packages the app into the specified package type (.pkg or .dmg) with the specified app version.
 6. Cleans up any extra files.
 7. Asks you politely if you'd like to run your newly created .pkg or .dmg in the `deploy` folder.

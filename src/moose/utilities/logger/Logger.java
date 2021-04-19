@@ -17,12 +17,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import moose.Main;
+import moose.Moose;
 
 // class Logger
 public class Logger {
 
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     // streams
     static PrintStream errorStream;
@@ -86,7 +86,7 @@ public class Logger {
         }
 
         // by default, setting the System.out to the errorStream just in case I missed catches
-        if (!Main.getSettings().isInDeveloperMode()) {
+        if (!Moose.getSettings().isInDeveloperMode()) {
             setSystemOutToConsole();
             setSystemErrToConsole();
         } else {

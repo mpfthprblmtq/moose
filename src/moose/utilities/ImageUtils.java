@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 import javax.imageio.ImageIO;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Gets the scaled instance of album art

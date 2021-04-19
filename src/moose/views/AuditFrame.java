@@ -11,7 +11,7 @@
 package moose.views;
 
 // imports
-import moose.Main;
+import moose.Moose;
 import moose.controllers.AuditController;
 import moose.controllers.CleanupController;
 import moose.controllers.SongController;
@@ -36,7 +36,7 @@ public class AuditFrame extends javax.swing.JFrame {
     public IconService iconService = new IconService();
 
     // logger object
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Creates new form AuditFrame
@@ -734,17 +734,17 @@ public class AuditFrame extends javax.swing.JFrame {
      * Populates the path label with the one in settings, or nothing if it's not there
      */
     public String populatePathLabel() {
-        if (Main.getSettings().getLibraryLocation().isEmpty()) {
+        if (Moose.getSettings().getLibraryLocation().isEmpty()) {
             return StringUtils.EMPTY;
         } else {
-            auditController.setFolder(new File(Main.getSettings().getLibraryLocation()));
-            cleanupController.setFolder(new File(Main.getSettings().getLibraryLocation()));
+            auditController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
+            cleanupController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
             label1.setEnabled(true);
 
             auditAnalyzeButton.setEnabled(true);
             cleanupAnalyzeButton.setEnabled(true);
             
-            return Main.getSettings().getLibraryLocation();
+            return Moose.getSettings().getLibraryLocation();
         }
     }
 
