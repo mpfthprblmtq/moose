@@ -26,13 +26,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -69,6 +73,10 @@ public class Frame extends javax.swing.JFrame {
 
     // cell editor used, with customizations and overrides
     DefaultCellEditor editor = ViewUtils.getCellEditor();
+
+    // ivars for the multPanel to check if the artwork has changed in the multPanel
+    byte[] originalMultPanelArtwork;
+    byte[] newMultPanelArtwork;
 
     /**
      * Creates new form Frame
@@ -180,11 +188,19 @@ public class Frame extends javax.swing.JFrame {
                 case "Move files...":
                     songController.moveFiles(selectedRows);
                     break;
-                case "Add artwork":
+                case "Add cover...":
                     songController.autoTaggingService.addAlbumArt(selectedRows);
+                    setMultiplePanelFields();
                     break;
-                case "Remove artwork":
+                case "Add cover for selected...":
+                    getCoverArtForMultPanel(selectedRows);
+                    break;
+                case "Remove cover":
                     songController.removeAlbumArt(selectedRows);
+                    break;
+                case "Remove cover for selected":
+                    newMultPanelArtwork = null;
+                    multImage.setIcon(null);
                     break;
                 default:
                     break;
@@ -204,7 +220,7 @@ public class Frame extends javax.swing.JFrame {
         model.addColumn("Track");
         model.addColumn("Disk");
         model.addColumn("Artwork");
-        model.addColumn("Index");
+        model.addColumn("I");
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
@@ -1371,7 +1387,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
-        showArtworkPopup(evt, table.getSelectedRowCount());
+        showArtworkPopupForMultPanel(evt, table.getSelectedRowCount());
     }//GEN-LAST:event_multImageMousePressed
 
     /**
@@ -1466,7 +1482,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_findAndReplaceMenuItemActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-        showAboutDialog();
+        DialogService.showAboutDialog();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
@@ -1787,15 +1803,6 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Show the about dialog, includes name, version, and copyright
-     */
-    public void showAboutDialog() {
-        JOptionPane.showMessageDialog(null,
-                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
-                "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
-    }
-
-    /**
      * Sets the multiple fields panel based on the data selected
      */
     public void setMultiplePanelFields() {
@@ -1854,8 +1861,10 @@ public class Frame extends javax.swing.JFrame {
 
         if (MiscUtils.checkIfSame(images[0], images) && images[0] != null) {
             multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
+            originalMultPanelArtwork = newMultPanelArtwork = images[0];
         } else {
-            multImage.setIcon(null);
+            List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
+            multImage.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
         }
     }
 
@@ -2015,7 +2024,37 @@ public class Frame extends javax.swing.JFrame {
             }
         }
 
-        // TODO check if the album art field needs updated
+        // check if the album art field needs updated
+        if (!Arrays.equals(originalMultPanelArtwork, newMultPanelArtwork)) {
+            // original doesn't match new, the artwork was changed
+            for (int row : selectedRows) {
+
+                // get the index of the song in the table
+                int index = songController.getIndex(row);
+
+                // set the value in the table to the new value
+                table.setValueAt(ImageUtils.getScaledImage(newMultPanelArtwork, 100), row, 10);
+
+                // set the value in the songs array
+                songController.setAlbumImage(index, newMultPanelArtwork);
+            }
+        }
+    }
+
+    /**
+     * Gets the album art for the mult panel
+     */
+    public void getCoverArtForMultPanel(int[] selectedRows) {
+        int index = songController.getIndex(selectedRows[0]);
+        File startingPoint = songController.getSongs().get(index).getFile();
+        File image = songController.autoTaggingService.selectAlbumArt(startingPoint);
+        try {
+            BufferedImage bi = ImageIO.read(image);
+            newMultPanelArtwork = ImageUtils.getBytesFromBufferedImage(bi);
+            multImage.setIcon(ImageUtils.getScaledImage(newMultPanelArtwork, 150));
+        } catch (IOException e) {
+            logger.logError("IOException when trying to get album art from mult panel!", e);
+        }
     }
 
     /**
@@ -2110,6 +2149,41 @@ public class Frame extends javax.swing.JFrame {
         popup.add(item = new JMenuItem("Add cover..."));
         item.addActionListener(menuListener);
         popup.add(item = new JMenuItem("Remove cover"));
+        item.addActionListener(menuListener);
+        popup.addSeparator();
+        if (rows == 1) {
+            popup.add(item = new JMenuItem("More info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
+        popup.add(item = new JMenuItem("Remove from list"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Play"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Save"));
+        item.addActionListener(menuListener);
+        popup.addSeparator();
+        popup.add(item = new JMenuItem("Autotag"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Auto-add track numbers"));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Auto-add artwork"));
+        item.addActionListener(menuListener);
+
+        popup.show(e.getComponent(), e.getX(), e.getY());
+    }
+
+    /**
+     * Shows the popup when you click on an album image in the multPanel
+     *
+     * @param e, the event to base the location of the menu on
+     */
+    void showArtworkPopupForMultPanel(MouseEvent e, int rows) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem item;
+        popup.add(item = new JMenuItem("Add cover for selected..."));
+        item.addActionListener(menuListener);
+        popup.add(item = new JMenuItem("Remove cover for selected"));
         item.addActionListener(menuListener);
         popup.addSeparator();
         if (rows == 1) {
