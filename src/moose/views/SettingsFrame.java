@@ -830,7 +830,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         }
         settings.setRemoveCommentOnAutoTagging(removeCommentCheckBox.isSelected());
         removeCommentEdited = !removeCommentEdited;
-        statusLabel.setText(StringUtils.EMPTY_STRING);
+        statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_removeCommentCheckBoxActionPerformed
 
     /**

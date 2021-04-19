@@ -95,7 +95,7 @@ public class AutoTaggingService {
 
             // comment
             if (Main.getSettings().getRemoveCommentOnAutoTagging()) {
-                Main.frame.songController.setComment(index, StringUtils.EMPTY_STRING);
+                Main.frame.songController.setComment(index, StringUtils.EMPTY);
             }
         }
 
