@@ -1,6 +1,6 @@
 package moose.controllers;
 
-import moose.Main;
+import moose.Moose;
 import moose.services.AuditService;
 import moose.utilities.AuditCleanupUtils;
 import moose.services.DialogService;
@@ -121,8 +121,8 @@ public class AuditController {
         }
 
         // get the most up to date frame and song controller since the frame updates on each album
-        this.frame = Main.getFrame();
-        this.songController = Main.getFrame().getSongController();
+        this.frame = Moose.getFrame();
+        this.songController = Moose.getFrame().getSongController();
 
         // update the table in the songController
         songController.setTable(frame.table);
@@ -155,7 +155,7 @@ public class AuditController {
         }
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
-        Main.frame.songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
+        Moose.frame.songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
 
         // prevent a negative index
         if (currentIndex >= 0) {
@@ -170,9 +170,9 @@ public class AuditController {
      */
     public void stopAudit() {
         albums.clear();
-        Main.frame.dispose();
-        Main.frame = new Frame();
-        Main.launchFrame();
+        Moose.frame.dispose();
+        Moose.frame = new Frame();
+        Moose.launchFrame();
     }
 
     /**
@@ -191,9 +191,9 @@ public class AuditController {
         currentIndex = 0;
 
         // launch a blank frame
-        Main.frame.dispose();
-        Main.frame = new Frame();
-        Main.launchFrame();
+        Moose.frame.dispose();
+        Moose.frame = new Frame();
+        Moose.launchFrame();
 
         // show that the audit is done
         DialogService.showMessageDialog(null, "Audit is complete!", "Audit Completed", JOptionPane.INFORMATION_MESSAGE);

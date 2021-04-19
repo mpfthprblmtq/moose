@@ -12,12 +12,12 @@ package moose.controllers;
 // imports
 import com.mpatric.mp3agic.*;
 
+import moose.Moose;
 import moose.services.AutoTaggingService;
 import moose.utilities.Constants;
 import moose.utilities.FileUtils;
 import moose.utilities.SongUtils;
 import moose.utilities.logger.Logger;
-import moose.Main;
 import moose.objects.Song;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ public class SongController {
     public AutoTaggingService autoTaggingService;
 
     // logger object
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     // lists/maps
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
@@ -120,7 +120,7 @@ public class SongController {
         if (!edited_songs.contains(index)) {
             edited_songs.add(index);
             int row = getRow(index);
-            Main.frame.setRowIcon(Constants.EDITED, row);
+            Moose.frame.setRowIcon(Constants.EDITED, row);
         }
         // else do nothing, index is already added
     }
@@ -277,7 +277,7 @@ public class SongController {
                 count++;
             }
         }
-        Main.frame.updateConsole(count + " file(s) updated!");
+        Moose.frame.updateConsole(count + " file(s) updated!");
     }
 
     /**
@@ -324,7 +324,7 @@ public class SongController {
         saveID3Info(mp3file, file);
 
         // update the row graphic
-        Main.frame.setRowIcon(Constants.SAVED, getRow(index));
+        Moose.frame.setRowIcon(Constants.SAVED, getRow(index));
 
         // done saving, remove it
         // gives an IndexOutOfBoundsException when trying to remove() with one element in it
@@ -464,7 +464,7 @@ public class SongController {
 
             // update graphics
             table.getModel().setValueAt(null, row, 11);
-            Main.frame.multImage.setIcon(null);
+            Moose.frame.multImage.setIcon(null);
         }
     }
 

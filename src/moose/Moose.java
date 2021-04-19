@@ -17,7 +17,7 @@ import moose.views.Frame;
 import moose.views.SettingsFrame;
 
 // class Main
-public class Main {
+public class Moose {
     
     // create and instantiate the frames
     public static Frame frame;

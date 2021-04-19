@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Settings;
 import moose.utilities.logger.Logger;
@@ -17,7 +17,7 @@ import java.util.EventObject;
 public class ViewUtils {
 
     // logger
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Builds the specific table model we use
@@ -141,12 +141,12 @@ public class ViewUtils {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
-                            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
+                        if (!Moose.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
+                            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Settings settings = Main.getSettings();
+                                Settings settings = Moose.getSettings();
                                 settings.addGenre(genre);
-                                Main.updateSettings(settings);
+                                Moose.updateSettings(settings);
                             }
                         }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {

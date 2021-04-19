@@ -29,7 +29,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ import static org.junit.Assert.assertNotNull;
 public class Frame extends javax.swing.JFrame {
 
     // logger object
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     // controller, instantiated in constructor
     public SongController songController;
@@ -268,7 +267,7 @@ public class Frame extends javax.swing.JFrame {
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
-        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
+        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
             if (!newGenres.contains(genre)) {
                 newGenres.add(genre);
             }
@@ -276,11 +275,11 @@ public class Frame extends javax.swing.JFrame {
 
         // for each new genre, ask if we want to add that one
         for (String newGenre : newGenres) {
-            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
-                Settings settings = Main.getSettings();
+                Settings settings = Moose.getSettings();
                 settings.addGenre(newGenre);
-                Main.updateSettings(settings);
+                Moose.updateSettings(settings);
             }
         }
     }
@@ -297,7 +296,7 @@ public class Frame extends javax.swing.JFrame {
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
-        genres.stream().filter((genre) -> (!Main.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
+        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
             if (!newGenres.contains(genre)) {
                 newGenres.add(genre);
             }
@@ -305,11 +304,11 @@ public class Frame extends javax.swing.JFrame {
 
         // for each new genre, ask if we want to add that one
         for (String newGenre : newGenres) {
-            int res = JOptionPane.showConfirmDialog(Main.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
-                Settings settings = Main.getSettings();
+                Settings settings = Moose.getSettings();
                 settings.addGenre(newGenre);
-                Main.updateSettings(settings);
+                Moose.updateSettings(settings);
             }
         }
     }
@@ -1459,11 +1458,11 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
-        Main.launchSettingsFrame();
+        Moose.launchSettingsFrame();
     }//GEN-LAST:event_settingsMenuItemActionPerformed
 
     private void auditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditMenuItemActionPerformed
-        Main.launchAuditFrame();
+        Moose.launchAuditFrame();
     }//GEN-LAST:event_auditMenuItemActionPerformed
 
     private void commandMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commandMenuItemActionPerformed
@@ -1529,7 +1528,7 @@ public class Frame extends javax.swing.JFrame {
                 break;
             case JOptionPane.OK_OPTION:
                 this.dispose();
-                Main.launchFrame();
+                Moose.launchFrame();
         }
     }//GEN-LAST:event_refreshMenuItemActionPerformed
 
@@ -1568,16 +1567,16 @@ public class Frame extends javax.swing.JFrame {
         command = command.toLowerCase();
         switch (command) {
             case "clear error log":
-                Main.settingsFrame.settingsController.clearErrorLog();
+                Moose.settingsFrame.settingsController.clearErrorLog();
                 break;
             case "clear event log":
-                Main.settingsFrame.settingsController.clearEventLog();
+                Moose.settingsFrame.settingsController.clearEventLog();
                 break;
             case "open error log":
-                Main.settingsFrame.settingsController.openErrorLog();
+                Moose.settingsFrame.settingsController.openErrorLog();
                 break;
             case "open event log":
-                Main.settingsFrame.settingsController.openEventLog();
+                Moose.settingsFrame.settingsController.openEventLog();
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Command!");
@@ -1610,13 +1609,13 @@ public class Frame extends javax.swing.JFrame {
      * Shows a dialog first, as long as the user wants it
      */
     public void clearAll() {
-        if (Main.getSettings().isAskBeforeClearAll()) {
+        if (Moose.getSettings().isAskBeforeClearAll()) {
             Boolean result = DialogService.showClearAllDialog(this);
             if (result != null) {
                 boolean dontAskAgain = result;
                 if (dontAskAgain) {
-                    Main.getSettings().setAskBeforeClearAll(false);
-                    Main.settingsFrame.settingsController.writeSettingsFile(Main.getSettings());
+                    Moose.getSettings().setAskBeforeClearAll(false);
+                    Moose.settingsFrame.settingsController.writeSettingsFile(Moose.getSettings());
                 }
                 model.setRowCount(0);
                 table.removeAll();
@@ -1772,7 +1771,7 @@ public class Frame extends javax.swing.JFrame {
      */
     public void showAboutDialog() {
         JOptionPane.showMessageDialog(null,
-                "<html><b>Moose</b></html>\nVersion: " + Main.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
+                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2020",
                 "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
     }
 
