@@ -31,8 +31,16 @@ import static moose.utilities.Constants.*;
 
 public class AutoTaggingService {
 
-    JTable table = Moose.frame.table;
+    JTable table;
     Logger logger = Moose.getLogger();
+
+    /**
+     * Sets the table
+     * @param table the table to set
+     */
+    public void setTable(JTable table) {
+        this.table = table;
+    }
 
     /**
      * Function that actually does the autotagging
