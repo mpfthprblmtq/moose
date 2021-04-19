@@ -4,6 +4,8 @@ import java.awt.Color;
 
 public class Constants {
 
+    public static final String DASH = "-";
+
     public static final String LARGE = "large";
     public static final String XLARGE = "xlarge";
     public static final int IMAGE_LIMIT = 100;
@@ -13,6 +15,8 @@ public class Constants {
     public static final Color BLACK = new Color(0, 0, 0);
 
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
+
+    public static final String TRACK_FILENAME_REGEX = "\\d\\d ((.)*)";
 
     public static final int UNDETERMINED = -1;
     public static final int YES = 0;
@@ -42,13 +46,25 @@ public class Constants {
     public static final int TABLE_COLUMN_DISK = 9;
     public static final int TABLE_COLUMN_ALBUMART = 10;
 
+    // audit constants
     public static final int AUDIT = 0;
     public static final int CLEANUP = 1;
+
+    public static final int ID3 = 0;
+    public static final int FILENAMES = 1;
+    public static final int COVER = 2;
+
+    public static final int MP3ASD = 0;
+    public static final int FLAC = 1;
+    public static final int WAV = 2;
+    public static final int ZIP = 3;
+    public static final int IMG = 4;
+    public static final int WINDOWS = 5;
+    public static final int OTHER = 6;
 
     public static final int GENRE = 0;
     public static final int LOGGING = 1;
     public static final int FILES = 2;
     public static final int API = 3;
-
-    public static final int CLEAR_ALL = 0;
+    public static final int FEATURES = 4;
 }
