@@ -54,6 +54,7 @@ public class SongController {
      */
     public void setTable(JTable table) {
         this.table = table;
+        autoTaggingService.setTable(this.table);
     }
 
     /**
@@ -474,7 +475,7 @@ public class SongController {
 
             // get the row and index of the track
             int row = table.convertRowIndexToModel(selectedRow);
-            int index = getIndex(row);
+            int index = getIndex(selectedRow);
 
             // update the songs array
             songs.get(index).setArtwork_bytes(null);

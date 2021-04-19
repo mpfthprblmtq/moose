@@ -7,9 +7,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ImageUtils {
 
@@ -84,6 +85,12 @@ public class ImageUtils {
         return outputFile;
     }
 
+    /**
+     * Resizes a BufferedImage
+     * @param img the buffered image to resize
+     * @param dim the x/y of the image
+     * @return a resized image
+     */
     private static BufferedImage resize(BufferedImage img, int dim) {
         Image tmp = img.getScaledInstance(dim, dim, Image.SCALE_SMOOTH);
         BufferedImage resized = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_RGB);
@@ -91,5 +98,68 @@ public class ImageUtils {
         g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
         return resized;
+    }
+
+    /**
+     * Combines BufferedImages (from byte arrays) by cascading them for use in the mult panel
+     * @param images the images to combine
+     * @param dim the x/y dimension of the image
+     * @return a combined BufferedImage
+     */
+    public static BufferedImage combineImages(List<byte[]> images, int dim) {
+
+        // let's throw the byte arrays into a buffered image list
+        List<BufferedImage> bufferedImages = new ArrayList<>();
+        for (byte[] bytes : images) {
+            try {
+                InputStream is = new ByteArrayInputStream(bytes);
+                bufferedImages.add(resize(ImageIO.read(is), 150));  // resize them while we're at it
+            } catch (IOException e) {
+                logger.logError("Exception when adding buffered images to a list from a list of bytes arrays!", e);
+            }
+        }
+
+        // now let's combine those images
+        BufferedImage combinedImage = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = combinedImage.createGraphics();
+        int offsetInterval = dim / (bufferedImages.size() + 2);
+        int offset = 0;
+        g2.drawImage(bufferedImages.get(0), null, offset, offset);
+        for (int i = 1; i < bufferedImages.size(); i++) {
+            offset += offsetInterval;
+            g2.drawImage(bufferedImages.get(i), null, offset, offset);
+        }
+        g2.dispose();
+        return combinedImage;
+    }
+
+    /**
+     * Utility function to get a unique list of byte arrays
+     * @param bytesList the list to check for unique values
+     * @return a unique list of byte arrays
+     */
+    public static List<byte[]> getUniqueByteArrays(List<byte[]> bytesList) {
+        List<byte[]> uniqueList = new ArrayList<>();
+        for (byte[] bytes : bytesList) {
+            if (listDoesntContainsByteArray(uniqueList, bytes)) {
+                uniqueList.add(bytes);
+            }
+        }
+        return uniqueList;
+    }
+
+    /**
+     * Utility function to check if a byte array exists in a list of byte arrays since we have to use Arrays.equals()
+     * @param bytesList the list to check
+     * @param bytes the bytes to compare the list values against
+     * @return the result of the check
+     */
+    private static boolean listDoesntContainsByteArray(List<byte[]> bytesList, byte[] bytes) {
+        for (byte[] bytesInList : bytesList) {
+            if (Arrays.equals(bytesInList, bytes)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

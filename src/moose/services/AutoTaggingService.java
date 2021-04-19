@@ -202,32 +202,42 @@ public class AutoTaggingService {
     public void addAlbumArt(int[] selectedRows) {
 
         // need this for some reason
-        File img_file = null;
+        File file = null;
 
         for (int i = 0; i < selectedRows.length; i++) {
 
-            // get the row and index of the track
-            int row = table.convertRowIndexToModel(selectedRows[i]);
-            int index = Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
+            // get the index of the track
+            int index = getIndex(selectedRows[i]);
 
             // get the file to use as the starting point for choosing an image
-            File file = Moose.frame.songController.getSongs().get(index).getFile();
+            File startingPoint = Moose.frame.songController.getSongs().get(index).getFile();
 
             // only show the JFileChooser on the first go
             if (i == 0) {
-                img_file = Objects.requireNonNull(FileUtils.launchJFileChooser(
-                        "Select an image to use",
-                        "Select",
-                        JFileChooser.FILES_ONLY,
-                        false,
-                        file,
-                        new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
-                if (img_file == null) {
+                file = selectAlbumArt(startingPoint);
+                if (file == null) {
                     return;
                 }
             }
-            addIndividualCover(row, img_file);
+            addIndividualCover(selectedRows[i], file);
         }
+    }
+
+    /**
+     * Method for getting the artwork you want to use
+     */
+    public File selectAlbumArt(File startingPoint) {
+        File file =  Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Select an image to use",
+                "Select",
+                JFileChooser.FILES_ONLY,
+                false,
+                startingPoint,
+                new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
+        if (file != null) {
+            return file;
+        }
+        return null;
     }
 
     /**

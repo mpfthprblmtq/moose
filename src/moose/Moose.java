@@ -39,7 +39,7 @@ public class Moose {
         logger = new Logger();
         
         // go
-        launchFrame();
+        launchFrame(new File("/Users/pat/Music/Library - For Testing/Atoms for Peace/[2013] Amok"));
     }
 
     /**
