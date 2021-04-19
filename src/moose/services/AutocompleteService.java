@@ -13,7 +13,7 @@ package moose.services;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
-import moose.Main;
+import moose.Moose;
 import moose.utilities.viewUtils.NameService;
 
 import static moose.utilities.Constants.*;
@@ -29,7 +29,7 @@ public class AutocompleteService {
      */
     public static NameService getNameService(boolean isGenreField, JTable table) {
         if(isGenreField) {
-            List<String> list = new ArrayList<>(Main.getSettings().getGenres());
+            List<String> list = new ArrayList<>(Moose.getSettings().getGenres());
             return new NameService(list);
         } else {
             if(table.getEditingColumn() == TABLE_COLUMN_TITLE

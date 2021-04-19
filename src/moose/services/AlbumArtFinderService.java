@@ -21,11 +21,11 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import moose.Moose;
 import moose.objects.Settings;
 import moose.utilities.Constants;
 import moose.utilities.DateUtils;
 import moose.utilities.logger.Logger;
-import moose.Main;
 import moose.objects.ImageSearchResponse;
 
 import static moose.utilities.Constants.LARGE;
@@ -33,11 +33,11 @@ import static moose.utilities.Constants.XLARGE;
 
 public class AlbumArtFinderService {
 
-    static Logger logger = Main.logger;
+    static Logger logger = Moose.logger;
     
     // list of responses
     List<ImageSearchResponse> responses = new ArrayList<>();
-    int img_size = Main.getSettings().getPreferredCoverArtSize();
+    int img_size = Moose.getSettings().getPreferredCoverArtSize();
     
     public AlbumArtFinderService() {
         
@@ -52,7 +52,7 @@ public class AlbumArtFinderService {
      * @return the result of the check
      */
     public static boolean checkIfBelowLimit() {
-        return Main.getSettings().getAlbumArtFinderSearchCount() < Constants.IMAGE_LIMIT;
+        return Moose.getSettings().getAlbumArtFinderSearchCount() < Constants.IMAGE_LIMIT;
     }
     
     public void makeFirstCall(String query) {
@@ -98,20 +98,20 @@ public class AlbumArtFinderService {
      */
     public void updateAlbumArtSettings() {
         // get the old settings to update
-        Settings settings = Main.getSettings();
+        Settings settings = Moose.getSettings();
 
         // check if date matches today
         String settingsDate = settings.getAlbumArtFinderSearchCountDate();
         String todaysDate = DateUtils.formatDate(new Date());
         if (settingsDate.equals(todaysDate)) {
             // date is today, just increment call count
-            settings.setAlbumArtFinderSearchCount(Main.getSettings().getAlbumArtFinderSearchCount() + 1);
+            settings.setAlbumArtFinderSearchCount(Moose.getSettings().getAlbumArtFinderSearchCount() + 1);
         } else {
             // date is not today, set the new date and set the new count to 1
             settings.setAlbumArtFinderSearchCountDate(todaysDate);
             settings.setAlbumArtFinderSearchCount(1);
         }
-        Main.updateSettings(settings);
+        Moose.updateSettings(settings);
     }
 
     /**
@@ -158,7 +158,7 @@ public class AlbumArtFinderService {
                 responseString = responseString.substring(0, responseString.length() - 1);  // get rid of the trailing curly brace
                 
                 // disables the "An illegal reflective access operation has occurred" warning
-                if (Main.getSettings().isInDeveloperMode()) {
+                if (Moose.getSettings().isInDeveloperMode()) {
                     Logger.disableLogging();
                 } else {
                     Logger.setSystemErrToConsole();
@@ -188,8 +188,8 @@ public class AlbumArtFinderService {
      * @return a url to search on
      */
     private static String buildUrl(String query, String width, int start) {
-        String api_key = Main.getSettings().getAlbumArtFinderApiKey();
-        String cse_id = Main.getSettings().getAlbumArtFinderCseId();
+        String api_key = Moose.getSettings().getAlbumArtFinderApiKey();
+        String cse_id = Moose.getSettings().getAlbumArtFinderCseId();
         String fields = "items(image(height%2Cwidth)%2Clink%2Cmime)";
         String search_type = "image";
 

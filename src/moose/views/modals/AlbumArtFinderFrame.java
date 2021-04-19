@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
-import moose.Main;
+import moose.Moose;
 import moose.objects.ImageSearchQuery;
 import moose.objects.ImageSearchResponse;
 import moose.services.AlbumArtFinderService;
@@ -28,7 +28,7 @@ import moose.utilities.logger.Logger;
 
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     List<Icon> icons = new ArrayList<>();
     int currentIconIndex;
@@ -378,8 +378,8 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     public void doSearch() {
 
         // check to see if we have a valid api key and cse id
-        if (StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
-                || StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderCseId())) {
+        if (StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderApiKey())
+                || StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderCseId())) {
             JOptionPane.showMessageDialog(
                     this,
                     "Invalid/Missing API key or CSE ID, open Settings to configure.",
@@ -428,15 +428,15 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     private void confirmImage() {
         foundCover = responses.get(currentIconIndex).getBImage();
-        int dim = Main.getSettings().getPreferredCoverArtSize();
+        int dim = Moose.getSettings().getPreferredCoverArtSize();
         File outputFile = ImageUtils.createImageFile(foundCover, dir, dim);
         assert outputFile != null;
         if (outputFile.exists()) {
             for (Integer row : this.rows) {
-                Main.frame.songController.autoTaggingService.addIndividualCover(row, outputFile);
+                Moose.frame.songController.autoTaggingService.addIndividualCover(row, outputFile);
             }
         }
-        Main.frame.setMultiplePanelFields();
+        Moose.frame.setMultiplePanelFields();
         this.dispose();
     }
 

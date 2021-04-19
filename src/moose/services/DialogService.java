@@ -1,14 +1,12 @@
 package moose.services;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.Constants;
 import moose.utilities.StringUtils;
 
 import javax.swing.*;
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DialogService {
@@ -85,7 +83,7 @@ public class DialogService {
     public static int showExistingAuditDialog() {
         Object[] options = new Object[]{"Cancel", "Start New", "Continue"};
         return JOptionPane.showOptionDialog(
-                Main.auditFrame,
+                Moose.auditFrame,
                 "An existing audit is in process, do you want to continue?",
                 "Existing audit found",
                 JOptionPane.YES_NO_CANCEL_OPTION,
@@ -98,7 +96,7 @@ public class DialogService {
     public static int showShouldAuditAllDialog() {
         Object[] options = new Object[]{"Cancel", "Only Marked Albums", "All Albums"};
         return JOptionPane.showOptionDialog(
-                Main.auditFrame,
+                Moose.auditFrame,
                 "Would you like to audit all of the albums, or just the ones marked in the audit?",
                 "Audit",
                 JOptionPane.YES_NO_CANCEL_OPTION,
