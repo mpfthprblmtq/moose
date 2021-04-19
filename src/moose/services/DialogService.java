@@ -11,6 +11,17 @@ import java.util.Map;
 
 public class DialogService {
 
+    static IconService iconService = new IconService();
+
+    /**
+     * Show the about dialog, includes name, version, and copyright
+     */
+    public static void showAboutDialog() {
+        JOptionPane.showMessageDialog(null,
+                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2021",
+                "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
+    }
+
     /**
      * Utility function that shows a dialog when clearing the main song list
      * Has a checkbox for "Don't show this again"
