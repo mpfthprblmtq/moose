@@ -153,10 +153,20 @@ public class SongController {
     /**
      * Helper function to set the file of the song file in the songs list.
      * @param index, the index of the song
+     * @param file, the new file to set
+     */
+    public void setFile(int index, File file) {
+        songs.get(index).setFile(file);
+        songEdited(index);
+    }
+
+    /**
+     * Helper function to set the new file of the song file in the songs list.
+     * @param index, the index of the song
      * @param newFile, the new file to set
      */
-    public void setFile(int index, File newFile) {
-        songs.get(index).setFile(newFile);
+    public void setNewFile(int index, File newFile) {
+        songs.get(index).setNewFile(newFile);
         songEdited(index);
     }
 
@@ -298,7 +308,7 @@ public class SongController {
                 count++;
             }
         }
-        Moose.frame.updateConsole(count + " file(s) updated!");
+        Moose.getFrame().updateConsole(count + " file(s) updated!");
     }
 
     /**
@@ -307,12 +317,23 @@ public class SongController {
      */
     public void save(int index) {
 
+        // get the song
         Song s = songs.get(index);
-        File file = s.getFile();
-        Mp3File mp3file = null;
 
+        // check to see if we need to rename the file
+        if (s.getNewFile() != null) {
+            if (!s.getFile().renameTo(s.getNewFile())) {
+                logger.logError("Problem saving a file on file name change, file: " + s.getFile().getName());
+            } else {
+                s.setFile(s.getNewFile());
+                s.setNewFile(null);
+            }
+        }
+
+        // try to get the mp3file object from the file
+        Mp3File mp3file = null;
         try {
-            mp3file = new Mp3File(file.getAbsolutePath());
+            mp3file = new Mp3File(s.getFile().getAbsolutePath());
             ID3v2 tag = new ID3v24Tag();
             mp3file.setId3v2Tag(tag);
         } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
@@ -342,10 +363,10 @@ public class SongController {
         mp3file.getId3v2Tag().setAlbumImage(s.getArtwork_bytes(), type);
 
         // save the id3 info
-        saveID3Info(mp3file, file);
+        saveID3Info(mp3file, s.getFile());
 
         // update the row graphic
-        Moose.frame.setRowIcon(Constants.SAVED, getRow(index));
+        Moose.getFrame().setRowIcon(Constants.SAVED, getRow(index));
 
         // done saving, remove it
         // gives an IndexOutOfBoundsException when trying to remove() with one element in it
@@ -398,19 +419,12 @@ public class SongController {
                     String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
                     int index = getIndex(i);
                     switch (j) {
-                        case 1:
+                        case 1:     // filename
                             if (includeFiles) {
-                                table.setValueAt(toReplace, i, j);
-                                File old_file = (File) table.getModel().getValueAt(i, 1);
-                                String path = old_file.getPath().replace(old_file.getName(), "");
-                                String fileName = table.getValueAt(i, j).toString();
-                                File new_file = new File(path + "//" + fileName + ".mp3");
-
-                                setFile(index, new_file);
-                                if (!old_file.renameTo(new_file)) {
-                                    logger.logError("Couldn't rename the file from Find and Replace! File: " + old_file.getPath());
-                                }
-                                table.getModel().setValueAt(new_file, i, 1);
+                                File oldFile = (File) table.getModel().getValueAt(table.convertRowIndexToModel(i), 1);
+                                File newFile = FileUtils.getNewMP3FileFromOld(oldFile, toReplace);
+                                setNewFile(table.convertRowIndexToModel(i), newFile);
+                                table.setValueAt(toReplace, i, 1);
                             }
                             count++;
                             break;

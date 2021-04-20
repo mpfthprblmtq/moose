@@ -18,6 +18,7 @@ import java.util.Objects;
 public class Song {
 
     private File file;
+    private File newFile;
     private String title;
     private String artist;
     private String album;
@@ -250,6 +251,20 @@ public class Song {
      */
     public void setFile(File file) {
         this.file = file;
+    }
+
+    /**
+     * @return the newFile
+     */
+    public File getNewFile() {
+        return newFile;
+    }
+
+    /**
+     * @param newFile the newFile to set
+     */
+    public void setNewFile(File newFile) {
+        this.newFile = newFile;
     }
     
     /**
