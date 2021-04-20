@@ -51,6 +51,21 @@ public class FileUtils {
     }
 
     /**
+     * Opens the containing folder for the file
+     * @param file the file to open
+     */
+    public static void showInFolder(File file) {
+        String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(path));
+            }
+        } catch (IOException e) {
+            logger.logError("IOException when opening containing folder of " + file.getPath());
+        }
+    }
+
+    /**
      * Creates a new file with the same path, just a different name
      */
     public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
@@ -72,16 +87,6 @@ public class FileUtils {
     public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection, File openAt, FileNameExtensionFilter fileNameExtensionFilter) {
 
         // create it
-//        JFileChooser jfc = new JFileChooser() {
-//            // overriding to prevent a user selecting nothing inside a directory
-//            @Override
-//            public void approveSelection() {
-//                File file = this.getSelectedFile();
-//                if (file.isDirectory()) {
-//                    super.approveSelection();
-//                }
-//            }
-//        };
         JFileChooser jfc = new JFileChooser();
 
         // configure it

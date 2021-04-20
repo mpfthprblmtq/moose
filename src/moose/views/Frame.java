@@ -166,6 +166,9 @@ public class Frame extends javax.swing.JFrame {
                 case "More info...":
                     openMoreInfo(false, null);
                     break;
+                case "Show in Finder...":
+                    showInFolder(selectedRows);
+                    break;
                 case "Remove from list":
                     removeRows(selectedRows);
                     break;
@@ -1675,6 +1678,16 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
+     * Opens the folder where this track lives
+     */
+    public void showInFolder(int[] selectedRows) {
+        if (selectedRows.length == 1) {
+            File file = (File) model.getValueAt(table.convertRowIndexToModel(selectedRows[0]), 1);
+            FileUtils.showInFolder(file);
+        }
+    }
+
+    /**
      * Moves to the next song
      */
     public void next(boolean editModeEnabled, Component focusedField) {
@@ -2161,6 +2174,9 @@ public class Frame extends javax.swing.JFrame {
         popup.addSeparator();
         if (rows == 1) {
             popup.add(item = new JMenuItem("More info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+            popup.add(item = new JMenuItem("Show in Finder..."));
             item.addActionListener(menuListener);
             popup.addSeparator();
         }
