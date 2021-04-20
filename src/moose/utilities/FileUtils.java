@@ -51,6 +51,14 @@ public class FileUtils {
     }
 
     /**
+     * Creates a new file with the same path, just a different name
+     */
+    public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
+        String path = oldFile.getPath().replace(oldFile.getName(), StringUtils.EMPTY);
+        return new File(path + newFilename + ".mp3");
+    }
+
+    /**
      * Creates a JFileChooser, configures it, and launches it
      * Returns a single index array if there's only one file returned
      * @param title, the title of the window

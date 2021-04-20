@@ -66,7 +66,7 @@ public class ViewUtils {
      * @param songController the songController that these actions act on
      * @return a Table Cell Listener for the table
      */
-    public static TableCellListener createTCLAction(JTable table, SongController songController) {
+    public static TableCellListener createTCL(JTable table, SongController songController) {
         TableModel model = table.getModel();
         Action action = new AbstractAction() {
 
@@ -85,20 +85,11 @@ public class ViewUtils {
 
                         break;
                     case 2:     // filename was changed
-                        // with the filename changing, this changes automatically without hitting save
-                        // this functionality might change
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            File old_file = (File) model.getValueAt(r, 1);
-                            String path = old_file.getPath().replace(old_file.getName(), "");
-                            String fileName = model.getValueAt(r, c).toString();
-                            File new_file = new File(path + "//" + fileName + ".mp3");
-
-                            songController.setFile(index, new_file);
-
-                            if (!old_file.renameTo(new_file)) {
-                                logger.logError("Couldn't rename file! Path: " + old_file.getPath());
-                            }
-                            model.setValueAt(new_file, r, 1);
+                            // we have to build the new file and set it in the songController
+                            File oldFile = (File) model.getValueAt(r, 1);
+                            File newFile = FileUtils.getNewMP3FileFromOld(oldFile, tcl.getNewValue().toString());
+                            songController.setNewFile(index, newFile);
                         }
                         // else do nothing, nothing was changed
                         break;

@@ -100,8 +100,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Creates new form Frame with a
-     *
+     * Creates new form Frame with a folder preloaded
      * @param folder, the folder we want to start with
      */
     public Frame(File folder) {
@@ -147,6 +146,9 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * More init stuff
+     */
     public void init() {
 
         // set the table's model to the custom model
@@ -268,7 +270,7 @@ public class Frame extends javax.swing.JFrame {
         });
 
         // create a table cell listener
-        TableCellListener tcl = ViewUtils.createTCLAction(table, songController);
+        TableCellListener tcl = ViewUtils.createTCL(table, songController);
         assertNotNull(tcl);     // this line is really just to get rid of the "unused var" warning
     }
 
@@ -1279,7 +1281,8 @@ public class Frame extends javax.swing.JFrame {
             // if it's a right click
             case java.awt.event.MouseEvent.BUTTON3:
 
-                if (!MiscUtils.intArrayContains(selectedRows, row)) {
+                // check if the row is in the selected rows array
+                if (Arrays.stream(selectedRows).anyMatch(i -> i == row)) {
                     table.setRowSelectionInterval(row, row);
                 }
                 if (row >= 0 && col >= 0) {
@@ -1719,55 +1722,58 @@ public class Frame extends javax.swing.JFrame {
 
         int row = table.getSelectedRow();
 
+        // filename
         if (!table.getValueAt(row, 1).equals(filename)) {
-            File old_file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
-            String path = old_file.getPath().replace(old_file.getName(), "");
-            File new_file = new File(path + "//" + filename + ".mp3");
-            songController.setFile(songController.getIndex(row), new_file);
-            if (!old_file.renameTo(new_file)) {
-                logger.logError("Error renaming file: " + old_file.getName() + " to: " + new_file.getName());
-            }
-            model.setValueAt(new_file, row, 1);
+            File oldFile = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
+            File newFile = FileUtils.getNewMP3FileFromOld(oldFile, filename);
+            songController.setNewFile(songController.getIndex(row), newFile);
             table.setValueAt(filename, row, 1);
         }
         // else do nothing, nothing was changed
 
+        // title
         if (!table.getValueAt(row, 2).equals(title)) {
             songController.setTitle(songController.getIndex(row), title);
             table.setValueAt(title, row, 2);
         }
         // else do nothing, nothing was changed
 
+        // artist
         if (!table.getValueAt(row, 3).equals(artist)) {
             songController.setArtist(songController.getIndex(row), artist);
             table.setValueAt(artist, row, 3);
         }
         // else do nothing, nothing was changed
 
+        // album
         if (!table.getValueAt(row, 4).equals(album)) {
             songController.setAlbum(songController.getIndex(row), album);
             table.setValueAt(album, row, 4);
         }
         // else do nothing, nothing was changed
 
+        // album artist
         if (!table.getValueAt(row, 5).equals(albumArtist)) {
             songController.setAlbumArtist(songController.getIndex(row), albumArtist);
             table.setValueAt(albumArtist, row, 5);
         }
         // else do nothing, nothing was changed
 
+        // year
         if (!table.getValueAt(row, 6).equals(year)) {
             songController.setYear(songController.getIndex(row), year);
             table.setValueAt(year, row, 6);
         }
         // else do nothing, nothing was changed
 
+        // genre
         if (!table.getValueAt(row, 7).equals(genre)) {
             songController.setGenre(songController.getIndex(row), genre);
             table.setValueAt(genre, row, 7);
         }
         // else do nothing, nothing was changed
 
+        // tracks
         if (!table.getValueAt(row, 8).equals(tracks)) {
             if (!tracks.equals("/")) {
                 String[] arr = tracks.split("/");
@@ -1783,6 +1789,7 @@ public class Frame extends javax.swing.JFrame {
         }
         // else do nothing, nothing was changed
 
+        // disks
         if (!table.getValueAt(row, 9).equals(disks)) {
             if (!disks.equals("/")) {
                 String[] arr = disks.split("/");
@@ -1798,6 +1805,7 @@ public class Frame extends javax.swing.JFrame {
         }
         // else do nothing, nothing was changed
 
+        // comment
         songController.setComment(songController.getIndex(row), comment);
 
     }
@@ -1859,7 +1867,7 @@ public class Frame extends javax.swing.JFrame {
         multTrack.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
         multDisk.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
 
-        if (MiscUtils.checkIfSame(images[0], images) && images[0] != null) {
+        if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
             multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
             originalMultPanelArtwork = newMultPanelArtwork = images[0];
         } else {
