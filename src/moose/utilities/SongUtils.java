@@ -25,7 +25,7 @@ public class SongUtils {
      */
     public static boolean isPartOfALabel(File dir) {
         String path = dir.getPath();
-        return (path.contains("/Genres/") || path.contains("/EPs/") || path.contains("/EP's/"));
+        return (path.contains("/Genres/") || path.contains("/EPs/") || path.contains("/EP's/") || path.contains("/EPS/"));
     }
 
     public static boolean isAnEPPartOfALabel(File dir) {
