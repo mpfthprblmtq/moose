@@ -25,7 +25,7 @@ public class CleanupService {
     public String analyze(File folder, List<List<String>> filePathList) {
         int mp3Count = 0;
         int coverCount = 0;
-        ArrayList<File> cleanupFiles = new ArrayList<>();
+        List<File> cleanupFiles = new ArrayList<>();
         FileUtils.listFiles(folder, cleanupFiles);
         Moose.getAuditFrame().setCleanupCurrentlyScanningLabelHorizontalAlignment(SwingConstants.TRAILING);
         int total = cleanupFiles.size();

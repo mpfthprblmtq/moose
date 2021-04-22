@@ -11,7 +11,9 @@ package moose.services;
 
 // imports
 import moose.Moose;
+import moose.controllers.SongController;
 import moose.objects.ImageSearchQuery;
+import moose.objects.Song;
 import moose.utilities.*;
 import moose.utilities.logger.Logger;
 import moose.views.modals.AlbumArtFinderFrame;
@@ -34,6 +36,13 @@ public class AutoTaggingService {
     JTable table;
     Logger logger = Moose.getLogger();
 
+    // controller
+    SongController songController;
+
+    public AutoTaggingService(SongController songController) {
+        this.songController = songController;
+    }
+
     /**
      * Sets the table
      * @param table the table to set
@@ -51,7 +60,8 @@ public class AutoTaggingService {
 
         for (int row : rows) {
             // get the file we'll use to determine track information
-            File file = getFile(row);
+            Song s = songController.getSongs().get(songController.getIndex(row));
+            File file = s.getNewFile() != null ? s.getNewFile() : s.getFile();
 
             String title = getTitleFromFile(file);
             String artist = getArtistFromFile(file);

@@ -8,7 +8,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtils {
 
@@ -19,7 +19,7 @@ public class FileUtils {
      * @param directory, the directory to list files from
      * @param files, the arrayList to store the files in
      */
-    public static void listFiles(File directory, ArrayList<File> files) {
+    public static void listFiles(File directory, List<File> files) {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
@@ -70,7 +70,10 @@ public class FileUtils {
      */
     public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
         String path = oldFile.getPath().replace(oldFile.getName(), StringUtils.EMPTY);
-        return new File(path + newFilename + ".mp3");
+        if (!newFilename.endsWith(".mp3")) {
+            newFilename = newFilename.concat(".mp3");
+        }
+        return new File(path + newFilename);
     }
 
     /**
