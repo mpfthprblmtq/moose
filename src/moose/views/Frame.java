@@ -29,9 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -70,9 +68,6 @@ public class Frame extends javax.swing.JFrame {
 
     // table model used, with some customizations and overrides
     DefaultTableModel model = ViewUtils.getTableModel();
-
-    // cell editor used, with customizations and overrides
-    DefaultCellEditor editor = ViewUtils.getCellEditor();
 
     // ivars for the multPanel to check if the artwork has changed in the multPanel
     byte[] originalMultPanelArtwork;
@@ -154,6 +149,9 @@ public class Frame extends javax.swing.JFrame {
         // set the table's model to the custom model
         table.setModel(model);
 
+        // set the songController's table
+        songController.setTable(table);
+
         // listener for the context menu when you right click on a row
         // basically tells the program where to go based on the user's choice
         this.menuListener = (ActionEvent event) -> {
@@ -164,7 +162,10 @@ public class Frame extends javax.swing.JFrame {
             // switch based on the option selected
             switch (event.getActionCommand()) {
                 case "More info...":
-                    openMoreInfo(false, null);
+                    openMoreInfo(false, null, selectedRows);
+                    break;
+                case "Show in Finder...":
+                    showInFolder(selectedRows);
                     break;
                 case "Remove from list":
                     removeRows(selectedRows);
@@ -179,7 +180,7 @@ public class Frame extends javax.swing.JFrame {
                     songController.autoTagFiles(selectedRows);
                     setMultiplePanelFields();
                     break;
-                case "Auto-add track numbers":
+                case "Auto-add track/disk numbers":
                     songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
                     setMultiplePanelFields();
                     break;
@@ -190,17 +191,17 @@ public class Frame extends javax.swing.JFrame {
                 case "Move files...":
                     songController.moveFiles(selectedRows);
                     break;
-                case "Add cover...":
+                case "Add artwork...":
                     songController.autoTaggingService.addAlbumArt(selectedRows);
                     setMultiplePanelFields();
                     break;
-                case "Add cover for selected...":
+                case "Add artwork for selected...":
                     getCoverArtForMultPanel(selectedRows);
                     break;
-                case "Remove cover":
+                case "Remove artwork":
                     songController.removeAlbumArt(selectedRows);
                     break;
-                case "Remove cover for selected":
+                case "Remove artwork for selected":
                     newMultPanelArtwork = null;
                     multImage.setIcon(null);
                     break;
@@ -230,18 +231,16 @@ public class Frame extends javax.swing.JFrame {
 
         // set the widths of the columns
         // file name and title are left out so they can take the remainder of the space dynamically
-        setColumnWidth(0, 12);      // row icon
-        setColumnWidth(3, 150);     // artist
-        setColumnWidth(4, 150);     // album
-        setColumnWidth(5, 150);     // album artist
-        setColumnWidth(6, 80);      // year
-        setColumnWidth(7, 150);     // genre
-        setColumnWidth(8, 50);      // track
-        setColumnWidth(9, 50);      // disk
-        setColumnWidth(10, 100);    // album art
-//        setColumnWidth(11, 20);
-
-        table.setCellEditor(editor);
+        ViewUtils.setColumnWidth(table, 0, 12);     // row icon
+        ViewUtils.setColumnWidth(table, 3, 150);    // artist
+        ViewUtils.setColumnWidth(table, 4, 150);    // album
+        ViewUtils.setColumnWidth(table, 5, 150);    // album artist
+        ViewUtils.setColumnWidth(table, 6, 80);     // year
+        ViewUtils.setColumnWidth(table, 7, 150);    // genre
+        ViewUtils.setColumnWidth(table, 8, 50);     // track
+        ViewUtils.setColumnWidth(table, 9, 50);     // disk
+        ViewUtils.setColumnWidth(table, 10, 100);   // album art
+//        ViewUtils.setColumnWidth(table, 11, 20);    // index
 
         // taken from the FileDrop example
         new FileDrop(System.out, tableSP, (File[] files) -> {
@@ -268,6 +267,10 @@ public class Frame extends javax.swing.JFrame {
             // check for new genres
             checkForNewGenres(successfullyAddedFiles);
         });
+
+        // create a customized cell editor
+        DefaultCellEditor editor = ViewUtils.getCellEditor();
+        table.setCellEditor(editor);
 
         // create a table cell listener
         TableCellListener tcl = ViewUtils.createTCL(table, songController);
@@ -1268,8 +1271,6 @@ public class Frame extends javax.swing.JFrame {
 
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
 
-        table.setCellEditor(editor);
-
         int row = table.rowAtPoint(evt.getPoint());
         int col = table.columnAtPoint(evt.getPoint());
         int rows = table.getSelectedRowCount();
@@ -1282,19 +1283,22 @@ public class Frame extends javax.swing.JFrame {
             case java.awt.event.MouseEvent.BUTTON3:
 
                 // check if the row is in the selected rows array
-                if (Arrays.stream(selectedRows).anyMatch(i -> i == row)) {
-                    table.setRowSelectionInterval(row, row);
-                }
+//                if (Arrays.stream(selectedRows).anyMatch(i -> i == row)) {
+//                    table.setRowSelectionInterval(row, row);
+//                }
                 if (row >= 0 && col >= 0) {
                     switch (col) {
                         case 10:
-                            showArtworkPopup(evt, rows);
+                            ViewUtils.showPopUpContextMenu(
+                                    evt, menuListener, rows, true, false, true, false);
                             break;
                         case 1:
-                            showFilePopup(evt, rows);
+                            ViewUtils.showPopUpContextMenu(
+                                    evt, menuListener, rows, true, true, false, false);
                             break;
                         default:
-                            showRegularPopup(evt, rows);
+                            ViewUtils.showPopUpContextMenu(
+                                    evt, menuListener, rows, true, false, false, false);
                             break;
                     }
                 } else {
@@ -1308,7 +1312,7 @@ public class Frame extends javax.swing.JFrame {
                 // check if double click
                 if (evt.getClickCount() == 2) {
                     if (col == 10) {
-                        showArtworkPopup(evt, rows);
+                        ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), true, false, true, false);
                     } else {
                         changeSelection(row, col, -1);
                         table.getEditorComponent().requestFocusInWindow();
@@ -1390,7 +1394,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
-        showArtworkPopupForMultPanel(evt, table.getSelectedRowCount());
+        ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), true, false, false, true);
     }//GEN-LAST:event_multImageMousePressed
 
     /**
@@ -1664,14 +1668,36 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Gets the info for a song
+     * Gets the info for multiple songs
      */
-    public void openMoreInfo(boolean editModeEnabled, Component focusedField) {
-        Song s = songController.getSongs().get(songController.getIndex(table.getSelectedRow()));
-        InfoFrame infoFrame = new InfoFrame(s, table.getSelectedRow(), editModeEnabled, focusedField);
+    public void openMoreInfo(boolean editModeEnabled, Component focusedField, int[] selectedRows) {
+        // get the map of songs
+        Map<Integer, Song> songs = new HashMap<>();
+        for (int row : selectedRows) {
+            songs.put(row, songController.getSongs().get(songController.getIndex(row)));
+        }
+
+        // send it -1 as the row because there's more than one row, makes sense, right?
+        InfoFrame infoFrame = new InfoFrame(songs, editModeEnabled, focusedField);
         infoFrame.setLocationRelativeTo(this);
         infoFrame.setVisible(true);
         this.setEnabled(false);
+    }
+
+    /**
+     * Opens the folder where this track lives
+     */
+    public void showInFolder(int[] selectedRows) {
+        List<File> folders = new ArrayList<>();
+        for (int row : selectedRows) {
+            File file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
+            if (!folders.contains(file)) {
+                folders.add(file);
+            }
+        }
+        for (File folder : folders) {
+            FileUtils.showInFolder(folder);
+        }
     }
 
     /**
@@ -1680,7 +1706,7 @@ public class Frame extends javax.swing.JFrame {
     public void next(boolean editModeEnabled, Component focusedField) {
         int row = table.getSelectedRow();
         table.setRowSelectionInterval(row + 1, row + 1);
-        openMoreInfo(editModeEnabled, focusedField);
+        openMoreInfo(editModeEnabled, focusedField, new int[]{row + 1});
         this.setEnabled(false);
     }
 
@@ -1690,13 +1716,13 @@ public class Frame extends javax.swing.JFrame {
     public void previous(boolean editModeEnabled, Component focusedField) {
         int row = table.getSelectedRow();
         table.setRowSelectionInterval(row - 1, row - 1);
-        openMoreInfo(editModeEnabled, focusedField);
+        openMoreInfo(editModeEnabled, focusedField, new int[]{row - 1});
         this.setEnabled(false);
     }
 
     /**
      * Get the changes from the info panel
-     *
+     * @param row the row to update the table with
      * @param filename,    the filename to change
      * @param title,       the title to change
      * @param artist,      the artist to change
@@ -1709,6 +1735,7 @@ public class Frame extends javax.swing.JFrame {
      * @param comment,     the comment to change
      */
     public void submitChangesFromInfoFrame(
+            int row,
             String filename,
             String title,
             String artist,
@@ -1720,10 +1747,8 @@ public class Frame extends javax.swing.JFrame {
             String disks,
             String comment) {
 
-        int row = table.getSelectedRow();
-
         // filename
-        if (!table.getValueAt(row, 1).equals(filename)) {
+        if (filename != null && !table.getValueAt(row, 1).equals(filename)) {
             File oldFile = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
             File newFile = FileUtils.getNewMP3FileFromOld(oldFile, filename);
             songController.setNewFile(songController.getIndex(row), newFile);
@@ -1732,49 +1757,49 @@ public class Frame extends javax.swing.JFrame {
         // else do nothing, nothing was changed
 
         // title
-        if (!table.getValueAt(row, 2).equals(title)) {
+        if (title != null && !table.getValueAt(row, 2).equals(title)) {
             songController.setTitle(songController.getIndex(row), title);
             table.setValueAt(title, row, 2);
         }
         // else do nothing, nothing was changed
 
         // artist
-        if (!table.getValueAt(row, 3).equals(artist)) {
+        if (artist != null && !table.getValueAt(row, 3).equals(artist)) {
             songController.setArtist(songController.getIndex(row), artist);
             table.setValueAt(artist, row, 3);
         }
         // else do nothing, nothing was changed
 
         // album
-        if (!table.getValueAt(row, 4).equals(album)) {
+        if (album != null && !table.getValueAt(row, 4).equals(album)) {
             songController.setAlbum(songController.getIndex(row), album);
             table.setValueAt(album, row, 4);
         }
         // else do nothing, nothing was changed
 
         // album artist
-        if (!table.getValueAt(row, 5).equals(albumArtist)) {
+        if (albumArtist != null && !table.getValueAt(row, 5).equals(albumArtist)) {
             songController.setAlbumArtist(songController.getIndex(row), albumArtist);
             table.setValueAt(albumArtist, row, 5);
         }
         // else do nothing, nothing was changed
 
         // year
-        if (!table.getValueAt(row, 6).equals(year)) {
+        if (year != null && !table.getValueAt(row, 6).equals(year)) {
             songController.setYear(songController.getIndex(row), year);
             table.setValueAt(year, row, 6);
         }
         // else do nothing, nothing was changed
 
         // genre
-        if (!table.getValueAt(row, 7).equals(genre)) {
+        if (genre != null && !table.getValueAt(row, 7).equals(genre)) {
             songController.setGenre(songController.getIndex(row), genre);
             table.setValueAt(genre, row, 7);
         }
         // else do nothing, nothing was changed
 
         // tracks
-        if (!table.getValueAt(row, 8).equals(tracks)) {
+        if (tracks != null && !table.getValueAt(row, 8).equals(tracks)) {
             if (!tracks.equals("/")) {
                 String[] arr = tracks.split("/");
                 String track = arr[0];
@@ -1790,7 +1815,7 @@ public class Frame extends javax.swing.JFrame {
         // else do nothing, nothing was changed
 
         // disks
-        if (!table.getValueAt(row, 9).equals(disks)) {
+        if (disks != null && !table.getValueAt(row, 9).equals(disks)) {
             if (!disks.equals("/")) {
                 String[] arr = disks.split("/");
                 String disk = arr[0];
@@ -1806,7 +1831,10 @@ public class Frame extends javax.swing.JFrame {
         // else do nothing, nothing was changed
 
         // comment
-        songController.setComment(songController.getIndex(row), comment);
+        if (comment != null) {
+            songController.setComment(songController.getIndex(row), comment);
+        }
+
 
     }
 
@@ -2145,151 +2173,136 @@ public class Frame extends javax.swing.JFrame {
         saveTrackMenuItem.setEnabled(b);
         saveAllMenuItem.setEnabled(b);
     }
-
-    /**
-     * Shows the popup when you click on an album image
-     *
-     * @param e, the event to base the location of the menu on
-     */
-    void showArtworkPopup(MouseEvent e, int rows) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item;
-        popup.add(item = new JMenuItem("Add cover..."));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Remove cover"));
-        item.addActionListener(menuListener);
-        popup.addSeparator();
-        if (rows == 1) {
-            popup.add(item = new JMenuItem("More info..."));
-            item.addActionListener(menuListener);
-            popup.addSeparator();
-        }
-        popup.add(item = new JMenuItem("Remove from list"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Play"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Save"));
-        item.addActionListener(menuListener);
-        popup.addSeparator();
-        popup.add(item = new JMenuItem("Autotag"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add track numbers"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add artwork"));
-        item.addActionListener(menuListener);
-
-        popup.show(e.getComponent(), e.getX(), e.getY());
-    }
-
-    /**
-     * Shows the popup when you click on an album image in the multPanel
-     *
-     * @param e, the event to base the location of the menu on
-     */
-    void showArtworkPopupForMultPanel(MouseEvent e, int rows) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item;
-        popup.add(item = new JMenuItem("Add cover for selected..."));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Remove cover for selected"));
-        item.addActionListener(menuListener);
-        popup.addSeparator();
-        if (rows == 1) {
-            popup.add(item = new JMenuItem("More info..."));
-            item.addActionListener(menuListener);
-            popup.addSeparator();
-        }
-        popup.add(item = new JMenuItem("Remove from list"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Play"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Save"));
-        item.addActionListener(menuListener);
-        popup.addSeparator();
-        popup.add(item = new JMenuItem("Autotag"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add track numbers"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add artwork"));
-        item.addActionListener(menuListener);
-
-        popup.show(e.getComponent(), e.getX(), e.getY());
-    }
-
-    /**
-     * Shows the normal popup
-     *
-     * @param e, the event to base the location of the menu on
-     */
-    void showRegularPopup(MouseEvent e, int rows) {
-        JPopupMenu popup = getBasePopUpMenu(rows);
-        popup.show(e.getComponent(), e.getX(), e.getY());
-    }
-
-    /**
-     * Shows the normal popup with some file options too
-     *
-     * @param e, the event to base the location of the menu on
-     */
-    void showFilePopup(MouseEvent e, int rows) {
-        JPopupMenu popup = getBasePopUpMenu(rows);
-        JMenuItem item;
-        popup.add(item = new JMenuItem(rows > 1 ? "Move file..." : "Move files..."));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Format filenames"));
-        item.addActionListener(menuListener);
-
-        popup.show(e.getComponent(), e.getX(), e.getY());
-    }
-
-    /**
-     * Returns the base popup menu
-     *
-     * @param rows, the number of rows selected
-     * @return the base popup menu
-     */
-    private JPopupMenu getBasePopUpMenu(int rows) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item;
-        if (rows == 1) {
-            popup.add(item = new JMenuItem("More info..."));
-            item.addActionListener(menuListener);
-            popup.addSeparator();
-        }
-        popup.add(item = new JMenuItem("Remove from list"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Play"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Save"));
-        item.addActionListener(menuListener);
-        popup.addSeparator();
-        popup.add(item = new JMenuItem("Autotag"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add track numbers"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Auto-add artwork"));
-        item.addActionListener(menuListener);
-
-        return popup;
-    }
-
-    /**
-     * Sets the specified column width
-     *
-     * @param column, the column to set
-     * @param width,  width in pixels
-     */
-    private void setColumnWidth(int column, int width) {
-        TableColumn tableColumn = table.getColumnModel().getColumn(column);
-        if (width < 0) {
-            JLabel label = new JLabel((String) tableColumn.getHeaderValue());
-            Dimension preferred = label.getPreferredSize();
-            width = (int) preferred.getWidth() + 14;
-        }
-        tableColumn.setPreferredWidth(width);
-        tableColumn.setMaxWidth(width);
-        tableColumn.setMinWidth(width);
-    }
+//
+//    /**
+//     * Shows the popup when you click on an album image
+//     *
+//     * @param e, the event to base the location of the menu on
+//     */
+//    void showArtworkPopup(MouseEvent e, int rows) {
+//        JPopupMenu popup = new JPopupMenu();
+//        JMenuItem item;
+//        popup.add(item = new JMenuItem("Add cover..."));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Remove cover"));
+//        item.addActionListener(menuListener);
+//        popup.addSeparator();
+//        if (rows == 1) {
+//            popup.add(item = new JMenuItem("More info..."));
+//            item.addActionListener(menuListener);
+//            popup.addSeparator();
+//            popup.add(item = new JMenuItem("Show in Finder..."));
+//            item.addActionListener(menuListener);
+//            popup.addSeparator();
+//        }
+//        popup.add(item = new JMenuItem("Remove from list"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Play"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Save"));
+//        item.addActionListener(menuListener);
+//        popup.addSeparator();
+//        popup.add(item = new JMenuItem("Autotag"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add track numbers"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add artwork"));
+//        item.addActionListener(menuListener);
+//
+//        popup.show(e.getComponent(), e.getX(), e.getY());
+//    }
+//
+//    /**
+//     * Shows the popup when you click on an album image in the multPanel
+//     *
+//     * @param e, the event to base the location of the menu on
+//     */
+//    void showArtworkPopupForMultPanel(MouseEvent e, int rows) {
+//        JPopupMenu popup = new JPopupMenu();
+//        JMenuItem item;
+//        popup.add(item = new JMenuItem("Add cover for selected..."));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Remove cover for selected"));
+//        item.addActionListener(menuListener);
+//        popup.addSeparator();
+//        if (rows == 1) {
+//            popup.add(item = new JMenuItem("More info..."));
+//            item.addActionListener(menuListener);
+//            popup.addSeparator();
+//        }
+//        popup.add(item = new JMenuItem("Remove from list"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Play"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Save"));
+//        item.addActionListener(menuListener);
+//        popup.addSeparator();
+//        popup.add(item = new JMenuItem("Autotag"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add track numbers"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add artwork"));
+//        item.addActionListener(menuListener);
+//
+//        popup.show(e.getComponent(), e.getX(), e.getY());
+//    }
+//
+//    /**
+//     * Shows the normal popup
+//     *
+//     * @param e, the event to base the location of the menu on
+//     */
+//    void showRegularPopup(MouseEvent e, int rows) {
+//        JPopupMenu popup = getBasePopUpMenu(rows);
+//        popup.show(e.getComponent(), e.getX(), e.getY());
+//    }
+//
+//    /**
+//     * Shows the normal popup with some file options too
+//     *
+//     * @param e, the event to base the location of the menu on
+//     */
+//    void showFilePopup(MouseEvent e, int rows) {
+//        JPopupMenu popup = getBasePopUpMenu(rows);
+//        JMenuItem item;
+//        popup.add(item = new JMenuItem(rows > 1 ? "Move file..." : "Move files..."));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Format filenames"));
+//        item.addActionListener(menuListener);
+//
+//        popup.show(e.getComponent(), e.getX(), e.getY());
+//    }
+//
+//    /**
+//     * Returns the base popup menu
+//     *
+//     * @param rows, the number of rows selected
+//     * @return the base popup menu
+//     */
+//    private JPopupMenu getBasePopUpMenu(int rows) {
+//        JPopupMenu popup = new JPopupMenu();
+//        JMenuItem item;
+//        if (rows == 1) {
+//            popup.add(item = new JMenuItem("More info..."));
+//            item.addActionListener(menuListener);
+//            popup.addSeparator();
+//        }
+//        popup.add(item = new JMenuItem("Remove from list"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Play"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Save"));
+//        item.addActionListener(menuListener);
+//        popup.addSeparator();
+//        popup.add(item = new JMenuItem("Autotag"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add track numbers"));
+//        item.addActionListener(menuListener);
+//        popup.add(item = new JMenuItem("Auto-add artwork"));
+//        item.addActionListener(menuListener);
+//
+//        return popup;
+//    }
 
     /**
      * @param args the command line arguments
