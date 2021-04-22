@@ -530,7 +530,7 @@ public class SongController {
                 null))[0];
         if (directory != null) {
             for (int selectedRow : selectedRows) {
-                File old_file = (File) table.getModel().getValueAt(selectedRow, 1);
+                File old_file = (File) table.getModel().getValueAt(table.convertRowIndexToModel(selectedRow), 1);
                 moveFile(selectedRow, old_file, directory);
             }
         }
