@@ -8,8 +8,11 @@ import moose.utilities.viewUtils.TableCellListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.EventObject;
@@ -58,6 +61,24 @@ public class ViewUtils {
                 return super.isCellEditable(e);
             }
         };
+    }
+
+    /**
+     * Sets the specified column width
+     *
+     * @param column, the column to set
+     * @param width,  width in pixels
+     */
+    public static void setColumnWidth(JTable table, int column, int width) {
+        TableColumn tableColumn = table.getColumnModel().getColumn(column);
+        if (width < 0) {
+            JLabel label = new JLabel((String) tableColumn.getHeaderValue());
+            Dimension preferred = label.getPreferredSize();
+            width = (int) preferred.getWidth() + 14;
+        }
+        tableColumn.setPreferredWidth(width);
+        tableColumn.setMaxWidth(width);
+        tableColumn.setMinWidth(width);
     }
 
     /**
@@ -173,5 +194,62 @@ public class ViewUtils {
 
         // return the TCL with the above action
         return new TableCellListener(table, action);
+    }
+
+    /**
+     * Creates a popup context menu based on the booleans given
+     * @param evt the MouseEvent we're using to show the popup
+     * @param menuListener the ActionListener that handles all the events from this context menu
+     * @param rows the number of rows currently selected
+     * @param base a boolean to determine if we're showing the base popup options
+     * @param file a boolean to determine if we're showing the file popup options
+     * @param artwork a boolean to determine if we're showing the artwork popup options
+     * @param artworkMultPanel a boolean to determine if we're showing the artwork on the mult panel popup options
+     */
+    public static void showPopUpContextMenu(
+            MouseEvent evt, ActionListener menuListener, int rows, boolean base, boolean file, boolean artwork, boolean artworkMultPanel) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem item;
+        if (base) {
+            popup.add(item = new JMenuItem("More info..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+            popup.add(item = new JMenuItem("Remove from list"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Play"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Save"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Show in Finder..."));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+            popup.add(item = new JMenuItem("Autotag"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Format filenames"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Auto-add track/disk numbers"));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Auto-add artwork"));
+            item.addActionListener(menuListener);
+            popup.addSeparator();
+        }
+        if (file) {
+            popup.add(item = new JMenuItem(rows > 1 ? "Move file..." : "Move files..."));
+            item.addActionListener(menuListener);
+        }
+        if (artwork) {
+            popup.add(item = new JMenuItem("Add artwork..."));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Remove artwork"));
+            item.addActionListener(menuListener);
+        } else if (artworkMultPanel) {
+            popup.add(item = new JMenuItem("Add artwork for selected..."));
+            item.addActionListener(menuListener);
+            popup.add(item = new JMenuItem("Remove artwork for selected"));
+            item.addActionListener(menuListener);
+        }
+
+        // show the popup
+        popup.show(evt.getComponent(), evt.getX(), evt.getY());
     }
 }
