@@ -1,6 +1,9 @@
 package moose.utilities;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Constants {
 
@@ -16,7 +19,18 @@ public class Constants {
 
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
 
-    public static final String TRACK_FILENAME_REGEX = "\\d\\d ((.)*)";
+    public static final String TRACK_FILENAME_REGEX = "\\d{2} ((.)*).mp3";
+    public static final String TRACK_NUMBER_REGEX = "\\d{2}";
+
+    public static final List<String> REGEX_ARRAY = new ArrayList<>(Arrays.asList(
+            "\\d{2}\\. .* - .*\\.mp3",  // 01. Kasbo - The Making of a Paracosm.mp3
+            "\\d{2} - .* - .*\\.mp3",   // 01 - Kasbo - The Making of a Paracosm.mp3
+            "\\d{2}\\. .*\\.mp3",       // 01. The Making of a Paracosm.mp3
+            "\\d{2} .* - .*\\.mp3",     // 02 Kasbo - Play Pretend (ft. Ourchives).mp3
+            "\\d{2} - .*\\.mp3",        // 02 - Play Pretend (ft. Ourchives).mp3
+            "[^\\d{2}].*\\.mp3",        // Play Pretend (ft. Ourchives).mp3
+            "[^\\d{2}]* - .*\\.mp3"     // Kasbo - Play Pretend (ft. Ourchives)
+    ));
 
     public static final int UNDETERMINED = -1;
     public static final int YES = 0;

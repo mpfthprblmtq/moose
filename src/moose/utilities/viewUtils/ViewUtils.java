@@ -1,10 +1,11 @@
-package moose.utilities;
+package moose.utilities.viewUtils;
 
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Settings;
+import moose.utilities.FileUtils;
+import moose.utilities.StringUtils;
 import moose.utilities.logger.Logger;
-import moose.utilities.viewUtils.TableCellListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

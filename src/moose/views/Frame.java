@@ -25,7 +25,6 @@ import moose.utilities.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +42,7 @@ import moose.utilities.logger.Logger;
 import moose.utilities.viewUtils.AutoCompleteDocument;
 import moose.utilities.viewUtils.FileDrop;
 import moose.utilities.viewUtils.TableCellListener;
+import moose.utilities.viewUtils.ViewUtils;
 
 import static moose.utilities.Constants.*;
 import static org.junit.Assert.assertNotNull;
@@ -110,7 +110,7 @@ public class Frame extends javax.swing.JFrame {
             songController.setTable(table);
 
             // add the songs in the folder param to start
-            ArrayList<File> files = new ArrayList<>();
+            List<File> files = new ArrayList<>();
             FileUtils.listFiles(folder, files);
 
             if (!importFiles(files).isEmpty()) {
@@ -128,7 +128,7 @@ public class Frame extends javax.swing.JFrame {
                 songController.setTable(table);
 
                 // add the songs in the folder param to start
-                ArrayList<File> files = new ArrayList<>();
+                List<File> files = new ArrayList<>();
                 FileUtils.listFiles(folder, files);
 
                 if (!importFiles(files).isEmpty()) {
@@ -191,6 +191,9 @@ public class Frame extends javax.swing.JFrame {
                 case "Move files...":
                     songController.moveFiles(selectedRows);
                     break;
+                case "Format filenames":
+                    songController.formatFilenames(selectedRows);
+                    break;
                 case "Add artwork...":
                     songController.autoTaggingService.addAlbumArt(selectedRows);
                     setMultiplePanelFields();
@@ -246,7 +249,7 @@ public class Frame extends javax.swing.JFrame {
         new FileDrop(System.out, tableSP, (File[] files) -> {
 
             // create an arraylist of files and traverse it
-            ArrayList<File> fileList = new ArrayList<>();
+            List<File> fileList = new ArrayList<>();
             for (File file : files) {
                 if (file.isDirectory()) {
                     FileUtils.listFiles(file, fileList);
@@ -516,7 +519,7 @@ public class Frame extends javax.swing.JFrame {
      *
      * @param files, the files to import
      */
-    public List<File> importFiles(ArrayList<File> files) {
+    public List<File> importFiles(List<File> files) {
 
         List<File> filesToRemove = new ArrayList<>();
         List<File> hiddenFilesToIgnore = new ArrayList<>();
@@ -1246,7 +1249,7 @@ public class Frame extends javax.swing.JFrame {
 
         if (dirs != null) {
             // create an arraylist of files
-            ArrayList<File> files = new ArrayList<>();
+            List<File> files = new ArrayList<>();
             for (File dir : dirs) {
                 FileUtils.listFiles(dir, files);
             }
@@ -1574,12 +1577,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_refreshMenuItemActionPerformed
 
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
-        int[] selectedRows = table.getSelectedRows();
-        if (selectedRows.length > 0) {
-            JOptionPane.showMessageDialog(this, "Not implemented yet!");
-        } else {
-            JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
-        }
+        songController.formatFilenames(table.getSelectedRows());
     }//GEN-LAST:event_formatFilenamesMenuItemActionPerformed
 
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
