@@ -21,6 +21,7 @@ public class Constants {
 
     public static final String TRACK_FILENAME_REGEX = "\\d{2} ((.)*).mp3";
     public static final String TRACK_NUMBER_REGEX = "\\d{2}";
+    public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
 
     public static final List<String> REGEX_ARRAY = new ArrayList<>(Arrays.asList(
             "\\d{2}\\. .* - .*\\.mp3",  // 01. Kasbo - The Making of a Paracosm.mp3
