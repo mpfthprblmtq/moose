@@ -303,12 +303,15 @@ public class AutoTaggingService {
      * @return the cover file, or null if it doesn't exist
      */
     public File folderContainsCover(File folder) {
-        String regex = "\\[\\d{4}] .*";
-        // if the folder isn't an album or part of the label
-        if (!folder.getName().matches(regex) && !SongUtils.isPartOfALabel(folder)) {
-            return null;
-        } else if (folder.getName().startsWith("CD")) {
+
+        // if the folder is a cd in a multi-cd album
+        if (folder.getName().startsWith("CD")) {
             folder = folder.getParentFile();
+        }
+
+        // if the folder isn't an album or part of the label
+        if (!folder.getName().matches(ALBUM_FOLDER_REGEX) && !SongUtils.isPartOfALabel(folder)) {
+            return null;
         }
 
         File[] files = folder.listFiles();      // get all the files
@@ -352,7 +355,7 @@ public class AutoTaggingService {
 
         // if we reach this point, no image files exist in that directory
         // perform one final check and recursively call itself
-        if (folder.getParentFile().getName().matches(regex)) {
+        if (folder.getParentFile().getName().matches(ALBUM_FOLDER_REGEX)) {
             return folderContainsCover(folder.getParentFile());
         }
 
