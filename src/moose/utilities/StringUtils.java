@@ -4,6 +4,7 @@ public class StringUtils {
 
     public static final String EMPTY = "";
     public static final String NEW_LINE = "\n";
+    public static final String SPACE = " ";
 
     /**
      * Checks a string if it's empty or not
@@ -16,6 +17,10 @@ public class StringUtils {
             return true;
         }
         return str.equals(EMPTY);
+    }
+
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
     }
 
     /**

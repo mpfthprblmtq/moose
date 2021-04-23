@@ -81,7 +81,7 @@ public class AuditService {
         List<File> albums = new ArrayList<>();
 
         // arraylist to store all the files
-        ArrayList<File> allFiles = new ArrayList<>();
+        List<File> allFiles = new ArrayList<>();
         FileUtils.listFiles(folder, allFiles);
 
         // traverse the list of files and add the albums to the albums list
@@ -302,7 +302,7 @@ public class AuditService {
     public boolean checkFilenames(File dir) {
 
         // create a list of all files from that directory
-        ArrayList<File> files = new ArrayList<>();
+        List<File> files = new ArrayList<>();
         FileUtils.listFiles(dir, files);
 
         // check all files in that list
@@ -324,7 +324,7 @@ public class AuditService {
     public boolean checkID3Tags(File dir) {
 
         // create a list of all files from that directory
-        ArrayList<File> files = new ArrayList<>();
+        List<File> files = new ArrayList<>();
         FileUtils.listFiles(dir, files);
 
         // traverse the file list
