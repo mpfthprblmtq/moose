@@ -14,9 +14,11 @@ import com.mpatric.mp3agic.*;
 
 import moose.Moose;
 import moose.services.AutoTaggingService;
+import moose.services.FilenameFormatterService;
 import moose.utilities.Constants;
 import moose.utilities.FileUtils;
 import moose.utilities.SongUtils;
+import moose.utilities.StringUtils;
 import moose.utilities.logger.Logger;
 import moose.objects.Song;
 
@@ -33,6 +35,7 @@ public class SongController {
 
     // services
     public AutoTaggingService autoTaggingService;
+    public FilenameFormatterService filenameFormatterService;
 
     // logger object
     Logger logger = Moose.getLogger();
@@ -45,7 +48,8 @@ public class SongController {
      * Default constructor
      */
     public SongController() {
-        autoTaggingService = new AutoTaggingService();
+        autoTaggingService = new AutoTaggingService(this);
+        filenameFormatterService = new FilenameFormatterService();
     }
 
     /**
@@ -148,16 +152,6 @@ public class SongController {
     public int getIndex(int row) {
         row = table.convertRowIndexToModel(row);
         return Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
-    }
-
-    /**
-     * Helper function to set the file of the song file in the songs list.
-     * @param index, the index of the song
-     * @param file, the new file to set
-     */
-    public void setFile(int index, File file) {
-        songs.get(index).setFile(file);
-        songEdited(index);
     }
 
     /**
@@ -302,9 +296,10 @@ public class SongController {
         for (int selectedRow : selectedRows) {
             int row = table.convertRowIndexToModel(selectedRow);    // get the row
             int index = getIndex(row);
-            // return if the song somehow isn't in the edited songs list
+            // check to see if the index is even edited before saving
             if (edited_songs.contains(index)) {
                 save(index);
+                table.getModel().setValueAt(songs.get(index).getFile(), row, 1);
                 count++;
             }
         }
@@ -510,8 +505,28 @@ public class SongController {
      * @param selectedRows, the rows selected on the table
      */
     public void autoTagFiles(int[] selectedRows) {
+        // set the table in case of an uncaught update
         autoTaggingService.setTable(table);
+
+        // clean up the file name first
+        formatFilenames(selectedRows);
+
+        // actually do the autotagging
         autoTaggingService.autoTag(selectedRows);
+    }
+
+    /**
+     * Formats the filenames
+     */
+    public void formatFilenames(int[] selectedRows) {
+        for (int row : selectedRows) {
+            File file = songs.get(getIndex(row)).getFile();
+            File newFile = filenameFormatterService.formatFilenames(file);
+            if (newFile != null) {
+                setNewFile(getIndex(row), newFile);
+                table.setValueAt(newFile.getName().replace(".mp3", StringUtils.EMPTY), row, 1);
+            }
+        }
     }
 
     /**

@@ -27,7 +27,7 @@ import moose.services.IconService;
 import moose.utilities.Constants;
 import moose.utilities.ImageUtils;
 import moose.utilities.StringUtils;
-import moose.utilities.ViewUtils;
+import moose.utilities.viewUtils.ViewUtils;
 
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
