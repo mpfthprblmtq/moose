@@ -111,11 +111,13 @@ public class ImageUtils {
         // let's throw the byte arrays into a buffered image list
         List<BufferedImage> bufferedImages = new ArrayList<>();
         for (byte[] bytes : images) {
-            try {
-                InputStream is = new ByteArrayInputStream(bytes);
-                bufferedImages.add(resize(ImageIO.read(is), 150));  // resize them while we're at it
-            } catch (IOException e) {
-                logger.logError("Exception when adding buffered images to a list from a list of bytes arrays!", e);
+            if (bytes.length != 0) {
+                try {
+                    InputStream is = new ByteArrayInputStream(bytes);
+                    bufferedImages.add(resize(ImageIO.read(is), 150));  // resize them while we're at it
+                } catch (IOException e) {
+                    logger.logError("Exception when adding buffered images to a list from a list of bytes arrays!", e);
+                }
             }
         }
 
