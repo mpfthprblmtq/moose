@@ -1284,11 +1284,6 @@ public class Frame extends javax.swing.JFrame {
 
             // if it's a right click
             case java.awt.event.MouseEvent.BUTTON3:
-
-                // check if the row is in the selected rows array
-//                if (Arrays.stream(selectedRows).anyMatch(i -> i == row)) {
-//                    table.setRowSelectionInterval(row, row);
-//                }
                 if (row >= 0 && col >= 0) {
                     switch (col) {
                         case 10:
@@ -1326,8 +1321,8 @@ public class Frame extends javax.swing.JFrame {
             // if it's a scroll click
             case java.awt.event.MouseEvent.BUTTON2:
                 File file = null;
-                for (int i = 0; i < selectedRows.length; i++) {
-                    file = songController.autoTaggingService.getFile(selectedRows[i]);
+                for (int selectedRow : selectedRows) {
+                    file = songController.autoTaggingService.getFile(selectedRow);
                     FileUtils.openFile(file);
                 }
                 break;
@@ -2035,11 +2030,26 @@ public class Frame extends javax.swing.JFrame {
                 // get the index of the song in the table
                 int index = songController.getIndex(row);
 
-                // set the value in the table to the new value
-                table.setValueAt(track, row, 8);
+                // TODO input validation
 
                 // set the value in the songs array
-                songController.setTrack(index, track);
+                if (StringUtils.isEmpty(track)) {
+                    songController.setTrack(index, track);
+                    songController.setTotalTracks(index, track);
+                } else if (track.matches("\\d*/\\d*")) {
+                    String[] arr = track.split("/");
+                    songController.setTrack(index, arr[0]);
+                    songController.setTotalTracks(index, arr[1]);
+                } else if (track.matches("/\\d*")) {
+                    songController.setTrack(index, StringUtils.EMPTY);
+                    songController.setTotalTracks(index, track);
+                } else if (track.matches("\\d*/")) {
+                    songController.setTrack(index, track);
+                    songController.setTotalTracks(index, StringUtils.EMPTY);
+                }
+
+                // set the value in the table to the new value
+                table.setValueAt(songController.getSongs().get(index).getFullTrackString(), row, 8);
             }
         }
 
@@ -2050,11 +2060,26 @@ public class Frame extends javax.swing.JFrame {
                 // get the index of the song in the table
                 int index = songController.getIndex(row);
 
-                // set the value in the table to the new value
-                table.setValueAt(disk, row, 9);
+                // TODO input validation
 
                 // set the value in the songs array
-                songController.setDisk(index, disk);
+                if (StringUtils.isEmpty(disk)) {
+                    songController.setDisk(index, StringUtils.EMPTY);
+                    songController.setTotalDisks(index, StringUtils.EMPTY);
+                } else if (disk.matches("\\d*/\\d*")) {
+                    String[] arr = disk.split("/");
+                    songController.setDisk(index, arr[0]);
+                    songController.setTotalDisks(index, arr[1]);
+                } else if (disk.matches("/\\d*")) {
+                    songController.setDisk(index, StringUtils.EMPTY);
+                    songController.setTotalDisks(index, disk);
+                } else if (disk.matches("\\d*/")) {
+                    songController.setTrack(index, disk);
+                    songController.setTotalDisks(index, StringUtils.EMPTY);
+                }
+
+                // set the value in the table to the new value
+                table.setValueAt(songController.getSongs().get(index).getFullDiskString(), row, 9);
             }
         }
 
