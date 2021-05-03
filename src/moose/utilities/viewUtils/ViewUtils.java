@@ -171,14 +171,52 @@ public class ViewUtils {
 
                     case 9:     // tracks was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setTrack(index, tcl.getNewValue().toString());
+                            String track = tcl.getNewValue().toString();
+
+                            // set the value in the songs array
+                            if (StringUtils.isEmpty(track)) {
+                                songController.setTrack(index, track);
+                                songController.setTotalTracks(index, track);
+                            } else if (track.matches("\\d*/\\d*")) {
+                                String[] arr = track.split("/");
+                                songController.setTrack(index, arr[0]);
+                                songController.setTotalTracks(index, arr[1]);
+                            } else if (track.matches("/\\d*")) {
+                                songController.setTrack(index, StringUtils.EMPTY);
+                                songController.setTotalTracks(index, track);
+                            } else if (track.matches("\\d*/")) {
+                                songController.setTrack(index, track);
+                                songController.setTotalTracks(index, StringUtils.EMPTY);
+                            } else {
+                                int row = songController.getRow(index);
+                                table.setValueAt(songController.getSongs().get(index).getFullTrackString(), row, 8);
+                            }
                         }
                         // else do nothing, nothing was changed
                         break;
 
                     case 10:     // disks was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
-                            songController.setDisk(index, tcl.getNewValue().toString());
+                            String disk = tcl.getNewValue().toString();
+
+                            // set the value in the songs array
+                            if (StringUtils.isEmpty(disk)) {
+                                songController.setDisk(index, StringUtils.EMPTY);
+                                songController.setTotalDisks(index, StringUtils.EMPTY);
+                            } else if (disk.matches("\\d*/\\d*")) {
+                                String[] arr = disk.split("/");
+                                songController.setDisk(index, arr[0]);
+                                songController.setTotalDisks(index, arr[1]);
+                            } else if (disk.matches("/\\d*")) {
+                                songController.setDisk(index, StringUtils.EMPTY);
+                                songController.setTotalDisks(index, disk);
+                            } else if (disk.matches("\\d*/")) {
+                                songController.setTrack(index, disk);
+                                songController.setTotalDisks(index, StringUtils.EMPTY);
+                            } else {
+                                int row = songController.getRow(index);
+                                table.setValueAt(songController.getSongs().get(index).getFullDiskString(), row, 9);
+                            }
                         }
                         // else do nothing, nothing was changed
                         break;
