@@ -317,6 +317,9 @@ public class SongController {
 
         // check to see if we need to rename the file
         if (s.getNewFile() != null) {
+            if (!s.getNewFile().getName().endsWith(".mp3")) {
+                s.setNewFile(new File(s.getNewFile().getAbsolutePath().concat(".mp3")));
+            }
             if (!s.getFile().renameTo(s.getNewFile())) {
                 logger.logError("Problem saving a file on file name change, file: " + s.getFile().getName());
             } else {
@@ -521,10 +524,14 @@ public class SongController {
     public void formatFilenames(int[] selectedRows) {
         for (int row : selectedRows) {
             File file = songs.get(getIndex(row)).getFile();
-            File newFile = filenameFormatterService.formatFilenames(file);
-            if (newFile != null) {
+            String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
+            String newFilename = filenameFormatterService.formatFilename(file);
+            if (StringUtils.isNotEmpty(newFilename)) {
+                File newFile = new File(path + newFilename);
                 setNewFile(getIndex(row), newFile);
-                table.setValueAt(newFile.getName().replace(".mp3", StringUtils.EMPTY), row, 1);
+                table.setValueAt(newFile.getName()
+                        .replace(".mp3", StringUtils.EMPTY)
+                        .replace(":", "/"), row, 1);
             }
         }
     }

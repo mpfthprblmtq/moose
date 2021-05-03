@@ -38,12 +38,12 @@ public class FilenameFormatterService {
      * @param file a file with a name to format
      * @return a new file with a better name
      */
-    public File formatFilenames(File file) {
+    public String formatFilename(File file) {
         String regexMatched = checkForMatch(file.getName());
         if (StringUtils.isNotEmpty(regexMatched)) {
             String newFilename = getGoodFilename(file, regexMatched);
             if (!newFilename.equals(file.getName())) {
-                return FileUtils.getNewMP3FileFromOld(file, newFilename);
+                return newFilename.replace("/", ":");
             }
         }
         return null;
@@ -144,7 +144,9 @@ public class FilenameFormatterService {
         // get the title
         String title = song.getTitle();
         if (StringUtils.isEmpty(title)) {
-            title = file.getName();
+            title = file.getName()
+                    .replace(":", "/")
+                    .replace(".mp3", StringUtils.EMPTY);
         }
 
         // get the track number
