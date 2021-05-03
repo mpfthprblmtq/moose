@@ -62,6 +62,9 @@ public class AutoTaggingService {
             // get the file we'll use to determine track information
             Song s = songController.getSongs().get(songController.getIndex(row));
             File file = s.getNewFile() != null ? s.getNewFile() : s.getFile();
+            if (!file.getName().endsWith(".mp3")) {
+                file = FileUtils.getNewMP3FileFromOld(file, file.getName());
+            }
 
             String title = getTitleFromFile(file);
             String artist = getArtistFromFile(file);

@@ -39,14 +39,35 @@ public class FilenameFormatterService {
      * @return a new file with a better name
      */
     public String formatFilename(File file) {
-        String regexMatched = checkForMatch(file.getName());
+        // clean it up first
+        String filename = cleanupFilename(file.getName());
+
+        // check for regex matches
+        String regexMatched = checkForMatch(filename);
         if (StringUtils.isNotEmpty(regexMatched)) {
             String newFilename = getGoodFilename(file, regexMatched);
-            if (!newFilename.equals(file.getName())) {
+            if (!newFilename.equals(filename)) {
                 return newFilename.replace("/", ":");
+            } else {
+                return filename;
             }
         }
-        return null;
+        return filename;
+    }
+
+    /**
+     * Cleans up the file name before doing any intense operations, which for now is just replacing feat with ft
+     */
+    private String cleanupFilename(String filename) {
+        String newFilename = filename
+                .replace("feat.", "ft.");
+        if (newFilename.contains("feat")) {
+            newFilename = newFilename.replace("feat", "ft.");
+        }
+        if (newFilename.contains("ft") && !newFilename.contains("ft.")) {
+            newFilename = newFilename.replace("ft", "ft.");
+        }
+        return newFilename;
     }
 
     /**
@@ -92,9 +113,6 @@ public class FilenameFormatterService {
         if (StringUtils.isEmpty(newFilename)) {
             newFilename = filename;
         }
-
-        // change the (feat. ?) to (ft. ?)
-        newFilename = newFilename.replace("feat.", "ft.");
 
         // return the new parsed filename
         return newFilename;
