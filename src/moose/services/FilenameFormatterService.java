@@ -7,18 +7,12 @@ package moose.services;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.sun.tools.javac.code.Attribute;
-import moose.Main;
 import moose.Moose;
 import moose.objects.Song;
 import moose.utilities.Constants;
-import moose.utilities.FileUtils;
 import moose.utilities.SongUtils;
 import moose.utilities.StringUtils;
-import moose.utilities.logger.Logger;
+
 
 /**
  *
