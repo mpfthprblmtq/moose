@@ -1,13 +1,11 @@
 package moose.services;
 
-import com.sun.codemodel.internal.JOp;
 import moose.Moose;
 import moose.utilities.Constants;
 import moose.utilities.StringUtils;
 import moose.utilities.logger.Logger;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSpinnerUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

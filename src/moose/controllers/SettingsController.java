@@ -33,7 +33,7 @@ public class SettingsController {
 
     // hardened version
     // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
-    final String version = "1.2.1";
+    final String version = "1.3.0";
     // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE PREVIOUS LINE
 
     // main settingsFile file

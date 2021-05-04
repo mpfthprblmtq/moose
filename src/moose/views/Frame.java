@@ -45,7 +45,6 @@ import moose.utilities.viewUtils.TableCellListener;
 import moose.utilities.viewUtils.ViewUtils;
 
 import static moose.utilities.Constants.*;
-import static org.junit.Assert.assertNotNull;
 
 // class Frame
 public class Frame extends javax.swing.JFrame {
@@ -277,7 +276,10 @@ public class Frame extends javax.swing.JFrame {
 
         // create a table cell listener
         TableCellListener tcl = ViewUtils.createTCL(table, songController);
-        assertNotNull(tcl);     // this line is really just to get rid of the "unused var" warning
+        if (tcl.getTable() == null) {
+            // this line is really just to get rid of the "unused var" warning
+            logger.logError("TCL table is null!");
+        }
     }
 
     /**
