@@ -8,6 +8,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtils {
@@ -74,6 +75,23 @@ public class FileUtils {
             newFilename = newFilename.concat(".mp3");
         }
         return new File(path + newFilename);
+    }
+
+    /**
+     * Checks to see if the folder only has one mp3 file in it
+     */
+    public static boolean folderContainsOnlyOneMP3(File folder) {
+        List<File> files = new ArrayList<>();
+        listFiles(folder, files);
+
+        int mp3Count = 0;
+        for (File file : files) {
+            if (file.getName().endsWith(".mp3")) {
+                mp3Count++;
+            }
+        }
+
+        return mp3Count == 1;
     }
 
     /**
