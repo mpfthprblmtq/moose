@@ -29,8 +29,8 @@ public class Constants {
             "\\d{2}\\. .*\\.mp3",       // 01. The Making of a Paracosm.mp3
             "\\d{2} .* - .*\\.mp3",     // 02 Kasbo - Play Pretend (ft. Ourchives).mp3
             "\\d{2} - .*\\.mp3",        // 02 - Play Pretend (ft. Ourchives).mp3
-            "[^\\d{2}].*\\.mp3",        // Play Pretend (ft. Ourchives).mp3
-            "[^\\d{2}]* - .*\\.mp3"     // Kasbo - Play Pretend (ft. Ourchives)
+            "[^\\d{2}].* - .*\\.mp3",    // Kasbo - Play Pretend (ft. Ourchives).mp3
+            "[^\\d{2}].*\\.mp3"         // Play Pretend (ft. Ourchives).mp3
     ));
 
     public static final int UNDETERMINED = -1;
