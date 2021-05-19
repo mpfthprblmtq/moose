@@ -1,7 +1,7 @@
 # Moose
 A music management system capable of reading and modifying dynamic id3 tags.
 
-![Generic badge](https://img.shields.io/badge/version-1.2.1-brightgreen.svg)
+![Generic badge](https://img.shields.io/badge/version-1.3.0-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 [View project on Github](https://www.github.com/mpfthprblmtq/moose)
