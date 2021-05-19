@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2017-2020 Pat Ripley  
+Copyright (c) 2017-2021 Pat Ripley  
 http://github.com/mpfthprblmtq/moose
 
 Permission is hereby granted, free of charge, to any person obtaining
