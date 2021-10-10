@@ -11,7 +11,7 @@ package moose.controllers;
 
 // imports
 import com.fasterxml.jackson.databind.SerializationFeature;
-import moose.Main;
+import moose.Moose;
 import moose.utilities.*;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class SettingsController {
 
     // hardened version
     // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE FOLLOWING LINE
-    final String version = "1.2.1";
+    final String version = "1.3.0";
     // THIS HAS TO BE IN THIS FILE, DO NOT EDIT OR REMOVE THE PREVIOUS LINE
 
     // main settingsFile file
@@ -46,7 +46,7 @@ public class SettingsController {
     final ObjectMapper mapper = new ObjectMapper();
 
     // logger object
-    Logger logger = Main.getLogger();
+    Logger logger = Moose.getLogger();
 
     public SettingsController() {
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -105,7 +105,7 @@ public class SettingsController {
         writeSettingsFile(settings);
 
         // check if successful
-        return Main.getSettings().getGenres().isEmpty();
+        return Moose.getSettings().getGenres().isEmpty();
     }
 
     public boolean defaultLogging() {
@@ -114,26 +114,26 @@ public class SettingsController {
         writeSettingsFile(settings);
 
         // check if successful
-        return !Main.getSettings().isInDebugMode() && !Main.getSettings().isInDeveloperMode();
+        return !Moose.getSettings().isInDebugMode() && !Moose.getSettings().isInDeveloperMode();
     }
 
     public boolean defaultFiles() {
-        settings.setLibraryLocation(StringUtils.EMPTY_STRING);
+        settings.setLibraryLocation(StringUtils.EMPTY);
         writeSettingsFile(settings);
 
         // check if successful
-        return StringUtils.isEmpty(Main.getSettings().getLibraryLocation());
+        return StringUtils.isEmpty(Moose.getSettings().getLibraryLocation());
     }
 
     public boolean defaultApi() {
-        settings.setAlbumArtFinderApiKey(StringUtils.EMPTY_STRING);
-        settings.setAlbumArtFinderCseId(StringUtils.EMPTY_STRING);
+        settings.setAlbumArtFinderApiKey(StringUtils.EMPTY);
+        settings.setAlbumArtFinderCseId(StringUtils.EMPTY);
         settings.setPreferredCoverArtSize(640);
         writeSettingsFile(settings);
 
         // check if successful
-        return StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderApiKey())
-                && StringUtils.isEmpty(Main.getSettings().getAlbumArtFinderCseId());
+        return StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderApiKey())
+                && StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderCseId());
     }
 
     public Settings getSettings() {
@@ -147,6 +147,7 @@ public class SettingsController {
         tempSettings.setDebugMode(actualSettings.isInDebugMode());
         tempSettings.setDeveloperMode(actualSettings.isInDeveloperMode());
         tempSettings.setLibraryLocation(actualSettings.getLibraryLocation());
+        tempSettings.setRemoveCommentOnAutoTagging(actualSettings.getRemoveCommentOnAutoTagging());
         tempSettings.setAskBeforeClearAll(actualSettings.isAskBeforeClearAll());
         tempSettings.setAlbumArtFinderCseId(actualSettings.getAlbumArtFinderCseId());
         tempSettings.setAlbumArtFinderApiKey(actualSettings.getAlbumArtFinderApiKey());
@@ -160,14 +161,14 @@ public class SettingsController {
      * Opens the event log
      */
     public void openEventLog() {
-        FileUtils.openFile(Main.logger.getEventLog());
+        FileUtils.openFile(Moose.logger.getEventLog());
     }
 
     /**
      * Opens the error log
      */
     public void openErrorLog() {
-        FileUtils.openFile(Main.logger.getErrorLog());
+        FileUtils.openFile(Moose.logger.getErrorLog());
     }
 
     /**

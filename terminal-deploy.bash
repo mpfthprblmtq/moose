@@ -37,8 +37,8 @@ echo "Java Version:"
 java -version
 echo
 echo "Javapackager Version:"
-jdk=$(/usr/libexec/java_home)
-"$jdk"/bin/javapackager -version
+jdk="/Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home/bin"
+"$jdk"/javapackager -version
 echo
 
 ###################################################################################################
@@ -147,9 +147,9 @@ cd "$APP_PATH"/deploy || exit
 echo "Done."
 mkdir -p package/macosx
 cp moose.icns package/macosx
-$jdk/bin/javapackager -deploy -native $packageType -name Moose \
+$jdk/javapackager -deploy -native $packageType -name Moose \
    -BappVersion=$appVersion -Bicon=package/macosx/moose.icns \
-   -srcdir . -srcfiles moose.jar -appclass moose.Main \
+   -srcdir . -srcfiles moose.jar -appclass moose.Moose \
    -outdir out -v
 cp out/Moose-*.$packageType moose-"$appVersion"-installer.$packageType
 ls -l

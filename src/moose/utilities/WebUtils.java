@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 import java.awt.*;
@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 public class WebUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
      * Opens a webpage with the specified url

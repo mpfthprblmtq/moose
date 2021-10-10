@@ -1,5 +1,51 @@
 # Changelog
 
+### 1.3.0 (The "Hey Look, Even More Features and Better Autotagging" Update)
+
+**Release Date:** 25 April 2021
+
+#### Summary:
+
+Per the usual pattern, I decided to take a break from my other project to focus on yet another project.  So here's another release, which will probably be followed by another indeterminate amount of time until I decide to work on it again.  Here's what changed:
+
+#### Changelog:
+
+**Features:**
+- Filename Formatter
+  - A new part of autotagging, Moose will attempt to automatically name the files based on the pattern "02 Play Pretend (ft. Ourchives)"
+  - If the filename doesn't match that pattern, it will attempt to match it to that pattern using regex and any tag information that may exist on that file already.  For instance, if the filename is something like "01. Kasbo - Play Pretend (feat. Ourchives)", it will parse that down to the expected filename, which in this case would be "01 Play Pretend (ft. Ourchives)."  Note how it removed any unnecessary punctuation and changed "feat." to "ft."
+  - If Moose is unable to determine the track number from the filename, a dialog will appear that will ask you to manually set the track number.
+- Better editing/saving behavior
+  - Before, if you renamed the file or changed the cover art, Moose would enact those changes immediately without the user hitting the save button.  This functionality changed to match everything else, where the user has to press save in order for any change to take place on that song.
+- Smarter Audit behavior
+  - When running an audit, you can just audit only the marked albums instead of being forced to go through all of them
+- Added a "Show in Finder" context menu item
+  - Opens where that song is in a finder window
+- Renamed `Main.java` to `Moose.java`
+  - Now it shows as "Moose" in the top bar rather than "Main," which didn't make much sense
+- Multiple album artwork shows all album arts on the "Multiple fields panel"
+  - If you select multiple rows on the table with differing album artworks, the multiple fields panel will show a conglomerate of those multiple album artworks
+- Better keyboard navigability
+  - CMD + A will now select all the rows in the table
+- Option to remove comments when you autotag
+  - Self explanatory, removes the comment from the song if you want it to
+- Opening the More Info modal for multiple songs
+  - Also self explanatory, now you can open a more info modal on multiple songs, and edit them like normal
+
+**Bug Fixes:**
+- Cover art wouldn't automatically populate in the case of an album having multiple disks
+- If a file imported into Moose had a '/' character in it, Moose would replace it with a ':' (Darn you OSX)
+- When you opened the More Info modal and made a change on the track or disk numbers, Moose would append a '/x' on the number
+- Context menu cleanup
+
+**Code Enhancements:**
+- Reformatted a lot of the app, mostly to improve the UI <-> Controller <-> Service pattern
+- Broke some of the major monolith files into some utility functions to clean up a bit
+
+**The Moose kingdom has some unwelcome guests:**
+- With the time of prosper after the great moose war, a new challenger approaches:  The Elk.
+- The Moose kingdom must ready its defenses after seeing such a bountiful time of peace.
+
 ### 1.2.1 (The "Too many Bugfixes and Documentation" Update) (AKA The Halloween Update)
 
 **Release Date:** 31 October 2020 🎃

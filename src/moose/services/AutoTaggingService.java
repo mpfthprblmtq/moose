@@ -10,7 +10,8 @@
 package moose.services;
 
 // imports
-import moose.Main;
+import moose.Moose;
+import moose.controllers.SongController;
 import moose.objects.ImageSearchQuery;
 import moose.objects.Song;
 import moose.utilities.*;
@@ -32,8 +33,23 @@ import static moose.utilities.Constants.*;
 
 public class AutoTaggingService {
 
-    JTable table = Main.frame.table;
-    Logger logger = Main.getLogger();
+    JTable table;
+    Logger logger = Moose.getLogger();
+
+    // controller
+    SongController songController;
+
+    public AutoTaggingService(SongController songController) {
+        this.songController = songController;
+    }
+
+    /**
+     * Sets the table
+     * @param table the table to set
+     */
+    public void setTable(JTable table) {
+        this.table = table;
+    }
 
     /**
      * Function that actually does the autotagging
@@ -44,7 +60,11 @@ public class AutoTaggingService {
 
         for (int row : rows) {
             // get the file we'll use to determine track information
-            File file = getFile(row);
+            Song s = songController.getSongs().get(songController.getIndex(row));
+            File file = s.getNewFile() != null ? s.getNewFile() : s.getFile();
+            if (!file.getName().endsWith(".mp3")) {
+                file = FileUtils.getNewMP3FileFromOld(file, file.getName());
+            }
 
             String title = getTitleFromFile(file);
             String artist = getArtistFromFile(file);
@@ -59,40 +79,45 @@ public class AutoTaggingService {
             int index = getIndex(row);
 
             // title
-            Main.frame.songController.setTitle(index, title);
+            Moose.frame.songController.setTitle(index, title);
             table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
             // artist
             if (!SongUtils.isPartOfALabel(file)) {
-                Main.frame.songController.setArtist(index, artist);
+                Moose.frame.songController.setArtist(index, artist);
                 table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
             }
 
             // album
-            Main.frame.songController.setAlbum(index, album);
+            Moose.frame.songController.setAlbum(index, album);
             table.setValueAt(album, row, TABLE_COLUMN_ALBUM);
 
             // album artist
-            Main.frame.songController.setAlbumArtist(index, albumArtist);
+            Moose.frame.songController.setAlbumArtist(index, albumArtist);
             table.setValueAt(albumArtist, row, TABLE_COLUMN_ALBUMARTIST);
 
             // year
-            Main.frame.songController.setYear(index, year);
+            Moose.frame.songController.setYear(index, year);
             table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
             // genre
             if (SongUtils.isPartOfALabel(file)) {
-                Main.frame.songController.setGenre(index, genre);
+                Moose.frame.songController.setGenre(index, genre);
                 table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
             }
 
             // tracks
-            Main.frame.songController.setTrack(index, tracks);
+            Moose.frame.songController.setTrack(index, tracks);
             table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
             // disks
-            Main.frame.songController.setDisk(index, disks);
+            Moose.frame.songController.setDisk(index, disks);
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
+
+            // comment
+            if (Moose.getSettings().getRemoveCommentOnAutoTagging()) {
+                Moose.frame.songController.setComment(index, StringUtils.EMPTY);
+            }
         }
 
         // album art
@@ -159,7 +184,7 @@ public class AutoTaggingService {
             }
 
             // update the track in the songs array
-            Main.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
+            Moose.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
 
             // update graphics
             Icon thumbnail_icon = ImageUtils.getScaledImage(bytes, 100);
@@ -168,12 +193,12 @@ public class AutoTaggingService {
             table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
 
             // song was edited, add it to the list
-            Main.frame.songController.songEdited(index);
+            Moose.frame.songController.songEdited(index);
 
             // if there's multiple rows selected, also add it to the multiple fields panel
             if (table.getSelectedRowCount() > 1) {
                 Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
-                Main.frame.multImage.setIcon(artwork_icon);
+                Moose.frame.multImage.setIcon(artwork_icon);
             }
 
         } catch (IOException ex) {
@@ -190,32 +215,42 @@ public class AutoTaggingService {
     public void addAlbumArt(int[] selectedRows) {
 
         // need this for some reason
-        File img_file = null;
+        File file = null;
 
         for (int i = 0; i < selectedRows.length; i++) {
 
-            // get the row and index of the track
-            int row = table.convertRowIndexToModel(selectedRows[i]);
-            int index = Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
+            // get the index of the track
+            int index = getIndex(selectedRows[i]);
 
             // get the file to use as the starting point for choosing an image
-            File file = Main.frame.songController.getSongs().get(index).getFile();
+            File startingPoint = Moose.frame.songController.getSongs().get(index).getFile();
 
             // only show the JFileChooser on the first go
             if (i == 0) {
-                img_file = Objects.requireNonNull(FileUtils.launchJFileChooser(
-                        "Select an image to use",
-                        "Select",
-                        JFileChooser.FILES_ONLY,
-                        false,
-                        file,
-                        new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
-                if (img_file == null) {
+                file = selectAlbumArt(startingPoint);
+                if (file == null) {
                     return;
                 }
             }
-            addIndividualCover(row, img_file);
+            addIndividualCover(selectedRows[i], file);
         }
+    }
+
+    /**
+     * Method for getting the artwork you want to use
+     */
+    public File selectAlbumArt(File startingPoint) {
+        File file =  Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Select an image to use",
+                "Select",
+                JFileChooser.FILES_ONLY,
+                false,
+                startingPoint,
+                new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
+        if (file != null) {
+            return file;
+        }
+        return null;
     }
 
     /**
@@ -225,7 +260,7 @@ public class AutoTaggingService {
      */
     public int confirmUserWantsAlbumArtFinder() {
         return JOptionPane.showConfirmDialog(
-                Main.frame,
+                Moose.frame,
                 "Cover art wasn't automatically found, would you like\n"
                     + "to use the Album Art Finder service in Moose?",
                 "Album Art Finder Service",
@@ -241,12 +276,12 @@ public class AutoTaggingService {
     public void showAlbumArtWindow(ImageSearchQuery query) {
         if (SwingUtilities.isEventDispatchThread()) {
             AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
-            albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+            albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
             albumArtFinderFrame.setVisible(true);
         } else {
             SwingUtilities.invokeLater(() -> {
                 AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
-                albumArtFinderFrame.setLocationRelativeTo(Main.frame);
+                albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
                 albumArtFinderFrame.setVisible(true);
             });
         }
@@ -271,12 +306,15 @@ public class AutoTaggingService {
      * @return the cover file, or null if it doesn't exist
      */
     public File folderContainsCover(File folder) {
-        String regex = "\\[\\d{4}] .*";
-        // if the folder isn't an album or part of the label
-        if (!folder.getName().matches(regex) && !SongUtils.isPartOfALabel(folder)) {
-            return null;
-        } else if (folder.getName().startsWith("CD")) {
+
+        // if the folder is a cd in a multi-cd album
+        if (folder.getName().startsWith("CD")) {
             folder = folder.getParentFile();
+        }
+
+        // if the folder isn't an album or part of the label
+        if (!folder.getName().matches(ALBUM_FOLDER_REGEX) && !SongUtils.isPartOfALabel(folder)) {
+            return null;
         }
 
         File[] files = folder.listFiles();      // get all the files
@@ -320,7 +358,7 @@ public class AutoTaggingService {
 
         // if we reach this point, no image files exist in that directory
         // perform one final check and recursively call itself
-        if (folder.getParentFile().getName().matches(regex)) {
+        if (folder.getParentFile().getName().matches(ALBUM_FOLDER_REGEX)) {
             return folderContainsCover(folder.getParentFile());
         }
 
@@ -361,7 +399,11 @@ public class AutoTaggingService {
         } else {
             String regex = "\\d{2} .*\\.mp3";
             if (file.getName().matches(regex)) {
-                return file.getName().substring(3).replace(".mp3", "").trim();
+                return file.getName()
+                        .substring(3)
+                        .replace(".mp3", StringUtils.EMPTY)
+                        .replace(":", "/")
+                        .trim();
             } else {
                 return "";
             }
@@ -376,7 +418,7 @@ public class AutoTaggingService {
      */
     public String getArtistFromFile(File file) {
         if (SongUtils.isAnEPPartOfALabel(file)) {
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         }
         return getArtist(file);
     }
@@ -402,7 +444,7 @@ public class AutoTaggingService {
                     return dir.getName().substring(6).trim();
                 }
             }
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         }
     }
 
@@ -437,7 +479,7 @@ public class AutoTaggingService {
             dir = dir.getParentFile().getParentFile();
             return dir.getName();
         } else {
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         }
     }
 
@@ -463,7 +505,7 @@ public class AutoTaggingService {
                 return dir.getName().substring(1, 5).trim();
             }
         }
-        return StringUtils.EMPTY_STRING;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -536,7 +578,7 @@ public class AutoTaggingService {
             int totalDisks = getTotalDisksFromFolder(dir);
             return dir.getName().substring(2) + "/" + totalDisks;
         } else {
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         }
     }
 
@@ -568,7 +610,7 @@ public class AutoTaggingService {
      */
     public String getGenreFromFile(File file) {
         if (!SongUtils.isAGenrePartOfALabel(file)) {
-            return StringUtils.EMPTY_STRING;
+            return StringUtils.EMPTY;
         }
         return file.getParentFile().getName();
     }
@@ -598,11 +640,11 @@ public class AutoTaggingService {
         String disks = getDisksFromFile(file);
 
         // tracks
-        Main.frame.songController.setTrack(index, tracks);
+        Moose.frame.songController.setTrack(index, tracks);
         table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
         // disks
-        Main.frame.songController.setDisk(index, disks);
+        Moose.frame.songController.setDisk(index, disks);
         table.setValueAt(disks, row, TABLE_COLUMN_DISK);
     }
 

@@ -16,9 +16,9 @@ import static org.junit.Assert.*;
  *
  * @author pat
  */
-public class Main_Test {
+public class Moose_Test {
     
-    public Main_Test() {
+    public Moose_Test() {
     }
     
     @BeforeClass
@@ -44,7 +44,7 @@ public class Main_Test {
     public void testMain() {
         System.out.println("main");
         String[] args = null;
-        Main.main(args);
+        Moose.main(args);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -55,7 +55,7 @@ public class Main_Test {
     @Test
     public void testLaunchFrame() {
         System.out.println("launchFrame");
-        Main.launchFrame();
+        Moose.launchFrame();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -66,7 +66,7 @@ public class Main_Test {
     @Test
     public void testLaunchSettingsFrame() {
         System.out.println("launchSettingsFrame");
-        Main.launchSettingsFrame();
+        Moose.launchSettingsFrame();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -77,7 +77,7 @@ public class Main_Test {
     @Test
     public void testCloseSettingsFrame() {
         System.out.println("closeSettingsFrame");
-        Main.closeSettingsFrame();
+        Moose.closeSettingsFrame();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -88,7 +88,7 @@ public class Main_Test {
     @Test
     public void testLaunchAuditFrame() {
         System.out.println("launchAuditFrame");
-        Main.launchAuditFrame();
+        Moose.launchAuditFrame();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -99,7 +99,7 @@ public class Main_Test {
     @Test
     public void testCloseAuditFrame() {
         System.out.println("closeAuditFrame");
-        Main.closeAuditFrame();
+        Moose.closeAuditFrame();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 import java.text.ParseException;
@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class DateUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     // date formatter
     static SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
