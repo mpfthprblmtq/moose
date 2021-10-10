@@ -14,14 +14,20 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
-import moose.Main;
+import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Song;
+import moose.services.IconService;
+import moose.utilities.Constants;
 import moose.utilities.ImageUtils;
 import moose.utilities.StringUtils;
+import moose.utilities.viewUtils.ViewUtils;
 
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
@@ -31,56 +37,78 @@ public class InfoFrame extends javax.swing.JFrame {
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
     
-    // songcontroller object
+    // songController object
     SongController songController;
 
-    // the song in the thingy
-    Song song;
+    // services
+    IconService iconService = new IconService();
+
+    // the song(s) in the thingy
+    // I am
+    // a m a z i n g
+    // at commenting code
+//    List<Song> songs;
+    Map<Integer, Song> songs;
 
     // edited globals
     boolean edited;
     boolean editModeEnabled;
     Component lastEditedField;
-    
-    /**
-     * Creates new form InfoFrame
-     * @param s, the song to source the info from
-     * @param row, the row on the table
-     */
-    public InfoFrame(Song s, int row, boolean editModeEnabled, Component focusedField) {
+    List<String> originalValues = new ArrayList<>();
+
+    // ivars for the artwork label to check if the artwork has changed in this frame
+    byte[] originalArtwork;
+    byte[] newArtwork;
+
+    public InfoFrame(Map<Integer, Song> songs, boolean editModeEnabled, Component focusedField) {
         initComponents();
-        this.setTitle(s.getArtist() + " - " + s.getTitle());
-        this.song = s;
-        setFields(s);
-        setNavigationButtons(row);
-        setFieldsEditable(editModeEnabled);
+        this.songs = songs;
+        init();
+
+        this.editModeEnabled = editModeEnabled;
         if (editModeEnabled) {
             editSubmitButton.setText("Submit");
             getFocusedField(focusedField);
         }
-        
-        this.row = row;
-        this.editModeEnabled = editModeEnabled;
-        songController = Main.frame.songController;
-        
-        // listener for the context menu when you right click on a row
-        // basically tells the program where to go based on the user's choice
-        this.menuListener = (ActionEvent event) -> {
+    }
 
+    private void init() {
+
+        // set the title
+        if (songs.size() == 1) {
+            Song s = songs.get(new ArrayList<>(songs.keySet()).get(0));
+            this.setTitle(s.getArtist() + " - " + s.getTitle());
+        } else {
+            this.setTitle(">Multiple Values<");
+        }
+
+        // sets all of the fields on the frame
+        setFields(new ArrayList<>(songs.values()));
+
+        // set the navigation button based on the row we're given
+        setNavigationButtons(row);
+
+        // set the edit mode
+        setFieldsEditable(editModeEnabled);
+
+        // set the song controller
+        songController = Moose.getFrame().songController;
+
+        this.menuListener = (ActionEvent event) -> {
             // switch based on the option selected
             switch (event.getActionCommand()) {
-                case "Add":
+                case "Add artwork...":
                     songController.autoTaggingService.addAlbumArt(new int[] {row});
                     addAlbumArt();
                     break;
-                case "Remove":
+                case "Remove artwork":
                     songController.removeAlbumArt(new int [] {row});
                     removeAlbumArt();
                     break;
                 default:
                     break;
             }
-        }; // end menuListener
+        };  // end menuListener
     }
 
     /**
@@ -618,30 +646,26 @@ public class InfoFrame extends javax.swing.JFrame {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         setFieldsEditable(false);
-        Main.frame.setEnabled(true);
+        Moose.getFrame().setEnabled(true);
     }//GEN-LAST:event_formWindowClosed
 
     private void filenameFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_filenameFieldKeyReleased
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getFile().getName().equals(filenameField.getText())) {
+        if (!originalValues.get(0).equals(filenameField.getText())) {
             edited = true;
         }
         lastEditedField = filenameField;
     }//GEN-LAST:event_filenameFieldKeyReleased
 
-    private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
-        showArtworkPopup(evt);
-    }//GEN-LAST:event_coverLabelMouseClicked
-
     private void titleFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_titleFieldKeyReleased
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getTitle().equals(titleField.getText())) {
+        if (!originalValues.get(1).equals(titleField.getText())) {
             edited = true;
-            editedLabel.setIcon(new ImageIcon(getClass().getResource("/resources/edit.png")));
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = titleField;
     }//GEN-LAST:event_titleFieldKeyReleased
@@ -650,9 +674,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getArtist().equals(artistField.getText())) {
+        if (!originalValues.get(2).equals(artistField.getText())) {
             edited = true;
-            editedLabel.setIcon(new ImageIcon(getClass().getResource("/resources/edit.png")));
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = artistField;
     }//GEN-LAST:event_artistFieldKeyReleased
@@ -661,8 +685,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getAlbum().equals(albumField.getText())) {
+        if (!originalValues.get(3).equals(albumField.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = albumField;
     }//GEN-LAST:event_albumFieldKeyReleased
@@ -671,8 +696,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getAlbumArtist().equals(albumArtistField.getText())) {
+        if (!originalValues.get(4).equals(albumArtistField.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = albumArtistField;
     }//GEN-LAST:event_albumArtistFieldKeyReleased
@@ -681,8 +707,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getYear().equals(yearField.getText())) {
+        if (!originalValues.get(5).equals(yearField.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = yearField;
     }//GEN-LAST:event_yearFieldKeyReleased
@@ -691,8 +718,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getGenre().equals(genreField.getText())) {
+        if (!originalValues.get(6).equals(genreField.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = genreField;
     }//GEN-LAST:event_genreFieldKeyReleased
@@ -701,8 +729,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getTrack().equals(track1Field.getText())) {
+        if (!originalValues.get(7).equals(track1Field.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = track1Field;
     }//GEN-LAST:event_track1FieldKeyReleased
@@ -711,8 +740,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getTotalTracks().equals(track2Field.getText())) {
+        if (!originalValues.get(8).equals(track2Field.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = track2Field;
     }//GEN-LAST:event_track2FieldKeyReleased
@@ -721,8 +751,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getDisk().equals(disk1Field.getText())) {
+        if (!originalValues.get(9).equals(disk1Field.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = disk1Field;
     }//GEN-LAST:event_disk1FieldKeyReleased
@@ -731,8 +762,9 @@ public class InfoFrame extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
         }
-        if (!song.getTotalDisks().equals(disk2Field.getText())) {
+        if (!originalValues.get(10).equals(disk2Field.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = disk2Field;
     }//GEN-LAST:event_disk2FieldKeyReleased
@@ -740,8 +772,9 @@ public class InfoFrame extends javax.swing.JFrame {
     private void commentFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commentFieldKeyReleased
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             editSubmitButton.doClick();
-        } else if (!song.getComment().equals(commentField.getText())) {
+        } else if (!originalValues.get(11).equals(commentField.getText())) {
             edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
         }
         lastEditedField = commentField;
     }//GEN-LAST:event_commentFieldKeyReleased
@@ -752,6 +785,10 @@ public class InfoFrame extends javax.swing.JFrame {
             evt.consume();  // consume prilosec
         }
     }//GEN-LAST:event_commentFieldKeyPressed
+
+    private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
+        ViewUtils.showPopUpContextMenu(evt, menuListener, 0, false, false, true, false);
+    }//GEN-LAST:event_coverLabelMouseClicked
 
     /**
      * Gets the album art from the table and puts it on the more info frame
@@ -778,7 +815,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Main.frame.next(this.editModeEnabled, lastEditedField);
+        Moose.frame.next(this.editModeEnabled, lastEditedField);
     }
     
     /**
@@ -790,7 +827,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Main.frame.previous(this.editModeEnabled, lastEditedField);
+        Moose.frame.previous(this.editModeEnabled, lastEditedField);
     }
 
     /**
@@ -798,36 +835,124 @@ public class InfoFrame extends javax.swing.JFrame {
      * @param row, the row to check against
      */
     public void setNavigationButtons(int row) {
-        if(row == Main.frame.table.getRowCount() - 1) {
+        if(row == Moose.frame.table.getRowCount() - 1) {
             previousButton.setEnabled(true);
             nextButton.setEnabled(false);
         } else if (row == 0) {
             previousButton.setEnabled(false);
             nextButton.setEnabled(true);
+        } else if (row == -1) {
+            previousButton.setEnabled(false);
+            nextButton.setEnabled(false);
         }
     }
     
     /**
      * Sets the fields on the UI
-     * @param s, the song with the data to set
+     * @param songs, a list of songs with data to set
      */
-    public void setFields(Song s) {
-        filenameField.setText(s.getFile().getName());
-        titleField.setText(s.getTitle());
-        artistField.setText(s.getArtist());
-        albumField.setText(s.getAlbum());
-        albumArtistField.setText(s.getAlbumArtist());
-        yearField.setText(s.getYear());
-        genreField.setText(s.getGenre());
-        track1Field.setText(s.getTrack());
-        track2Field.setText(s.getTotalTracks());
-        disk1Field.setText(s.getDisk());
-        disk2Field.setText(s.getTotalDisks());
-        lengthField.setText(s.getLength());
-        bitrateField.setText(s.getBitrate());
-        sampleRateField.setText(s.getSampleRate());
-        commentField.setText(s.getComment());
-        coverLabel.setIcon(ImageUtils.getScaledImage(s.getArtwork_bytes(), 150));
+    public void setFields(List<Song> songs) {
+        if (songs.size() == 1) {
+            Song song = songs.get(0);
+            filenameField.setText(song.getFile().getName());
+            titleField.setText(song.getTitle());
+            artistField.setText(song.getArtist());
+            albumField.setText(song.getAlbum());
+            albumArtistField.setText(song.getAlbumArtist());
+            yearField.setText(song.getYear());
+            genreField.setText(song.getGenre());
+            track1Field.setText(song.getTrack());
+            track2Field.setText(song.getTotalTracks());
+            disk1Field.setText(song.getDisk());
+            disk2Field.setText(song.getTotalDisks());
+            lengthField.setText(song.getLength());
+            bitrateField.setText(song.getBitrate());
+            sampleRateField.setText(song.getSampleRate());
+            commentField.setText(song.getComment());
+            coverLabel.setIcon(ImageUtils.getScaledImage(song.getArtwork_bytes(), 150));
+
+        } else {
+
+            // make the arrays of values
+            int size = songs.size();
+            String[] titles = new String[size];
+            String[] artists = new String[size];
+            String[] albums = new String[size];
+            String[] albumArtists = new String[size];
+            String[] genres = new String[size];
+            String[] years = new String[size];
+            String[] tracks = new String[size];
+            String[] trackTotals = new String[size];
+            String[] disks = new String[size];
+            String[] diskTotals = new String[size];
+            String[] lengths = new String[size];
+            String[] bitRates = new String[size];
+            String[] sampleRates = new String[size];
+            String[] comments = new String[size];
+            byte[][] images = new byte[size][];
+
+            // fill the arrays
+            for (int i = 0; i < songs.size(); i++) {
+                Song s = songs.get(i);
+                titles[i] = s.getTitle();
+                artists[i] = s.getArtist();
+                albums[i] = s.getAlbum();
+                albumArtists[i] = s.getAlbumArtist();
+                genres[i] = s.getGenre();
+                years[i] = s.getYear();
+                tracks[i] = s.getTrack();
+                trackTotals[i] = s.getTotalTracks();
+                disks[i] = s.getDisk();
+                diskTotals[i] = s.getTotalDisks();
+                lengths[i] = s.getLength();
+                bitRates[i] = s.getBitrate();
+                sampleRates[i] = s.getSampleRate();
+                comments[i] = s.getComment();
+                images[i] = s.getArtwork_bytes();
+            }
+
+            // set the fields
+            filenameField.setText(Constants.DASH);
+            filenameField.setEnabled(false);
+            titleField.setText(StringUtils.checkIfSame(titles[0], titles) ? titles[0] : Constants.DASH);
+            artistField.setText(StringUtils.checkIfSame(artists[0], artists) ? artists[0] : Constants.DASH);
+            albumField.setText(StringUtils.checkIfSame(albums[0], albums) ? albums[0] : Constants.DASH);
+            albumArtistField.setText(StringUtils.checkIfSame(albumArtists[0], albumArtists) ? albumArtists[0] : Constants.DASH);
+            yearField.setText(StringUtils.checkIfSame(years[0], years) ? years[0] : Constants.DASH);
+            genreField.setText(StringUtils.checkIfSame(genres[0], genres) ? genres[0] : Constants.DASH);
+            track1Field.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
+            track2Field.setText(StringUtils.checkIfSame(trackTotals[0], trackTotals) ? trackTotals[0] : Constants.DASH);
+            disk1Field.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
+            disk2Field.setText(StringUtils.checkIfSame(diskTotals[0], diskTotals) ? diskTotals[0] : Constants.DASH);
+            lengthField.setText(StringUtils.checkIfSame(lengths[0], lengths) ? lengths[0] : Constants.DASH);
+            bitrateField.setText(StringUtils.checkIfSame(bitRates[0], bitRates) ? bitRates[0] : Constants.DASH);
+            sampleRateField.setText(StringUtils.checkIfSame(sampleRates[0], sampleRates) ? sampleRates[0] : Constants.DASH);
+            commentField.setText(StringUtils.checkIfSame(comments[0], comments) ? comments[0] : Constants.DASH);
+
+            if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
+                coverLabel.setIcon(ImageUtils.getScaledImage(images[0], 150));
+                originalArtwork = newArtwork = images[0];
+            } else {
+                List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
+                coverLabel.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
+            }
+        }
+
+        // store the fields' original values to determine if the form was edited
+        originalValues.addAll(Arrays.asList(
+                filenameField.getText(),
+                titleField.getText(),
+                artistField.getText(),
+                albumField.getText(),
+                albumArtistField.getText(),
+                yearField.getText(),
+                genreField.getText(),
+                track1Field.getText(),
+                track2Field.getText(),
+                disk1Field.getText(),
+                disk2Field.getText(),
+                commentField.getText()
+        ));
     }
     
     /**
@@ -857,68 +982,41 @@ public class InfoFrame extends javax.swing.JFrame {
      */
     public void submit() {
         if (edited) {
-            Main.frame.submitChangesFromInfoFrame(
-                    filenameField.getText().replace(".mp3", StringUtils.EMPTY_STRING),
-                    titleField.getText(),
-                    artistField.getText(),
-                    albumField.getText(),
-                    albumArtistField.getText(),
-                    yearField.getText(),
-                    genreField.getText(),
-                    track1Field.getText() + "/" + track2Field.getText(),
-                    disk1Field.getText() + "/" + disk2Field.getText(),
-                    commentField.getText());
+            String filename = filenameField.getText();
+            String title = titleField.getText();
+            String artist = artistField.getText();
+            String album = albumField.getText();
+            String albumArtist = albumArtistField.getText();
+            String year = yearField.getText();
+            String genre = genreField.getText();
+            String track = track1Field.getText() + "/" + track2Field.getText();
+            String disk = disk1Field.getText() + "/" + disk2Field.getText();
+            String comment = commentField.getText();
+
+            for (Integer row : songs.keySet()) {
+                Moose.frame.submitChangesFromInfoFrame(
+                        row,
+                        filename.equals(originalValues.get(0)) ? null : filename,
+                        title.equals(originalValues.get(1)) ? null : title,
+                        artist.equals(originalValues.get(2)) ? null : artist,
+                        album.equals(originalValues.get(3)) ? null : album,
+                        albumArtist.equals(originalValues.get(4)) ? null : albumArtist,
+                        year.equals(originalValues.get(5)) ? null : year,
+                        genre.equals(originalValues.get(6)) ? null : genre,
+                        track.equals(originalValues.get(7) + "/" + originalValues.get(8)) ? null : track,
+                        disk.equals(originalValues.get(9) + "/" + originalValues.get(10)) ? null : disk,
+                        comment.equals(originalValues.get(11)) ? null : comment
+                );
+            }
         }
         this.edited = false;
     }
     
     /**
-     * Shows the popup when you click on an album image
-     *
-     * @param e
-     */
-    void showArtworkPopup(MouseEvent e) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item;
-        popup.add(item = new JMenuItem("Add"));
-        item.addActionListener(menuListener);
-        popup.add(item = new JMenuItem("Remove"));
-        item.addActionListener(menuListener);
-
-        popup.show(e.getComponent(), e.getX(), e.getY());
-    }
-    
-    /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(InfoFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(InfoFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(InfoFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(InfoFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-        //</editor-fold>
+    public static void main(String[] args) {
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            //new InfoFrame().setVisible(true);
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

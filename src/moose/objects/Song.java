@@ -18,6 +18,7 @@ import java.util.Objects;
 public class Song {
 
     private File file;
+    private File newFile;
     private String title;
     private String artist;
     private String album;
@@ -25,9 +26,9 @@ public class Song {
     private String genre;
     private String year;
     private String track;
-    private final String totalTracks;
+    private String totalTracks;
     private String disk;
-    private final String totalDisks;
+    private String totalDisks;
     private byte[] artwork_bytes;
     
     private final String bitrate;
@@ -204,6 +205,13 @@ public class Song {
     }
 
     /**
+     * @param totalTracks the totalTracks to set
+     */
+    public void setTotalTracks(String totalTracks) {
+        this.totalTracks = totalTracks;
+    }
+
+    /**
      * @return the disk
      */
     public String getDisk() {
@@ -225,6 +233,13 @@ public class Song {
     }
 
     /**
+     * @param totalDisks the totalDisks to set
+     */
+    public void setTotalDisks(String totalDisks) {
+        this.totalDisks = totalDisks;
+    }
+
+    /**
      * @return the file
      */
     public File getFile() {
@@ -236,6 +251,20 @@ public class Song {
      */
     public void setFile(File file) {
         this.file = file;
+    }
+
+    /**
+     * @return the newFile
+     */
+    public File getNewFile() {
+        return newFile;
+    }
+
+    /**
+     * @param newFile the newFile to set
+     */
+    public void setNewFile(File newFile) {
+        this.newFile = newFile;
     }
     
     /**

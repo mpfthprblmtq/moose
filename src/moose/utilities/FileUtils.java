@@ -1,6 +1,6 @@
 package moose.utilities;
 
-import moose.Main;
+import moose.Moose;
 import moose.utilities.logger.Logger;
 
 import javax.swing.*;
@@ -9,20 +9,18 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtils {
 
-    static Logger logger = Main.getLogger();
+    static Logger logger = Moose.getLogger();
 
     /**
-     * Helper Function that lists and stores all of the files in a directory and
-     * subdirectories
-     *
+     * Helper Function that lists and stores all of the files in a directory and subdirectories
      * @param directory, the directory to list files from
      * @param files, the arrayList to store the files in
-     * @return a list of all the files in the directory
      */
-    public static ArrayList<File> listFiles(File directory, ArrayList<File> files) {
+    public static void listFiles(File directory, List<File> files) {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
@@ -34,12 +32,10 @@ public class FileUtils {
                 listFiles(file, files);     // this file is a directory, recursively call itself
             }
         }
-        return files;
     }
 
     /**
      * Opens a file
-     *
      * @param file, the file to open
      */
     public static void openFile(File file) {
@@ -48,7 +44,7 @@ public class FileUtils {
             try {
                 desktop.open(file);
             } catch (IOException ex) {
-                logger.logError("Couldn't open the event log!", ex);
+                logger.logError("Couldn't open the file: " + file.getName(), ex);
             }
         } else {
             logger.logError("Tried to open file, but " + file.getName() + " doesn't exist!");
@@ -56,9 +52,51 @@ public class FileUtils {
     }
 
     /**
+     * Opens the containing folder for the file
+     * @param file the file to open
+     */
+    public static void showInFolder(File file) {
+        String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(path));
+            }
+        } catch (IOException e) {
+            logger.logError("IOException when opening containing folder of " + file.getPath());
+        }
+    }
+
+    /**
+     * Creates a new file with the same path, just a different name
+     */
+    public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
+        String path = oldFile.getPath().replace(oldFile.getName(), StringUtils.EMPTY);
+        if (!newFilename.endsWith(".mp3")) {
+            newFilename = newFilename.concat(".mp3");
+        }
+        return new File(path + newFilename);
+    }
+
+    /**
+     * Checks to see if the folder only has one mp3 file in it
+     */
+    public static boolean folderContainsOnlyOneMP3(File folder) {
+        List<File> files = new ArrayList<>();
+        listFiles(folder, files);
+
+        int mp3Count = 0;
+        for (File file : files) {
+            if (file.getName().endsWith(".mp3")) {
+                mp3Count++;
+            }
+        }
+
+        return mp3Count == 1;
+    }
+
+    /**
      * Creates a JFileChooser, configures it, and launches it
      * Returns a single index array if there's only one file returned
-     *
      * @param title, the title of the window
      * @param approveButtonText, the text to show on the approve button
      * @param selectionMode, the mode for selecting files
@@ -70,24 +108,15 @@ public class FileUtils {
     public static File[] launchJFileChooser(String title, String approveButtonText, int selectionMode, boolean multipleSelection, File openAt, FileNameExtensionFilter fileNameExtensionFilter) {
 
         // create it
-        JFileChooser jfc = new JFileChooser() {
-            // overriding to prevent a user selecting nothing inside a directory
-            @Override
-            public void approveSelection() {
-                File file = this.getSelectedFile();
-                if (file.isDirectory()) {
-                    super.approveSelection();
-                }
-            }
-        };
+        JFileChooser jfc = new JFileChooser();
 
         // configure it
 
         // if the parameter openAt is null, open the library location by default if its set
         // if it's not set, open the user.home
         if (openAt == null) {
-            if (StringUtils.isEmpty(Main.getSettings().getLibraryLocation())) {
-                openAt = new File(Main.getSettings().getLibraryLocation());
+            if (StringUtils.isEmpty(Moose.getSettings().getLibraryLocation())) {
+                openAt = new File(Moose.getSettings().getLibraryLocation());
             } else {
                 openAt = new File(System.getProperty("user.home"));
             }
@@ -117,5 +146,4 @@ public class FileUtils {
             return null;
         }
     }
-
 }
