@@ -35,7 +35,7 @@ public class AutocompleteService {
             if(table.getEditingColumn() == TABLE_COLUMN_TITLE
                     || table.getEditingColumn() == TABLE_COLUMN_ARTIST
                     || table.getEditingColumn() == TABLE_COLUMN_ALBUM
-                    || table.getEditingColumn() == TABLE_COLUMN_ALBUMARTIST
+                    || table.getEditingColumn() == TABLE_COLUMN_ALBUM_ARTIST
                     || table.getEditingColumn() == TABLE_COLUMN_YEAR) {
                 return new NameService(getAllColumnFields(table));
             } else {

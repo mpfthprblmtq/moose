@@ -94,7 +94,7 @@ public class AutoTaggingService {
 
             // album artist
             Moose.frame.songController.setAlbumArtist(index, albumArtist);
-            table.setValueAt(albumArtist, row, TABLE_COLUMN_ALBUMARTIST);
+            table.setValueAt(albumArtist, row, TABLE_COLUMN_ALBUM_ARTIST);
 
             // year
             Moose.frame.songController.setYear(index, year);
@@ -190,7 +190,7 @@ public class AutoTaggingService {
             Icon thumbnail_icon = ImageUtils.getScaledImage(bytes, 100);
 
             // set the image on the row
-            table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUMART);
+            table.setValueAt(thumbnail_icon, row, TABLE_COLUMN_ALBUM_ART);
 
             // song was edited, add it to the list
             Moose.frame.songController.songEdited(index);
