@@ -14,6 +14,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.EventObject;
@@ -57,6 +58,10 @@ public class ViewUtils {
                 if (e instanceof MouseEvent) {
                     if (((MouseEvent) e).getClickCount() == 2) {
                         return true;
+                    }
+                } else if (e instanceof KeyEvent) {
+                    if (((KeyEvent) e).getKeyCode() == KeyEvent.VK_META) {
+                        return false;
                     }
                 }
                 return super.isCellEditable(e);

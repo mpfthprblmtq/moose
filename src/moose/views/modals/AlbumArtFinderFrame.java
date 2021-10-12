@@ -436,7 +436,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 Moose.frame.songController.autoTaggingService.addIndividualCover(row, outputFile);
             }
         }
-        Moose.frame.setMultiplePanelFields();
+        Moose.frame.updateMultiplePanelFields();
         this.dispose();
     }
 

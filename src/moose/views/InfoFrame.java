@@ -79,10 +79,10 @@ public class InfoFrame extends javax.swing.JFrame {
             Song s = songs.get(new ArrayList<>(songs.keySet()).get(0));
             this.setTitle(s.getArtist() + " - " + s.getTitle());
         } else {
-            this.setTitle(">Multiple Values<");
+            this.setTitle("> Multiple Values <");
         }
 
-        // sets all of the fields on the frame
+        // sets all the fields on the frame
         setFields(new ArrayList<>(songs.values()));
 
         // set the navigation button based on the row we're given
