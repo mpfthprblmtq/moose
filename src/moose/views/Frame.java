@@ -1898,8 +1898,7 @@ public class Frame extends javax.swing.JFrame {
             songs.put(row, songController.getSongs().get(songController.getIndex(row)));
         }
 
-        // send it -1 as the row because there's more than one row, makes sense, right?
-        InfoFrame infoFrame = new InfoFrame(songs, editModeEnabled, focusedField);
+        InfoFrame infoFrame = new InfoFrame(songs, selectedRows, editModeEnabled, focusedField);
         infoFrame.setLocationRelativeTo(this);
         infoFrame.setVisible(true);
         this.setEnabled(false);
