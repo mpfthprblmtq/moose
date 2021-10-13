@@ -142,7 +142,7 @@ public class AutoTaggingService {
         // now we should determine if we need to use the album art finder
         if (!rowsToReprocess.isEmpty()) {
             int useService = confirmUserWantsAlbumArtFinder();
-            if (useService == Constants.YES) {
+            if (useService == JOptionPane.YES_OPTION) {
                 List<ImageSearchQuery> queries = new ArrayList<>();
                 for (Integer toReprocess : rowsToReprocess) {
                     File dir = getFile(toReprocess).getParentFile();
@@ -172,16 +172,10 @@ public class AutoTaggingService {
      * @param cover, the cover to add to the file/table
      */
     public void addIndividualCover(int row, File cover) {
-        try {
             // get the index of the track
             int index = getIndex(row);
 
-            // convert file to byte array
-            byte[] bytes;
-            try (RandomAccessFile ra_file = new RandomAccessFile(cover.getAbsolutePath(), "r")) {
-                bytes = new byte[(int) ra_file.length()];
-                ra_file.read(bytes);
-            }
+            byte[] bytes = ImageUtils.getBytesFromFile(cover);
 
             // update the track in the songs array
             Moose.frame.songController.getSongs().get(index).setArtwork_bytes(bytes);
@@ -200,10 +194,6 @@ public class AutoTaggingService {
                 Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
                 Moose.frame.multImage.setIcon(artwork_icon);
             }
-
-        } catch (IOException ex) {
-            logger.logError("Exception adding individual cover!", ex);
-        }
     }
 
     /**
@@ -227,30 +217,13 @@ public class AutoTaggingService {
 
             // only show the JFileChooser on the first go
             if (i == 0) {
-                file = selectAlbumArt(startingPoint);
+                file = ImageUtils.selectAlbumArt(startingPoint);
                 if (file == null) {
                     return;
                 }
             }
             addIndividualCover(selectedRows[i], file);
         }
-    }
-
-    /**
-     * Method for getting the artwork you want to use
-     */
-    public File selectAlbumArt(File startingPoint) {
-        File file =  Objects.requireNonNull(FileUtils.launchJFileChooser(
-                "Select an image to use",
-                "Select",
-                JFileChooser.FILES_ONLY,
-                false,
-                startingPoint,
-                new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif")))[0];
-        if (file != null) {
-            return file;
-        }
-        return null;
     }
 
     /**

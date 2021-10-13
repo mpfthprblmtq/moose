@@ -50,15 +50,13 @@ public class Constants {
     public static final String REMOVE_ARTWORK = "Remove artwork";
     public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
 
-    public static final int UNDETERMINED = -1;
-    public static final int YES = 0;
-    public static final int NO = 1;
-    public static final int SAVED = 2;
-
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
+    public static final int SAVED = 2;
 
     // column constants
+    public static final int TABLE_COLUMN_ICON = 0;
+    public static final int TABLE_COLUMN_FILENAME = 1;
     public static final int TABLE_COLUMN_TITLE = 2;
     public static final int TABLE_COLUMN_ARTIST = 3;
     public static final int TABLE_COLUMN_ALBUM = 4;

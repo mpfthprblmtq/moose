@@ -249,9 +249,10 @@ public class ViewUtils {
      * @param file a boolean to determine if we're showing the file popup options
      * @param artwork a boolean to determine if we're showing the artwork popup options
      * @param artworkMultPanel a boolean to determine if we're showing the artwork on the mult panel popup options
+     * @param customItems a list of custom item strings to add to the bottom
      */
     public static void showPopUpContextMenu(
-            MouseEvent evt, ActionListener menuListener, int rows, boolean base, boolean file, boolean artwork, boolean artworkMultPanel) {
+            MouseEvent evt, ActionListener menuListener, int rows, boolean base, boolean file, boolean artwork, boolean artworkMultPanel, String[] customItems) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         if (base) {
@@ -291,6 +292,13 @@ public class ViewUtils {
             item.addActionListener(menuListener);
             popup.add(item = new JMenuItem("Remove artwork for selected"));
             item.addActionListener(menuListener);
+        }
+        if (customItems != null && customItems.length > 0) {
+            for (String str : customItems) {
+                popup.addSeparator();
+                popup.add(item = new JMenuItem(str));
+                item.addActionListener(menuListener);
+            }
         }
 
         // show the popup
