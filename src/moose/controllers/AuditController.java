@@ -128,7 +128,7 @@ public class AuditController {
         songController.setTable(frame.table);
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
-        songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
+        songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
 
         // check if the audit is done
         if (currentIndex + 2 == albums.size()) {
@@ -155,7 +155,7 @@ public class AuditController {
         }
 
         // save all of the tracks in the current screen so the user doesn't have to manually do it
-        Moose.frame.songController.saveTracks(IntStream.range(0, frame.getRowCount()).toArray());
+        Moose.frame.songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
 
         // prevent a negative index
         if (currentIndex >= 0) {
