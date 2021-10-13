@@ -24,42 +24,48 @@ public class Constants {
     public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
 
     public static final List<String> REGEX_ARRAY = new ArrayList<>(Arrays.asList(
-            "\\d{2}\\. .* - .*\\.mp3",  // 01. Kasbo - The Making of a Paracosm.mp3
-            "\\d{2} - .* - .*\\.mp3",   // 01 - Kasbo - The Making of a Paracosm.mp3
-            "\\d{2}\\. .*\\.mp3",       // 01. The Making of a Paracosm.mp3
-            "\\d{2} .* - .*\\.mp3",     // 02 Kasbo - Play Pretend (ft. Ourchives).mp3
-            "\\d{2} - .*\\.mp3",        // 02 - Play Pretend (ft. Ourchives).mp3
-            "[^\\d{2}].* - .*\\.mp3",    // Kasbo - Play Pretend (ft. Ourchives).mp3
+            "(\\d{2}|\\d{1})\\. .* - .*\\.mp3",  // 01. Kasbo - The Making of a Paracosm.mp3 (single or double-digit)
+            "(\\d{2}|\\d{1}) - .* - .*\\.mp3",   // 01 - Kasbo - The Making of a Paracosm.mp3 (single or double-digit)
+            "(\\d{2}|\\d{1})\\. .*\\.mp3",       // 01. The Making of a Paracosm.mp3 (single or double-digit)
+            "(\\d{2}|\\d{1}) .* - .*\\.mp3",     // 02 Kasbo - Play Pretend (ft. Ourchives).mp3 (single or double-digit)
+            "(\\d{2}|\\d{1}) - .*\\.mp3",        // 02 - Play Pretend (ft. Ourchives).mp3 (single or double-digit)
+            "[^\\d{2}].* - .*\\.mp3",   // Kasbo - Play Pretend (ft. Ourchives).mp3
             "[^\\d{2}].*\\.mp3"         // Play Pretend (ft. Ourchives).mp3
     ));
+    public static final String TRACK_DISK_REGEX = "\\d+\\/\\d+";
 
-    public static final int UNDETERMINED = -1;
-    public static final int YES = 0;
-    public static final int NO = 1;
-    public static final int SAVED = 2;
+    // menu options
+    public static final String MORE_INFO = "More info...";
+    public static final String SHOW_IN_FINDER = "Show in Finder...";
+    public static final String REMOVE_FROM_LIST = "Remove from list";
+    public static final String PLAY = "Play";
+    public static final String SAVE = "Save";
+    public static final String AUTO_TAG = "Autotag";
+    public static final String AUTO_TRACK_DISK_NUMBERS = "Auto-add track/disk numbers";
+    public static final String AUTO_ARTWORK = "Auto-add artwork";
+    public static final String MOVE_FILE = "Move file(s)";
+    public static final String FORMAT_FILENAME = "Format filename(s)";
+    public static final String ADD_ARTWORK = "Add artwork...";
+    public static final String ADD_ARTWORK_SELECTED = "Add artwork for selected...";
+    public static final String REMOVE_ARTWORK = "Remove artwork";
+    public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
 
-    // some constants to make life easier
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
-
-    public static final int SHIFT_TAB = 0;
-    public static final int SHIFT_ENTER = 1;
-    public static final int TAB = 2;
-    public static final int ENTER = 3;
-
-    public static final int FROM_DIALOG = 1;
-    public static final int NORMAL_NAV = 2;
+    public static final int SAVED = 2;
 
     // column constants
+    public static final int TABLE_COLUMN_ICON = 0;
+    public static final int TABLE_COLUMN_FILENAME = 1;
     public static final int TABLE_COLUMN_TITLE = 2;
     public static final int TABLE_COLUMN_ARTIST = 3;
     public static final int TABLE_COLUMN_ALBUM = 4;
-    public static final int TABLE_COLUMN_ALBUMARTIST = 5;
+    public static final int TABLE_COLUMN_ALBUM_ARTIST = 5;
     public static final int TABLE_COLUMN_YEAR = 6;
     public static final int TABLE_COLUMN_GENRE = 7;
     public static final int TABLE_COLUMN_TRACK = 8;
     public static final int TABLE_COLUMN_DISK = 9;
-    public static final int TABLE_COLUMN_ALBUMART = 10;
+    public static final int TABLE_COLUMN_ALBUM_ART = 10;
 
     // audit constants
     public static final int AUDIT = 0;
@@ -77,6 +83,7 @@ public class Constants {
     public static final int WINDOWS = 5;
     public static final int OTHER = 6;
 
+    // settings tabs
     public static final int GENRE = 0;
     public static final int LOGGING = 1;
     public static final int FILES = 2;

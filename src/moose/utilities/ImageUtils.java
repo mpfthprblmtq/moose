@@ -5,6 +5,7 @@ import moose.utilities.logger.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -15,6 +16,39 @@ import java.util.List;
 public class ImageUtils {
 
     static Logger logger = Moose.getLogger();
+
+    /**
+     * Method for getting the artwork you want to use
+     */
+    public static File selectAlbumArt(File startingPoint) {
+        File[] files = FileUtils.launchJFileChooser(
+                "Select an image to use",
+                "Select",
+                JFileChooser.FILES_ONLY,
+                false,
+                startingPoint,
+                new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "tif"));
+        if (files != null) {
+            return files[0];
+        }
+        return null;
+    }
+
+    /**
+     * Returns a byte array from a File
+     * @param file, the file to read from
+     * @return bytes, the byte array
+     */
+    public static byte[] getBytesFromFile(File file) {
+        byte[] bytes = null;
+        try (RandomAccessFile ra_file = new RandomAccessFile(file.getAbsolutePath(), "r")) {
+            bytes = new byte[(int) ra_file.length()];
+            ra_file.read(bytes);
+        } catch (IOException ex) {
+            logger.logError("Exception getting bytes from a file!", ex);
+        }
+        return bytes;
+    }
 
     /**
      * Gets the scaled instance of album art
@@ -58,6 +92,24 @@ public class ImageUtils {
             System.out.println("what");
             return null;
         }
+    }
+
+    /**
+     * Returns a byte array from an ImageIcon
+     * @param icon, the imageIcon to scan
+     */
+    public static byte[] getBytesFromImageIcon(ImageIcon icon) {
+        // check if icon is blank first
+        if (icon.getIconWidth() < 0 && icon.getIconHeight() < 0) {
+            return new byte[]{};
+        }
+
+        // icon isn't blank, let's create a buffered image and then some bytes
+        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics g = bi.createGraphics();
+        icon.paintIcon(null, g, 0,0);
+        g.dispose();
+        return getBytesFromBufferedImage(bi);
     }
 
     /**
@@ -108,13 +160,22 @@ public class ImageUtils {
      */
     public static BufferedImage combineImages(List<byte[]> images, int dim) {
 
+        // return a blank image if any of the images are blank
+        if (hasEmptyByteArray(images)) {
+            BufferedImage blankImage = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = blankImage.createGraphics();
+            g2.drawImage(blankImage, null, 0, 0);
+            g2.dispose();
+            return blankImage;
+        }
+
         // let's throw the byte arrays into a buffered image list
         List<BufferedImage> bufferedImages = new ArrayList<>();
         for (byte[] bytes : images) {
             if (bytes.length != 0) {
                 try {
                     InputStream is = new ByteArrayInputStream(bytes);
-                    bufferedImages.add(resize(ImageIO.read(is), 150));  // resize them while we're at it
+                    bufferedImages.add(resize(ImageIO.read(is), dim));  // resize them while we're at it
                 } catch (IOException e) {
                     logger.logError("Exception when adding buffered images to a list from a list of bytes arrays!", e);
                 }
@@ -165,7 +226,17 @@ public class ImageUtils {
         return true;
     }
 
-
+    /**
+     * Checks a list of byte arrays to see if there's any empty byte arrays
+     */
+    public static boolean hasEmptyByteArray(List<byte[]> byteList) {
+        for (byte[] bytes : byteList) {
+            if (bytes.length == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Checks if a byte array is the same throughout an array
