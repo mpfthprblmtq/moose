@@ -14,10 +14,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import moose.Moose;
@@ -25,9 +27,12 @@ import moose.controllers.SongController;
 import moose.objects.Song;
 import moose.services.IconService;
 import moose.utilities.Constants;
+import moose.utilities.FileUtils;
 import moose.utilities.ImageUtils;
 import moose.utilities.StringUtils;
 import moose.utilities.viewUtils.ViewUtils;
+
+import static moose.utilities.Constants.*;
 
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
@@ -47,7 +52,6 @@ public class InfoFrame extends javax.swing.JFrame {
     // I am
     // a m a z i n g
     // at commenting code
-//    List<Song> songs;
     Map<Integer, Song> songs;
 
     // edited globals
@@ -97,13 +101,14 @@ public class InfoFrame extends javax.swing.JFrame {
         this.menuListener = (ActionEvent event) -> {
             // switch based on the option selected
             switch (event.getActionCommand()) {
-                case "Add artwork...":
-                    songController.autoTaggingService.addAlbumArt(new int[] {row});
+                case ADD_ARTWORK:
                     addAlbumArt();
                     break;
-                case "Remove artwork":
-                    songController.removeAlbumArt(new int [] {row});
+                case REMOVE_ARTWORK:
                     removeAlbumArt();
+                    break;
+                case AUTO_ARTWORK:
+                    // TODO
                     break;
                 default:
                     break;
@@ -534,16 +539,11 @@ public class InfoFrame extends javax.swing.JFrame {
                                             .addComponent(lengthField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(bitrateField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(sampleRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGap(115, 115, 115))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGap(115, 115, 115))
                             .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(75, 75, 75)
-                                .addComponent(coverLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(jLabel2)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(coverLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -609,9 +609,9 @@ public class InfoFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel17)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(coverLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(coverLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(editSubmitButton)
@@ -636,6 +636,7 @@ public class InfoFrame extends javax.swing.JFrame {
         if(editSubmitButton.getText().equals("Edit")) {
             editSubmitButton.setText("Submit");
             setFieldsEditable(true);
+            this.editModeEnabled = true;
         } else if (editSubmitButton.getText().equals("Submit")) {
             editSubmitButton.setText("Edit");
             setFieldsEditable(false);
@@ -787,16 +788,25 @@ public class InfoFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_commentFieldKeyPressed
 
     private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
-        ViewUtils.showPopUpContextMenu(evt, menuListener, 0, false, false, true, false);
+        if (this.editModeEnabled) {
+            ViewUtils.showPopUpContextMenu(evt, menuListener, 0, false, false, true, false, new String[] {AUTO_ARTWORK});
+        }
     }//GEN-LAST:event_coverLabelMouseClicked
 
     /**
      * Gets the album art from the table and puts it on the more info frame
      */
     public void addAlbumArt() {
-        byte[] bytes = songController.getSongs().get(songController.getIndex(row)).getArtwork_bytes();
-        Icon artwork_icon = ImageUtils.getScaledImage(bytes, 150);
-        coverLabel.setIcon(artwork_icon);
+        File startingPoint = FileUtils.getStartingPoint(songs.values().stream().map(Song::getFile).collect(Collectors.toList()));
+        File image = ImageUtils.selectAlbumArt(startingPoint);
+        if (image != null) {
+            byte[] bytes = ImageUtils.getBytesFromFile(image);
+            Icon artwork_icon = ImageUtils.getScaledImage(bytes, 290);
+            coverLabel.setIcon(artwork_icon);
+            edited = true;
+            editedLabel.setIcon(iconService.get(IconService.EDITED));
+            newArtwork = bytes;
+        }
     }
     
     /**
@@ -804,6 +814,8 @@ public class InfoFrame extends javax.swing.JFrame {
      */
      public void removeAlbumArt() {
          coverLabel.setIcon(null);
+         edited = true;
+         editedLabel.setIcon(iconService.get(IconService.EDITED));
      }
     
     /**
@@ -869,7 +881,7 @@ public class InfoFrame extends javax.swing.JFrame {
             bitrateField.setText(song.getBitrate());
             sampleRateField.setText(song.getSampleRate());
             commentField.setText(song.getComment());
-            coverLabel.setIcon(ImageUtils.getScaledImage(song.getArtwork_bytes(), 150));
+            coverLabel.setIcon(ImageUtils.getScaledImage(song.getArtwork_bytes(), 290));
 
         } else {
 
@@ -930,11 +942,11 @@ public class InfoFrame extends javax.swing.JFrame {
             commentField.setText(StringUtils.checkIfSame(comments[0], comments) ? comments[0] : Constants.DASH);
 
             if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
-                coverLabel.setIcon(ImageUtils.getScaledImage(images[0], 150));
+                coverLabel.setIcon(ImageUtils.getScaledImage(images[0], 290));
                 originalArtwork = newArtwork = images[0];
             } else {
                 List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
-                coverLabel.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
+                coverLabel.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 290)));
             }
         }
 
@@ -982,31 +994,53 @@ public class InfoFrame extends javax.swing.JFrame {
      */
     public void submit() {
         if (edited) {
-            String filename = filenameField.getText();
-            String title = titleField.getText();
-            String artist = artistField.getText();
-            String album = albumField.getText();
-            String albumArtist = albumArtistField.getText();
-            String year = yearField.getText();
-            String genre = genreField.getText();
-            String track = track1Field.getText() + "/" + track2Field.getText();
-            String disk = disk1Field.getText() + "/" + disk2Field.getText();
-            String comment = commentField.getText();
+
+            JTable table = Moose.frame.table;
 
             for (Integer row : songs.keySet()) {
-                Moose.frame.submitChangesFromInfoFrame(
-                        row,
-                        filename.equals(originalValues.get(0)) ? null : filename,
-                        title.equals(originalValues.get(1)) ? null : title,
-                        artist.equals(originalValues.get(2)) ? null : artist,
-                        album.equals(originalValues.get(3)) ? null : album,
-                        albumArtist.equals(originalValues.get(4)) ? null : albumArtist,
-                        year.equals(originalValues.get(5)) ? null : year,
-                        genre.equals(originalValues.get(6)) ? null : genre,
-                        track.equals(originalValues.get(7) + "/" + originalValues.get(8)) ? null : track,
-                        disk.equals(originalValues.get(9) + "/" + originalValues.get(10)) ? null : disk,
-                        comment.equals(originalValues.get(11)) ? null : comment
-                );
+
+                // check if we need to create a new file
+                File oldFile = (File) table.getModel().getValueAt(table.convertRowIndexToModel(row), 1);
+                File newFile = null;
+                if (!filenameField.getText().equals(DASH) &&
+                        !originalValues.get(0).equals(table.getValueAt(row, 1))) {
+                    newFile = FileUtils.getNewMP3FileFromOld(oldFile, filenameField.getText());
+                }
+
+                // create a new song with the file(s)
+                Song song = new Song(oldFile, newFile);
+
+                // set the values of the song object
+                // note that if the value in the text field matches the original value, we'll send back null for that field
+                song.setTitle(titleField.getText().equals(originalValues.get(1)) ? null : titleField.getText());
+                song.setArtist(artistField.getText().equals(originalValues.get(2)) ? null : artistField.getText());
+                song.setAlbum(albumField.getText().equals(originalValues.get(3)) ? null : albumField.getText());
+                song.setAlbumArtist(albumArtistField.getText().equals(originalValues.get(4)) ? null : albumArtistField.getText());
+                song.setYear(yearField.getText().equals(originalValues.get(5)) ? null : yearField.getText());
+                song.setGenre(genreField.getText().equals(originalValues.get(6)) ? null : genreField.getText());
+                if (!track1Field.getText().equals(originalValues.get(7)) || !track2Field.getText().equals(originalValues.get(8))) {
+                    String formattedTracks = table.getValueAt(row, TABLE_COLUMN_TRACK).toString();
+                    String[] arr = formattedTracks.split("/");
+                    String track = arr[0];
+                    String totalTracks = arr[1];
+                    song.setTrack(track1Field.getText().equals(originalValues.get(7)) ? track : track1Field.getText());
+                    song.setTotalTracks(track2Field.getText().equals(originalValues.get(8)) ? totalTracks : track2Field.getText());
+                }
+                if (!disk1Field.getText().equals(originalValues.get(9)) || !disk2Field.getText().equals(originalValues.get(10))) {
+                    String formattedDisks = table.getValueAt(row, TABLE_COLUMN_DISK).toString();
+                    String[] arr = formattedDisks.split("/");
+                    String disk = arr[0];
+                    String totalDisks = arr[1];
+                    song.setDisk(disk1Field.getText().equals(originalValues.get(9)) ? disk : disk1Field.getText());
+                    song.setTotalDisks(disk2Field.getText().equals(originalValues.get(10)) ? totalDisks : disk2Field.getText());
+                }
+                song.setComment(commentField.getText().equals(originalValues.get(11)) ? null : commentField.getText());
+                if (!Arrays.equals(newArtwork, originalArtwork)) {
+                    song.setArtwork_bytes(newArtwork);
+                }
+
+                // submit sequentially
+                Moose.frame.submitRowChanges(row, song);
             }
         }
         this.edited = false;

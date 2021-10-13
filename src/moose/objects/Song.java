@@ -31,10 +31,17 @@ public class Song {
     private String totalDisks;
     private byte[] artwork_bytes;
     
-    private final String bitrate;
+    private String bitrate;
     private String sampleRate;
     private String length;
     private String comment;
+
+    public Song() {}
+
+    public Song(File file, File newFile) {
+        setFile(file);
+        setNewFile(newFile);
+    }
 
     public Song(File file, String title, String artist, String album, String albumArtist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int sampleRate, long len, String comment) {
 

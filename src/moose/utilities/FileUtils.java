@@ -17,6 +17,7 @@ public class FileUtils {
 
     /**
      * Helper Function that lists and stores all of the files in a directory and subdirectories
+     *
      * @param directory, the directory to list files from
      * @param files, the arrayList to store the files in
      */
@@ -36,6 +37,7 @@ public class FileUtils {
 
     /**
      * Opens a file
+     *
      * @param file, the file to open
      */
     public static void openFile(File file) {
@@ -53,6 +55,7 @@ public class FileUtils {
 
     /**
      * Opens the containing folder for the file
+     *
      * @param file the file to open
      */
     public static void showInFolder(File file) {
@@ -97,11 +100,12 @@ public class FileUtils {
     /**
      * Creates a JFileChooser, configures it, and launches it
      * Returns a single index array if there's only one file returned
-     * @param title, the title of the window
-     * @param approveButtonText, the text to show on the approve button
-     * @param selectionMode, the mode for selecting files
-     * @param multipleSelection, a boolean for allowing multiple file selection in the window
-     * @param openAt, an optional-ish parameter to open the JFileChooser at a certain location
+     *
+     * @param title,                   the title of the window
+     * @param approveButtonText,       the text to show on the approve button
+     * @param selectionMode,           the mode for selecting files
+     * @param multipleSelection,       a boolean for allowing multiple file selection in the window
+     * @param openAt,                  an optional-ish parameter to open the JFileChooser at a certain location
      * @param fileNameExtensionFilter, an optional-ish parameter to set the filter to look at files on
      * @return a file array of the selected file(s)
      */
@@ -145,5 +149,40 @@ public class FileUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Gets the common base starting point for files
+     *
+     * @param files, the list of files
+     */
+    public static File getStartingPoint(List<File> files) {
+        String commonPath = "";
+        String[][] folders = new String[files.size()][];
+        for (int i = 0; i < files.size(); i++) {
+            folders[i] = files.get(i).getPath().split("/");
+        }
+        for (int j = 0; j < folders[0].length; j++) {
+            String thisFolder = folders[0][j];  // grab the next folder name in the first path
+            boolean allMatched = true;  // assume all have matched in case there are no more paths
+            // look at the other paths
+            for (int i = 1; i < folders.length && allMatched; i++) {
+                // if there is no folder here
+                if (folders[i].length < j) {
+                    allMatched = false; // no match
+                    break;              // stop looking because we've gone as far as we can
+                }
+                // otherwise, check if it matched
+                allMatched = folders[i][j].equals(thisFolder);
+            }
+            // if they all matched this folder name
+            if (allMatched) {
+                commonPath += thisFolder + "/"; // add it to the answer
+            } else {
+                //stop looking
+                break;
+            }
+        }
+        return new File(commonPath);
     }
 }
