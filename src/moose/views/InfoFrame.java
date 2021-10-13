@@ -37,8 +37,6 @@ import static moose.utilities.Constants.*;
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
 
-    int row;
-    
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
     
@@ -64,9 +62,12 @@ public class InfoFrame extends javax.swing.JFrame {
     byte[] originalArtwork;
     byte[] newArtwork;
 
-    public InfoFrame(Map<Integer, Song> songs, boolean editModeEnabled, Component focusedField) {
+    int[] selectedRows;
+
+    public InfoFrame(Map<Integer, Song> songs, int[] selectedRows, boolean editModeEnabled, Component focusedField) {
         initComponents();
         this.songs = songs;
+        this.selectedRows = selectedRows;
         init();
 
         this.editModeEnabled = editModeEnabled;
@@ -90,7 +91,7 @@ public class InfoFrame extends javax.swing.JFrame {
         setFields(new ArrayList<>(songs.values()));
 
         // set the navigation button based on the row we're given
-        setNavigationButtons(row);
+        setNavigationButtons();
 
         // set the edit mode
         setFieldsEditable(editModeEnabled);
@@ -846,14 +847,17 @@ public class InfoFrame extends javax.swing.JFrame {
      * Sets the navigation buttons based on the row selected in the table
      * @param row, the row to check against
      */
-    public void setNavigationButtons(int row) {
-        if(row == Moose.frame.table.getRowCount() - 1) {
-            previousButton.setEnabled(true);
-            nextButton.setEnabled(false);
-        } else if (row == 0) {
-            previousButton.setEnabled(false);
-            nextButton.setEnabled(true);
-        } else if (row == -1) {
+    public void setNavigationButtons() {
+        if (this.selectedRows.length == 1) {
+            int row = selectedRows[0];
+            if (row == Moose.frame.table.getRowCount() - 1) {
+                previousButton.setEnabled(true);
+                nextButton.setEnabled(false);
+            } else if (row == 0) {
+                previousButton.setEnabled(false);
+                nextButton.setEnabled(true);
+            }
+        } else {
             previousButton.setEnabled(false);
             nextButton.setEnabled(false);
         }
