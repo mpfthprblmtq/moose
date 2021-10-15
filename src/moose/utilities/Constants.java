@@ -26,6 +26,14 @@ public class Constants {
     public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
     public static final String FILENAME_TRIM_REGEX = "(?<TrackTitle>\\w.*).*";
     public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<TrackTitle>.*)";
+    public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
+            "LYRIC VIDEO",
+            "OFFICIAL LYRIC VIDEO",
+            "OFFICIAL MUSIC VIDEO",
+            "LYRICS",
+            "MONSTERCAT RELEASE",
+            "MONSTERCAT LYRIC VIDEO",
+    };
 
     // menu options
     public static final String MORE_INFO = "More info...";
