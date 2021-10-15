@@ -19,6 +19,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.EventObject;
 
+import static moose.utilities.Constants.*;
+
 public class ViewUtils {
 
     // logger
@@ -256,41 +258,41 @@ public class ViewUtils {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         if (base) {
-            popup.add(item = new JMenuItem("More info..."));
+            popup.add(item = new JMenuItem(MORE_INFO));
             item.addActionListener(menuListener);
             popup.addSeparator();
-            popup.add(item = new JMenuItem("Remove from list"));
+            popup.add(item = new JMenuItem(REMOVE_FROM_LIST));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Play"));
+            popup.add(item = new JMenuItem(PLAY));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Save"));
+            popup.add(item = new JMenuItem(SAVE));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Show in Finder..."));
+            popup.add(item = new JMenuItem(SHOW_IN_FINDER));
             item.addActionListener(menuListener);
             popup.addSeparator();
-            popup.add(item = new JMenuItem("Autotag"));
+            popup.add(item = new JMenuItem(AUTO_TAG));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Format filenames"));
+            popup.add(item = new JMenuItem(FORMAT_FILENAME));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Auto-add track/disk numbers"));
+            popup.add(item = new JMenuItem(AUTO_TRACK_DISK_NUMBERS));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Auto-add artwork"));
+            popup.add(item = new JMenuItem(AUTO_ARTWORK));
             item.addActionListener(menuListener);
             popup.addSeparator();
         }
         if (file) {
-            popup.add(item = new JMenuItem(rows > 1 ? "Move file..." : "Move files..."));
+            popup.add(item = new JMenuItem(MOVE_FILE));
             item.addActionListener(menuListener);
         }
         if (artwork) {
-            popup.add(item = new JMenuItem("Add artwork..."));
+            popup.add(item = new JMenuItem(ADD_ARTWORK));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Remove artwork"));
+            popup.add(item = new JMenuItem(REMOVE_ARTWORK));
             item.addActionListener(menuListener);
         } else if (artworkMultPanel) {
-            popup.add(item = new JMenuItem("Add artwork for selected..."));
+            popup.add(item = new JMenuItem(ADD_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
-            popup.add(item = new JMenuItem("Remove artwork for selected"));
+            popup.add(item = new JMenuItem(REMOVE_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
         }
         if (customItems != null && customItems.length > 0) {

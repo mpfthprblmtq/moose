@@ -116,11 +116,11 @@ public class DialogService {
         // create and configure the track number field
         JTextField trackField = new JTextField();
         ((AbstractDocument)trackField.getDocument()).setDocumentFilter(new DocumentFilter(){
-            Pattern regEx = Pattern.compile("\\d*");
+            final Pattern regex = Pattern.compile("\\d*");
 
             @Override
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                Matcher matcher = regEx.matcher(text);
+                Matcher matcher = regex.matcher(text);
                 if(!matcher.matches()){
                     return;
                 }
@@ -153,17 +153,14 @@ public class DialogService {
         Object[] message = {panel};
 
         // create a thread to wait until the dialog box pops up
-        (new Thread() {
-            @Override
-            public void run() {
-                try {
-                    sleep(500);
-                } catch (InterruptedException e) {
-                    logger.logError("Exception with threading when opening the track number dialog.", e);
-                }
-                trackField.requestFocus();
+        (new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                logger.logError("Exception with threading when opening the track number dialog.", e);
             }
-        }).start();
+            trackField.requestFocus();
+        })).start();
 
         // show the dialog
         int option = JOptionPane.showConfirmDialog(component, message, "Manual set Track Number", JOptionPane.OK_CANCEL_OPTION);

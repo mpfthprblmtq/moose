@@ -51,8 +51,8 @@ public class Frame extends javax.swing.JFrame {
     // logger object
     Logger logger = Moose.getLogger();
 
-    // controller, instantiated in constructor
-    public SongController songController = new SongController();
+    // controller
+    public SongController songController = Moose.getSongController();
 
     // services
     public IconService iconService = new IconService();
@@ -87,7 +87,6 @@ public class Frame extends javax.swing.JFrame {
         }
 
         // set up the song controller
-        songController = new SongController();
         songController.setTable(table);
     }
 
