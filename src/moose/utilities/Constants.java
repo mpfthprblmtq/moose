@@ -20,19 +20,12 @@ public class Constants {
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
 
     public static final String TRACK_FILENAME_REGEX = "\\d{2} ((.)*).mp3";
-    public static final String TRACK_NUMBER_REGEX = "\\d{2}";
     public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
 
-    public static final List<String> REGEX_ARRAY = new ArrayList<>(Arrays.asList(
-            "(\\d{2}|\\d{1})\\. .* - .*\\.mp3",  // 01. Kasbo - The Making of a Paracosm.mp3 (single or double-digit)
-            "(\\d{2}|\\d{1}) - .* - .*\\.mp3",   // 01 - Kasbo - The Making of a Paracosm.mp3 (single or double-digit)
-            "(\\d{2}|\\d{1})\\. .*\\.mp3",       // 01. The Making of a Paracosm.mp3 (single or double-digit)
-            "(\\d{2}|\\d{1}) .* - .*\\.mp3",     // 02 Kasbo - Play Pretend (ft. Ourchives).mp3 (single or double-digit)
-            "(\\d{2}|\\d{1}) - .*\\.mp3",        // 02 - Play Pretend (ft. Ourchives).mp3 (single or double-digit)
-            "[^\\d{2}].* - .*\\.mp3",   // Kasbo - Play Pretend (ft. Ourchives).mp3
-            "[^\\d{2}].*\\.mp3"         // Play Pretend (ft. Ourchives).mp3
-    ));
-    public static final String TRACK_DISK_REGEX = "\\d+\\/\\d+";
+    public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
+    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
+    public static final String FILENAME_TRIM_REGEX = "(?<TrackTitle>\\w.*).*";
+    public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<TrackTitle>.*)";
 
     // menu options
     public static final String MORE_INFO = "More info...";

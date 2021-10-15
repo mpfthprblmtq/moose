@@ -5,48 +5,46 @@
  */
 package moose.services;
 
-import java.awt.*;
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import moose.Moose;
+import moose.controllers.SongController;
 import moose.objects.Song;
-import moose.utilities.Constants;
+import moose.utilities.FileUtils;
 import moose.utilities.SongUtils;
 import moose.utilities.StringUtils;
 
+import static moose.utilities.Constants.*;
+
 
 /**
- *
  * @author pat
  */
 public class FilenameFormatterService {
 
-    // frame
-    Frame frame;
+    // auto tagging service
+    AutoTaggingService autoTaggingService;
 
-    public FilenameFormatterService() {
-        this.frame = Moose.getFrame();
+    public FilenameFormatterService(SongController songController) {
+        this.autoTaggingService = songController.getAutoTaggingService();
     }
 
     /**
      * Formats filenames to a more suitable standard if we find a match
-     * @param file a file with a name to format
-     * @param singleFile a boolean to tell us if the file is a single, so there's only one
-     * @return a new file with a better name
+     *
+     * @param file, a file with a name to format
+     * @param singleFile, a boolean to tell us if the file is a single, so there's only one
+     * @return a new and improved file name
      */
     public String formatFilename(File file, boolean singleFile) {
         // clean it up first
         String filename = cleanupFilename(file.getName());
+        file = FileUtils.getNewMP3FileFromOld(file, filename);
 
-        // check for regex matches
-        String regexMatched = checkForMatch(filename);
-        if (StringUtils.isNotEmpty(regexMatched)) {
-            String newFilename = getGoodFilename(file, regexMatched, singleFile);
-            if (!newFilename.equals(filename)) {
-                return newFilename.replace("/", ":");
-            } else {
-                return filename;
-            }
-        }
+        // then process it heavily
+        filename = getBetterFilename(file, singleFile);
         return filename;
     }
 
@@ -54,100 +52,68 @@ public class FilenameFormatterService {
      * Cleans up the file name before doing any intense operations, which for now is just replacing feat with ft
      */
     private String cleanupFilename(String filename) {
-        String newFilename = filename
-                .replace("feat.", "ft.");
-        if (newFilename.contains("feat")) {
-            newFilename = newFilename.replace("feat", "ft.");
-        }
-        if (newFilename.contains("ft") && !newFilename.contains("ft.")) {
-            newFilename = newFilename.replace("ft", "ft.");
-        }
-        return newFilename;
-    }
-
-    /**
-     * Checks for a match in any of the file regexes declared as "dumb" and/or "bad"
-     * @param filename the filename to check
-     * @return the regex the filename matched with, null if it didn't match
-     */
-    private String checkForMatch(String filename) {
-        for (String regex : Constants.REGEX_ARRAY) {
-            if (filename.matches(regex)) {
-                return regex;
-            }
-        }
-        return null;
+        return filename
+                .replace("feat.", "ft.")
+                .replace("Feat.", "ft.");
     }
 
     /**
      * Checks for a match of known filename regexes, then applies fixes to the filename
-     * @param file the file with the name to change
-     * @param regex the regex that was matched
+     *
+     * @param file       the file with the name to change
      * @param singleFile a boolean to tell us if the file is single, so there's only one
      * @return a good filename, or null if the fix couldn't be applied
      */
-    private String getGoodFilename(File file, String regex, boolean singleFile) {
-
+    public String getBetterFilename(File file, boolean singleFile) {
         String filename = file.getName();
-        String newFilename = StringUtils.EMPTY;
+        String trackNumber = StringUtils.EMPTY;
+        String trackTitle = StringUtils.EMPTY;
 
-        // apply regex fix
-        if (regex.equals(Constants.REGEX_ARRAY.get(2))) {
-            newFilename = applyRegex(filename, ". ");
-        } else if (
-                regex.equals(Constants.REGEX_ARRAY.get(0)) ||
-                        regex.equals(Constants.REGEX_ARRAY.get(1)) ||
-                regex.equals(Constants.REGEX_ARRAY.get(3)) ||
-                regex.equals(Constants.REGEX_ARRAY.get(4))
-        ) {
-            newFilename = applyRegex(filename, " - ");
-        } else if (regex.equals(Constants.REGEX_ARRAY.get(5)) || regex.equals(Constants.REGEX_ARRAY.get(6))) {
-            newFilename = getFilenameWithNoTrack(file, singleFile);
+        // try and replace the artist before we use the regex
+        String artist = autoTaggingService.getArtist(file);
+        filename = filename.replaceFirst(artist, StringUtils.EMPTY);
+
+        // perform regex search on filename
+        // first check if it matches the ## Title.mp3 format
+        if (filename.matches(FILENAME_PRECHECK_REGEX)) {
+            Pattern pattern = Pattern.compile(FILENAME_REGEX);
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find()) {
+                trackNumber = matcher.group("TrackNumber");
+                trackTitle = matcher.group("TrackTitle");
+            }
+        } else {
+            // didn't match precheck regex
+            // let's try and get the title by trimming nonsense out
+            Pattern pattern = Pattern.compile(FILENAME_TRIM_REGEX);
+            Matcher matcher = pattern.matcher(filename);
+            if (matcher.find()) {
+                trackTitle = matcher.group("TrackTitle");
+            }
+            trackTitle = trackTitle.trim();
         }
 
-        // if it's empty for some reason, the regex fix didn't work, so let's just use the old filename
-        if (StringUtils.isEmpty(newFilename)) {
-            newFilename = filename;
+        // check to see if it's a single file
+        if (StringUtils.isEmpty(trackNumber) && singleFile) {
+            trackNumber = "01";
         }
 
-        // return the new parsed filename
-        return newFilename;
-    }
+        // pad the 0 if the track number is only one digit
+        trackNumber = trackNumber.length() == 1 ? "0" + trackNumber : trackNumber;
 
-    /**
-     * Actually does the fix
-     * @param filename the filename to fix
-     * @param initialSplit the split string used to split the track and title
-     * @return a good filename, or null if the fix couldn't be applied
-     */
-    private String applyRegex(String filename, String initialSplit) {
-        // split to get a track and title
-        String[] arr = filename.split(initialSplit);
-        String track = arr[0];
-        String title = arr[1];
-        if (arr.length > 2) {
-            title = arr[arr.length - 1];
+        // last ditch effort, make the user do it manually
+        if (StringUtils.isEmpty(trackNumber) || StringUtils.isEmpty(trackTitle)) {
+            return getManualFilename(file);
         }
 
-        // make sure track is the two digit
-        if (!track.matches(Constants.TRACK_NUMBER_REGEX)) {
-            track = track.substring(0,2);
-        }
-
-        // verify the filename and return it if it's good
-        String newFilename = track + " " + title;
-        if (newFilename.matches(Constants.TRACK_FILENAME_REGEX)) {
-            return newFilename;
-        }
-
-        // filename wasn't good, return null
-        return null;
+        // return the new filename
+        return trackNumber + " " + trackTitle;
     }
 
     /**
      * Attempts to get the track name/title from the file if there's no track number on the file
      */
-    private String getFilenameWithNoTrack(File file, boolean singleFile) {
+    private String getManualFilename(File file) {
 
         // get the song data if there is any
         Song song = SongUtils.getSongFromFile(file);
@@ -158,17 +124,7 @@ public class FilenameFormatterService {
         // get the title
         String title = song.getTitle();
         if (StringUtils.isEmpty(title)) {
-            title = file.getName()
-                    .replace(":", "/")
-                    .replace(".mp3", StringUtils.EMPTY);
-        }
-        if ((title + ".mp3").matches(Constants.REGEX_ARRAY.get(5))) {
-            String[] arr = title.split(" - ");
-            title = arr[1];
-        }
-
-        if (singleFile) {
-            return "01 " + title;
+            title = file.getName().replace(".mp3", StringUtils.EMPTY);
         }
 
         // get the track number
@@ -183,17 +139,15 @@ public class FilenameFormatterService {
             } else {
                 return file.getName();
             }
-
         }
 
         // if the track number is still empty (either from sheer user arrogance or some other reason)
         if (StringUtils.isEmpty(track)) {
             return file.getName();
         }
+
         // clean up the track
-        if (track.length() == 1) {
-            track = "0".concat(track);
-        }
+        track = track.length() == 1 ? "0" + track : track;
 
         // yay we have a track and title
         return track + " " + title;

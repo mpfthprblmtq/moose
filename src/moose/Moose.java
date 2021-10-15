@@ -10,6 +10,8 @@
 package moose;
 
 import java.io.File;
+
+import moose.controllers.SongController;
 import moose.objects.Settings;
 import moose.utilities.logger.Logger;
 import moose.views.AuditFrame;
@@ -27,6 +29,9 @@ public class Moose {
     // logger object
     public static Logger logger;
 
+    // song controller
+    public static SongController songController;
+
     /**
      * Entry point for the app, launches the main Frame
      * @param args, the entry arguments
@@ -37,10 +42,20 @@ public class Moose {
         
         // instantiate the logger object so we can have some logging
         logger = new Logger();
+
+        // instantiate the main song controller object
+        songController = new SongController();
         
         // go
         launchFrame();
 //        launchFrame(new File("/Users/pat/Music/Library - For Testing/Atoms for Peace/[2013] Amok"));
+    }
+
+    /**
+     * @return the songController
+     */
+    public static SongController getSongController() {
+        return songController;
     }
 
     /**

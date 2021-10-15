@@ -49,7 +49,14 @@ public class SongController {
      */
     public SongController() {
         autoTaggingService = new AutoTaggingService(this);
-        filenameFormatterService = new FilenameFormatterService();
+        filenameFormatterService = new FilenameFormatterService(this);
+    }
+
+    /**
+     * Returns the autoTaggingService
+     */
+    public AutoTaggingService getAutoTaggingService() {
+        return this.autoTaggingService;
     }
 
     /**
