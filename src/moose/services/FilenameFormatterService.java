@@ -18,10 +18,6 @@ import moose.utilities.StringUtils;
 
 import static moose.utilities.Constants.*;
 
-
-/**
- * @author pat
- */
 public class FilenameFormatterService {
 
     // auto tagging service
@@ -34,7 +30,7 @@ public class FilenameFormatterService {
     /**
      * Formats filenames to a more suitable standard if we find a match
      *
-     * @param file, a file with a name to format
+     * @param file,       a file with a name to format
      * @param singleFile, a boolean to tell us if the file is a single, so there's only one
      * @return a new and improved file name
      */
@@ -49,12 +45,22 @@ public class FilenameFormatterService {
     }
 
     /**
-     * Cleans up the file name before doing any intense operations, which for now is just replacing feat with ft
+     * Cleans up the file name before doing any intense operations,
+     * which includes replacing "feat." with "ft." and removing common strings
+     *
+     * @param filename, the filename to clean up
+     * @return the cleaned up filename
      */
     private String cleanupFilename(String filename) {
-        return filename
-                .replace("feat.", "ft.")
-                .replace("Feat.", "ft.");
+        filename = filename.replaceAll("(?i)feat.", "ft.");
+
+        // I totally get my music from legit sources, don't judge me
+        for (String toReplace : FILENAME_STRINGS_TO_REMOVE) {
+            filename = filename.replaceAll("\\((?i)" + toReplace + "\\)", StringUtils.EMPTY);
+            filename = filename.replaceAll("\\[(?i)" + toReplace + "\\]", StringUtils.EMPTY);
+        }
+
+        return filename;
     }
 
     /**
@@ -65,6 +71,51 @@ public class FilenameFormatterService {
      * @return a good filename, or null if the fix couldn't be applied
      */
     public String getBetterFilename(File file, boolean singleFile) {
+        String filename;
+        File originalFile = file;
+
+        // apply regex fixes
+        String[] result = applyFixes(file, singleFile);
+
+        String trackNumber = result[0];
+        String trackTitle = result[1];
+
+        // last ditch effort, make the user do it manually
+        if (StringUtils.isEmpty(trackNumber) || StringUtils.isEmpty(trackTitle)) {
+            filename = trackNumber + " " + trackTitle;
+
+            // if we have a new file name, change the name of the actual file
+            if (!filename.equals(file.getName())) {
+                file = FileUtils.getNewMP3FileFromOld(file, filename);
+            }
+
+            // get the manual title and number
+            filename = getManualFilename(file, originalFile);
+
+            // if we have a new file name, change the name of the actual file
+            if (!filename.equals(file.getName())) {
+                file = FileUtils.getNewMP3FileFromOld(file, filename);
+            }
+
+            // apply regex fixes again since we might actually have it now
+            result = applyFixes(file, singleFile);
+            trackNumber = result[0];
+            trackTitle = result[1];
+        }
+
+        // return the new filename
+        return trackNumber + " " + trackTitle;
+    }
+
+    /**
+     * Applies regex fixes to the file
+     *
+     * @param file,       the file we're editing
+     * @param singleFile, a boolean to determine if the file is a single file
+     * @return a two element string array with the track number and track title
+     */
+    private String[] applyFixes(File file, boolean singleFile) {
+
         String filename = file.getName();
         String trackNumber = StringUtils.EMPTY;
         String trackTitle = StringUtils.EMPTY;
@@ -90,7 +141,8 @@ public class FilenameFormatterService {
             if (matcher.find()) {
                 trackTitle = matcher.group("TrackTitle");
             }
-            trackTitle = trackTitle.trim();
+            // get rid of any spaces around it or between the title and .mp3
+            trackTitle = trackTitle.replace(".mp3", "").trim() + ".mp3";
         }
 
         // check to see if it's a single file
@@ -101,55 +153,56 @@ public class FilenameFormatterService {
         // pad the 0 if the track number is only one digit
         trackNumber = trackNumber.length() == 1 ? "0" + trackNumber : trackNumber;
 
-        // last ditch effort, make the user do it manually
-        if (StringUtils.isEmpty(trackNumber) || StringUtils.isEmpty(trackTitle)) {
-            return getManualFilename(file);
-        }
-
-        // return the new filename
-        return trackNumber + " " + trackTitle;
+        return new String[]{trackNumber, trackTitle};
     }
 
     /**
      * Attempts to get the track name/title from the file if there's no track number on the file
+     *
+     * @param file,         the file we're editing
+     * @param originalFile, the original file that we were editing, used to get the original song info
+     * @return the manual filename
      */
-    private String getManualFilename(File file) {
+    private String getManualFilename(File file, File originalFile) {
+
+        String trackTitle = StringUtils.EMPTY;
+        String trackNumber = StringUtils.EMPTY;
 
         // get the song data if there is any
-        Song song = SongUtils.getSongFromFile(file);
-        if (song == null) {
-            return file.getName();
+        Song song = SongUtils.getSongFromFile(originalFile);
+
+        if (song != null) {
+            // get the title
+            trackTitle = song.getTitle();
+            if (StringUtils.isEmpty(trackTitle)) {
+                trackTitle = file.getName().replace(".mp3", StringUtils.EMPTY);
+            }
+
+            // get the track number
+            // if there isn't a track in the id3 data, show a dialog where the user can manually input the number
+            trackNumber = song.getTrack();
         }
 
-        // get the title
-        String title = song.getTitle();
-        if (StringUtils.isEmpty(title)) {
-            title = file.getName().replace(".mp3", StringUtils.EMPTY);
-        }
+        // set the track title
+        trackTitle = StringUtils.isEmpty(trackTitle) ? file.getName() : trackTitle;
 
-        // get the track number
-        // if there isn't a track in the id3 data, show a dialog where the user can manually input the number
-        String track = song.getTrack();
-        if (StringUtils.isEmpty(track)) {
+        if (StringUtils.isEmpty(trackNumber)) {
             // show the dialog
-            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
+            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
             if (arr != null) {
-                title = arr[0];
-                track = arr[1];
+                trackTitle = arr[0];
+                trackNumber = arr[1];
             } else {
                 return file.getName();
             }
         }
 
         // if the track number is still empty (either from sheer user arrogance or some other reason)
-        if (StringUtils.isEmpty(track)) {
+        if (StringUtils.isEmpty(trackNumber)) {
             return file.getName();
         }
 
-        // clean up the track
-        track = track.length() == 1 ? "0" + track : track;
-
         // yay we have a track and title
-        return track + " " + title;
+        return trackNumber + " " + trackTitle.trim();
     }
 }

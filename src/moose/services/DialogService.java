@@ -111,7 +111,7 @@ public class DialogService {
     public static String[] showGetTitleOrTrackNumberDialog(Component component, String title) {
         // create and configure the title field
         JTextField titleField = new JTextField(20);
-        titleField.setText(StringUtils.isNotEmpty(title) ? title : StringUtils.EMPTY);
+        titleField.setText(StringUtils.isNotEmpty(title) ? title.replace(":", "/") : StringUtils.EMPTY);
 
         // create and configure the track number field
         JTextField trackField = new JTextField();
@@ -166,7 +166,7 @@ public class DialogService {
         int option = JOptionPane.showConfirmDialog(component, message, "Manual set Track Number", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
-            return new String[]{titleField.getText(), trackField.getText()};
+            return new String[]{titleField.getText().replace("/", ":"), trackField.getText()};
         } else {
             return null;
         }
