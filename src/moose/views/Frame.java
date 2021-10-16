@@ -69,6 +69,7 @@ public class Frame extends javax.swing.JFrame {
     // ivars for the multPanel to check if the artwork has changed in the multPanel
     byte[] originalMultPanelArtwork;
     byte[] newMultPanelArtwork;
+    boolean multipleArtworks = false;
 
     /**
      * Creates new form Frame
@@ -1211,6 +1212,7 @@ public class Frame extends javax.swing.JFrame {
         if (table.getRowCount() > 0) {
             table.selectAll();
         }
+        updateMultiplePanelFields();
     }//GEN-LAST:selectAllMenuItemActionPerformed
 
     /**
@@ -1830,9 +1832,11 @@ public class Frame extends javax.swing.JFrame {
         if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
             multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
             originalMultPanelArtwork = newMultPanelArtwork = images[0];
+            multipleArtworks = false;
         } else {
             List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
             multImage.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
+            multipleArtworks = true;
         }
     }
 
@@ -1864,10 +1868,13 @@ public class Frame extends javax.swing.JFrame {
             song.setDisk(arr[0]);
             song.setTotalDisks(arr[1]);
         }
-        if (!Arrays.equals(originalMultPanelArtwork, newMultPanelArtwork)) {
-            song.setArtwork_bytes(newMultPanelArtwork);
-        } else {
-            song.setArtwork_bytes(originalMultPanelArtwork);
+
+        if (!multipleArtworks) {
+            if (!Arrays.equals(originalMultPanelArtwork, newMultPanelArtwork)) {
+                song.setArtwork_bytes(newMultPanelArtwork);
+            } else {
+                song.setArtwork_bytes(originalMultPanelArtwork);
+            }
         }
 
         // update the rows iteratively
@@ -2044,8 +2051,10 @@ public class Frame extends javax.swing.JFrame {
         // album art
         if (!Arrays.equals(song.getArtwork_bytes(),
                 ImageUtils.getBytesFromImageIcon((ImageIcon) table.getValueAt(row, TABLE_COLUMN_ALBUM_ART)))) {
-            songController.setAlbumImage(songController.getIndex(row), song.getArtwork_bytes());
-            table.setValueAt(ImageUtils.getScaledImage(song.getArtwork_bytes(), 100), row, TABLE_COLUMN_ALBUM_ART);
+            if (!multipleArtworks) {
+                songController.setAlbumImage(songController.getIndex(row), song.getArtwork_bytes());
+                table.setValueAt(ImageUtils.getScaledImage(song.getArtwork_bytes(), 100), row, TABLE_COLUMN_ALBUM_ART);
+            }
         }
 
     }
