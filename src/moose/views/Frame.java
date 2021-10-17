@@ -21,9 +21,7 @@ import moose.services.DialogService;
 import moose.services.IconService;
 import moose.utilities.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -149,6 +147,17 @@ public class Frame extends javax.swing.JFrame {
 
         // set the songController's table
         songController.setTable(table);
+
+        // mouse event listener to listen for clicking on the table outside the available rows
+        // deselects the current row selection
+        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if(event.getID() == MouseEvent.MOUSE_CLICKED) {
+                MouseEvent mouseEvent = (MouseEvent) event;
+                if(table.rowAtPoint(mouseEvent.getPoint()) == -1) {
+                    table.clearSelection();
+                }
+            }
+        }, AWTEvent.MOUSE_EVENT_MASK);
 
         // listener for the context menu when you right-click on a row
         // basically tells the program where to go based on the user's choice
@@ -629,6 +638,9 @@ public class Frame extends javax.swing.JFrame {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tableMousePressed(evt);
             }
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
         });
         table.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -674,6 +686,11 @@ public class Frame extends javax.swing.JFrame {
         multTitle.setMinimumSize(new java.awt.Dimension(250, 26));
         multTitle.setNextFocusableComponent(multArtist);
         multTitle.setPreferredSize(new java.awt.Dimension(250, 26));
+        multTitle.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multTitleFocusGained(evt);
+            }
+        });
         multTitle.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTitleKeyPressed(evt);
@@ -765,6 +782,11 @@ public class Frame extends javax.swing.JFrame {
         multTrack.setMinimumSize(new java.awt.Dimension(50, 26));
         multTrack.setNextFocusableComponent(multDisk);
         multTrack.setPreferredSize(new java.awt.Dimension(50, 26));
+        multTrack.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multTrackFocusGained(evt);
+            }
+        });
         multTrack.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multTrackKeyPressed(evt);
@@ -776,6 +798,11 @@ public class Frame extends javax.swing.JFrame {
         multDisk.setMinimumSize(new java.awt.Dimension(50, 26));
         multDisk.setNextFocusableComponent(multTitle);
         multDisk.setPreferredSize(new java.awt.Dimension(50, 26));
+        multDisk.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                multDiskFocusGained(evt);
+            }
+        });
         multDisk.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 multDiskKeyPressed(evt);
@@ -1146,7 +1173,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
-        // select some file(s)
+
         File[] dirs = FileUtils.launchJFileChooser(
                 "Select a folder to open...",
                 "Open",
@@ -1209,11 +1236,18 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:selectAllMenuItemActionPerformed
+        selectAll();
+    }//GEN-LAST:selectAllMenuItemActionPerformed
+
+    /**
+     * Selects all rows in the table
+     */
+    private void selectAll() {
         if (table.getRowCount() > 0) {
             table.selectAll();
         }
         updateMultiplePanelFields();
-    }//GEN-LAST:selectAllMenuItemActionPerformed
+    }
 
     /**
      * Action for the Audit menu item, launches the audit frame
@@ -1528,11 +1562,15 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the KeyEvent we use to determine where to go
      */
     private void tableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyReleased
-        changeSelection(evt);
+        if (evt.getKeyCode() == KeyEvent.VK_META) {
+            evt.consume();
+        } else {
+            changeSelection(evt);
+        }
     }//GEN-LAST:event_tableKeyReleased
 
     private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_META) {
+        if (evt.getKeyCode() == KeyEvent.VK_META || evt.isMetaDown()) {
             evt.consume();
         }
     }//GEN-LAST:event_tableKeyPressed
@@ -1544,6 +1582,11 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the KeyEvent that we use to determine the type of navigation (Enter, Tab, Shift+Enter, Shift+Tab)
      */
     public void changeSelection(KeyEvent evt) {
+
+        // check if it's an automatic action
+        if (evt.getKeyCode() == KeyEvent.VK_A && evt.isMetaDown()) {
+            selectAll();
+        }
 
         // changes to the row/column
         int rowDelta;
@@ -1728,49 +1771,85 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multDiskKeyPressed
 
     /**
-     * On focus gain, update auto complete fields
+     * On focus gain, select all text
+     *
+     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     */
+    private void multTitleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTitleFocusGained
+        multTitle.selectAll();
+    }//GEN-LAST:event_multTitleFocusGained
+
+    /**
+     * On focus gain, update auto complete fields and select all
      *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multArtistFocusGained
         updateAutocompleteFields(multArtist, false);
+        multArtist.selectAll();
     }//GEN-LAST:event_multArtistFocusGained
 
     /**
-     * On focus gain, update auto complete fields
+     * On focus gain, update auto complete fields and select all
      *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multAlbumFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumFocusGained
         updateAutocompleteFields(multAlbum, false);
+        multAlbum.selectAll();
     }//GEN-LAST:event_multAlbumFocusGained
 
     /**
-     * On focus gain, update auto complete fields
+     * On focus gain, update auto complete fields and select all
      *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multAlbumArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumArtistFocusGained
         updateAutocompleteFields(multAlbumArtist, false);
+        multAlbumArtist.selectAll();
     }//GEN-LAST:event_multAlbumArtistFocusGained
 
     /**
-     * On focus gain, update auto complete fields
+     * On focus gain, update auto complete fields and select all
      *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multGenreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multGenreFocusGained
         updateAutocompleteFields(multGenre, true);
+        multGenre.selectAll();
     }//GEN-LAST:event_multGenreFocusGained
 
     /**
-     * On focus gain, update auto complete fields
+     * On focus gain, update auto complete fields and select all
      *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multYearFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multYearFocusGained
         updateAutocompleteFields(multYear, false);
+        multYear.selectAll();
     }//GEN-LAST:event_multYearFocusGained
+
+    /**
+     * On focus gain, select all text
+     *
+     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     */
+    private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
+        multTrack.selectAll();
+    }//GEN-LAST:event_multTrackFocusGained
+
+    /**
+     * On focus gain, select all text
+     *
+     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     */
+    private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
+        multDisk.selectAll();
+    }//GEN-LAST:event_multDiskFocusGained
+
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+        System.out.println(table.rowAtPoint(evt.getPoint()));
+    }//GEN-LAST:event_tableMouseClicked
 
     /**
      * Sets the multiple fields panel based on the data selected
