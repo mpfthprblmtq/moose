@@ -555,17 +555,17 @@ public class SongController {
      */
     public void moveFiles(int[] selectedRows) {
 
-        File directory = Objects.requireNonNull(FileUtils.launchJFileChooser(
+        File[] files = FileUtils.launchJFileChooser(
                 "Choose the destination folder...",
                 "Select",
                 JFileChooser.DIRECTORIES_ONLY,
                 false,
                 null,
-                null))[0];
-        if (directory != null) {
+                null);
+        if (files != null) {
             for (int selectedRow : selectedRows) {
                 File old_file = (File) table.getModel().getValueAt(table.convertRowIndexToModel(selectedRow), 1);
-                moveFile(selectedRow, old_file, directory);
+                moveFile(selectedRow, old_file, files[0]);
             }
         }
         // else do nothing, user exited or pressed cancel
