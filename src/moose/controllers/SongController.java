@@ -44,6 +44,9 @@ public class SongController {
     HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
     List<Integer> edited_songs = new ArrayList<>();           // arraylist to contain indices of edited songs to save
 
+    // ivar to check if user has unsaved changes
+    boolean hasUnsavedChanges = false;
+
     /**
      * Default constructor
      */
@@ -74,6 +77,13 @@ public class SongController {
      */
     public HashMap<Integer, Song> getSongs() {
         return songs;
+    }
+
+    /**
+     * Returns the hasUnsavedChanges flag
+     */
+    public boolean hasUnsavedChanges() {
+        return this.hasUnsavedChanges;
     }
 
     /**
@@ -133,6 +143,7 @@ public class SongController {
             edited_songs.add(index);
             int row = getRow(index);
             Moose.frame.setRowIcon(Constants.EDITED, row);
+            this.hasUnsavedChanges = true;
         }
         // else do nothing, index is already added
     }
@@ -311,6 +322,7 @@ public class SongController {
             }
         }
         Moose.getFrame().updateConsole(count + " file(s) updated!");
+        this.hasUnsavedChanges = false;
     }
 
     /**
