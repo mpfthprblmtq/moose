@@ -202,4 +202,12 @@ public class DialogService {
                 "Only Marked Albums"
         );
     }
+
+    public static int showUnsavedChangesDialog(Component component) {
+        return JOptionPane.showConfirmDialog(
+                component,
+                "You have unsaved changes, are you sure you want to exit?",
+                "Unsaved Changes",
+                JOptionPane.YES_NO_OPTION);
+    }
 }
