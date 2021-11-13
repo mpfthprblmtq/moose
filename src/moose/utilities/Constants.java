@@ -1,9 +1,6 @@
 package moose.utilities;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Constants {
 
@@ -23,9 +20,16 @@ public class Constants {
     public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
 
     public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
-    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
-    public static final String FILENAME_TRIM_REGEX = "(?<TrackTitle>\\w.*).*";
-    public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<TrackTitle>.*)";
+    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3} .*";
+    public static final String FILENAME_TRIM_REGEX = "(?<Title>\\w.*).*";
+    public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<Title>.*)";
+    public static final String TITLE_REGEX = "(?<Title>.*).mp3";
+    public static final String TRACKNUM_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Title>.*).mp3";
+    public static final String ARTIST_TITLE_REGEX = "(?<Artist>.*) - (?<Title>.*).mp3";
+    public static final String YEAR_ARTIST_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Artist>.*) - (?<Album>.*)";
+    public static final String YEAR_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Album>.*)";
+    public static final String TRACKNUM_ARTIST_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Artist>.*) - (?<Title>.*).mp3";
+    public static final String CD_FILEPATH_REGEX = ".*/CD\\d*/";
     public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
             "LYRIC VIDEO",
             "OFFICIAL LYRIC VIDEO",
