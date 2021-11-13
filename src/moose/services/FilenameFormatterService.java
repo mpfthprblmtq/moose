@@ -121,7 +121,7 @@ public class FilenameFormatterService {
         String trackTitle = StringUtils.EMPTY;
 
         // try and replace the artist before we use the regex
-        String artist = autoTaggingService.getArtist(file);
+        String artist = autoTaggingService.getArtistFromFile(file);
         filename = filename.replaceFirst(artist, StringUtils.EMPTY);
 
         // perform regex search on filename
@@ -131,7 +131,7 @@ public class FilenameFormatterService {
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find()) {
                 trackNumber = matcher.group("TrackNumber");
-                trackTitle = matcher.group("TrackTitle");
+                trackTitle = matcher.group("Title");
             }
         } else {
             // didn't match precheck regex
@@ -139,7 +139,7 @@ public class FilenameFormatterService {
             Pattern pattern = Pattern.compile(FILENAME_TRIM_REGEX);
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find()) {
-                trackTitle = matcher.group("TrackTitle");
+                trackTitle = matcher.group("Title");
             }
             // get rid of any spaces around it or between the title and .mp3
             trackTitle = trackTitle.replace(".mp3", "").trim() + ".mp3";

@@ -20,14 +20,13 @@ import moose.views.modals.AlbumArtFinderFrame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static moose.utilities.Constants.*;
 
@@ -71,7 +70,7 @@ public class AutoTaggingService {
             String album = getAlbumFromFile(file);
             String albumArtist = getAlbumArtistFromFile(file);
             String year = getYearFromFile(file);
-            String tracks = getTracksFromFolder(file);
+            String tracks = getTracksFromFile(file);
             String disks = getDisksFromFile(file);
             String genre = getGenreFromFile(file);
 
@@ -83,10 +82,9 @@ public class AutoTaggingService {
             table.setValueAt(title, row, TABLE_COLUMN_TITLE);
 
             // artist
-            if (!SongUtils.isPartOfALabel(file)) {
-                Moose.frame.songController.setArtist(index, artist);
-                table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
-            }
+            Moose.frame.songController.setArtist(index, artist);
+            table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
+
 
             // album
             Moose.frame.songController.setAlbum(index, album);
@@ -101,10 +99,8 @@ public class AutoTaggingService {
             table.setValueAt(year, row, TABLE_COLUMN_YEAR);
 
             // genre
-            if (SongUtils.isPartOfALabel(file)) {
-                Moose.frame.songController.setGenre(index, genre);
-                table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
-            }
+            Moose.frame.songController.setGenre(index, genre);
+            table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
 
             // tracks
             Moose.frame.songController.setTrack(index, tracks);
@@ -124,14 +120,22 @@ public class AutoTaggingService {
         autoAddCoverArt(rows);
     }
 
+    /**
+     * Attempts to add cover art for the rows
+     *
+     * @param selectedRows, the rows to update
+     */
     public void autoAddCoverArt(int[] selectedRows) {
 
         List<Integer> rowsToReprocess = new ArrayList<>();
 
         // go through the list and add the covers that exist
+        // if we can't find the cover art automatically, add the rows to a list so that we can reprocess them later
+        // using the album art finder
         for (int selectedRow : selectedRows) {
             File dir = getFile(selectedRow).getParentFile();
             File cover = folderContainsCover(dir);
+            // if we have a cover add it, else add the row to the rowsToReprocess list
             if (cover != null) {
                 addIndividualCover(selectedRow, cover);
             } else {
@@ -139,19 +143,34 @@ public class AutoTaggingService {
             }
         }
 
-        // now we should determine if we need to use the album art finder
+        // now we should determine if we need to use the album art finder for the rows we couldn't do automatically
         if (!rowsToReprocess.isEmpty()) {
+
+            // ask the user if they want to use the album art finder
             int useService = confirmUserWantsAlbumArtFinder();
             if (useService == JOptionPane.YES_OPTION) {
+
+                // let's use the album art finder
                 List<ImageSearchQuery> queries = new ArrayList<>();
                 for (Integer toReprocess : rowsToReprocess) {
-                    File dir = getFile(toReprocess).getParentFile();
-                    String query = getArtistAndAlbumFromDirectory(dir);
+
+                    File file = getFile(toReprocess);
+
+                    // get the query to search on
+                    String artist = getArtistFromFile(file);
+                    String album = getAlbumFromFile(file);
+                    String query = artist + " " + album;
+
+                    // get the parent directory to put the cover
+                    File dir = file.getParentFile();
+
+                    // add a ImageSearchQuery object to the list of queries
                     if (!ImageSearchQuery.contains(queries, query)) {
                         ImageSearchQuery imageSearchQuery = new ImageSearchQuery(query, dir, new ArrayList<>());
                         imageSearchQuery.getRows().add(toReprocess);
                         queries.add(imageSearchQuery);
                     } else {
+                        // if we already have the query included in the list, add the row to the rows to update
                         int index = ImageSearchQuery.getIndex(queries, query);
                         queries.get(index).getRows().add(toReprocess);
                     }
@@ -261,18 +280,6 @@ public class AutoTaggingService {
     }
 
     /**
-     * Gets the artist and album from a directory
-     *
-     * @param dir, the dir to get the artist and album from
-     * @return the "Artist Album" query
-     */
-    public String getArtistAndAlbumFromDirectory(File dir) {
-        String artist = dir.getParentFile().getName();
-        String album = dir.getName().substring(7);  // substring to get rid of the year prefix
-        return artist + " " + album;
-    }
-
-    /**
      * Helper function to check and see if a directory has a cover image file
      *
      * @param folder, the folder to check
@@ -367,20 +374,33 @@ public class AutoTaggingService {
      * @return a string track title
      */
     public String getTitleFromFile(File file) {
-        if (SongUtils.isAGenrePartOfALabel(file)) {
-            return file.getName().replace(".mp3", "");
-        } else {
-            String regex = "\\d{2} .*\\.mp3";
-            if (file.getName().matches(regex)) {
-                return file.getName()
-                        .substring(3)
-                        .replace(".mp3", StringUtils.EMPTY)
-                        .replace(":", "/")
-                        .trim();
-            } else {
-                return "";
-            }
+
+        // regex objects
+        Pattern pattern;
+        Matcher matcher;
+
+        // 01 Kasbo - Play Pretend (ft. Ourchives).mp3
+        pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
+        matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            return matcher.group("Title");
         }
+
+        // 01 Play Pretend (ft. Ourchives).mp3
+        pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
+        matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            return matcher.group("Title");
+        }
+
+        // Play Pretend (ft. Ourchives)
+        pattern = Pattern.compile(TITLE_REGEX);
+        matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            return matcher.group("Title");
+        }
+
+        return file.getName().replace(".mp3", StringUtils.EMPTY);
     }
 
     /**
@@ -390,10 +410,43 @@ public class AutoTaggingService {
      * @return a string artist
      */
     public String getArtistFromFile(File file) {
-        if (SongUtils.isAnEPPartOfALabel(file)) {
-            return StringUtils.EMPTY;
+
+        // regex objects
+        Pattern pattern;
+        Matcher matcher;
+
+        // 01 Kasbo - Play Pretend (ft. Ourchives).mp3
+        pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
+        matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            return matcher.group("Artist");
         }
-        return getArtist(file);
+
+        // Kasbo - Play Pretend (ft. Ourchives).mp3
+        pattern = Pattern.compile(ARTIST_TITLE_REGEX);
+        matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            return matcher.group("Artist");
+        }
+
+        // [2021] Kasbo - Play Pretend (ft. Ourchives)
+        pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+        matcher = pattern.matcher(file.getParentFile().getName());
+        if (matcher.find()) {
+            return matcher.group("Artist");
+        }
+
+        // split the file path by the / character, then try to parse it on whatever it can find
+        String[] arr = file.getPath().split("/");
+        for (String folder : arr) {
+            pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+            matcher = pattern.matcher(folder);
+            if (matcher.find()) {
+                return matcher.group("Artist");
+            }
+        }
+
+        return getAlbumArtistFromFile(file);
     }
 
     /**
@@ -403,22 +456,41 @@ public class AutoTaggingService {
      * @return a string album
      */
     public String getAlbumFromFile(File file) {
-        if (SongUtils.isAGenrePartOfALabel(file)) {
-            return getGenreFromFile(file);
-        } else {
-            File dir = file.getParentFile();
-            String regex = "\\[\\d{4}] .*";
-            if (dir.getName().matches(regex)) {
-                return dir.getName().substring(6).trim();
-            } else if (dir.getName().startsWith("CD")) {
-                // album is a multiple CD album
-                dir = dir.getParentFile();
-                if (dir.getName().matches(regex)) {
-                    return dir.getName().substring(6).trim();
+
+        // regex objects
+        Pattern pattern;
+        Matcher matcher;
+
+        // check to see if the parent file is a part of a multiple CD
+        if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
+            file = file.getParentFile();
+        }
+
+        if (SongUtils.isPartOfALabel(file)) {
+            // for singles, the album should be the genre
+            if (SongUtils.isASingleInALabel(file)) {
+                return file.getParentFile().getParentFile().getName();
+            } else {
+                pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+                matcher = pattern.matcher(file.getParentFile().getName());
+                if (matcher.find()) {
+                    return matcher.group("Album");
+                }
+
+                pattern = Pattern.compile(YEAR_ALBUM_REGEX);
+                matcher = pattern.matcher(file.getParentFile().getName());
+                if (matcher.find()) {
+                    return matcher.group("Album");
                 }
             }
-            return StringUtils.EMPTY;
+        } else {
+            pattern = Pattern.compile(YEAR_ALBUM_REGEX);
+            matcher = pattern.matcher(file.getParentFile().getName());
+            if (matcher.find()) {
+                return matcher.group("Album");
+            }
         }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -428,31 +500,23 @@ public class AutoTaggingService {
      * @return a string album artist
      */
     public String getAlbumArtistFromFile(File file) {
-        if (SongUtils.isPartOfALabel(file)) {
-            File dir = file.getParentFile().getParentFile().getParentFile();
-            return dir.getName();
-        }
-        // get the normal artist
-        return getArtist(file);
-    }
 
-    /**
-     * Gets the artist based on the file location
-     *
-     * @param file, the file to check
-     * @return a string artist
-     */
-    public String getArtist(File file) {
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}] .*";
-        if (dir.getName().matches(regex)) {
-            dir = dir.getParentFile();
-            return dir.getName();
-        } else if (dir.getName().startsWith("CD")) {
-            dir = dir.getParentFile().getParentFile();
-            return dir.getName();
+        // Library/Label/Singles/Genre/[2021] Artist - Album/01 Title.mp3
+        if (SongUtils.isASingleInALabel(file)) {
+            return file.getParentFile().getParentFile().getParentFile().getParentFile().getName();
+
+        // Library/Label/Compilations/Compilation/01 Artist - Title.mp3
+        // Library/Label/EPs/Album/01 Title.mp3
+        // Library/Label/LPs/Album/CD2/01 Title.mp3
+        } else if (SongUtils.isPartOfALabel(file)) {
+            if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
+                return file.getParentFile().getParentFile().getParentFile().getParentFile().getName();
+            }
+            return file.getParentFile().getParentFile().getParentFile().getName();
+
+        // Library/AlbumArtist/[2021] Album/01 Title.mp3
         } else {
-            return StringUtils.EMPTY;
+            return file.getParentFile().getParentFile().getName();
         }
     }
 
@@ -463,19 +527,24 @@ public class AutoTaggingService {
      * @return a string year
      */
     public String getYearFromFile(File file) {
-        if (file == null) {
-            return "";
-        }
 
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}] .*";
-        if (dir.getName().matches(regex)) {
-            return dir.getName().substring(1, 5).trim();
-        } else if (dir.getName().startsWith("CD")) {
-            // album is a multiple CD album
-            dir = dir.getParentFile();
-            if (dir.getName().matches(regex)) {
-                return dir.getName().substring(1, 5).trim();
+        // regex objects
+        Pattern pattern;
+        Matcher matcher;
+
+        // go through the file's parent files and try to find the year
+        String[] arr = file.getPath().split("/");
+        for (String folder : arr) {
+            pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+            matcher = pattern.matcher(folder);
+            if (matcher.find()) {
+                return matcher.group("Year");
+            }
+
+            pattern = Pattern.compile(YEAR_ALBUM_REGEX);
+            matcher = pattern.matcher(folder);
+            if (matcher.find()) {
+                return matcher.group("Year");
             }
         }
         return StringUtils.EMPTY;
@@ -485,53 +554,29 @@ public class AutoTaggingService {
      * Gets the tracks based on the filename and other files in the directory
      *
      * @param file, the file to check
-     * @return a tracks in the form of a string
+     * @return  a string representation of tracks
      */
-    public String getTracksFromFolder(File file) {
-        if (file == null) {
-            return "";
-        }
+    public String getTracksFromFile(File file) {
 
+        // get the total number of tracks from the parent directory
         File dir = file.getParentFile();
-        String totalTracks = getTotalTracksFromFolder(dir);
-        String regex = "\\d{2} .*\\.mp3";
-        if (file.getName().matches(regex)) {
-            if (Integer.parseInt(file.getName().substring(0, 2)) < 10) {
-                return file.getName().charAt(1) + "/" + totalTracks;
-            } else {
-                return file.getName().substring(0, 2) + "/" + totalTracks;
-            }
-        } else {
-            return "";
-        }
-    }
+        String totalTracks = String.valueOf(FileUtils.getNumberOfMP3Files(dir));
 
-    /**
-     * Gets the total number of tracks in a folder
-     *
-     * @param file, the folder to check
-     * @return a String representation of the songs in the folder
-     */
-    public String getTotalTracksFromFolder(File file) {
-        return String.valueOf(getNumberOfSongs(file));
-    }
-
-    /**
-     * Gets the total number of tracks in a folder
-     *
-     * @param file, the folder to check
-     * @return an int count of mp3 files in a folder
-     */
-    public int getNumberOfSongs(File file) {
-        File[] files = file.listFiles();
-        int count = 0;
-        assert files != null;
-        for (File file1 : files) {
-            if (file1.getName().endsWith(".mp3")) {
-                count++;
-            }
+        // get the string representation of the track number
+        String trackNumber = StringUtils.EMPTY;
+        Pattern pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
+        Matcher matcher = pattern.matcher(file.getName());
+        if (matcher.find()) {
+            trackNumber = matcher.group("TrackNumber");
         }
-        return count;
+
+        // if we didn't get it, return empty string to prevent /12 nonsense
+        if (StringUtils.isEmpty(trackNumber)) {
+            return StringUtils.EMPTY;
+        }
+
+        int parsedTrackNumber = Integer.parseInt(trackNumber);
+        return parsedTrackNumber + "/" + totalTracks;
     }
 
     /**
@@ -541,51 +586,29 @@ public class AutoTaggingService {
      * @return a string representation of disks
      */
     public String getDisksFromFile(File file) {
-        File dir = file.getParentFile();
-        String regex = "\\[\\d{4}] .*";
-        if (dir.getName().matches(regex)) {
-            // there's no CD1, CD2 folders, single disk album
-            return "1/1";
-        } else if (dir.getName().startsWith("CD") && dir.getParentFile().getName().matches(regex)) {
-            // multiple disk album, get the current disk based on the folder it's in
-            int totalDisks = getTotalDisksFromFolder(dir);
-            return dir.getName().substring(2) + "/" + totalDisks;
+
+        // if we have a multiple CD scenario
+        if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
+            File cdDir = file.getParentFile();
+            int cdNumber = Integer.parseInt(cdDir.getName().replace("CD", StringUtils.EMPTY));
+            int totalDisks = FileUtils.getTotalDisksFromFolder(cdDir.getParentFile());
+            return cdNumber + "/" + totalDisks;
         } else {
-            return StringUtils.EMPTY;
+            return "1/1";
         }
     }
 
     /**
-     * Gets the total disks from a folder
-     *
-     * @param dir, the folder to check
-     * @return an int count of disks
-     */
-    public int getTotalDisksFromFolder(File dir) {
-        dir = dir.getParentFile();
-        File[] dirs = dir.listFiles(File::isDirectory);
-        int count = 0;
-        assert dirs != null;
-        for (File folder : dirs) {
-            if (folder.getName().startsWith("CD")) {
-                // most (if not all) times, this should be 2
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * Returns a genre String if the file is a part of a label
+     * Returns a genre String if the file is a single in a label, else return nothing
      *
      * @param file, the file to check
      * @return a genre string
      */
     public String getGenreFromFile(File file) {
-        if (!SongUtils.isAGenrePartOfALabel(file)) {
-            return StringUtils.EMPTY;
+        if (SongUtils.isASingleInALabel(file)) {
+            return file.getParentFile().getParentFile().getName();
         }
-        return file.getParentFile().getName();
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -609,7 +632,7 @@ public class AutoTaggingService {
     public void autoAddTrackAndDiskNumbers(int row, File file) {
         int index = getIndex(row);
 
-        String tracks = getTracksFromFolder(file);
+        String tracks = getTracksFromFile(file);
         String disks = getDisksFromFile(file);
 
         // tracks
