@@ -98,6 +98,42 @@ public class FileUtils {
     }
 
     /**
+     * Gets the total number of tracks in a folder
+     *
+     * @param dir, the folder to check
+     * @return an int count of mp3 files in a folder
+     */
+    public static int getNumberOfMP3Files(File dir) {
+        File[] files = dir.listFiles();
+        int count = 0;
+        assert files != null;
+        for (File file : files) {
+            if (file.getName().endsWith(".mp3")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the total disks from a folder
+     *
+     * @param dir, the folder to check
+     * @return an int count of disks
+     */
+    public static int getTotalDisksFromFolder(File dir) {
+        File[] dirs = dir.listFiles(File::isDirectory);
+        int count = 0;
+        assert dirs != null;
+        for (File folder : dirs) {
+            if (folder.getName().startsWith("CD")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * Creates a JFileChooser, configures it, and launches it
      * Returns a single index array if there's only one file returned
      *

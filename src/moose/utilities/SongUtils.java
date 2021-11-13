@@ -25,17 +25,18 @@ public class SongUtils {
      */
     public static boolean isPartOfALabel(File dir) {
         String path = dir.getPath();
-        return (path.contains("/Genres/") || path.contains("/EPs/") || path.contains("/EP's/") || path.contains("/EPS/"));
+        return (path.contains("/Compilations/") || path.contains("/EPs/") || path.contains("/LPs/") || path.contains("/Singles/"));
     }
 
-    public static boolean isAnEPPartOfALabel(File dir) {
-        String path = dir.getPath();
-        return (path.contains("/EPs/") || path.contains("/EP's/"));
-    }
-
-    public static boolean isAGenrePartOfALabel(File dir) {
-        String path = dir.getPath();
-        return path.contains("/Genres/");
+    /**
+     * Check if a directory is a single in a label
+     *
+     * @param file, the file to check
+     * @return the result of the check, true if it's a single from a label, false if it isn't
+     */
+    public static boolean isASingleInALabel(File file) {
+        String path = file.getPath();
+        return path.contains("/Singles/");
     }
 
     /**
@@ -60,6 +61,7 @@ public class SongUtils {
             // things borked
             mp3file = null;
             logger.logError("Exception when trying to read data from file: " + file.getName(), e);
+            Moose.getFrame().updateConsole(e.getMessage());
         }
 
         // check if that mp3file is null first
