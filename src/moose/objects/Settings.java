@@ -25,6 +25,7 @@ public class Settings {
     private boolean askBeforeClearAll;
     private List<String> genres;
     private String libraryLocation;
+    private String applicationSupportLocation;
     private boolean removeCommentOnAutoTagging;
     private int preferredCoverArtSize;
     private String albumArtFinderApiKey;
@@ -47,6 +48,9 @@ public class Settings {
         this.albumArtFinderCseId = StringUtils.EMPTY;
         this.albumArtFinderSearchCount = 0;
         this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
+
+        // set the support location since we always know where that'll be
+        setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/Moose/");
     }
 
     public Settings withVersionNumber(String version) {
@@ -63,7 +67,7 @@ public class Settings {
             getGenres().add(genre);
         }
     }
-    
+
     /**
      * Removes a genre from the genre list
      * @param genre, the genre to remove
@@ -110,6 +114,14 @@ public class Settings {
 
     public void setLibraryLocation(String libraryLocation) {
         this.libraryLocation = libraryLocation;
+    }
+
+    public String getApplicationSupportLocation() {
+        return applicationSupportLocation;
+    }
+
+    public void setApplicationSupportLocation(String applicationSupportLocation) {
+        this.applicationSupportLocation = applicationSupportLocation;
     }
 
     public String getAlbumArtFinderApiKey() {

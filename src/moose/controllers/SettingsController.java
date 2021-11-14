@@ -51,10 +51,12 @@ public class SettingsController {
     public SettingsController() {
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+
+        // create the settings object
+        this.settings = new Settings();
     }
 
     public void readSettingsFile() {
-
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
             settings = mapper.readValue(jsonString, Settings.class);
@@ -65,8 +67,7 @@ public class SettingsController {
 
     public void setUpSupportDirectory() {
         // create the logging directory if it doesn't already exist
-        String settingsDir_path = System.getProperty("user.home") + "/Library/Application Support/Moose/";
-        File settingsDir = new File(settingsDir_path);
+        File settingsDir = new File(settings.getApplicationSupportLocation());
         if (!settingsDir.exists()) {
             if (!settingsDir.mkdirs()) {
                 logger.logError("Couldn't create the main Application Support directory in "
@@ -75,7 +76,7 @@ public class SettingsController {
         }
 
         // create the settingsFile file if it doesn't already exist
-        String settings_path = settingsDir_path + "moose.json";
+        String settings_path = settings.getApplicationSupportLocation() + "moose.json";
         settingsFile = new File(settings_path);
         if (!settingsFile.exists()) {
             try {
@@ -138,23 +139,6 @@ public class SettingsController {
 
     public Settings getSettings() {
         return this.settings.withVersionNumber(version);
-    }
-
-    public Settings copySettings() {
-        Settings tempSettings = new Settings();
-        Settings actualSettings = getSettings();
-        tempSettings.setGenres(actualSettings.getGenres());
-        tempSettings.setDebugMode(actualSettings.isInDebugMode());
-        tempSettings.setDeveloperMode(actualSettings.isInDeveloperMode());
-        tempSettings.setLibraryLocation(actualSettings.getLibraryLocation());
-        tempSettings.setRemoveCommentOnAutoTagging(actualSettings.getRemoveCommentOnAutoTagging());
-        tempSettings.setAskBeforeClearAll(actualSettings.isAskBeforeClearAll());
-        tempSettings.setAlbumArtFinderCseId(actualSettings.getAlbumArtFinderCseId());
-        tempSettings.setAlbumArtFinderApiKey(actualSettings.getAlbumArtFinderApiKey());
-        tempSettings.setAlbumArtFinderSearchCount(actualSettings.getAlbumArtFinderSearchCount());
-        tempSettings.setAlbumArtFinderSearchCountDate(actualSettings.getAlbumArtFinderSearchCountDate());
-        tempSettings.setPreferredCoverArtSize(actualSettings.getPreferredCoverArtSize());
-        return tempSettings;
     }
 
     /**
