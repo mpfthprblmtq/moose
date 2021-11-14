@@ -77,17 +77,9 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="macroMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Actions"/>
+            <Property name="text" type="java.lang.String" value="Macros"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="auditMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Audit..."/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="auditMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="autoTagMenuItem">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
@@ -144,6 +136,26 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="formatFilenamesMenuItemActionPerformed"/>
               </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="toolsMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Tools"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="auditMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Audit/Cleanup..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="auditMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="analyticsMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Analytics..."/>
+              </Properties>
             </MenuItem>
           </SubComponents>
         </Menu>

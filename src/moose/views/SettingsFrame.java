@@ -65,7 +65,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         settingsController.readSettingsFile();
 
         // set the temp settings with the actual settings
-        settings = settingsController.copySettings();
+        settings = settingsController.getSettings();
 
         // init the components
         initComponents();
@@ -106,7 +106,11 @@ public class SettingsFrame extends javax.swing.JFrame {
         filesPanel = new javax.swing.JPanel();
         libraryLocationHeaderLabel = new javax.swing.JLabel();
         libraryLocationField = new javax.swing.JLabel();
-        browseButton = new javax.swing.JButton();
+        libraryBrowseButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        libraryLocationHeaderLabel1 = new javax.swing.JLabel();
+        libraryLocationField1 = new javax.swing.JLabel();
+        appSupportOpenButton = new javax.swing.JButton();
         apiPanel = new javax.swing.JPanel();
         cseLabel = new javax.swing.JLabel();
         cseTextField = new javax.swing.JTextField();
@@ -129,6 +133,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings");
         setResizable(false);
+
+        tabbedPane.setForeground(new java.awt.Color(1, 1, 1));
 
         genrePanel.setEnabled(false);
 
@@ -368,10 +374,32 @@ public class SettingsFrame extends javax.swing.JFrame {
         libraryLocationField.setPreferredSize(new java.awt.Dimension(66, 40));
         libraryLocationField.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
-        browseButton.setText("Browse...");
-        browseButton.addActionListener(new java.awt.event.ActionListener() {
+        libraryBrowseButton.setText("Browse...");
+        libraryBrowseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtonActionPerformed(evt);
+                libraryBrowseButtonActionPerformed(evt);
+            }
+        });
+
+        libraryLocationHeaderLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        libraryLocationHeaderLabel1.setText("Application Support Directory:");
+
+        libraryLocationField1.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        libraryLocationField1.setText(settingsController.getSettings().getApplicationSupportLocation());
+        libraryLocationField1.setToolTipText("");
+        libraryLocationField1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        libraryLocationField1.setMaximumSize(new java.awt.Dimension(66, 40));
+        libraryLocationField1.setMinimumSize(new java.awt.Dimension(66, 40));
+        libraryLocationField1.setPreferredSize(new java.awt.Dimension(66, 40));
+        libraryLocationField1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+
+        appSupportOpenButton.setText("Open...");
+        appSupportOpenButton.setMaximumSize(new java.awt.Dimension(100, 29));
+        appSupportOpenButton.setMinimumSize(new java.awt.Dimension(100, 29));
+        appSupportOpenButton.setPreferredSize(new java.awt.Dimension(100, 29));
+        appSupportOpenButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                appSupportOpenButtonActionPerformed(evt);
             }
         });
 
@@ -384,10 +412,17 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(filesPanelLayout.createSequentialGroup()
                         .addComponent(libraryLocationHeaderLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                        .addComponent(browseButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(libraryBrowseButton))
                     .addGroup(filesPanelLayout.createSequentialGroup()
-                        .addComponent(libraryLocationField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(filesPanelLayout.createSequentialGroup()
+                                .addComponent(libraryLocationHeaderLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                                .addComponent(appSupportOpenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSeparator1)
+                            .addComponent(libraryLocationField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(libraryLocationField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         filesPanelLayout.setVerticalGroup(
@@ -396,10 +431,18 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(libraryLocationHeaderLabel)
-                    .addComponent(browseButton))
+                    .addComponent(libraryBrowseButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(libraryLocationHeaderLabel1)
+                    .addComponent(appSupportOpenButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(libraryLocationField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(134, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Files", filesPanel);
@@ -745,7 +788,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      *
      * @param evt, the event
      */
-    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+    private void libraryBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_libraryBrowseButtonActionPerformed
         // get the folder through a JFileChooser
         File dir = Objects.requireNonNull(FileUtils.launchJFileChooser(
                 "Choose the directory you want to store music in...",
@@ -755,34 +798,19 @@ public class SettingsFrame extends javax.swing.JFrame {
                 null,
                 null))[0];
         if (dir != null) {
+            String originalLibraryLocation = settings.getLibraryLocation();
             settings.setLibraryLocation(dir.getAbsolutePath() + "/");
-            if (!Moose.getSettings().getLibraryLocation().equals(settings.getLibraryLocation())) {
+            if (!originalLibraryLocation.equals(settings.getLibraryLocation())) {
                 libraryLocationField.setForeground(Constants.GREEN);
                 libraryLocationField.setText(settings.getLibraryLocation());
             }
             statusLabel.setText(StringUtils.EMPTY);
         }
-    }//GEN-LAST:event_browseButtonActionPerformed
+    }//GEN-LAST:event_libraryBrowseButtonActionPerformed
 
-    private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyTyped
-        String originalValue = Moose.getSettings().getAlbumArtFinderCseId();
-        if (!cseTextField.getText().equals(originalValue)) {
-            cseTextField.setForeground(Constants.GREEN);
-            settings.setAlbumArtFinderCseId(cseTextField.getText());
-        } else {
-            cseTextField.setForeground(Constants.BLACK);
-        }
-    }//GEN-LAST:event_cseTextFieldKeyTyped
-
-    private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyTyped
-        String originalValue = Moose.getSettings().getAlbumArtFinderApiKey();
-        if (!apiKeyTextField.getText().equals(originalValue)) {
-            apiKeyTextField.setForeground(Constants.GREEN);
-            settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
-        } else {
-            apiKeyTextField.setForeground(Constants.BLACK);
-        }
-    }//GEN-LAST:event_apiKeyTextFieldKeyTyped
+    private void appSupportOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appSupportOpenButtonActionPerformed
+        FileUtils.openFile(new File(settingsController.getSettings().getApplicationSupportLocation()));
+    }//GEN-LAST:event_appSupportOpenButtonActionPerformed
 
     private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
         int originalValue = Moose.getSettings().getPreferredCoverArtSize();
@@ -833,6 +861,20 @@ public class SettingsFrame extends javax.swing.JFrame {
         statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_removeCommentCheckBoxActionPerformed
 
+    private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getAlbumArtFinderCseId();
+        if (!originalValue.equals(cseTextField.getText())) {
+            cseTextField.setForeground(Constants.GREEN);
+        }
+    }//GEN-LAST:event_cseTextFieldKeyReleased
+
+    private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getAlbumArtFinderApiKey();
+        if (!originalValue.equals(apiKeyTextField.getText())) {
+            apiKeyTextField.setForeground(Constants.GREEN);
+        }
+    }//GEN-LAST:event_apiKeyTextFieldKeyReleased
+
     /**
      * Gets the list of genres and fill a DefaultListModel for the view
      *
@@ -857,20 +899,16 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @return the times used today
      */
     public String populateTimesUsedTodayField() {
-        Date today = new Date();
-        Date dateLastUsed = DateUtils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+        Date lastUsed = DateUtils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+        lastUsed = lastUsed == null ? new Date() : lastUsed;
 
         // check to see if date in settings is today
-        assert dateLastUsed != null;
-        if (today.getDay() == dateLastUsed.getDay() &&
-                today.getMonth() == dateLastUsed.getMonth() &&
-                today.getYear() == dateLastUsed.getYear()) {
-            // date is today, return normally
-        } else {
+        if (!DateUtils.isDateSameAsToday(lastUsed)) {
             // date was not today, set the times used today to 0
             this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
             this.settingsController.writeSettingsFile(settings);
         }
+        
         return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
                 .concat("/")
                 .concat(String.valueOf(Constants.IMAGE_LIMIT));
@@ -907,7 +945,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             statusLabel.setText(StringUtils.EMPTY);
             genreStatusLabel.setForeground(Constants.GREEN);
             genresDeleted++;
-            genreStatusLabel.setText(genresDeleted + " genres deleted!");
+            genreStatusLabel.setText(genresDeleted + " genre(s) deleted!");
         }
     }
 
@@ -1021,6 +1059,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     private void resetUI() {
         genreList.setModel(getGenreListModel());
+        genreStatusLabel.setText(StringUtils.EMPTY);
         debugCheckBox.setForeground(Constants.BLACK);
         debugCheckBox.setSelected(Moose.getSettings().isInDebugMode());
         developerModeCheckBox.setForeground(Constants.BLACK);
@@ -1037,23 +1076,12 @@ public class SettingsFrame extends javax.swing.JFrame {
         preferredCoverArtSizeSpinner.setValue(Moose.getSettings().getPreferredCoverArtSize());
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            //new SettingsFrame().setVisible(true);
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addGenreButton;
     private javax.swing.JLabel apiKeyLabel;
     private javax.swing.JTextField apiKeyTextField;
     private javax.swing.JPanel apiPanel;
-    private javax.swing.JButton browseButton;
+    private javax.swing.JButton appSupportOpenButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton clearErrorLogButton;
     private javax.swing.JButton clearEventLogButton;
@@ -1078,8 +1106,12 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel genresHeaderLabel;
     private javax.swing.JScrollPane genresScrollPane;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JButton libraryBrowseButton;
     private javax.swing.JLabel libraryLocationField;
+    private javax.swing.JLabel libraryLocationField1;
     private javax.swing.JLabel libraryLocationHeaderLabel;
+    private javax.swing.JLabel libraryLocationHeaderLabel1;
     private javax.swing.JLabel loggingHeaderLabel;
     private javax.swing.JPanel loggingPanel;
     private javax.swing.JButton openErrorLogButton;
