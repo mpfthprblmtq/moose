@@ -615,12 +615,14 @@ public class Frame extends javax.swing.JFrame {
         viewMenu = new javax.swing.JMenu();
         selectAllMenuItem = new javax.swing.JMenuItem();
         macroMenu = new javax.swing.JMenu();
-        auditMenuItem = new javax.swing.JMenuItem();
         autoTagMenuItem = new javax.swing.JMenuItem();
         addCoversMenuItem = new javax.swing.JMenuItem();
         findAndReplaceMenuItem = new javax.swing.JMenuItem();
         addTrackNumbersMenuItem = new javax.swing.JMenuItem();
         formatFilenamesMenuItem = new javax.swing.JMenuItem();
+        toolsMenu = new javax.swing.JMenu();
+        auditMenuItem = new javax.swing.JMenuItem();
+        analyticsMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
         wikiMenuItem = new javax.swing.JMenuItem();
@@ -1055,15 +1057,7 @@ public class Frame extends javax.swing.JFrame {
 
         jMenuBar1.add(viewMenu);
 
-        macroMenu.setText("Actions");
-
-        auditMenuItem.setText("Audit...");
-        auditMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                auditMenuItemActionPerformed(evt);
-            }
-        });
-        macroMenu.add(auditMenuItem);
+        macroMenu.setText("Macros");
 
         autoTagMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
         autoTagMenuItem.setText("AutoTag");
@@ -1115,6 +1109,21 @@ public class Frame extends javax.swing.JFrame {
         macroMenu.add(formatFilenamesMenuItem);
 
         jMenuBar1.add(macroMenu);
+
+        toolsMenu.setText("Tools");
+
+        auditMenuItem.setText("Audit/Cleanup...");
+        auditMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                auditMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(auditMenuItem);
+
+        analyticsMenuItem.setText("Analytics...");
+        toolsMenu.add(analyticsMenuItem);
+
+        jMenuBar1.add(toolsMenu);
 
         helpMenu.setText("Help");
 
@@ -2270,6 +2279,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem addCoversMenuItem;
     private javax.swing.JMenuItem addTrackNumbersMenuItem;
+    private javax.swing.JMenuItem analyticsMenuItem;
     private javax.swing.JMenuItem auditMenuItem;
     private javax.swing.JMenuItem autoTagMenuItem;
     private javax.swing.JButton clearAllButton;
@@ -2306,6 +2316,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem settingsMenuItem;
     public javax.swing.JTable table;
     private javax.swing.JScrollPane tableSP;
+    private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenu viewMenu;
     private javax.swing.JMenuItem wikiMenuItem;
     // End of variables declaration//GEN-END:variables

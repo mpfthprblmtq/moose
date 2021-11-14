@@ -135,7 +135,6 @@ public class AuditService {
 
         // open up a new Frame with the album preloaded
         Moose.frame.dispose();
-        Moose.frame = new Frame(albums.get(index));
         Moose.launchFrame(albums.get(index));
         auditFrame = Moose.getAuditFrame();
         auditFrame.refreshAuditFrame(getCheckResults(albums.get(index)), albums.get(index).getPath());
