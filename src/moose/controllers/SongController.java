@@ -173,6 +173,21 @@ public class SongController {
     }
 
     /**
+     * Gets the index based on the song information given
+     * @param song, the song with the data to compare against
+     * @return the index of the song
+     */
+    public int getIndex(Song song) {
+        for (Integer index : getSongs().keySet()) {
+            Song songInMap = getSongs().get(index);
+            if (song.equals(songInMap, false)) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Helper function to set the new file of the song file in the songs list.
      * @param index, the index of the song
      * @param newFile, the new file to set
@@ -360,12 +375,13 @@ public class SongController {
         // set all the text based items
         try {
             assert mp3file != null;
+            // id3v2Tag
             mp3file.getId3v2Tag().setTitle(s.getTitle());
             mp3file.getId3v2Tag().setArtist(s.getArtist());
             mp3file.getId3v2Tag().setAlbum(s.getAlbum());
             mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumArtist());
-            mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
             mp3file.getId3v2Tag().setYear(s.getYear());
+            mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
             mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
             mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
             mp3file.getId3v2Tag().setComment(s.getComment());

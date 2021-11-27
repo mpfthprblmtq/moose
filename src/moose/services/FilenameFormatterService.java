@@ -120,9 +120,9 @@ public class FilenameFormatterService {
         String trackNumber = StringUtils.EMPTY;
         String trackTitle = StringUtils.EMPTY;
 
-        // try and replace the artist before we use the regex
-        String artist = autoTaggingService.getArtistFromFile(file);
-        filename = filename.replaceFirst(artist, StringUtils.EMPTY);
+        // try and replace the artist with already known information before we use the regex
+        String artist = autoTaggingService.getArtistFromExistingID3Info(file);
+        filename = filename.replace(artist, StringUtils.EMPTY);
 
         // perform regex search on filename
         // first check if it matches the ## Title.mp3 format
