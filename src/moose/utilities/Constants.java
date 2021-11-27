@@ -16,11 +16,20 @@ public class Constants {
 
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
 
-    public static final String TRACK_FILENAME_REGEX = "\\d{2} ((.)*).mp3";
+    public static final String SINGLES = "Singles";
+    public static final String COMPILATIONS = "Compilations";
+    public static final String LPS = "LPs";
+    public static final String EPS = "EPs";
+    public static final String SINGLES_FILEPATH_REGEX = ".*/.*/Singles/.*/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
+    public static final String COMPILATIONS_FILEPATH_REGEX = ".*/.*/Compilations/\\[\\d{4}\\] .*/\\d{1,3} .* - .*\\.mp3";
+    public static final String LPS_FILEPATH_REGEX = ".*/.*/LPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
+    public static final String EPS_FILEPATH_REGEX = ".*/.*/EPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
+    public static final String GENERAL_FILEPATH_REGEX = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
+
     public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
 
     public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
-    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3} .*";
+    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
     public static final String FILENAME_TRIM_REGEX = "(?<Title>\\w.*).*";
     public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<Title>.*)";
     public static final String TITLE_REGEX = "(?<Title>.*).mp3";
@@ -29,7 +38,7 @@ public class Constants {
     public static final String YEAR_ARTIST_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Artist>.*) - (?<Album>.*)";
     public static final String YEAR_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Album>.*)";
     public static final String TRACKNUM_ARTIST_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String CD_FILEPATH_REGEX = ".*/CD\\d*/";
+    public static final String CD_FILEPATH_REGEX = ".*\\/(?<CDNumber>CD\\d+)\\/.*";
     public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
             "LYRIC VIDEO",
             "OFFICIAL LYRIC VIDEO",

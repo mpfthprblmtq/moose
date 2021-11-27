@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static moose.utilities.Constants.SINGLES;
+
 public class AutoTaggingServiceTest {
 
     private AutoTaggingService autoTaggingService;
@@ -88,7 +90,7 @@ public class AutoTaggingServiceTest {
             } else {
                 expected = "TestArtist";
             }
-            String actual = autoTaggingService.getArtistFromFile(files.get(i));
+            String actual = autoTaggingService.getArtistFromFile(files.get(i), null);
             Assert.assertEquals(expected, actual);
         }
     }
@@ -97,7 +99,7 @@ public class AutoTaggingServiceTest {
     public void testGetAlbumFromFile() {
         String expected;
         for (File file : files) {
-            if (SongUtils.isASingleInALabel(file)) {
+            if (SongUtils.isPartOfALabel(file, SINGLES)) {
                 expected = "TestGenre";
             } else {
                 if (file.getPath().contains("TestAlbum1")) {
@@ -135,7 +137,7 @@ public class AutoTaggingServiceTest {
     public void testGetGenreFromFile() {
         String expected;
         for (File file : files) {
-            if (SongUtils.isASingleInALabel(file)) {
+            if (SongUtils.isPartOfALabel(file, SINGLES)) {
                 expected = "TestGenre";
             } else {
                 expected = StringUtils.EMPTY;
@@ -150,7 +152,7 @@ public class AutoTaggingServiceTest {
         String expected;
         for (File file : files) {
             if (file.getName().startsWith("01")) {
-                if (SongUtils.isASingleInALabel(file)) {
+                if (SongUtils.isPartOfALabel(file, SINGLES)) {
                     expected = "1/1";
                 } else {
                     expected = "1/3";

@@ -70,6 +70,21 @@ public class FileUtils {
     }
 
     /**
+     * Renames the file and logs the result
+     * @param from, the file to change
+     * @param to, the file to change from to to
+     * @return the result of the change
+     */
+    public static boolean rename(File from, File to) {
+        if (from.renameTo(to)) {
+            return true;
+        } else {
+            logger.logError("Couldn't rename " + from.getName() + " to " + to.getName() + "!");
+            return false;
+        }
+    }
+
+    /**
      * Creates a new file with the same path, just a different name
      */
     public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
