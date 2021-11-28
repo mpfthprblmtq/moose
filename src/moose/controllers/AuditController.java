@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static moose.utilities.Constants.*;
+
 public class AuditController {
 
     // service
@@ -244,9 +246,37 @@ public class AuditController {
         }
 
         // now that the auto fixes are done, reload the frame and set some ivars
+        // if the directory changed name, update it in the filePathList so that we can keep track of how many albums we've gone through
+        if (!this.currentDirectory.equals(directory.getPath())) {
+            if (filePathList.get(ID3).contains(this.currentDirectory)) {
+                filePathList.get(ID3).set(filePathList.get(ID3).indexOf(this.currentDirectory), directory.getPath());
+            }
+            if (filePathList.get(FILENAMES).contains(this.currentDirectory)) {
+                filePathList.get(FILENAMES).set(filePathList.get(FILENAMES).indexOf(this.currentDirectory), directory.getPath());
+            }
+            if (filePathList.get(COVER).contains(this.currentDirectory)) {
+                filePathList.get(COVER).set(filePathList.get(COVER).indexOf(this.currentDirectory), directory.getPath());
+            }
+        }
         albums.set(currentIndex, directory);
         List<Boolean> results = auditService.getCheckResults(directory);
+        setIvars(results.get(ID3), results.get(FILENAMES), results.get(COVER), directory.getPath());
         auditFrame.refreshAuditFrame(results, directory.getPath());
+
+        updateAuditResultCount();
+    }
+
+    public void updateAuditResultCount() {
+        if (!this.id3Issues) {
+            filePathList.get(ID3).remove(this.currentDirectory);
+        }
+        if (!this.fileIssues) {
+            filePathList.get(FILENAMES).remove(this.currentDirectory);
+        }
+        if (!this.coverIssues) {
+            filePathList.get(COVER).remove(this.currentDirectory);
+        }
+        auditFrame.updateConsole(auditService.getResultsFromFilePathList(filePathList));
     }
 
     public String getCurrentDirString(String currentDir) {
