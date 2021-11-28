@@ -714,6 +714,10 @@ public class AuditFrame extends javax.swing.JFrame {
         // else nothing was chosen
     }
 
+    public void updateConsole(String s) {
+        auditResultsTextArea.setText(s);
+    }
+
     /**
      * Starts the audit
      */

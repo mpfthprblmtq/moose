@@ -70,6 +70,15 @@ public class AuditService {
         }
         Moose.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
         Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(albums.size() + " albums successfully scanned!");
+        return getResultsFromFilePathList(auditFilePathList);
+    }
+
+    /**
+     * Method to get a pretty version of the count of each type of issue in the audit file path list
+     * @param auditFilePathList, the list of lists to read
+     * @return a formatted string
+     */
+    public String getResultsFromFilePathList(List<List<String>> auditFilePathList) {
         return "ID3Tags missing:    " + auditFilePathList.get(0).size() + "\n"
                 + "File path issues:   " + auditFilePathList.get(1).size() + "\n"
                 + "Cover art missing:  " + auditFilePathList.get(2).size();
