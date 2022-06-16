@@ -1367,15 +1367,7 @@ public class Frame extends javax.swing.JFrame {
         includeFilesBox.setSelected(true);
         Object[] message = {"Find:", find, "Replace:", replace, includeFilesBox};
 
-        // create a thread to wait until the dialog box pops up
-        (new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                logger.logError("Exception with threading when opening the find and replace dialog.", e);
-            }
-            find.requestFocus();
-        })).start();
+        ViewUtils.focusOnField(find, "Find and Replace");
 
         int option = JOptionPane.showConfirmDialog(this, message, "Find and Replace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (option == JOptionPane.OK_OPTION) {
@@ -1524,6 +1516,7 @@ public class Frame extends javax.swing.JFrame {
         } else {
             clearAll();
         }
+        Moose.songController = new SongController();
     }//GEN-LAST:event_clearAllButtonActionPerformed
 
     /**
@@ -2010,6 +2003,9 @@ public class Frame extends javax.swing.JFrame {
             String[] arr = multTrack.getText().split("/");
             song.setTrack(arr[0]);
             song.setTotalTracks(arr[1]);
+        } else if (StringUtils.isEmpty(multTrack.getText())) {
+            song.setTrack("");
+            song.setTotalTracks("");
         }
         if (StringUtils.isNotEmpty(multDisk.getText()) && !multDisk.getText().equals(DASH) && !multDisk.getText().matches(TRACK_DISK_REGEX)) {
             DialogService.showMessageDialog(this, "Invalid disk input: " + multDisk.getText(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -2017,6 +2013,9 @@ public class Frame extends javax.swing.JFrame {
             String[] arr = multDisk.getText().split("/");
             song.setDisk(arr[0]);
             song.setTotalDisks(arr[1]);
+        } else if (StringUtils.isEmpty(multDisk.getText())) {
+            song.setDisk("");
+            song.setTotalDisks("");
         }
 
         if (!multipleArtworks) {
@@ -2142,7 +2141,7 @@ public class Frame extends javax.swing.JFrame {
         // check if song has a new file, which means we need to change the file name
         if (song.getNewFile() != null) {
             songController.setNewFile(songController.getIndex(row), song.getNewFile());
-            table.setValueAt(song.getNewFile().getName().replace(".mp3", ""), row, TABLE_COLUMN_FILENAME);
+            table.setValueAt(song.getNewFile().getName().replace(".mp3", StringUtils.EMPTY), row, TABLE_COLUMN_FILENAME);
         }
 
         // title
@@ -2209,17 +2208,6 @@ public class Frame extends javax.swing.JFrame {
                 songController.setAlbumImage(songController.getIndex(row), song.getArtwork_bytes());
                 table.setValueAt(ImageUtils.getScaledImage(song.getArtwork_bytes(), 100), row, TABLE_COLUMN_ALBUM_ART);
             }
-        }
-    }
-
-    /**
-     * Sets the table selected rows to the given selected rows array
-     *
-     * @param selectedRows, the rows on the table to select
-     */
-    public void setSelectedRows(int[] selectedRows) {
-        for (Integer row : selectedRows) {
-            table.getSelectionModel().addSelectionInterval(row, row);
         }
     }
 

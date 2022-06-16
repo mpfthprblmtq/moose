@@ -62,7 +62,9 @@ public class FileUtils {
         String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
         try {
             if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(new File(path));
+                if (file.exists()) {
+                    Desktop.getDesktop().open(new File(path));
+                }
             }
         } catch (IOException e) {
             logger.logError("IOException when opening containing folder of " + file.getPath());

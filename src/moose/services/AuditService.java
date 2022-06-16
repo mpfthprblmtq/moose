@@ -104,7 +104,7 @@ public class AuditService {
                 File a = file.getParentFile();
 
                 // folder is a multi-disk album
-                if (a.getName().equals("CD1") || a.getName().equals("CD2")) {
+                if (a.getPath().matches(CD_FILEPATH_REGEX)) {
                     a = a.getParentFile();
                 }
                 if (!albums.contains(a)) {
@@ -297,6 +297,10 @@ public class AuditService {
      */
     public boolean coverHasErrors(File dir) {
 
+        if (dir.getPath().matches(CD_FILEPATH_REGEX)) {
+            dir = dir.getParentFile();
+        }
+
         // check the current directory ivar
         File[] files = dir.listFiles();
         assert files != null;
@@ -472,14 +476,24 @@ public class AuditService {
      */
     private void renameTrack(File file, File updatedDir, boolean includeArtist) {
 
+        // for change tracking
+        File oldFile = null;
+
         // this if check is for if the directory changes, we need to update the file object with the new path
         if (!file.exists()) {
+            oldFile = file;
             file = updateFile(file, updatedDir);
         }
 
         // grab the song data
         Song song = SongUtils.getSongFromFile(file);
         int index = Moose.getSongController().getIndex(song);
+
+        // if the index wasn't found from the song, that means that the table data doesn't match the file data
+        // so grab the index from the actual file(s)
+        if (index == -1) {
+            index = Moose.getSongController().getIndex(oldFile, file);
+        }
 
         if (includeArtist) {
             // check if file matches 01 artist - title.mp3 standard
@@ -489,7 +503,9 @@ public class AuditService {
                     && StringUtils.isNotEmpty(song.getArtist())
                     && StringUtils.isNotEmpty(song.getTitle())) {
                 String track = song.getTrack().length() == 1 ? "0".concat(song.getTrack()) : song.getTrack();
-                renameFile(file, track + " " + song.getArtist() + " - " + song.getTitle() + ".mp3", index);
+                String newFileName = track + " " + song.getArtist() + " - " + song.getTitle() + ".mp3";
+                newFileName = newFileName.replace("/", ":");
+                renameFile(file, newFileName, index);
             }
         } else {
             // check if file matches 01 title.mp3 standard
@@ -498,9 +514,14 @@ public class AuditService {
                     && StringUtils.isNotEmpty(song.getTitle())
                     && StringUtils.isNotEmpty(song.getTrack())) {
                 String track = song.getTrack().length() == 1 ? "0".concat(song.getTrack()) : song.getTrack();
-                renameFile(file, track + " " + song.getTitle() + ".mp3", index);
+                String newFileName = track + " " + song.getTitle() + ".mp3";
+                newFileName = newFileName.replace("/", ":");
+                renameFile(file, newFileName, index);
             }
         }
+        // update the table and the songController
+        Moose.getFrame().table.getModel().setValueAt(file, Moose.getSongController().getRow(index), TABLE_COLUMN_FILENAME);
+        Moose.getFrame().songController.setNewFile(index, file);
     }
 
     /**
@@ -516,7 +537,7 @@ public class AuditService {
             album = album.getParentFile();
         }
         String path = album.getParentFile().getPath();
-        File newDir = new File(path + "/" + newDirName);
+        File newDir = new File(path + "/" + newDirName.replace("/", ":"));
         if (FileUtils.rename(album, newDir)) {
             return newDir;
         }
