@@ -38,7 +38,8 @@ public class Constants {
     public static final String YEAR_ARTIST_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Artist>.*) - (?<Album>.*)";
     public static final String YEAR_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Album>.*)";
     public static final String TRACKNUM_ARTIST_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String CD_FILEPATH_REGEX = ".*\\/(?<CDNumber>CD\\d+)\\/.*";
+    public static final String TRACKNUM_ARTIST_TITLE_OPT_REGEX = "(\\d{1,2} )*(?<Artist>.*) - (?<Title>.*).mp3";
+    public static final String CD_FILEPATH_REGEX = ".*\\/(?<CDNumber>CD\\d+)\\.*";
     public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
             "LYRIC VIDEO",
             "OFFICIAL LYRIC VIDEO",

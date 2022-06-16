@@ -104,7 +104,7 @@ public class FilenameFormatterService {
         }
 
         // return the new filename
-        return trackNumber + " " + trackTitle;
+        return StringUtils.isNotEmpty(trackNumber) ? trackNumber + StringUtils.SPACE + trackTitle : trackTitle;
     }
 
     /**
@@ -121,8 +121,10 @@ public class FilenameFormatterService {
         String trackTitle = StringUtils.EMPTY;
 
         // try and replace the artist with already known information before we use the regex
-        String artist = autoTaggingService.getArtistFromExistingID3Info(file);
-        filename = filename.replace(artist, StringUtils.EMPTY);
+        if (!SongUtils.isPartOfALabel(file, COMPILATIONS)) {
+            String artist = autoTaggingService.getArtistFromExistingID3Info(file);
+            filename = filename.replace(artist, StringUtils.EMPTY);
+        }
 
         // perform regex search on filename
         // first check if it matches the ## Title.mp3 format
@@ -167,6 +169,7 @@ public class FilenameFormatterService {
 
         String trackTitle = StringUtils.EMPTY;
         String trackNumber = StringUtils.EMPTY;
+        String trackArtist = StringUtils.EMPTY;
 
         // get the song data if there is any
         Song song = SongUtils.getSongFromFile(originalFile);
@@ -181,13 +184,27 @@ public class FilenameFormatterService {
             // get the track number
             // if there isn't a track in the id3 data, show a dialog where the user can manually input the number
             trackNumber = song.getTrack();
+
+            // get the artist if we're in a compilation
+            if (SongUtils.isPartOfALabel(file, COMPILATIONS)) {
+                trackArtist = song.getArtist();
+                if (StringUtils.isEmpty(trackArtist)) {
+                    if (file.getName().matches(TRACKNUM_ARTIST_TITLE_OPT_REGEX)) {
+                        Pattern pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_OPT_REGEX);
+                        Matcher matcher = pattern.matcher(file.getName());
+                        if (matcher.find()) {
+                            trackArtist = matcher.group("Artist");
+                        }
+                    }
+                }
+            }
         }
 
         // set the track title
         trackTitle = StringUtils.isEmpty(trackTitle) ? file.getName() : trackTitle;
 
         if (StringUtils.isEmpty(trackNumber)) {
-            // show the dialog
+            // show the dialog if we haven't already
             String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
             if (arr != null) {
                 trackTitle = arr[0];
@@ -197,12 +214,23 @@ public class FilenameFormatterService {
             }
         }
 
-        // if the track number is still empty (either from sheer user arrogance or some other reason)
-        if (StringUtils.isEmpty(trackNumber)) {
-            return file.getName();
+        String fileName;
+        if (StringUtils.isNotEmpty(trackArtist)) {
+            fileName = trackArtist.trim() + " - " + trackTitle.trim();
+        } else {
+            fileName = trackTitle.trim();
         }
 
-        // yay we have a track and title
-        return trackNumber + " " + trackTitle.trim();
+        // if the track number is still empty (either from sheer user arrogance or some other reason)
+        if (StringUtils.isEmpty(trackNumber)) {
+            return fileName;
+        }
+
+        // yay we have a track and title (and maybe an artist)
+        if (StringUtils.isNotEmpty(trackArtist)) {
+            return trackNumber + StringUtils.SPACE + fileName;
+        } else {
+            return trackNumber + " " + fileName;
+        }
     }
 }

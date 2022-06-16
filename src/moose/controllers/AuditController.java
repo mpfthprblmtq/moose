@@ -264,6 +264,9 @@ public class AuditController {
         auditFrame.refreshAuditFrame(results, directory.getPath());
 
         updateAuditResultCount();
+        if (!this.id3Issues && !this.fileIssues && !this.coverIssues && auditFrame.shouldAdvanceOnAutofix()) {
+            auditFrame.next();
+        }
     }
 
     public void updateAuditResultCount() {

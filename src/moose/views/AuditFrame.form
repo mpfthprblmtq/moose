@@ -77,42 +77,53 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="auditProgressBar" max="32767" attributes="0"/>
-                          <Component id="auditCurrentlyScanningLabel" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label5" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="ID3TagCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label3" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="filenameCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label4" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="currentDirLabel" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="auditAnalyzeButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="auditStartButton" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
-                                      <Component id="auditViewResultsButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jSeparator1" max="32767" attributes="0"/>
+                                  <Component id="auditProgressBar" max="32767" attributes="0"/>
+                                  <Component id="auditCurrentlyScanningLabel" alignment="0" max="32767" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label5" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="ID3TagCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label3" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="filenameCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label4" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="currentDirLabel" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="auditAnalyzeButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="auditStartButton" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                                              <Component id="auditViewResultsButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jScrollPane2" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="previousFolderButton" linkSize="1" min="-2" pref="152" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="previousFolderButton" linkSize="1" min="-2" pref="152" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="advanceOnAutoFixCheckbox" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="attemptAutoFixButton" alignment="1" max="32767" attributes="0"/>
                                   <Component id="nextFolderButton" linkSize="1" alignment="1" max="32767" attributes="0"/>
@@ -162,8 +173,13 @@
                           <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
                           <Component id="label5" min="-2" pref="30" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="attemptAutoFixButton" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="attemptAutoFixButton" linkSize="2" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                          <Component id="advanceOnAutoFixCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="previousFolderButton" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
@@ -345,6 +361,13 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JSeparator" name="jSeparator1">
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="advanceOnAutoFixCheckbox">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Advance on successful Autofix"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="cleanupPanel">

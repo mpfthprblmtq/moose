@@ -21,6 +21,7 @@ import moose.utilities.SongUtils;
 import moose.utilities.StringUtils;
 import moose.utilities.logger.Logger;
 import moose.objects.Song;
+import moose.utilities.viewUtils.ViewUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -178,12 +179,27 @@ public class SongController {
      * @return the index of the song
      */
     public int getIndex(Song song) {
+        // check for an exact match first
         for (Integer index : getSongs().keySet()) {
             Song songInMap = getSongs().get(index);
             if (song.equals(songInMap, false)) {
                 return index;
             }
         }
+
+        // song wasn't found
+        return -1;
+    }
+
+    public int getIndex(File oldFile, File newFile) {
+        for (Integer index : getSongs().keySet()) {
+            Song songInMap = getSongs().get(index);
+            if (songInMap.getFile().getPath().equals(oldFile.getPath()) || songInMap.getNewFile().getPath().equals(newFile.getPath())) {
+                return index;
+            }
+        }
+
+        // song wasn't found
         return -1;
     }
 
@@ -350,7 +366,11 @@ public class SongController {
         Song s = songs.get(index);
 
         // check to see if we need to rename the file
-        if (s.getNewFile() != null) {
+        // TODO why am I doing all this nonsense
+        if (s.getNewFile() != null && s.getFile().getName().equals(s.getNewFile().getName())) {
+            s.setFile(s.getNewFile());
+            s.setNewFile(null);
+        } else if (s.getNewFile() != null) {
             if (!s.getNewFile().getName().endsWith(".mp3")) {
                 s.setNewFile(new File(s.getNewFile().getAbsolutePath().concat(".mp3")));
             }
@@ -369,7 +389,8 @@ public class SongController {
             ID3v2 tag = new ID3v24Tag();
             mp3file.setId3v2Tag(tag);
         } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-            System.err.println(ex);
+            logger.logError("Couldn't save file: " + s.getFile().getName(), ex);
+            ViewUtils.showErrorDialog("Couldn't save file: " + s.getFile().getName(), ex, Moose.getFrame());
         }
 
         // set all the text based items

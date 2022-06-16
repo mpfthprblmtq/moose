@@ -108,14 +108,24 @@ public class AutoTaggingService {
 
             // tracks
             String[] trackArr = tracks.split("/");
-            Moose.frame.songController.setTrack(index, trackArr[0]);
-            Moose.frame.songController.setTotalTracks(index, trackArr[1]);
+            if (trackArr.length == 2) {
+                Moose.frame.songController.setTrack(index, trackArr[0]);
+                Moose.frame.songController.setTotalTracks(index, trackArr[1]);
+            } else {
+                Moose.frame.songController.setTrack(index, StringUtils.EMPTY);
+                Moose.frame.songController.setTotalTracks(index, StringUtils.EMPTY);
+            }
             table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
             // disks
             String[] diskArr = disks.split("/");
-            Moose.frame.songController.setDisk(index, diskArr[0]);
-            Moose.frame.songController.setTotalDisks(index, diskArr[1]);
+            if (diskArr.length == 2) {
+                Moose.frame.songController.setDisk(index, diskArr[0]);
+                Moose.frame.songController.setTotalDisks(index, diskArr[1]);
+            } else {
+                Moose.frame.songController.setDisk(index, StringUtils.EMPTY);
+                Moose.frame.songController.setTotalDisks(index, StringUtils.EMPTY);
+            }
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
 
             // comment
@@ -326,22 +336,53 @@ public class AutoTaggingService {
             } catch (IOException ex) {
                 logger.logError("IOException while trying to reach buffered image: ".concat(images.get(0).getPath()));
             }
+            BufferedImage newBufferedImage = null;
             if (bufferedImage != null) {
-                // check to see if it is the same width/height
+                // check to see if it is the same width/height, resize if not
                 if (bufferedImage.getWidth() != bufferedImage.getHeight()) {
-                    return null;
+                    newBufferedImage = ImageUtils.resize(bufferedImage, Math.min(bufferedImage.getHeight(), bufferedImage.getWidth()));
+                }
+            }
+            File resultFile;
+            if (newBufferedImage != null) {
+                resultFile = ImageUtils.createImageFile(newBufferedImage, images.get(0).getParentFile(), newBufferedImage.getHeight());
+                if (images.get(0).delete()) {
+                    return resultFile;
+                }
+            } else {
+                String parent = images.get(0).getParentFile().getPath();
+                String filename = images.get(0).getName();
+                String type = filename.substring(filename.lastIndexOf("."));
+                resultFile = new File(parent.concat("/cover").concat(type));
+                if (!images.get(0).renameTo(resultFile)) {
+                    logger.logError("Error while renaming image file: ".concat(resultFile.getPath()));
                 }
             }
 
-            String parent = images.get(0).getParentFile().getPath();
-            String filename = images.get(0).getName();
-            String type = filename.substring(filename.lastIndexOf("."));
-            File rename_to = new File(parent.concat("/cover").concat(type));
+            return resultFile;
+        }
 
-            if (!images.get(0).renameTo(rename_to)) {
-                logger.logError("Error while renaming image file: ".concat(rename_to.getPath()));
+        // if we reach this point, an image file wasn't found at all, let's check all the files to see if they
+        // share the same cover art, and grab the image if they do
+        List<Song> songs = new ArrayList<>();
+        List<File> fileList = new ArrayList<>();
+        FileUtils.listFiles(folder, fileList);
+        for (File file : fileList) {
+            Song song = SongUtils.getSongFromFile(file);
+            if (song != null) {
+                songs.add(song);
             }
-            return rename_to;
+        }
+        List<byte[]> bytesList = new ArrayList<>();
+        for (Song song : songs) {
+            bytesList.add(song.getArtwork_bytes());
+        }
+        if (ImageUtils.checkIfSame(bytesList.get(0), bytesList.toArray(new byte[0][]))) {
+            byte[] bytes = bytesList.get(0);
+            BufferedImage image = ImageUtils.getBufferedImageFromBytes(bytes);
+            if (image != null) {
+                return ImageUtils.createImageFile(image, folder, image.getHeight());
+            }
         }
 
         // if we reach this point, no image files exist in that directory
@@ -607,7 +648,20 @@ public class AutoTaggingService {
             trackNumber = matcher.group("TrackNumber");
         }
 
-        // if we didn't get it, return empty string to prevent /12 nonsense
+        // if we didn't get it, ask the user
+        if (StringUtils.isEmpty(trackNumber)) {
+            Song s = songController.getSongFromFile(file);
+            String title = file.getName().replace(".mp3", StringUtils.EMPTY);
+            if (s != null && StringUtils.isNotEmpty(s.getTitle())) {
+                title = s.getTitle();
+            }
+            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
+            if (arr != null) {
+                trackNumber = arr[1];
+            }
+        }
+
+        // if we still didn't get it, return empty string to prevent /12 nonsense
         if (StringUtils.isEmpty(trackNumber)) {
             return StringUtils.EMPTY;
         }
