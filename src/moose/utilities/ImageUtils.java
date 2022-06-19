@@ -113,6 +113,20 @@ public class ImageUtils {
     }
 
     /**
+     * Returns a buffered image from a byte array
+     * @param bytes, the bytes to read from
+     */
+    public static BufferedImage getBufferedImageFromBytes(byte[] bytes) {
+        try {
+            InputStream is = new ByteArrayInputStream(bytes);
+            return ImageIO.read(is);
+        } catch (IOException e) {
+            logger.logError("Couldn't convert bytes to bufferedImage!");
+            return null;
+        }
+    }
+
+    /**
      * Creates a img file
      * @param img, the img file to create
      * @param dir, the directory of the file to create
@@ -143,7 +157,7 @@ public class ImageUtils {
      * @param dim the x/y of the image
      * @return a resized image
      */
-    private static BufferedImage resize(BufferedImage img, int dim) {
+    public static BufferedImage resize(BufferedImage img, int dim) {
         Image tmp = img.getScaledInstance(dim, dim, Image.SCALE_SMOOTH);
         BufferedImage resized = new BufferedImage(dim, dim, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = resized.createGraphics();

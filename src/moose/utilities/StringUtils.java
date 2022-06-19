@@ -1,5 +1,8 @@
 package moose.utilities;
 
+import java.util.List;
+import java.util.Objects;
+
 public class StringUtils {
 
     public static final String EMPTY = "";
@@ -45,5 +48,48 @@ public class StringUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Cleans a string if it's a file (from mac, might need to test this on Windows)
+     * @param s, the string to clean (replace : with /)
+     * @return a cleaned string
+     */
+    public static String cleanFilenameString(String s) {
+        return s.replaceAll(":", "/");
+    }
+
+    /**
+     * Same utility function, finds common longest string from list of strings
+     * @param strings, the list of strings
+     * @return the longest common string
+     */
+    public static String same(List<String> strings) {
+
+        // result string
+        String result = "";
+
+        // get first string from list as reference
+        String s = strings.get(0);
+
+        for (int i = 0; i < s.length(); i++) {
+            for (int j = i + 1; j <= s.length(); j++) {
+
+                // generating all possible substrings of our reference string strings.get(0) i.e s
+                String stem = s.substring(i, j);
+                int k;
+                for (k = 1; k < strings.size(); k++) {
+                    // check if the generated stem is common to all words
+                    if (!strings.get(k).contains(stem))
+                        break;
+                }
+
+                // if current substring is present in all strings and its length is greater than current result
+                if (k == strings.size() && result.length() < stem.length())
+                    result = stem;
+            }
+        }
+
+        return result;
     }
 }
