@@ -374,6 +374,38 @@ public class Song {
                 Objects.equals(comment, song.comment);
     }
 
+    /**
+     * Supplemental function to compare song data, but this one has an optional includeFile parameter
+     * @param o, the object to compare with
+     * @param includeFile, a boolean to include the file in the check or not
+     * @return the result of the check
+     */
+    public boolean equals(Object o, boolean includeFile) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Song song = (Song) o;
+        boolean result = Objects.equals(title, song.title) &&
+                Objects.equals(artist, song.artist) &&
+                Objects.equals(album, song.album) &&
+                Objects.equals(albumArtist, song.albumArtist) &&
+                Objects.equals(genre, song.genre) &&
+                Objects.equals(year, song.year) &&
+                Objects.equals(track, song.track) &&
+                Objects.equals(totalTracks, song.totalTracks) &&
+                Objects.equals(disk, song.disk) &&
+                Objects.equals(totalDisks, song.totalDisks) &&
+                Arrays.equals(artwork_bytes, song.artwork_bytes) &&
+                Objects.equals(bitrate, song.bitrate) &&
+                Objects.equals(sampleRate, song.sampleRate) &&
+                Objects.equals(length, song.length) &&
+                Objects.equals(comment, song.comment);
+
+        if (result && includeFile && Objects.equals(file, song.file)) {
+            result = false;
+        }
+        return result;
+    }
+
     @Override
     public int hashCode() {
         int result = Objects.hash(file, title, artist, album, albumArtist, genre, year, track, totalTracks, disk, totalDisks, bitrate, sampleRate, length, comment);

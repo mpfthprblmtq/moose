@@ -1,16 +1,14 @@
 package moose.utilities;
 
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.ID3v24Tag;
-import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.UnsupportedTagException;
-import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.*;
 import moose.Moose;
 import moose.objects.Song;
 import moose.utilities.logger.Logger;
 
 import java.io.File;
 import java.io.IOException;
+
+import static moose.utilities.Constants.*;
 
 public class SongUtils {
 
@@ -25,7 +23,10 @@ public class SongUtils {
      */
     public static boolean isPartOfALabel(File dir) {
         String path = dir.getPath();
-        return (path.contains("/Compilations/") || path.contains("/EPs/") || path.contains("/LPs/") || path.contains("/Singles/"));
+        return (path.contains("/" + SINGLES + "/") ||
+                path.contains("/" + COMPILATIONS + "/") ||
+                path.contains("/" + LPS + "/") ||
+                path.contains("/" + EPS + "/"));
     }
 
     /**
@@ -34,9 +35,9 @@ public class SongUtils {
      * @param file, the file to check
      * @return the result of the check, true if it's a single from a label, false if it isn't
      */
-    public static boolean isASingleInALabel(File file) {
+    public static boolean isPartOfALabel(File file, String type) {
         String path = file.getPath();
-        return path.contains("/Singles/");
+        return path.contains("/" + type + "/");
     }
 
     /**
@@ -52,20 +53,21 @@ public class SongUtils {
             // create the mp3file from the file's path
             mp3file = new Mp3File(file.getPath());
 
-            // if the mp3file doesn't have an id3tag, create one
+            // if the mp3file doesn't have an id3v2tag, create one
             if (!mp3file.hasId3v2Tag()) {
                 ID3v2 tag = new ID3v24Tag();
                 mp3file.setId3v2Tag(tag);
             }
+            // same thing for the id3v1tag
+            if (!mp3file.hasId3v1Tag()) {
+                ID3v1 tag = new ID3v1Tag();
+                mp3file.setId3v1Tag(tag);
+            }
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             // things borked
-            mp3file = null;
-            logger.logError("Exception when trying to read data from file: " + file.getName(), e);
-            Moose.getFrame().updateConsole(e.getMessage());
-        }
-
-        // check if that mp3file is null first
-        if (mp3file == null) {
+            if (logger != null) {
+                logger.logError("Exception when trying to read data from file: " + file.getName(), e);
+            }
             return null;
         }
 
@@ -75,10 +77,12 @@ public class SongUtils {
         String album = mp3file.getId3v2Tag().getAlbum();
         String albumartist = mp3file.getId3v2Tag().getAlbumArtist();
         String genre = mp3file.getId3v2Tag().getGenreDescription();
-        String year = mp3file.getId3v2Tag().getYear();
         String track = mp3file.getId3v2Tag().getTrack();
         String disk = mp3file.getId3v2Tag().getPartOfSet();
         byte[] artwork_bytes = mp3file.getId3v2Tag().getAlbumImage();
+
+        // get the year using both because year can be in two places for some reason?
+        String year = getYear(mp3file);
 
         int bitrate = mp3file.getBitrate();
         int samplerate = mp3file.getSampleRate();
@@ -99,5 +103,22 @@ public class SongUtils {
 
         // create a song object with the information
         return new Song(file, title, artist, album, albumartist, genre, year, track, disk, artwork_bytes, bitrate, samplerate, len, comment);
+    }
+
+    /**
+     * Utility function to get the year from an mp3 file
+     * @param mp3file, the mp3 file object to read from
+     */
+    private static String getYear(Mp3File mp3file) {
+        String v2Year = mp3file.getId3v2Tag().getYear();
+        String v1Year = mp3file.getId3v1Tag().getYear();
+        if (StringUtils.isNotEmpty(v2Year) && StringUtils.isNotEmpty(v1Year)) {
+            return v2Year;
+        } else if (StringUtils.isNotEmpty(v2Year) && StringUtils.isEmpty(v1Year)) {
+            return v2Year;
+        } else if (StringUtils.isEmpty(v2Year) && StringUtils.isNotEmpty(v1Year)) {
+            return v1Year;
+        }
+        return StringUtils.EMPTY;
     }
 }

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 
+import static moose.utilities.Constants.*;
+
 // class AuditFrame
 public class AuditFrame extends javax.swing.JFrame {
 
@@ -70,6 +72,7 @@ public class AuditFrame extends javax.swing.JFrame {
         auditCurrentlyScanningLabel = new javax.swing.JLabel();
         previousFolderButton = new javax.swing.JButton();
         nextFolderButton = new javax.swing.JButton();
+        attemptAutoFixButton = new javax.swing.JButton();
         ID3TagCheck = new javax.swing.JLabel();
         filenameCheck = new javax.swing.JLabel();
         coverArtCheck = new javax.swing.JLabel();
@@ -83,6 +86,8 @@ public class AuditFrame extends javax.swing.JFrame {
         currentDirLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         auditResultsTextArea = new javax.swing.JTextArea();
+        jSeparator1 = new javax.swing.JSeparator();
+        advanceOnAutoFixCheckbox = new javax.swing.JCheckBox();
         cleanupPanel = new javax.swing.JPanel();
         cleanupCurrentlyScanningLabel = new javax.swing.JLabel();
         cleanupProgressBar = new javax.swing.JProgressBar();
@@ -132,6 +137,14 @@ public class AuditFrame extends javax.swing.JFrame {
             }
         });
 
+        attemptAutoFixButton.setText("Attempt Auto Fix");
+        attemptAutoFixButton.setEnabled(false);
+        attemptAutoFixButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                attemptAutoFixButtonActionPerformed(evt);
+            }
+        });
+
         ID3TagCheck.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         filenameCheck.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -141,7 +154,7 @@ public class AuditFrame extends javax.swing.JFrame {
         label3.setText("Every file has necessary ID3Tag information");
         label3.setEnabled(false);
 
-        label4.setText("Filenames all match standard");
+        label4.setText("File names and directories all match standard");
         label4.setEnabled(false);
 
         label5.setText("Has cover art associated with the folder");
@@ -177,10 +190,9 @@ public class AuditFrame extends javax.swing.JFrame {
             }
         });
 
-        currentDirLabel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        currentDirLabel.setFont(new java.awt.Font("Monospaced", 0, 10)); // NOI18N
         currentDirLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         currentDirLabel.setText(" ");
-        currentDirLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         currentDirLabel.setMaximumSize(new java.awt.Dimension(17, 339));
         currentDirLabel.setMinimumSize(new java.awt.Dimension(17, 339));
         currentDirLabel.setPreferredSize(new java.awt.Dimension(17, 339));
@@ -195,43 +207,57 @@ public class AuditFrame extends javax.swing.JFrame {
         auditResultsTextArea.setMinimumSize(new java.awt.Dimension(175, 244));
         jScrollPane2.setViewportView(auditResultsTextArea);
 
+        advanceOnAutoFixCheckbox.setText("Advance on successful Autofix");
+
         javax.swing.GroupLayout auditPanelLayout = new javax.swing.GroupLayout(auditPanel);
         auditPanel.setLayout(auditPanelLayout);
         auditPanelLayout.setHorizontalGroup(
             auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(auditPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(auditPanelLayout.createSequentialGroup()
-                        .addComponent(previousFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(nextFolderButton))
-                    .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(auditPanelLayout.createSequentialGroup()
-                        .addComponent(coverArtCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(label5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(auditPanelLayout.createSequentialGroup()
-                        .addComponent(ID3TagCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(label3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(auditPanelLayout.createSequentialGroup()
-                        .addComponent(filenameCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(label4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(currentDirLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(auditPanelLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(auditAnalyzeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(auditStartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(auditViewResultsButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(label2))
+                            .addComponent(jSeparator1)
+                            .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addComponent(coverArtCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(label5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addComponent(ID3TagCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(label3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addComponent(filenameCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(label4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(currentDirLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(auditAnalyzeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(auditStartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(auditViewResultsButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(label2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
+                        .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addComponent(previousFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(advanceOnAutoFixCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(attemptAutoFixButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(nextFolderButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
+
+        auditPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {nextFolderButton, previousFolderButton});
+
         auditPanelLayout.setVerticalGroup(
             auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
@@ -251,8 +277,8 @@ public class AuditFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(label2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(currentDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(currentDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -265,12 +291,20 @@ public class AuditFrame extends javax.swing.JFrame {
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(coverArtCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(label5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(attemptAutoFixButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(advanceOnAutoFixCheckbox))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(previousFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(nextFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
+
+        auditPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {attemptAutoFixButton, nextFolderButton, previousFolderButton});
 
         tabbedPane.addTab("Audit", auditPanel);
 
@@ -414,11 +448,14 @@ public class AuditFrame extends javax.swing.JFrame {
                             .addComponent(cleanupCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cleanupPanelLayout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(deleteSelectedButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(deleteAllButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(deleteAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))))
                         .addContainerGap())))
         );
+
+        cleanupPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {deleteAllButton, deleteSelectedButton});
+
         cleanupPanelLayout.setVerticalGroup(
             cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cleanupPanelLayout.createSequentialGroup()
@@ -451,6 +488,8 @@ public class AuditFrame extends javax.swing.JFrame {
                 .addComponent(deleteAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        cleanupPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {deleteAllButton, deleteSelectedButton});
 
         tabbedPane.addTab("Cleanup", cleanupPanel);
 
@@ -491,8 +530,8 @@ public class AuditFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chooseFolderButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(tabbedPane)
+                .addContainerGap())
         );
 
         pack();
@@ -642,6 +681,10 @@ public class AuditFrame extends javax.swing.JFrame {
         startAuditAnalysis();
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
 
+    private void attemptAutoFixButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attemptAutoFixButtonActionPerformed
+        autoFix();
+    }//GEN-LAST:event_attemptAutoFixButtonActionPerformed
+
     public void startAuditAnalysis() {
         // make a swing worker do the image search in a separate thread so I can update the GUI
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -684,6 +727,18 @@ public class AuditFrame extends javax.swing.JFrame {
             resetAuditFrame();
         }
         // else nothing was chosen
+    }
+
+    public void updateConsole(String s) {
+        auditResultsTextArea.setText(s);
+    }
+
+    public boolean shouldAdvanceOnAutofix() {
+        return advanceOnAutoFixCheckbox.isSelected();
+    }
+
+    public void next() {
+        nextFolderButton.doClick();
     }
 
     /**
@@ -733,6 +788,13 @@ public class AuditFrame extends javax.swing.JFrame {
 
         // enable the button used for viewing now that we have results
         cleanupViewResultsButton.setEnabled(true);
+    }
+
+    /**
+     * Attempts to auto fix things
+     */
+    private void autoFix() {
+        auditController.autoFix();
     }
 
     /**
@@ -815,23 +877,18 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     public void refreshAuditFrame(List<Boolean> checkResults, String currentDirectory) {
 
-        if (!checkResults.isEmpty()) {
-            if (checkResults.get(Constants.ID3)) {
-                ID3TagCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
-            } else {
-                ID3TagCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
-            }
-            if (checkResults.get(Constants.FILENAMES)) {
-                filenameCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
-            } else {
-                filenameCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
-            }
-            if (checkResults.get(Constants.COVER)) {
-                coverArtCheck.setIcon(iconService.get(IconService.AUDIT_PASS));
-            } else {
-                coverArtCheck.setIcon(iconService.get(IconService.AUDIT_FAIL));
-            }
-        }
+        // set the controller ivars
+        auditController.setIvars(checkResults.get(ID3), checkResults.get(FILENAMES), checkResults.get(COVER), currentDirectory);
+
+        // set the pass/fail icons
+        ID3TagCheck.setIcon(checkResults.get(ID3) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
+        filenameCheck.setIcon(checkResults.get(Constants.FILENAMES) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
+        coverArtCheck.setIcon(checkResults.get(Constants.COVER) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
+
+        // set the attempt fix button to enabled if there's anything to fix
+        attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(Constants.COVER) || checkResults.get(Constants.FILENAMES));
+
+        // update the current directory label
         currentDirLabel.setText(auditController.getCurrentDirString(currentDirectory));
     }
 
@@ -920,6 +977,7 @@ public class AuditFrame extends javax.swing.JFrame {
         currentDirLabel.setText(StringUtils.EMPTY);
         previousFolderButton.setEnabled(false);
         nextFolderButton.setEnabled(false);
+        attemptAutoFixButton.setEnabled(false);
         nextFolderButton.setText("Save & Next -->");
 
         // cleanup fields
@@ -948,6 +1006,8 @@ public class AuditFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel ID3TagCheck;
+    private javax.swing.JCheckBox advanceOnAutoFixCheckbox;
+    private javax.swing.JButton attemptAutoFixButton;
     private javax.swing.JButton auditAnalyzeButton;
     private javax.swing.JLabel auditCurrentlyScanningLabel;
     private javax.swing.JPanel auditPanel;
@@ -972,6 +1032,7 @@ public class AuditFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox imagesCheckBox;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel label1;
     private javax.swing.JLabel label2;
     private javax.swing.JLabel label3;

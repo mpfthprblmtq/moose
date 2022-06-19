@@ -62,10 +62,27 @@ public class FileUtils {
         String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
         try {
             if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(new File(path));
+                if (file.exists()) {
+                    Desktop.getDesktop().open(new File(path));
+                }
             }
         } catch (IOException e) {
             logger.logError("IOException when opening containing folder of " + file.getPath());
+        }
+    }
+
+    /**
+     * Renames the file and logs the result
+     * @param from, the file to change
+     * @param to, the file to change from to to
+     * @return the result of the change
+     */
+    public static boolean rename(File from, File to) {
+        if (from.renameTo(to)) {
+            return true;
+        } else {
+            logger.logError("Couldn't rename " + from.getName() + " to " + to.getName() + "!");
+            return false;
         }
     }
 

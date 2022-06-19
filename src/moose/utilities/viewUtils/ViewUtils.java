@@ -306,4 +306,31 @@ public class ViewUtils {
         // show the popup
         popup.show(evt.getComponent(), evt.getX(), evt.getY());
     }
+
+    /**
+     * Shows an error dialog
+     * @param message, the message to show
+     * @param ex, the exception that occurred
+     * @param component, the component context
+     */
+    public static void showErrorDialog(String message, Exception ex, Component component) {
+        JOptionPane.showMessageDialog(component, message + "\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Autofocuses on a textfield or component in a dialog using threads
+     * @param component, the component to focus on
+     * @param context, where the dialog is
+     */
+    public static void focusOnField(Component component, String context) {
+        // create a thread to wait until the dialog box pops up
+        (new Thread(() -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                logger.logError("Exception with threading when opening the " + context + " dialog.", e);
+            }
+            component.requestFocus();
+        })).start();
+    }
 }

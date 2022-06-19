@@ -3,7 +3,7 @@ package moose.services;
 import moose.Moose;
 import moose.utilities.Constants;
 import moose.utilities.StringUtils;
-import moose.utilities.logger.Logger;
+import moose.utilities.viewUtils.ViewUtils;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -17,8 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DialogService {
-
-    static Logger logger = Moose.getLogger();
 
     static IconService iconService = new IconService();
 
@@ -152,18 +150,10 @@ public class DialogService {
         // create the list of items
         Object[] message = {panel};
 
-        // create a thread to wait until the dialog box pops up
-        (new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                logger.logError("Exception with threading when opening the track number dialog.", e);
-            }
-            trackField.requestFocus();
-        })).start();
+        ViewUtils.focusOnField(trackField, "Manual Set Track Number");
 
         // show the dialog
-        int option = JOptionPane.showConfirmDialog(component, message, "Manual set Track Number", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(component, message, "Manual Set Track Number", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
             return new String[]{titleField.getText().replace("/", ":"), trackField.getText()};

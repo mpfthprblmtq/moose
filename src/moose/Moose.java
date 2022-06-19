@@ -86,6 +86,7 @@ public class Moose {
      * Controls the Frame opening
      */
     public static void launchFrame() {
+        songController = new SongController();
         frame = new Frame();
         frame.setLocation(20, 20);
         frame.setVisible(true);
@@ -96,6 +97,7 @@ public class Moose {
      * @param dir, the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
+        songController = new SongController();
         frame = new Frame(dir);
         frame.setLocation(20, 20);
         frame.setVisible(true);

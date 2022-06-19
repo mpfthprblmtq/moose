@@ -60,19 +60,24 @@ public class AutoTaggingService {
         for (int row : rows) {
             // get the file we'll use to determine track information
             Song s = songController.getSongs().get(songController.getIndex(row));
-            File file = s.getNewFile() != null ? s.getNewFile() : s.getFile();
+            File oldFile = null;
+            File file = s.getFile();
+            if (s.getNewFile() != null) {
+                file = s.getNewFile();
+                oldFile = s.getFile();
+            }
             if (!file.getName().endsWith(".mp3")) {
                 file = FileUtils.getNewMP3FileFromOld(file, file.getName());
             }
 
             String title = getTitleFromFile(file);
-            String artist = getArtistFromFile(file);
+            String artist = getArtistFromFile(file, oldFile);
             String album = getAlbumFromFile(file);
             String albumArtist = getAlbumArtistFromFile(file);
             String year = getYearFromFile(file);
             String tracks = getTracksFromFile(file);
             String disks = getDisksFromFile(file);
-            String genre = getGenreFromFile(file);
+            String genre = StringUtils.isEmpty(s.getGenre()) ? getGenreFromFile(file) : s.getGenre();
 
             // get the index for the setters
             int index = getIndex(row);
@@ -84,7 +89,6 @@ public class AutoTaggingService {
             // artist
             Moose.frame.songController.setArtist(index, artist);
             table.setValueAt(artist, row, TABLE_COLUMN_ARTIST);
-
 
             // album
             Moose.frame.songController.setAlbum(index, album);
@@ -103,11 +107,25 @@ public class AutoTaggingService {
             table.setValueAt(genre, row, TABLE_COLUMN_GENRE);
 
             // tracks
-            Moose.frame.songController.setTrack(index, tracks);
+            String[] trackArr = tracks.split("/");
+            if (trackArr.length == 2) {
+                Moose.frame.songController.setTrack(index, trackArr[0]);
+                Moose.frame.songController.setTotalTracks(index, trackArr[1]);
+            } else {
+                Moose.frame.songController.setTrack(index, StringUtils.EMPTY);
+                Moose.frame.songController.setTotalTracks(index, StringUtils.EMPTY);
+            }
             table.setValueAt(tracks, row, TABLE_COLUMN_TRACK);
 
             // disks
-            Moose.frame.songController.setDisk(index, disks);
+            String[] diskArr = disks.split("/");
+            if (diskArr.length == 2) {
+                Moose.frame.songController.setDisk(index, diskArr[0]);
+                Moose.frame.songController.setTotalDisks(index, diskArr[1]);
+            } else {
+                Moose.frame.songController.setDisk(index, StringUtils.EMPTY);
+                Moose.frame.songController.setTotalDisks(index, StringUtils.EMPTY);
+            }
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
 
             // comment
@@ -157,7 +175,7 @@ public class AutoTaggingService {
                     File file = getFile(toReprocess);
 
                     // get the query to search on
-                    String artist = getArtistFromFile(file);
+                    String artist = getArtistFromFile(file, null);
                     String album = getAlbumFromFile(file);
                     String query = artist + " " + album;
 
@@ -318,22 +336,53 @@ public class AutoTaggingService {
             } catch (IOException ex) {
                 logger.logError("IOException while trying to reach buffered image: ".concat(images.get(0).getPath()));
             }
+            BufferedImage newBufferedImage = null;
             if (bufferedImage != null) {
-                // check to see if it is the same width/height
+                // check to see if it is the same width/height, resize if not
                 if (bufferedImage.getWidth() != bufferedImage.getHeight()) {
-                    return null;
+                    newBufferedImage = ImageUtils.resize(bufferedImage, Math.min(bufferedImage.getHeight(), bufferedImage.getWidth()));
+                }
+            }
+            File resultFile;
+            if (newBufferedImage != null) {
+                resultFile = ImageUtils.createImageFile(newBufferedImage, images.get(0).getParentFile(), newBufferedImage.getHeight());
+                if (images.get(0).delete()) {
+                    return resultFile;
+                }
+            } else {
+                String parent = images.get(0).getParentFile().getPath();
+                String filename = images.get(0).getName();
+                String type = filename.substring(filename.lastIndexOf("."));
+                resultFile = new File(parent.concat("/cover").concat(type));
+                if (!images.get(0).renameTo(resultFile)) {
+                    logger.logError("Error while renaming image file: ".concat(resultFile.getPath()));
                 }
             }
 
-            String parent = images.get(0).getParentFile().getPath();
-            String filename = images.get(0).getName();
-            String type = filename.substring(filename.lastIndexOf("."));
-            File rename_to = new File(parent.concat("/cover").concat(type));
+            return resultFile;
+        }
 
-            if (!images.get(0).renameTo(rename_to)) {
-                logger.logError("Error while renaming image file: ".concat(rename_to.getPath()));
+        // if we reach this point, an image file wasn't found at all, let's check all the files to see if they
+        // share the same cover art, and grab the image if they do
+        List<Song> songs = new ArrayList<>();
+        List<File> fileList = new ArrayList<>();
+        FileUtils.listFiles(folder, fileList);
+        for (File file : fileList) {
+            Song song = SongUtils.getSongFromFile(file);
+            if (song != null) {
+                songs.add(song);
             }
-            return rename_to;
+        }
+        List<byte[]> bytesList = new ArrayList<>();
+        for (Song song : songs) {
+            bytesList.add(song.getArtwork_bytes());
+        }
+        if (ImageUtils.checkIfSame(bytesList.get(0), bytesList.toArray(new byte[0][]))) {
+            byte[] bytes = bytesList.get(0);
+            BufferedImage image = ImageUtils.getBufferedImageFromBytes(bytes);
+            if (image != null) {
+                return ImageUtils.createImageFile(image, folder, image.getHeight());
+            }
         }
 
         // if we reach this point, no image files exist in that directory
@@ -383,21 +432,21 @@ public class AutoTaggingService {
         pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return matcher.group("Title");
+            return StringUtils.cleanFilenameString(matcher.group("Title"));
         }
 
         // 01 Play Pretend (ft. Ourchives).mp3
         pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return matcher.group("Title");
+            return StringUtils.cleanFilenameString(matcher.group("Title"));
         }
 
         // Play Pretend (ft. Ourchives)
         pattern = Pattern.compile(TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return matcher.group("Title");
+            return StringUtils.cleanFilenameString(matcher.group("Title"));
         }
 
         return file.getName().replace(".mp3", StringUtils.EMPTY);
@@ -409,7 +458,22 @@ public class AutoTaggingService {
      * @param file, the file to check
      * @return a string artist
      */
-    public String getArtistFromFile(File file) {
+    public String getArtistFromFile(File file, File oldFile) {
+
+        // check to see if we already have an artist on the file, since we'll probably need to use that
+        // but first, check if we have the old file, which is the original file, otherwise we won't be able to find it
+        if (oldFile != null) {
+            file = oldFile;
+        }
+        Song s = SongUtils.getSongFromFile(file);
+        if (s != null) {
+            if (s.getNewFile() != null) {
+                file = s.getNewFile();
+            }
+            if (StringUtils.isNotEmpty(s.getArtist())) {
+                return s.getArtist();
+            }
+        }
 
         // regex objects
         Pattern pattern;
@@ -419,21 +483,21 @@ public class AutoTaggingService {
         pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return matcher.group("Artist");
+            return StringUtils.cleanFilenameString(matcher.group("Artist"));
         }
 
         // Kasbo - Play Pretend (ft. Ourchives).mp3
         pattern = Pattern.compile(ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return matcher.group("Artist");
+            return StringUtils.cleanFilenameString(matcher.group("Artist"));
         }
 
         // [2021] Kasbo - Play Pretend (ft. Ourchives)
         pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
         matcher = pattern.matcher(file.getParentFile().getName());
         if (matcher.find()) {
-            return matcher.group("Artist");
+            return StringUtils.cleanFilenameString(matcher.group("Artist"));
         }
 
         // split the file path by the / character, then try to parse it on whatever it can find
@@ -442,11 +506,22 @@ public class AutoTaggingService {
             pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
             matcher = pattern.matcher(folder);
             if (matcher.find()) {
-                return matcher.group("Artist");
+                return StringUtils.cleanFilenameString(matcher.group("Artist"));
             }
         }
 
         return getAlbumArtistFromFile(file);
+    }
+
+    /**
+     * Gets the artist from existing ID3 information
+     */
+    public String getArtistFromExistingID3Info(File file) {
+        Song s = SongUtils.getSongFromFile(file);
+        if (s != null) {
+            return s.getArtist();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -462,32 +537,32 @@ public class AutoTaggingService {
         Matcher matcher;
 
         // check to see if the parent file is a part of a multiple CD
-        if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
+        if (file.getPath().matches(CD_FILEPATH_REGEX)) {
             file = file.getParentFile();
         }
 
         if (SongUtils.isPartOfALabel(file)) {
             // for singles, the album should be the genre
-            if (SongUtils.isASingleInALabel(file)) {
+            if (SongUtils.isPartOfALabel(file, SINGLES)) {
                 return file.getParentFile().getParentFile().getName();
             } else {
                 pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
                 matcher = pattern.matcher(file.getParentFile().getName());
                 if (matcher.find()) {
-                    return matcher.group("Album");
+                    return StringUtils.cleanFilenameString(matcher.group("Album"));
                 }
 
                 pattern = Pattern.compile(YEAR_ALBUM_REGEX);
                 matcher = pattern.matcher(file.getParentFile().getName());
                 if (matcher.find()) {
-                    return matcher.group("Album");
+                    return StringUtils.cleanFilenameString(matcher.group("Album"));
                 }
             }
         } else {
             pattern = Pattern.compile(YEAR_ALBUM_REGEX);
             matcher = pattern.matcher(file.getParentFile().getName());
             if (matcher.find()) {
-                return matcher.group("Album");
+                return StringUtils.cleanFilenameString(matcher.group("Album"));
             }
         }
         return StringUtils.EMPTY;
@@ -502,21 +577,24 @@ public class AutoTaggingService {
     public String getAlbumArtistFromFile(File file) {
 
         // Library/Label/Singles/Genre/[2021] Artist - Album/01 Title.mp3
-        if (SongUtils.isASingleInALabel(file)) {
-            return file.getParentFile().getParentFile().getParentFile().getParentFile().getName();
+        if (SongUtils.isPartOfALabel(file, SINGLES)) {
+            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
 
         // Library/Label/Compilations/Compilation/01 Artist - Title.mp3
         // Library/Label/EPs/Album/01 Title.mp3
         // Library/Label/LPs/Album/CD2/01 Title.mp3
         } else if (SongUtils.isPartOfALabel(file)) {
-            if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
-                return file.getParentFile().getParentFile().getParentFile().getParentFile().getName();
+            if (file.getPath().matches(CD_FILEPATH_REGEX)) {
+                return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
             }
-            return file.getParentFile().getParentFile().getParentFile().getName();
+            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getName());
 
         // Library/AlbumArtist/[2021] Album/01 Title.mp3
         } else {
-            return file.getParentFile().getParentFile().getName();
+            if (file.getPath().matches(CD_FILEPATH_REGEX)) {
+                return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getName());
+            }
+            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getName());
         }
     }
 
@@ -554,7 +632,7 @@ public class AutoTaggingService {
      * Gets the tracks based on the filename and other files in the directory
      *
      * @param file, the file to check
-     * @return  a string representation of tracks
+     * @return a string representation of tracks
      */
     public String getTracksFromFile(File file) {
 
@@ -570,7 +648,20 @@ public class AutoTaggingService {
             trackNumber = matcher.group("TrackNumber");
         }
 
-        // if we didn't get it, return empty string to prevent /12 nonsense
+        // if we didn't get it, ask the user
+        if (StringUtils.isEmpty(trackNumber)) {
+            Song s = songController.getSongFromFile(file);
+            String title = file.getName().replace(".mp3", StringUtils.EMPTY);
+            if (s != null && StringUtils.isNotEmpty(s.getTitle())) {
+                title = s.getTitle();
+            }
+            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
+            if (arr != null) {
+                trackNumber = arr[1];
+            }
+        }
+
+        // if we still didn't get it, return empty string to prevent /12 nonsense
         if (StringUtils.isEmpty(trackNumber)) {
             return StringUtils.EMPTY;
         }
@@ -605,8 +696,8 @@ public class AutoTaggingService {
      * @return a genre string
      */
     public String getGenreFromFile(File file) {
-        if (SongUtils.isASingleInALabel(file)) {
-            return file.getParentFile().getParentFile().getName();
+        if (SongUtils.isPartOfALabel(file, SINGLES)) {
+            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getName());
         }
         return StringUtils.EMPTY;
     }

@@ -21,6 +21,7 @@ import moose.utilities.SongUtils;
 import moose.utilities.StringUtils;
 import moose.utilities.logger.Logger;
 import moose.objects.Song;
+import moose.utilities.viewUtils.ViewUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -170,6 +171,36 @@ public class SongController {
     public int getIndex(int row) {
         row = table.convertRowIndexToModel(row);
         return Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
+    }
+
+    /**
+     * Gets the index based on the song information given
+     * @param song, the song with the data to compare against
+     * @return the index of the song
+     */
+    public int getIndex(Song song) {
+        // check for an exact match first
+        for (Integer index : getSongs().keySet()) {
+            Song songInMap = getSongs().get(index);
+            if (song.equals(songInMap, false)) {
+                return index;
+            }
+        }
+
+        // song wasn't found
+        return -1;
+    }
+
+    public int getIndex(File oldFile, File newFile) {
+        for (Integer index : getSongs().keySet()) {
+            Song songInMap = getSongs().get(index);
+            if (songInMap.getFile().getPath().equals(oldFile.getPath()) || songInMap.getNewFile().getPath().equals(newFile.getPath())) {
+                return index;
+            }
+        }
+
+        // song wasn't found
+        return -1;
     }
 
     /**
@@ -335,7 +366,11 @@ public class SongController {
         Song s = songs.get(index);
 
         // check to see if we need to rename the file
-        if (s.getNewFile() != null) {
+        // TODO why am I doing all this nonsense
+        if (s.getNewFile() != null && s.getFile().getName().equals(s.getNewFile().getName())) {
+            s.setFile(s.getNewFile());
+            s.setNewFile(null);
+        } else if (s.getNewFile() != null) {
             if (!s.getNewFile().getName().endsWith(".mp3")) {
                 s.setNewFile(new File(s.getNewFile().getAbsolutePath().concat(".mp3")));
             }
@@ -354,18 +389,20 @@ public class SongController {
             ID3v2 tag = new ID3v24Tag();
             mp3file.setId3v2Tag(tag);
         } catch (IOException | UnsupportedTagException | InvalidDataException ex) {
-            System.err.println(ex);
+            logger.logError("Couldn't save file: " + s.getFile().getName(), ex);
+            ViewUtils.showErrorDialog("Couldn't save file: " + s.getFile().getName(), ex, Moose.getFrame());
         }
 
         // set all the text based items
         try {
             assert mp3file != null;
+            // id3v2Tag
             mp3file.getId3v2Tag().setTitle(s.getTitle());
             mp3file.getId3v2Tag().setArtist(s.getArtist());
             mp3file.getId3v2Tag().setAlbum(s.getAlbum());
             mp3file.getId3v2Tag().setAlbumArtist(s.getAlbumArtist());
-            mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
             mp3file.getId3v2Tag().setYear(s.getYear());
+            mp3file.getId3v2Tag().setGenreDescription(s.getGenre());
             mp3file.getId3v2Tag().setTrack(s.getFullTrackString());
             mp3file.getId3v2Tag().setPartOfSet(s.getFullDiskString());
             mp3file.getId3v2Tag().setComment(s.getComment());

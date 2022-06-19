@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static moose.utilities.Constants.*;
+
 public class AuditController {
 
     // service
@@ -29,6 +31,14 @@ public class AuditController {
     // some ivars
     File folder;
     int currentIndex;
+
+    // boolean things
+    private boolean coverIssues;
+    private boolean fileIssues;
+    private boolean id3Issues;
+
+    // current directory
+    private String currentDirectory;
 
     // list of albums for the audit
     List<File> albums = new ArrayList<>();
@@ -197,6 +207,79 @@ public class AuditController {
 
         // show that the audit is done
         DialogService.showMessageDialog(null, "Audit is complete!", "Audit Completed", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Sets the ivars in the controller
+     */
+    public void setIvars(boolean id3Issues, boolean fileIssues, boolean coverIssues, String currentDirectory) {
+        this.id3Issues = id3Issues;
+        this.fileIssues = fileIssues;
+        this.coverIssues = coverIssues;
+        this.currentDirectory = currentDirectory;
+    }
+
+    public void autoFix() {
+
+        // file object to see if there was an update to the current directory
+        File directory = new File(this.currentDirectory);
+
+        if (this.id3Issues && this.fileIssues && this.coverIssues) {
+            auditService.autoFixID3();
+            directory = auditService.autoFixFilePaths(new File(this.currentDirectory));
+            // covers are handled by auto tagging
+        } else if (!this.id3Issues && this.fileIssues && this.coverIssues) {
+            directory = auditService.autoFixFilePaths(new File(this.currentDirectory));
+            auditService.autoFixCovers();
+        } else if (this.id3Issues && !this.fileIssues && this.coverIssues) {
+            auditService.autoFixID3();
+            // covers are handled by auto tagging
+        } else if (!this.id3Issues && !this.fileIssues && this.coverIssues) {
+            auditService.autoFixCovers();
+        } else if (this.id3Issues && this.fileIssues) {
+            auditService.autoFixID3();
+            directory = auditService.autoFixFilePaths(new File(this.currentDirectory));
+        } else if (this.id3Issues) {
+            auditService.autoFixID3();
+        } else if (this.fileIssues) {
+            directory = auditService.autoFixFilePaths(new File(this.currentDirectory));
+        }
+
+        // now that the auto fixes are done, reload the frame and set some ivars
+        // if the directory changed name, update it in the filePathList so that we can keep track of how many albums we've gone through
+        if (!this.currentDirectory.equals(directory.getPath())) {
+            if (filePathList.get(ID3).contains(this.currentDirectory)) {
+                filePathList.get(ID3).set(filePathList.get(ID3).indexOf(this.currentDirectory), directory.getPath());
+            }
+            if (filePathList.get(FILENAMES).contains(this.currentDirectory)) {
+                filePathList.get(FILENAMES).set(filePathList.get(FILENAMES).indexOf(this.currentDirectory), directory.getPath());
+            }
+            if (filePathList.get(COVER).contains(this.currentDirectory)) {
+                filePathList.get(COVER).set(filePathList.get(COVER).indexOf(this.currentDirectory), directory.getPath());
+            }
+        }
+        albums.set(currentIndex, directory);
+        List<Boolean> results = auditService.getCheckResults(directory);
+        setIvars(results.get(ID3), results.get(FILENAMES), results.get(COVER), directory.getPath());
+        auditFrame.refreshAuditFrame(results, directory.getPath());
+
+        updateAuditResultCount();
+        if (!this.id3Issues && !this.fileIssues && !this.coverIssues && auditFrame.shouldAdvanceOnAutofix()) {
+            auditFrame.next();
+        }
+    }
+
+    public void updateAuditResultCount() {
+        if (!this.id3Issues) {
+            filePathList.get(ID3).remove(this.currentDirectory);
+        }
+        if (!this.fileIssues) {
+            filePathList.get(FILENAMES).remove(this.currentDirectory);
+        }
+        if (!this.coverIssues) {
+            filePathList.get(COVER).remove(this.currentDirectory);
+        }
+        auditFrame.updateConsole(auditService.getResultsFromFilePathList(filePathList));
     }
 
     public String getCurrentDirString(String currentDir) {

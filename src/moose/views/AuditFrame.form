@@ -49,8 +49,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="chooseFolderButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabbedPane" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="tabbedPane" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -77,43 +77,57 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="auditProgressBar" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="previousFolderButton" min="-2" pref="149" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="nextFolderButton" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Component id="auditCurrentlyScanningLabel" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label5" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="ID3TagCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label3" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="filenameCheck" min="-2" pref="30" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="label4" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="currentDirLabel" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="auditAnalyzeButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="auditStartButton" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
-                                      <Component id="auditViewResultsButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
+                                  <Component id="jSeparator1" max="32767" attributes="0"/>
+                                  <Component id="auditProgressBar" max="32767" attributes="0"/>
+                                  <Component id="auditCurrentlyScanningLabel" alignment="0" max="32767" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label5" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="ID3TagCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label3" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="filenameCheck" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="label4" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="currentDirLabel" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="auditAnalyzeButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="auditStartButton" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                                              <Component id="auditViewResultsButton" alignment="1" min="-2" pref="149" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jScrollPane2" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="previousFolderButton" linkSize="1" min="-2" pref="152" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="advanceOnAutoFixCheckbox" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="attemptAutoFixButton" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="nextFolderButton" linkSize="1" alignment="1" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -141,8 +155,8 @@
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="currentDirLabel" min="-2" pref="17" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="currentDirLabel" min="-2" pref="23" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -159,12 +173,19 @@
                           <Component id="coverArtCheck" min="-2" pref="30" max="-2" attributes="0"/>
                           <Component id="label5" min="-2" pref="30" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="previousFolderButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                          <Component id="nextFolderButton" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
-                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="attemptAutoFixButton" linkSize="2" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                          <Component id="advanceOnAutoFixCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="previousFolderButton" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
+                          <Component id="nextFolderButton" linkSize="2" min="-2" pref="40" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -208,6 +229,15 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextFolderButtonActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="attemptAutoFixButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Attempt Auto Fix"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="attemptAutoFixButtonActionPerformed"/>
+              </Events>
+            </Component>
             <Component class="javax.swing.JLabel" name="ID3TagCheck">
               <Properties>
                 <Property name="horizontalAlignment" type="int" value="0"/>
@@ -231,7 +261,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="label4">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Filenames all match standard"/>
+                <Property name="text" type="java.lang.String" value="File names and directories all match standard"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
@@ -286,11 +316,10 @@
             <Component class="javax.swing.JLabel" name="currentDirLabel">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="12" style="0"/>
+                  <Font name="Monospaced" size="10" style="0"/>
                 </Property>
                 <Property name="horizontalAlignment" type="int" value="11"/>
                 <Property name="text" type="java.lang.String" value=" "/>
-                <Property name="verticalAlignment" type="int" value="1"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[17, 339]"/>
                 </Property>
@@ -332,6 +361,13 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JSeparator" name="jSeparator1">
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="advanceOnAutoFixCheckbox">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Advance on successful Autofix"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="cleanupPanel">
@@ -378,9 +414,9 @@
                                   <Component id="cleanupCurrentlyScanningLabel" alignment="0" max="32767" attributes="0"/>
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="deleteSelectedButton" alignment="1" min="-2" max="-2" attributes="0"/>
-                                          <Component id="deleteAllButton" alignment="1" min="-2" pref="140" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="deleteAllButton" linkSize="3" max="32767" attributes="0"/>
+                                          <Component id="deleteSelectedButton" linkSize="3" pref="152" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -421,9 +457,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="imagesCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="deleteSelectedButton" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Component id="deleteSelectedButton" linkSize="4" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="deleteAllButton" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Component id="deleteAllButton" linkSize="4" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
