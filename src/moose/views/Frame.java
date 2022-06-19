@@ -14,7 +14,6 @@ package moose.views;
 
 import java.awt.*;
 
-import com.apple.eawt.*;
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Settings;
@@ -168,15 +167,6 @@ public class Frame extends javax.swing.JFrame {
                 closeWindow();
             }
         });
-
-        // set the CMD + Q action to my custom closeWindow() method
-        if (System.getProperty("os.name").contains("Mac")) {
-            Application macApp = Application.getApplication();
-            Application appleApplication = Application.getApplication();
-            appleApplication.disableSuddenTermination();
-            appleApplication.setQuitStrategy(QuitStrategy.CLOSE_ALL_WINDOWS);
-            macApp.setQuitHandler ((e, response) -> closeWindow());
-        }
 
         // listener for the context menu when you right-click on a row
         // basically tells the program where to go based on the user's choice
