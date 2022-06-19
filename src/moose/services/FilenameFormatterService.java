@@ -35,13 +35,7 @@ public class FilenameFormatterService {
      * @return a new and improved file name
      */
     public String formatFilename(File file, boolean singleFile) {
-        // clean it up first
-        String filename = cleanupFilename(file.getName());
-        file = FileUtils.getNewMP3FileFromOld(file, filename);
-
-        // then process it heavily
-        filename = getBetterFilename(file, singleFile);
-        return filename;
+        return getBetterFilename(file, singleFile);
     }
 
     /**
@@ -60,7 +54,7 @@ public class FilenameFormatterService {
             filename = filename.replaceAll("\\[(?i)" + toReplace + "\\]", StringUtils.EMPTY);
         }
 
-        return filename;
+        return filename.trim();
     }
 
     /**
@@ -104,7 +98,8 @@ public class FilenameFormatterService {
         }
 
         // return the new filename
-        return StringUtils.isNotEmpty(trackNumber) ? trackNumber + StringUtils.SPACE + trackTitle : trackTitle;
+        String newFileName = StringUtils.isNotEmpty(trackNumber) ? trackNumber + StringUtils.SPACE + trackTitle : trackTitle;
+        return cleanupFilename(newFileName);
     }
 
     /**
