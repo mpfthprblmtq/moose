@@ -54,7 +54,9 @@ public class FilenameFormatterService {
             filename = filename.replaceAll("\\[(?i)" + toReplace + "\\]", StringUtils.EMPTY);
         }
 
-        return filename.trim();
+        // remove all the spaces, even if there's some at the end of the file before the .mp3
+        filename = filename.replace(".mp3", StringUtils.EMPTY).trim();
+        return filename + ".mp3";
     }
 
     /**
@@ -129,6 +131,15 @@ public class FilenameFormatterService {
             if (matcher.find()) {
                 trackNumber = matcher.group("TrackNumber");
                 trackTitle = matcher.group("Title");
+            }
+        } else if (filename.matches(YOUTUBE_FILENAME_REGEX)) {
+            Pattern pattern = Pattern.compile(YOUTUBE_FILENAME_REGEX);
+            Matcher matcher = pattern.matcher(filename);
+            if (file.getPath().contains(SINGLES)) {
+                trackNumber = "01";
+            }
+            if (matcher.find()) {
+                trackTitle = matcher.group("FileName");
             }
         } else {
             // didn't match precheck regex
