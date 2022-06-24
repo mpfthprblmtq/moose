@@ -1,8 +1,8 @@
 package moose.services;
 
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.controllers.SongController;
 import moose.utilities.SongUtils;
-import moose.utilities.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
