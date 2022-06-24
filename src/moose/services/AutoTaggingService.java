@@ -10,12 +10,17 @@
 package moose.services;
 
 // imports
+
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.ImageSearchQuery;
 import moose.objects.Song;
-import moose.utilities.*;
-import moose.utilities.logger.Logger;
+import moose.utilities.ImageUtils;
+import moose.utilities.MP3FileUtils;
+import moose.utilities.SongUtils;
 import moose.views.modals.AlbumArtFinderFrame;
 
 import javax.imageio.ImageIO;
@@ -67,7 +72,7 @@ public class AutoTaggingService {
                 oldFile = s.getFile();
             }
             if (!file.getName().endsWith(".mp3")) {
-                file = FileUtils.getNewMP3FileFromOld(file, file.getName());
+                file = MP3FileUtils.getNewMP3FileFromOld(file, file.getName());
             }
 
             String title = getTitleFromFile(file);
@@ -432,21 +437,21 @@ public class AutoTaggingService {
         pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Title"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
         }
 
         // 01 Play Pretend (ft. Ourchives).mp3
         pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Title"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
         }
 
         // Play Pretend (ft. Ourchives)
         pattern = Pattern.compile(TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Title"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
         }
 
         return file.getName().replace(".mp3", StringUtils.EMPTY);
@@ -483,21 +488,21 @@ public class AutoTaggingService {
         pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Artist"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Artist"));
         }
 
         // Kasbo - Play Pretend (ft. Ourchives).mp3
         pattern = Pattern.compile(ARTIST_TITLE_REGEX);
         matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Artist"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Artist"));
         }
 
         // [2021] Kasbo - Play Pretend (ft. Ourchives)
         pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
         matcher = pattern.matcher(file.getParentFile().getName());
         if (matcher.find()) {
-            return StringUtils.cleanFilenameString(matcher.group("Artist"));
+            return FileUtils.cleanFilenameForOSX(matcher.group("Artist"));
         }
 
         // split the file path by the / character, then try to parse it on whatever it can find
@@ -506,7 +511,7 @@ public class AutoTaggingService {
             pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
             matcher = pattern.matcher(folder);
             if (matcher.find()) {
-                return StringUtils.cleanFilenameString(matcher.group("Artist"));
+                return FileUtils.cleanFilenameForOSX(matcher.group("Artist"));
             }
         }
 
@@ -549,20 +554,20 @@ public class AutoTaggingService {
                 pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
                 matcher = pattern.matcher(file.getParentFile().getName());
                 if (matcher.find()) {
-                    return StringUtils.cleanFilenameString(matcher.group("Album"));
+                    return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
                 }
 
                 pattern = Pattern.compile(YEAR_ALBUM_REGEX);
                 matcher = pattern.matcher(file.getParentFile().getName());
                 if (matcher.find()) {
-                    return StringUtils.cleanFilenameString(matcher.group("Album"));
+                    return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
                 }
             }
         } else {
             pattern = Pattern.compile(YEAR_ALBUM_REGEX);
             matcher = pattern.matcher(file.getParentFile().getName());
             if (matcher.find()) {
-                return StringUtils.cleanFilenameString(matcher.group("Album"));
+                return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
             }
         }
         return StringUtils.EMPTY;
@@ -578,23 +583,23 @@ public class AutoTaggingService {
 
         // Library/Label/Singles/Genre/[2021] Artist - Album/01 Title.mp3
         if (SongUtils.isPartOfALabel(file, SINGLES)) {
-            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
+            return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
 
         // Library/Label/Compilations/Compilation/01 Artist - Title.mp3
         // Library/Label/EPs/Album/01 Title.mp3
         // Library/Label/LPs/Album/CD2/01 Title.mp3
         } else if (SongUtils.isPartOfALabel(file)) {
             if (file.getPath().matches(CD_FILEPATH_REGEX)) {
-                return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
+                return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
             }
-            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getName());
+            return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getName());
 
         // Library/AlbumArtist/[2021] Album/01 Title.mp3
         } else {
             if (file.getPath().matches(CD_FILEPATH_REGEX)) {
-                return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getParentFile().getName());
+                return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getName());
             }
-            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getName());
+            return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getName());
         }
     }
 
@@ -638,7 +643,7 @@ public class AutoTaggingService {
 
         // get the total number of tracks from the parent directory
         File dir = file.getParentFile();
-        String totalTracks = String.valueOf(FileUtils.getNumberOfMP3Files(dir));
+        String totalTracks = String.valueOf(MP3FileUtils.getNumberOfMP3Files(dir));
 
         // get the string representation of the track number
         String trackNumber = StringUtils.EMPTY;
@@ -682,7 +687,7 @@ public class AutoTaggingService {
         if (file.getPath().replace(file.getName(), StringUtils.EMPTY).matches(CD_FILEPATH_REGEX)) {
             File cdDir = file.getParentFile();
             int cdNumber = Integer.parseInt(cdDir.getName().replace("CD", StringUtils.EMPTY));
-            int totalDisks = FileUtils.getTotalDisksFromFolder(cdDir.getParentFile());
+            int totalDisks = MP3FileUtils.getTotalDisksFromFolder(cdDir.getParentFile());
             return cdNumber + "/" + totalDisks;
         } else {
             return "1/1";
@@ -697,7 +702,7 @@ public class AutoTaggingService {
      */
     public String getGenreFromFile(File file) {
         if (SongUtils.isPartOfALabel(file, SINGLES)) {
-            return StringUtils.cleanFilenameString(file.getParentFile().getParentFile().getName());
+            return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getName());
         }
         return StringUtils.EMPTY;
     }

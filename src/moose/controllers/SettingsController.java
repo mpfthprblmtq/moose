@@ -11,8 +11,10 @@ package moose.controllers;
 
 // imports
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
-import moose.utilities.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import moose.objects.Settings;
-import moose.utilities.logger.Logger;
 
 // class SettingsController
 public class SettingsController {
@@ -145,14 +146,22 @@ public class SettingsController {
      * Opens the event log
      */
     public void openEventLog() {
-        FileUtils.openFile(Moose.logger.getEventLog());
+        try {
+            FileUtils.openFile(logger.getEventLog());
+        } catch (Exception e) {
+            logger.logError("Couldn't open event log file: " + logger.getEventLog().getPath(), e);
+        }
     }
 
     /**
      * Opens the error log
      */
     public void openErrorLog() {
-        FileUtils.openFile(Moose.logger.getErrorLog());
+        try {
+            FileUtils.openFile(logger.getErrorLog());
+        } catch (Exception e) {
+            logger.logError("Couldn't open error log file: " + logger.getErrorLog().getPath(), e);
+        }
     }
 
     /**

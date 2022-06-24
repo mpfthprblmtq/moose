@@ -3,7 +3,7 @@
    File:   SongController.java
    Desc:   Controller class for Frame, works directly with the data based on input from Frame UI
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2022
  */
 
 // package
@@ -12,14 +12,15 @@ package moose.controllers;
 // imports
 import com.mpatric.mp3agic.*;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.services.AutoTaggingService;
 import moose.services.FilenameFormatterService;
 import moose.utilities.Constants;
-import moose.utilities.FileUtils;
+import moose.utilities.MP3FileUtils;
 import moose.utilities.SongUtils;
-import moose.utilities.StringUtils;
-import moose.utilities.logger.Logger;
 import moose.objects.Song;
 import moose.utilities.viewUtils.ViewUtils;
 
@@ -27,6 +28,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static com.mpfthprblmtq.commons.utils.FileUtils.launchJFileChooser;
 
 // class SongController
 public class SongController {
@@ -476,7 +479,7 @@ public class SongController {
                         case 1:     // filename
                             if (includeFiles) {
                                 File oldFile = (File) table.getModel().getValueAt(table.convertRowIndexToModel(i), 1);
-                                File newFile = FileUtils.getNewMP3FileFromOld(oldFile, toReplace);
+                                File newFile = MP3FileUtils.getNewMP3FileFromOld(oldFile, toReplace);
                                 setNewFile(table.convertRowIndexToModel(i), newFile);
                                 table.setValueAt(toReplace, i, 1);
                             }
@@ -586,7 +589,7 @@ public class SongController {
             }
 
             String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
-            String newFilename = filenameFormatterService.formatFilename(file, FileUtils.folderContainsOnlyOneMP3(file.getParentFile()));
+            String newFilename = filenameFormatterService.formatFilename(file, MP3FileUtils.folderContainsOnlyOneMP3(file.getParentFile()));
             if (StringUtils.isNotEmpty(newFilename)) {
                 File newFile = new File(path + newFilename);
                 setNewFile(getIndex(row), newFile);
@@ -604,7 +607,7 @@ public class SongController {
      */
     public void moveFiles(int[] selectedRows) {
 
-        File[] files = FileUtils.launchJFileChooser(
+        File[] files = launchJFileChooser(
                 "Choose the destination folder...",
                 "Select",
                 JFileChooser.DIRECTORIES_ONLY,
@@ -647,7 +650,11 @@ public class SongController {
         for (int selectedRow : selectedRows) {
             int row = table.convertRowIndexToModel(selectedRow);    // get the row
             File file = (File) table.getModel().getValueAt(row, 1);
-            FileUtils.openFile(file);
+            try {
+                FileUtils.openFile(file);
+            } catch (Exception e) {
+                logger.logError("Couldn't play file: " + file.getName(), e);
+            }
         }
     }
 }

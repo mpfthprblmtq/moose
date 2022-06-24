@@ -1,9 +1,10 @@
 package moose.utilities;
 
 import com.mpatric.mp3agic.*;
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.objects.Song;
-import moose.utilities.logger.Logger;
 
 import java.io.File;
 import java.io.IOException;

@@ -6,7 +6,7 @@
 package moose.controllers;
 
 import java.io.File;
-import moose.utilities.logger.Logger;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,12 +19,10 @@ import org.junit.Before;
 public class SongControllerTest {
     
     SongController songController;
-    Logger logger = new Logger();
     
     @Before
     public void setup() {
         songController = new SongController();
-        logger.setSystemOutToConsole();
     }
 
     @Test

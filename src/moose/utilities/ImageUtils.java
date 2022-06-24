@@ -1,7 +1,8 @@
 package moose.utilities;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
 import moose.Moose;
-import moose.utilities.logger.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

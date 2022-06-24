@@ -22,14 +22,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Song;
 import moose.services.IconService;
 import moose.utilities.Constants;
-import moose.utilities.FileUtils;
+import moose.utilities.MP3FileUtils;
 import moose.utilities.ImageUtils;
-import moose.utilities.StringUtils;
 import moose.utilities.viewUtils.ViewUtils;
 
 import static moose.utilities.Constants.*;
@@ -845,7 +846,6 @@ public class InfoFrame extends javax.swing.JFrame {
 
     /**
      * Sets the navigation buttons based on the row selected in the table
-     * @param row, the row to check against
      */
     public void setNavigationButtons() {
         if (this.selectedRows.length == 1) {
@@ -930,20 +930,20 @@ public class InfoFrame extends javax.swing.JFrame {
             // set the fields
             filenameField.setText(Constants.DASH);
             filenameField.setEnabled(false);
-            titleField.setText(StringUtils.checkIfSame(titles[0], titles) ? titles[0] : Constants.DASH);
-            artistField.setText(StringUtils.checkIfSame(artists[0], artists) ? artists[0] : Constants.DASH);
-            albumField.setText(StringUtils.checkIfSame(albums[0], albums) ? albums[0] : Constants.DASH);
-            albumArtistField.setText(StringUtils.checkIfSame(albumArtists[0], albumArtists) ? albumArtists[0] : Constants.DASH);
-            yearField.setText(StringUtils.checkIfSame(years[0], years) ? years[0] : Constants.DASH);
-            genreField.setText(StringUtils.checkIfSame(genres[0], genres) ? genres[0] : Constants.DASH);
-            track1Field.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
-            track2Field.setText(StringUtils.checkIfSame(trackTotals[0], trackTotals) ? trackTotals[0] : Constants.DASH);
-            disk1Field.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
-            disk2Field.setText(StringUtils.checkIfSame(diskTotals[0], diskTotals) ? diskTotals[0] : Constants.DASH);
-            lengthField.setText(StringUtils.checkIfSame(lengths[0], lengths) ? lengths[0] : Constants.DASH);
-            bitrateField.setText(StringUtils.checkIfSame(bitRates[0], bitRates) ? bitRates[0] : Constants.DASH);
-            sampleRateField.setText(StringUtils.checkIfSame(sampleRates[0], sampleRates) ? sampleRates[0] : Constants.DASH);
-            commentField.setText(StringUtils.checkIfSame(comments[0], comments) ? comments[0] : Constants.DASH);
+            titleField.setText(StringUtils.checkIfSame(titles[0], Arrays.asList(tracks)) ? titles[0] : Constants.DASH);
+            artistField.setText(StringUtils.checkIfSame(artists[0], Arrays.asList(artists)) ? artists[0] : Constants.DASH);
+            albumField.setText(StringUtils.checkIfSame(albums[0], Arrays.asList(albums)) ? albums[0] : Constants.DASH);
+            albumArtistField.setText(StringUtils.checkIfSame(albumArtists[0], Arrays.asList(albumArtists)) ? albumArtists[0] : Constants.DASH);
+            yearField.setText(StringUtils.checkIfSame(years[0], Arrays.asList(years)) ? years[0] : Constants.DASH);
+            genreField.setText(StringUtils.checkIfSame(genres[0], Arrays.asList(genres)) ? genres[0] : Constants.DASH);
+            track1Field.setText(StringUtils.checkIfSame(tracks[0], Arrays.asList(tracks)) ? tracks[0] : Constants.DASH);
+            track2Field.setText(StringUtils.checkIfSame(trackTotals[0], Arrays.asList(trackTotals)) ? trackTotals[0] : Constants.DASH);
+            disk1Field.setText(StringUtils.checkIfSame(disks[0], Arrays.asList(disks)) ? disks[0] : Constants.DASH);
+            disk2Field.setText(StringUtils.checkIfSame(diskTotals[0], Arrays.asList(diskTotals)) ? diskTotals[0] : Constants.DASH);
+            lengthField.setText(StringUtils.checkIfSame(lengths[0], Arrays.asList(lengths)) ? lengths[0] : Constants.DASH);
+            bitrateField.setText(StringUtils.checkIfSame(bitRates[0], Arrays.asList(bitRates)) ? bitRates[0] : Constants.DASH);
+            sampleRateField.setText(StringUtils.checkIfSame(sampleRates[0], Arrays.asList(sampleRates)) ? sampleRates[0] : Constants.DASH);
+            commentField.setText(StringUtils.checkIfSame(comments[0], Arrays.asList(comments)) ? comments[0] : Constants.DASH);
 
             if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
                 coverLabel.setIcon(ImageUtils.getScaledImage(images[0], 290));
@@ -1008,7 +1008,7 @@ public class InfoFrame extends javax.swing.JFrame {
                 File newFile = null;
                 if (!filenameField.getText().equals(DASH) &&
                         !originalValues.get(0).equals(table.getValueAt(row, 1))) {
-                    newFile = FileUtils.getNewMP3FileFromOld(oldFile, filenameField.getText());
+                    newFile = MP3FileUtils.getNewMP3FileFromOld(oldFile, filenameField.getText());
                 }
 
                 // create a new song with the file(s)

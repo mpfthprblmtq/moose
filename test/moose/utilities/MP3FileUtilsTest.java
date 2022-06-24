@@ -1,5 +1,6 @@
 package moose.utilities;
 
+import com.mpfthprblmtq.commons.utils.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FileUtilsTest {
+public class MP3FileUtilsTest {
 
     @Test
     public void testGetStartingPoint() {

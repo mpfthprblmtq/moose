@@ -16,14 +16,18 @@ package moose.views;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.DateUtils;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.*;
 import moose.objects.Settings;
 import moose.services.DialogService;
 import moose.utilities.*;
-import moose.utilities.logger.Logger;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.*;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -809,7 +813,12 @@ public class SettingsFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_libraryBrowseButtonActionPerformed
 
     private void appSupportOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appSupportOpenButtonActionPerformed
-        FileUtils.openFile(new File(settingsController.getSettings().getApplicationSupportLocation()));
+        try {
+            FileUtils.openFile(new File(settingsController.getSettings().getApplicationSupportLocation()));
+        } catch (Exception e) {
+            logger.logError("Couldn't open file!", e);
+        }
+
     }//GEN-LAST:event_appSupportOpenButtonActionPerformed
 
     private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
@@ -899,19 +908,24 @@ public class SettingsFrame extends javax.swing.JFrame {
      * @return the times used today
      */
     public String populateTimesUsedTodayField() {
-        Date lastUsed = DateUtils.getDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
-        lastUsed = lastUsed == null ? new Date() : lastUsed;
+        try {
+            Date lastUsed = DateUtils.getSimpleDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+            lastUsed = lastUsed == null ? new Date() : lastUsed;
 
-        // check to see if date in settings is today
-        if (!DateUtils.isDateSameAsToday(lastUsed)) {
-            // date was not today, set the times used today to 0
-            this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
-            this.settingsController.writeSettingsFile(settings);
+            // check to see if date in settings is today
+            if (!DateUtils.isDateSameAsToday(lastUsed)) {
+                // date was not today, set the times used today to 0
+                this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
+                this.settingsController.writeSettingsFile(settings);
+            }
+
+            return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
+                    .concat("/")
+                    .concat(String.valueOf(Constants.IMAGE_LIMIT));
+        } catch (ParseException e) {
+            logger.logError("Couldn't parse date: " + this.settingsController.getSettings().getAlbumArtFinderSearchCountDate(), e);
+            return null;
         }
-        
-        return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
-                .concat("/")
-                .concat(String.valueOf(Constants.IMAGE_LIMIT));
     }
 
     /**

@@ -1,8 +1,8 @@
 package moose.services;
 
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.utilities.Constants;
-import moose.utilities.StringUtils;
 import moose.utilities.viewUtils.ViewUtils;
 
 import javax.swing.*;

@@ -9,12 +9,12 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Song;
-import moose.utilities.FileUtils;
+import moose.utilities.MP3FileUtils;
 import moose.utilities.SongUtils;
-import moose.utilities.StringUtils;
 
 import static moose.utilities.Constants.*;
 
@@ -82,7 +82,7 @@ public class FilenameFormatterService {
 
             // if we have a new file name, change the name of the actual file
             if (!filename.equals(file.getName())) {
-                file = FileUtils.getNewMP3FileFromOld(file, filename);
+                file = MP3FileUtils.getNewMP3FileFromOld(file, filename);
             }
 
             // get the manual title and number
@@ -90,7 +90,7 @@ public class FilenameFormatterService {
 
             // if we have a new file name, change the name of the actual file
             if (!filename.equals(file.getName())) {
-                file = FileUtils.getNewMP3FileFromOld(file, filename);
+                file = MP3FileUtils.getNewMP3FileFromOld(file, filename);
             }
 
             // apply regex fixes again since we might actually have it now

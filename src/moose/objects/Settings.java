@@ -10,11 +10,12 @@
 package moose.objects;
 
 // imports
+import com.mpfthprblmtq.commons.utils.DateUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import moose.utilities.DateUtils;
-import moose.utilities.StringUtils;
 
 // class Settings
 public class Settings {
@@ -47,7 +48,7 @@ public class Settings {
         this.albumArtFinderApiKey = StringUtils.EMPTY;
         this.albumArtFinderCseId = StringUtils.EMPTY;
         this.albumArtFinderSearchCount = 0;
-        this.albumArtFinderSearchCountDate = DateUtils.formatDate(new Date());
+        this.albumArtFinderSearchCountDate = DateUtils.formatSimpleDate(new Date());
 
         // set the support location since we always know where that'll be
         setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/Moose/");
