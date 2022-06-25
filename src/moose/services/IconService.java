@@ -16,6 +16,7 @@ public class IconService {
 
     public IconService() {}
 
+    // TODO put this in a map you moron
     public Icon get(int type) {
         if (this.getClass() != null) {
             switch(type) {
