@@ -1,10 +1,10 @@
 package moose.services;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
 import moose.Moose;
 import moose.utilities.AuditCleanupUtils;
 import moose.utilities.Constants;
-import moose.utilities.FileUtils;
-import moose.utilities.logger.Logger;
 
 import javax.swing.*;
 import java.io.File;
@@ -216,7 +216,7 @@ public class CleanupService {
             } else {
                 logger.logError("Tried to delete " + file.getPath() + " in cleanup, but the file didn't exist!");
             }
-        };
+        }
         return filesDeleted;
     }
 }

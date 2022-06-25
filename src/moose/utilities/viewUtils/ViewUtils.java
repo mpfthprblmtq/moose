@@ -1,11 +1,11 @@
 package moose.utilities.viewUtils;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Settings;
-import moose.utilities.FileUtils;
-import moose.utilities.StringUtils;
-import moose.utilities.logger.Logger;
+import moose.utilities.MP3FileUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -117,7 +117,7 @@ public class ViewUtils {
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             // we have to build the new file and set it in the songController
                             File oldFile = (File) model.getValueAt(r, 1);
-                            File newFile = FileUtils.getNewMP3FileFromOld(oldFile, tcl.getNewValue().toString());
+                            File newFile = MP3FileUtils.getNewMP3FileFromOld(oldFile, tcl.getNewValue().toString());
                             songController.setNewFile(index, newFile);
                         }
                         // else do nothing, nothing was changed
@@ -161,7 +161,7 @@ public class ViewUtils {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Moose.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre)) {
+                        if (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
                                 Settings settings = Moose.getSettings();

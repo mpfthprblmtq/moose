@@ -21,11 +21,11 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.DateUtils;
 import moose.Moose;
 import moose.objects.Settings;
 import moose.utilities.Constants;
-import moose.utilities.DateUtils;
-import moose.utilities.logger.Logger;
 import moose.objects.ImageSearchResponse;
 
 import static moose.utilities.Constants.LARGE;
@@ -102,7 +102,7 @@ public class AlbumArtFinderService {
 
         // check if date matches today
         String settingsDate = settings.getAlbumArtFinderSearchCountDate();
-        String todaysDate = DateUtils.formatDate(new Date());
+        String todaysDate = DateUtils.formatSimpleDate(new Date());
         if (settingsDate.equals(todaysDate)) {
             // date is today, just increment call count
             settings.setAlbumArtFinderSearchCount(Moose.getSettings().getAlbumArtFinderSearchCount() + 1);
@@ -159,9 +159,9 @@ public class AlbumArtFinderService {
                 
                 // disables the "An illegal reflective access operation has occurred" warning
                 if (Moose.getSettings().isInDeveloperMode()) {
-                    Logger.disableLogging();
+                    logger.disableLogging();
                 } else {
-                    Logger.setSystemErrToConsole();
+                    logger.setSystemErrToConsole();
                 }
                 responseList = mapper.readValue(responseString, new TypeReference<List<ImageSearchResponse>>(){});  // parse that bad boy
                 

@@ -14,6 +14,10 @@ package moose.views;
 
 import java.awt.*;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
+import com.mpfthprblmtq.commons.utils.WebUtils;
 import moose.*;
 import moose.controllers.SongController;
 import moose.objects.Settings;
@@ -36,7 +40,6 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import moose.services.AutocompleteService;
-import moose.utilities.logger.Logger;
 import moose.utilities.viewUtils.AutoCompleteDocument;
 import moose.utilities.viewUtils.FileDrop;
 import moose.utilities.viewUtils.TableCellListener;
@@ -332,7 +335,7 @@ public class Frame extends javax.swing.JFrame {
 
         // create a list of all the genres that don't exist already
         List<String> newGenres = new ArrayList<>();
-        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && !StringUtils.isEmpty(genre))).forEachOrdered((genre) -> {
+        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre))).forEachOrdered((genre) -> {
             if (!newGenres.contains(genre)) {
                 newGenres.add(genre);
             }
@@ -1423,7 +1426,11 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
-        WebUtils.openPage(Constants.MOOSE_WIKI);
+        try {
+            WebUtils.openPage(MOOSE_WIKI);
+        } catch (Exception e) {
+            logger.logError("Couldn't open web page: " + MOOSE_WIKI, e);
+        }
     }//GEN-LAST:event_wikiMenuItemActionPerformed
 
     /**
@@ -1528,7 +1535,11 @@ public class Frame extends javax.swing.JFrame {
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
         for (int i = 0; i < table.getRowCount(); i++) {
             File file = songController.autoTaggingService.getFile(i);
-            FileUtils.openFile(file);
+            try {
+                FileUtils.openFile(file);
+            } catch (Exception e) {
+                logger.logError("Couldn't open file!", e);
+            }
         }
 
     }//GEN-LAST:event_openAllButtonActionPerformed
@@ -1597,7 +1608,11 @@ public class Frame extends javax.swing.JFrame {
             // if it's a scroll click, open files
             case java.awt.event.MouseEvent.BUTTON2:
                 for (int selectedRow : selectedRows) {
-                    FileUtils.openFile(songController.autoTaggingService.getFile(selectedRow));
+                    try {
+                        FileUtils.openFile(songController.autoTaggingService.getFile(selectedRow));
+                    } catch (Exception e) {
+                        logger.logError("Couldn't open file!", e);
+                    }
                 }
                 break;
 
@@ -1952,14 +1967,14 @@ public class Frame extends javax.swing.JFrame {
         }
 
         // fill the fields
-        multTitle.setText(StringUtils.checkIfSame(titles[0], titles) ? titles[0] : Constants.DASH);
-        multArtist.setText(StringUtils.checkIfSame(artists[0], artists) ? artists[0] : Constants.DASH);
-        multAlbum.setText(StringUtils.checkIfSame(albums[0], albums) ? albums[0] : Constants.DASH);
-        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists[0], albumArtists) ? albumArtists[0] : Constants.DASH);
-        multGenre.setText(StringUtils.checkIfSame(genres[0], genres) ? genres[0] : Constants.DASH);
-        multYear.setText(StringUtils.checkIfSame(years[0], years) ? years[0] : Constants.DASH);
-        multTrack.setText(StringUtils.checkIfSame(tracks[0], tracks) ? tracks[0] : Constants.DASH);
-        multDisk.setText(StringUtils.checkIfSame(disks[0], disks) ? disks[0] : Constants.DASH);
+        multTitle.setText(StringUtils.checkIfSame(titles[0], Arrays.asList(titles)) ? titles[0] : Constants.DASH);
+        multArtist.setText(StringUtils.checkIfSame(artists[0], Arrays.asList(artists)) ? artists[0] : Constants.DASH);
+        multAlbum.setText(StringUtils.checkIfSame(albums[0], Arrays.asList(albums)) ? albums[0] : Constants.DASH);
+        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists[0], Arrays.asList(albumArtists)) ? albumArtists[0] : Constants.DASH);
+        multGenre.setText(StringUtils.checkIfSame(genres[0], Arrays.asList(genres)) ? genres[0] : Constants.DASH);
+        multYear.setText(StringUtils.checkIfSame(years[0], Arrays.asList(years)) ? years[0] : Constants.DASH);
+        multTrack.setText(StringUtils.checkIfSame(tracks[0], Arrays.asList(tracks)) ? tracks[0] : Constants.DASH);
+        multDisk.setText(StringUtils.checkIfSame(disks[0], Arrays.asList(disks)) ? disks[0] : Constants.DASH);
 
         if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
             multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
@@ -2090,7 +2105,12 @@ public class Frame extends javax.swing.JFrame {
             }
         }
         for (File folder : folders) {
-            FileUtils.showInFolder(folder);
+            try {
+                FileUtils.showInFolder(folder);
+            } catch (Exception e) {
+                logger.logError("Couldn't open file!", e);
+            }
+
         }
     }
 

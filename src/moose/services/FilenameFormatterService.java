@@ -9,12 +9,12 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
 import moose.objects.Song;
-import moose.utilities.FileUtils;
+import moose.utilities.MP3FileUtils;
 import moose.utilities.SongUtils;
-import moose.utilities.StringUtils;
 
 import static moose.utilities.Constants.*;
 
@@ -35,13 +35,7 @@ public class FilenameFormatterService {
      * @return a new and improved file name
      */
     public String formatFilename(File file, boolean singleFile) {
-        // clean it up first
-        String filename = cleanupFilename(file.getName());
-        file = FileUtils.getNewMP3FileFromOld(file, filename);
-
-        // then process it heavily
-        filename = getBetterFilename(file, singleFile);
-        return filename;
+        return getBetterFilename(file, singleFile);
     }
 
     /**
@@ -60,7 +54,9 @@ public class FilenameFormatterService {
             filename = filename.replaceAll("\\[(?i)" + toReplace + "\\]", StringUtils.EMPTY);
         }
 
-        return filename;
+        // remove all the spaces, even if there's some at the end of the file before the .mp3
+        filename = filename.replace(".mp3", StringUtils.EMPTY).trim();
+        return filename + ".mp3";
     }
 
     /**
@@ -86,7 +82,7 @@ public class FilenameFormatterService {
 
             // if we have a new file name, change the name of the actual file
             if (!filename.equals(file.getName())) {
-                file = FileUtils.getNewMP3FileFromOld(file, filename);
+                file = MP3FileUtils.getNewMP3FileFromOld(file, filename);
             }
 
             // get the manual title and number
@@ -94,7 +90,7 @@ public class FilenameFormatterService {
 
             // if we have a new file name, change the name of the actual file
             if (!filename.equals(file.getName())) {
-                file = FileUtils.getNewMP3FileFromOld(file, filename);
+                file = MP3FileUtils.getNewMP3FileFromOld(file, filename);
             }
 
             // apply regex fixes again since we might actually have it now
@@ -104,7 +100,8 @@ public class FilenameFormatterService {
         }
 
         // return the new filename
-        return StringUtils.isNotEmpty(trackNumber) ? trackNumber + StringUtils.SPACE + trackTitle : trackTitle;
+        String newFileName = StringUtils.isNotEmpty(trackNumber) ? trackNumber + StringUtils.SPACE + trackTitle : trackTitle;
+        return cleanupFilename(newFileName);
     }
 
     /**
@@ -134,6 +131,15 @@ public class FilenameFormatterService {
             if (matcher.find()) {
                 trackNumber = matcher.group("TrackNumber");
                 trackTitle = matcher.group("Title");
+            }
+        } else if (filename.matches(YOUTUBE_FILENAME_REGEX)) {
+            Pattern pattern = Pattern.compile(YOUTUBE_FILENAME_REGEX);
+            Matcher matcher = pattern.matcher(filename);
+            if (file.getPath().contains(SINGLES)) {
+                trackNumber = "01";
+            }
+            if (matcher.find()) {
+                trackTitle = matcher.group("FileName");
             }
         } else {
             // didn't match precheck regex

@@ -144,7 +144,7 @@ read -r openFile
 if [[ $openFile == "y" || $openFile == "Y" ]]
 then
   cd "$APP_PATH"/deploy || exit
-  open moose-"$appVersion"-installer.$packageType
+  open moose-"$version"-installer.$packageType
 fi
 echo
 echo "                        /\`."
