@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.StringUtils;
+import com.mpfthprblmtq.commons.utils.WebUtils;
 import moose.Moose;
 import moose.objects.ImageSearchQuery;
 import moose.objects.ImageSearchResponse;
 import moose.services.AlbumArtFinderService;
 import moose.utilities.ImageUtils;
-import moose.utilities.StringUtils;
-import moose.utilities.WebUtils;
-import moose.utilities.logger.Logger;
 
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
@@ -361,7 +361,13 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_prevButtonActionPerformed
 
     private void googleImagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleImagesButtonActionPerformed
-        WebUtils.openPage(AlbumArtFinderService.buildImageSearchQuery(queryTextField.getText()));
+        String url = AlbumArtFinderService.buildImageSearchQuery(queryTextField.getText());
+        try {
+            WebUtils.openPage(url);
+        } catch (Exception e) {
+            logger.logError("Couldn't open web page: " + url, e);
+        }
+
         this.dispose();
     }//GEN-LAST:event_googleImagesButtonActionPerformed
 

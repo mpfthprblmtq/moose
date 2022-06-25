@@ -10,11 +10,13 @@
 package moose.services;
 
 //imports
+import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.objects.Song;
 import moose.utilities.*;
 import moose.views.AuditFrame;
-import moose.utilities.logger.Logger;
 
 import javax.swing.SwingConstants;
 import java.io.File;
@@ -538,10 +540,13 @@ public class AuditService {
         }
         String path = album.getParentFile().getPath();
         File newDir = new File(path + "/" + newDirName.replace("/", ":"));
-        if (FileUtils.rename(album, newDir)) {
+        try {
+            FileUtils.rename(album, newDir);
             return newDir;
+        } catch (Exception e) {
+            logger.logError("Couldn't rename file!", e);
+            return null;
         }
-        return null;
     }
 
     /**
@@ -554,13 +559,17 @@ public class AuditService {
         String path = file.getParentFile().getPath();
         File newFile = new File(path + "/" + newFileName);
         // update the table
-        if (FileUtils.rename(file, newFile)) {
+        try {
+            FileUtils.rename(file, newFile);
             Moose.getFrame().table.setValueAt(
                     newFileName.replace(".mp3", StringUtils.EMPTY),
                     Moose.getSongController().getRow(index),
                     TABLE_COLUMN_FILENAME
             );
+        } catch (Exception e) {
+            logger.logError("Couldn't rename file!", e);
         }
+
     }
 
     /**
@@ -585,7 +594,7 @@ public class AuditService {
         List<String> artists = songsInAlbum.stream().map(Song::getArtist).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 
         // grab the common string (artist) from each string
-        String commonArtist = StringUtils.same(artists);
+        String commonArtist = StringUtils.findCommonString(artists);
 
         // replace any non-word character at the beginning and end of the string, so we don't have any " & " or things like that anywhere
         return commonArtist.replaceAll("(^[\\W_]*)|([\\W_]*$)", StringUtils.EMPTY);

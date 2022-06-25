@@ -11,12 +11,14 @@ package moose;
 
 import java.io.File;
 
+import com.mpfthprblmtq.commons.logger.Logger;
 import moose.controllers.SongController;
 import moose.objects.Settings;
-import moose.utilities.logger.Logger;
 import moose.views.AuditFrame;
 import moose.views.Frame;
 import moose.views.SettingsFrame;
+
+import javax.swing.*;
 
 // class Main
 public class Moose {
@@ -41,7 +43,9 @@ public class Moose {
         settingsFrame = new SettingsFrame();
         
         // instantiate the logger object so we can have some logging
-        logger = new Logger();
+        // TODO make sure this works
+        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
+        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
 
         // instantiate the main song controller object
         songController = new SongController();
@@ -108,6 +112,14 @@ public class Moose {
      */
     public static Frame getFrame() {
         return frame;
+    }
+
+    /**
+     * Returns the main frame table
+     * @return the JTable on the Frame
+     */
+    public static JTable getTable() {
+        return frame.table;
     }
 
     /**
