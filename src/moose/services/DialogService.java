@@ -25,7 +25,7 @@ public class DialogService {
      */
     public static void showAboutDialog() {
         JOptionPane.showMessageDialog(null,
-                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + "© Pat Ripley 2018-2021",
+                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + Constants.MOOSE_COPYRIGHT,
                 "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
     }
 

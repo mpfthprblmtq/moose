@@ -627,7 +627,7 @@ public class Frame extends javax.swing.JFrame {
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
-        jLabel1.setText("Moo0oO0ose");
+        jLabel1.setText("Moose");
 
         saveAllButton.setText("Save All");
         saveAllButton.setFocusable(false);
