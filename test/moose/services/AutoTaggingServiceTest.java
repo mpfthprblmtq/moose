@@ -3,10 +3,12 @@ package moose.services;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.controllers.SongController;
 import moose.utilities.SongUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +25,7 @@ public class AutoTaggingServiceTest {
     private AutoTaggingService autoTaggingService;
     private List<File> files;
 
-    @Before
+    @BeforeAll
     @SuppressWarnings("all")
     public void setUp() {
         autoTaggingService = new AutoTaggingService(new SongController());
@@ -55,7 +57,7 @@ public class AutoTaggingServiceTest {
         }
     }
 
-    @After
+    @AfterAll
     @SuppressWarnings("all")
     public void tearDown() {
         File tempFile = new File("./test/temp");
@@ -68,8 +70,7 @@ public class AutoTaggingServiceTest {
         } catch (IOException e) {
             System.err.println("IOException while trying to delete temp test directory!");
         }
-        Assert.assertFalse("Directory still exists",
-                Files.exists(tempPath));
+        assertFalse(Files.exists(tempPath));
     }
 
     @Test
@@ -77,7 +78,7 @@ public class AutoTaggingServiceTest {
         String expected = "TestTitle";
         for (File file : files) {
             String actual = autoTaggingService.getTitleFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -91,7 +92,7 @@ public class AutoTaggingServiceTest {
                 expected = "TestArtist";
             }
             String actual = autoTaggingService.getArtistFromFile(files.get(i), null);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -111,7 +112,7 @@ public class AutoTaggingServiceTest {
                 }
             }
             String actual = autoTaggingService.getAlbumFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -120,7 +121,7 @@ public class AutoTaggingServiceTest {
         String expected = "TestAlbumArtist";
         for (File file : files) {
             String actual = autoTaggingService.getAlbumArtistFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -129,7 +130,7 @@ public class AutoTaggingServiceTest {
         String expected = "2021";
         for (File file : files) {
             String actual = autoTaggingService.getYearFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -143,7 +144,7 @@ public class AutoTaggingServiceTest {
                 expected = StringUtils.EMPTY;
             }
             String actual = autoTaggingService.getGenreFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -166,7 +167,7 @@ public class AutoTaggingServiceTest {
             }
 
             String actual = autoTaggingService.getTracksFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 
@@ -182,7 +183,7 @@ public class AutoTaggingServiceTest {
                 expected = "1/1";
             }
             String actual = autoTaggingService.getDisksFromFile(file);
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 

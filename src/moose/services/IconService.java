@@ -1,45 +1,21 @@
 package moose.services;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import java.util.Objects;
 
 public class IconService {
 
-    public static final int DEFAULT = 0;
-    public static final int EDITED = 1;
-    public static final int SAVED = 2;
+    public static final String DEFAULT = "/resources/default.png";
+    public static final String EDITED = "/resources/edit.png";
+    public static final String SAVED = "/resources/check.png";
+    public static final String SUCCESS = "/resources/check2.png";
+    public static final String ERROR = "/resources/error.png";
+    public static final String MOOSE_64 = "/resources/moose64.png";
+    public static final String MOOSE_128 = "/resources/moose128.png";
+    public static final String LOADING = "/resources/loading-icon.gif";
 
-    public static final int AUDIT_PASS = 3;
-    public static final int AUDIT_FAIL = 4;
-
-    public static final int MOOSE_128 = 5;
-
-    public IconService() {}
-
-    // TODO put this in a map you moron
-    public Icon get(int type) {
-        if (this.getClass() != null) {
-            switch(type) {
-                case DEFAULT:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/default.png")));
-                case EDITED:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/edit.png")));
-                case SAVED:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/check.png")));
-                case MOOSE_128:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/moose128.png")));
-                case AUDIT_PASS:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/check2.png")));
-                case AUDIT_FAIL:
-                    return new ImageIcon(Objects.requireNonNull(
-                            this.getClass().getResource("/resources/error.png")));
-            }
-        }
-        return null;
+    public static Icon get(String type) {
+        return new ImageIcon(Objects.requireNonNull(IconService.class.getResource(type)));
     }
 }

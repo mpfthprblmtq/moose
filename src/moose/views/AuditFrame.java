@@ -36,9 +36,6 @@ public class AuditFrame extends javax.swing.JFrame {
     public AuditController auditController;
     public CleanupController cleanupController;
 
-    // services
-    public IconService iconService = new IconService();
-
     // logger object
     static Logger logger = Moose.getLogger();
 
@@ -883,9 +880,9 @@ public class AuditFrame extends javax.swing.JFrame {
         auditController.setIvars(checkResults.get(ID3), checkResults.get(FILENAMES), checkResults.get(COVER), currentDirectory);
 
         // set the pass/fail icons
-        ID3TagCheck.setIcon(checkResults.get(ID3) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
-        filenameCheck.setIcon(checkResults.get(Constants.FILENAMES) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
-        coverArtCheck.setIcon(checkResults.get(Constants.COVER) ? iconService.get(IconService.AUDIT_FAIL) : iconService.get(IconService.AUDIT_PASS));
+        ID3TagCheck.setIcon(checkResults.get(ID3) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
+        filenameCheck.setIcon(checkResults.get(Constants.FILENAMES) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
+        coverArtCheck.setIcon(checkResults.get(Constants.COVER) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
 
         // set the attempt fix button to enabled if there's anything to fix
         attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(Constants.COVER) || checkResults.get(Constants.FILENAMES));

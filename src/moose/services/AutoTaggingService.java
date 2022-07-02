@@ -16,7 +16,8 @@ import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import moose.Moose;
 import moose.controllers.SongController;
-import moose.objects.ImageSearchQuery;
+import moose.objects.Settings;
+import moose.objects.api.imageSearch.ImageSearchQuery;
 import moose.objects.Song;
 import moose.utilities.ImageUtils;
 import moose.utilities.MP3FileUtils;
@@ -42,6 +43,9 @@ public class AutoTaggingService {
 
     // controller
     SongController songController;
+
+    // services
+    SpotifyApiService spotifyApiService = new SpotifyApiService();
 
     public AutoTaggingService(SongController songController) {
         this.songController = songController;
@@ -134,7 +138,7 @@ public class AutoTaggingService {
             table.setValueAt(disks, row, TABLE_COLUMN_DISK);
 
             // comment
-            if (Moose.getSettings().getRemoveCommentOnAutoTagging()) {
+            if (Moose.getSettings().getFeatures().get(Settings.REMOVE_COMMENT_ON_AUTOTAGGING)) {
                 Moose.frame.songController.setComment(index, StringUtils.EMPTY);
             }
         }
@@ -169,39 +173,73 @@ public class AutoTaggingService {
         // now we should determine if we need to use the album art finder for the rows we couldn't do automatically
         if (!rowsToReprocess.isEmpty()) {
 
-            // ask the user if they want to use the album art finder
-            int useService = confirmUserWantsAlbumArtFinder();
-            if (useService == JOptionPane.YES_OPTION) {
+            // let's use the album art finder
+            List<ImageSearchQuery> queries = new ArrayList<>();
+            for (Integer toReprocess : rowsToReprocess) {
 
-                // let's use the album art finder
-                List<ImageSearchQuery> queries = new ArrayList<>();
-                for (Integer toReprocess : rowsToReprocess) {
+                File file = getFile(toReprocess);
 
-                    File file = getFile(toReprocess);
+                // get the query to search on
+                String artist = getArtistFromFile(file, null);
+                String album = getAlbumFromFileForArtwork(file);
 
-                    // get the query to search on
-                    String artist = getArtistFromFile(file, null);
-                    String album = getAlbumFromFile(file);
-                    String query = artist + " " + album;
+                // get the parent directory to put the cover
+                File dir = file.getParentFile();
 
-                    // get the parent directory to put the cover
-                    File dir = file.getParentFile();
+                // add a ImageSearchQuery object to the list of queries
+                if (!ImageSearchQuery.contains(queries, artist, album)) {
+                    ImageSearchQuery imageSearchQuery = new ImageSearchQuery(artist, album, dir, new ArrayList<>());
+                    imageSearchQuery.getRows().add(toReprocess);
+                    queries.add(imageSearchQuery);
+                } else {
+                    // if we already have the query included in the list, add the row to the rows to update
+                    int index = ImageSearchQuery.getIndex(queries, artist, album);
+                    queries.get(index).getRows().add(toReprocess);
+                }
+            }
 
-                    // add a ImageSearchQuery object to the list of queries
-                    if (!ImageSearchQuery.contains(queries, query)) {
-                        ImageSearchQuery imageSearchQuery = new ImageSearchQuery(query, dir, new ArrayList<>());
-                        imageSearchQuery.getRows().add(toReprocess);
-                        queries.add(imageSearchQuery);
-                    } else {
-                        // if we already have the query included in the list, add the row to the rows to update
-                        int index = ImageSearchQuery.getIndex(queries, query);
-                        queries.get(index).getRows().add(toReprocess);
+            // if the option is there to auto process with spotify
+            if (Moose.getSettings().getFeatures().get(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY)) {
+                // go through the search queries one by one
+                List<ImageSearchQuery> queriesToRemove = new ArrayList<>();
+                for (ImageSearchQuery query : queries) {
+                    // get the url
+                    String url = spotifyApiService.getImages(query.getArtist(), query.getAlbum());
+                    // if the url isn't empty, that means we found the cover art automatically
+                    if (StringUtils.isNotEmpty(url)) {
+                        // grab the image
+                        BufferedImage image = ImageUtils.getImageFromUrl(url);
+                        // create the physical file
+                        int dim = Moose.getSettings().getPreferredCoverArtSize();
+                        assert image != null;
+                        File outputFile = ImageUtils.createImageFile(image, query.getDir(), dim);
+                        assert outputFile != null;
+                        // with that new file, auto add the cover art
+                        if (outputFile.exists()) {
+                            for (Integer row : query.getRows()) {
+                                Moose.frame.songController.autoTaggingService.addIndividualCover(row, outputFile);
+                            }
+                        }
+                        // update graphics
+                        Moose.frame.updateMultiplePanelFields();
+                        // add that query to a list so we can delete it later
+                        queriesToRemove.add(query);
                     }
                 }
+                // remove that query from the list of queries in case we get rid of all of them
+                queries.removeAll(queriesToRemove);
+            }
 
-                // get the queries and dirs to open the frames with
-                for (ImageSearchQuery query : queries) {
-                    showAlbumArtWindow(query);
+            // if we still have some images to look for, use the album art finder frame for the rest of them
+            if (!queries.isEmpty()) {
+                // ask the user if they want to use the album art finder
+                int useService = confirmUserWantsAlbumArtFinder();
+                if (useService == JOptionPane.YES_OPTION) {
+
+                    // get the queries and dirs to open the frames with
+                    for (ImageSearchQuery query : queries) {
+                        showAlbumArtWindow(query);
+                    }
                 }
             }
         }
@@ -372,6 +410,7 @@ public class AutoTaggingService {
         List<Song> songs = new ArrayList<>();
         List<File> fileList = new ArrayList<>();
         FileUtils.listFiles(folder, fileList);
+        fileList.removeIf(file -> !file.getName().endsWith(".mp3"));
         for (File file : fileList) {
             Song song = SongUtils.getSongFromFile(file);
             if (song != null) {
@@ -561,6 +600,36 @@ public class AutoTaggingService {
                 matcher = pattern.matcher(file.getParentFile().getName());
                 if (matcher.find()) {
                     return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
+                }
+            }
+        } else {
+            pattern = Pattern.compile(YEAR_ALBUM_REGEX);
+            matcher = pattern.matcher(file.getParentFile().getName());
+            if (matcher.find()) {
+                return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    public String getAlbumFromFileForArtwork(File file) {
+        // regex objects
+        Pattern pattern;
+        Matcher matcher;
+
+        // check to see if the parent file is a part of a multiple CD
+        if (file.getPath().matches(CD_FILEPATH_REGEX)) {
+            file = file.getParentFile();
+        }
+
+        if (SongUtils.isPartOfALabel(file)) {
+            if (SongUtils.isPartOfALabel(file, SINGLES) || SongUtils.isPartOfALabel(file, EPS) || SongUtils.isPartOfALabel(file, LPS)) {
+                if (file.getParentFile().getName().matches(YEAR_ARTIST_ALBUM_REGEX)) {
+                    pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+                    matcher = pattern.matcher(file.getParentFile().getName());
+                    if (matcher.find()) {
+                        return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
+                    }
                 }
             }
         } else {
