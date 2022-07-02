@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +50,21 @@ public class ImageUtils {
             logger.logError("Exception getting bytes from a file!", ex);
         }
         return bytes;
+    }
+
+    /**
+     * Returns a BufferedImage from a url
+     * @param imageUrl the url to get the image from
+     * @return a buffered image
+     */
+    public static BufferedImage getImageFromUrl(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            return ImageIO.read(url);
+        } catch (IOException e) {
+            logger.logError("Exception while getting an image from the url: " + imageUrl, e);
+            return null;
+        }
     }
 
     /**

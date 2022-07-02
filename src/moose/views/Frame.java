@@ -56,9 +56,6 @@ public class Frame extends javax.swing.JFrame {
     // controller
     public SongController songController = Moose.getSongController();
 
-    // services
-    public IconService iconService = new IconService();
-
     // some graphics ivars
     ActionListener menuListener;        // listener for the popup menu objects
 
@@ -378,13 +375,13 @@ public class Frame extends javax.swing.JFrame {
     public void setRowIcon(int icon, int row) {
         switch (icon) {
             case DEFAULT:
-                table.setValueAt(iconService.get(IconService.DEFAULT), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconService.get(IconService.DEFAULT), row, TABLE_COLUMN_ICON);
                 break;
             case EDITED:
-                table.setValueAt(iconService.get(IconService.EDITED), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconService.get(IconService.EDITED), row, TABLE_COLUMN_ICON);
                 break;
             case SAVED:
-                table.setValueAt(iconService.get(IconService.SAVED), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconService.get(IconService.SAVED), row, TABLE_COLUMN_ICON);
                 break;
         }
     }
@@ -421,7 +418,7 @@ public class Frame extends javax.swing.JFrame {
 
         // add the row to the table
         model.addRow(new Object[]{
-                iconService.get(IconService.DEFAULT), // adds the default status icon
+                IconService.get(IconService.DEFAULT), // adds the default status icon
                 s.getFile(), // hidden file object
                 cleanedFileName, // actual editable file name
                 s.getTitle(),
@@ -928,7 +925,7 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/moose64.png"))); // NOI18N
+        jLabel3.setIcon(IconService.get(IconService.MOOSE_64)); // NOI18N
 
         clearAllButton.setText("Clear All");
         clearAllButton.setMaximumSize(new java.awt.Dimension(100, 68));

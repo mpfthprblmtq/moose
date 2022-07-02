@@ -48,6 +48,11 @@ public class SongUtils {
      */
     public static Song getSongFromFile(File file) {
 
+        // check if file is mp3
+        if (!file.getName().endsWith(".mp3")) {
+            return null;
+        }
+
         // mp3agic Mp3File object, used for the id3tags
         Mp3File mp3file;
         try {
@@ -66,9 +71,7 @@ public class SongUtils {
             }
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             // things borked
-            if (logger != null) {
-                logger.logError("Exception when trying to read data from file: " + file.getName(), e);
-            }
+            logger.logError("Exception when trying to read data from file: " + file.getName(), e);
             return null;
         }
 

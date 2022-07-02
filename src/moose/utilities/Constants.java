@@ -17,6 +17,12 @@ public class Constants {
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
     public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-2022";
 
+    // api constants
+    public static final String SPOTIFY_AUTH_URL = "https://accounts.spotify.com/api/token";
+    public static final String SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search";
+    public static final String SPOTIFY_ALBUMS_URL = "https://api.spotify.com/v1/artists/{id}/albums";
+
+    // filename, file path, and other regex needed for auto tagging
     public static final String SINGLES = "Singles";
     public static final String COMPILATIONS = "Compilations";
     public static final String LPS = "LPs";
@@ -26,9 +32,7 @@ public class Constants {
     public static final String LPS_FILEPATH_REGEX = ".*/.*/LPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
     public static final String EPS_FILEPATH_REGEX = ".*/.*/EPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
     public static final String GENERAL_FILEPATH_REGEX = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
-
     public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
-
     public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
     public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
     public static final String FILENAME_TRIM_REGEX = "(?<Title>\\w.*).*";
