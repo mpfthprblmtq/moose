@@ -1,8 +1,9 @@
 package moose.utilities;
 
 import com.mpfthprblmtq.commons.utils.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +22,6 @@ public class MP3FileUtilsTest {
         File expected = new File("/users/pat/Music/Library/TestArtist1");
 
         File actual = FileUtils.getStartingPoint(files);
-        Assert.assertEquals(expected.getPath(), actual.getPath());
+        assertEquals(expected.getPath(), actual.getPath());
     }
 }

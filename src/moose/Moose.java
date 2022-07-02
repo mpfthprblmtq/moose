@@ -131,10 +131,6 @@ public class Moose {
         settingsFrame.setVisible(true);
     }
     
-    public static void closeSettingsFrame() {
-        settingsFrame.dispose();
-    }
-    
     /**
      * Controls the AuditFrame opening and closing
      */
@@ -142,10 +138,6 @@ public class Moose {
         auditFrame = new AuditFrame(frame, frame.songController);
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
-    }
-    
-    public static void closeAuditFrame() {
-        auditFrame.dispose();
     }
 
     /**

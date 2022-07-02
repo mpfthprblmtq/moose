@@ -106,13 +106,23 @@ echo
 mkdir -p package/macosx
 cp moose.icns package/macosx
 $jdk/javapackager -deploy -native $packageType -name Moose \
-   -BappVersion=$version -Bicon=package/macosx/moose.icns \
-   -srcdir . -srcfiles moose.jar -appclass moose.Moose \
+   -BappVersion="$version" -Bicon=package/macosx/moose.icns \
+   -srcdir . -appclass moose.Moose \
    -outdir out -v
-cp out/Moose-*.$packageType moose-"$version"-installer.$packageType
-ls -l
-echo
-echo "Done with .$packageType!"
+
+# verify app built
+installer=$APP_PATH/out/moose-"$version"-installer.$packageType
+if [ -f "$installer" ]
+then
+  cp out/Moose-*.$packageType moose-"$version"-installer.$packageType
+  ls -l
+  echo "Done with .$packageType!"
+else
+  echo
+  echo "Error while building app!"
+  echo
+  exit
+fi
 echo
 echo
 

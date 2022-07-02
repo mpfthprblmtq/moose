@@ -95,11 +95,10 @@ public class SettingsController {
 
     /**
      * Fills the settingsFile file with some default values
-     * @return the result of writing the settings file
      */
-    public boolean fillDefaults() {
+    public void fillDefaults() {
         settings = new Settings();
-        return writeSettingsFile(settings);
+        writeSettingsFile(settings);
     }
 
     public boolean defaultGenres() {
@@ -111,8 +110,8 @@ public class SettingsController {
     }
 
     public boolean defaultLogging() {
-        settings.setDeveloperMode(false);
-        settings.setDebugMode(false);
+        settings.setInDeveloperMode(false);
+        settings.setInDebugMode(false);
         writeSettingsFile(settings);
 
         // check if successful
