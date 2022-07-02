@@ -504,12 +504,7 @@ public class AutoTaggingService {
      */
     public String getArtistFromFile(File file, File oldFile) {
 
-        // check to see if we already have an artist on the file, since we'll probably need to use that
-        // but first, check if we have the old file, which is the original file, otherwise we won't be able to find it
-        if (oldFile != null) {
-            file = oldFile;
-        }
-        Song s = SongUtils.getSongFromFile(file);
+        Song s = SongUtils.getSongFromFile(oldFile == null ? file : oldFile);
         if (s != null) {
             if (s.getNewFile() != null) {
                 file = s.getNewFile();
