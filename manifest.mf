@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: moose.Moose
-Class-Path: lib/mp3agic-0.9.0.jar lib/jackson/jackon-core-2.9.8.jar lib/jackson/jackson-annotations-2.9.8.jar lib/jackson/jackson-databind-2.9.8.jar

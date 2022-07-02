@@ -7,7 +7,7 @@
  */
 
 // package
-package moose.objects;
+package moose.objects.api.imageSearch;
 
 // imports
 import java.awt.image.BufferedImage;

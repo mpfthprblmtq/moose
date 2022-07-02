@@ -602,14 +602,11 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="separator2" max="32767" attributes="0"/>
-                          <Component id="cseLabel" max="32767" attributes="0"/>
-                          <Component id="apiKeyLabel" alignment="0" max="32767" attributes="0"/>
-                          <Component id="apiKeyTextField" max="32767" attributes="0"/>
-                          <Component id="cseTextField" alignment="0" max="32767" attributes="0"/>
+                          <Component id="googleSearchEngineLabel" pref="367" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                   <Component id="dateLastUsedLabel" alignment="0" max="32767" attributes="0"/>
@@ -621,11 +618,38 @@
                                   <Component id="timesUsedTodayField" alignment="1" max="32767" attributes="0"/>
                               </Group>
                           </Group>
+                          <Component id="separator3" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="preferredCoverArtSizeLabel" min="-2" pref="175" max="-2" attributes="0"/>
+                              <Component id="cseLabel" min="-2" pref="55" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="preferredCoverArtSizeSpinner" min="-2" pref="70" max="-2" attributes="0"/>
+                              <Component id="cseTextField" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="apiKeyLabel" min="-2" pref="55" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="apiKeyTextField" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="preferredCoverArtSizeLabel" min="-2" pref="175" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="preferredCoverArtSizeSpinner" min="-2" pref="70" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="spotifyLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="spotifyClientIdLabel" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="spotifyClientSecretLabel" alignment="0" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="spotifyClientIdTextField" max="32767" attributes="0"/>
+                                  <Component id="spotifyClientSecretTextField" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -636,14 +660,18 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cseLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="googleSearchEngineLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cseTextField" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="apiKeyLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="cseTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cseLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="apiKeyTextField" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="apiKeyLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="apiKeyTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="dateLastUsedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="dateLastUsedField" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -653,22 +681,39 @@
                           <Component id="timesUsedTodayLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="timesUsedTodayField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="separator2" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="spotifyLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="spotifyClientIdLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="spotifyClientIdTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="spotifyClientSecretLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="spotifyClientSecretTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="18" max="32767" attributes="0"/>
+                      <Component id="separator3" min="-2" pref="10" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="preferredCoverArtSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="preferredCoverArtSizeSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="82" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JLabel" name="cseLabel">
+            <Component class="javax.swing.JLabel" name="googleSearchEngineLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Custom Search Engine ID (CSE ID)"/>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Lucida Grande" size="16" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Google Custom Search Engine"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="cseTextField">
@@ -756,6 +801,51 @@
                 <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="preferredCoverArtSizeSpinnerStateChanged"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JSeparator" name="separator3">
+            </Component>
+            <Component class="javax.swing.JLabel" name="cseLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="CSE ID:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="spotifyLabel">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Lucida Grande" size="16" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Spotify API"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="spotifyClientIdLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Client ID:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="spotifyClientSecretLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Client Secret:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="spotifyClientIdTextField">
+              <Properties>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="this.settingsController.getSettings().getSpotifyClientId()" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="spotifyClientIdTextFieldKeyReleased"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JTextField" name="spotifyClientSecretTextField">
+              <Properties>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="this.settingsController.getSettings().getSpotifyClientSecret()" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="spotifyClientSecretTextFieldKeyReleased"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="featuresPanel">
@@ -773,11 +863,12 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="removeCommentCheckBox" pref="367" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="jLabel1" min="-2" pref="155" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="removeCommentCheckBox" pref="367" max="32767" attributes="0"/>
+                          <Component id="autoCoverArtSpotifyCheckBox" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -790,16 +881,23 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="removeCommentCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="267" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="autoCoverArtSpotifyCheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="232" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
+            <Component class="javax.swing.JLabel" name="jLabel1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="AutoTagging:"/>
+              </Properties>
+            </Component>
             <Component class="javax.swing.JCheckBox" name="removeCommentCheckBox">
               <Properties>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="settingsController.getSettings().getRemoveCommentOnAutoTagging()" type="code"/>
+                  <Connection code="settingsController.getSettings().getFeatures().get(Settings.REMOVE_COMMENT_ON_AUTOTAGGING)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Remove comments on AutoTagging"/>
               </Properties>
@@ -807,10 +905,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeCommentCheckBoxActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel1">
+            <Component class="javax.swing.JCheckBox" name="autoCoverArtSpotifyCheckBox">
               <Properties>
-                <Property name="text" type="java.lang.String" value="AutoTagging:"/>
+                <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="settingsController.getSettings().getFeatures().get(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY)" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Auto find and add cover art with Spotify API"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoCoverArtSpotifyCheckBoxActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

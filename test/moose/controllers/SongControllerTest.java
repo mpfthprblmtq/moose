@@ -5,12 +5,12 @@
  */
 package moose.controllers;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.Before;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -20,7 +20,7 @@ public class SongControllerTest {
     
     SongController songController;
     
-    @Before
+    @BeforeAll
     public void setup() {
         songController = new SongController();
     }
@@ -51,7 +51,7 @@ public class SongControllerTest {
         System.out.print("Should pass : ");
         year = songController.autoTaggingService.getYearFromFile(file1);
         System.out.println(year);
-        Assert.assertTrue(year.matches(regex));
+        assertTrue(year.matches(regex));
         
         // scenario 2
         File dir2 = new File("albumname");
@@ -60,7 +60,7 @@ public class SongControllerTest {
         
         year = songController.autoTaggingService.getYearFromFile(file2);
         System.out.println(year);
-        Assert.assertFalse(year.matches(regex));
+        assertFalse(year.matches(regex));
 
         // scenario 3
         File dir3 = new File("[201] albumname");
@@ -69,12 +69,12 @@ public class SongControllerTest {
 
         year = songController.autoTaggingService.getYearFromFile(file3);
         System.out.println(year);
-        Assert.assertFalse(year.matches(regex));
+        assertFalse(year.matches(regex));
 
         // scenario 4
         year = songController.autoTaggingService.getYearFromFile(null);
         System.out.println("Should not pass : ");
-        Assert.assertFalse(year.matches(regex));
+        assertFalse(year.matches(regex));
 
         // cleanup
         dir1.delete();
@@ -97,27 +97,22 @@ public class SongControllerTest {
         System.out.print("Should pass : ");
         disks = songController.autoTaggingService.getDisksFromFile(file1);
         System.out.println(disks);
-        Assert.assertTrue(disks.matches(regex));
+        assertTrue(disks.matches(regex));
 
         System.out.print("Should pass : ");
         disks = songController.autoTaggingService.getDisksFromFile(file2);
         System.out.println(disks);
-        Assert.assertTrue(disks.matches(regex));
+        assertTrue(disks.matches(regex));
 
         System.out.print("Should pass : ");
         disks = songController.autoTaggingService.getDisksFromFile(file3);
         System.out.println(disks);
-        Assert.assertTrue(disks.matches(regex));
+        assertTrue(disks.matches(regex));
 
         System.out.print("Shouldn't pass : ");
         disks = songController.autoTaggingService.getDisksFromFile(file4);
         System.out.println(disks);
-        Assert.assertFalse(disks.matches(regex));
-    }
-
-    @After
-    public void tearDown() {
-        
+        assertFalse(disks.matches(regex));
     }
 
 }

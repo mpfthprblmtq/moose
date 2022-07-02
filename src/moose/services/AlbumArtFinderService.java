@@ -26,7 +26,7 @@ import com.mpfthprblmtq.commons.utils.DateUtils;
 import moose.Moose;
 import moose.objects.Settings;
 import moose.utilities.Constants;
-import moose.objects.ImageSearchResponse;
+import moose.objects.api.imageSearch.ImageSearchResponse;
 
 import static moose.utilities.Constants.LARGE;
 import static moose.utilities.Constants.XLARGE;

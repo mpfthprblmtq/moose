@@ -18,15 +18,13 @@ import java.util.regex.Pattern;
 
 public class DialogService {
 
-    static IconService iconService = new IconService();
-
     /**
      * Show the about dialog, includes name, version, and copyright
      */
     public static void showAboutDialog() {
         JOptionPane.showMessageDialog(null,
                 "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + Constants.MOOSE_COPYRIGHT,
-                "About Moose", JOptionPane.PLAIN_MESSAGE, iconService.get(IconService.MOOSE_128));
+                "About Moose", JOptionPane.PLAIN_MESSAGE, IconService.get(IconService.MOOSE_128));
     }
 
     /**
