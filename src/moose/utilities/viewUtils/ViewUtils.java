@@ -164,9 +164,8 @@ public class ViewUtils {
                         if (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre)) {
                             int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                             if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Settings settings = Moose.getSettings();
-                                settings.addGenre(genre);
-                                Moose.updateSettings(settings);
+                                Moose.getSettings().getGenres().add(genre);
+                                Moose.updateSettings();
                             }
                         }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {

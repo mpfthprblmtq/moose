@@ -14,6 +14,7 @@ public class IconService {
     public static final String MOOSE_64 = "/resources/moose64.png";
     public static final String MOOSE_128 = "/resources/moose128.png";
     public static final String LOADING = "/resources/loading-icon.gif";
+    public static final String CIRCLE = "/resources/circle-outline.png";
 
     public static Icon get(String type) {
         return new ImageIcon(Objects.requireNonNull(IconService.class.getResource(type)));

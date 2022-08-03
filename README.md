@@ -24,7 +24,7 @@ Compatible with:
 
 The moose (North America) or elk (Eurasia), *Alces alces*, is a member of the New World deer subfamily and is the largest and heaviest extant species in the deer family. Most adult male moose have distinctive broad, palmate ("open-hand shaped") antlers; most other members of the deer family have antlers with a dendritic ("twig-like") configuration. Moose typically inhabit boreal forests and temperate broadleaf and mixed forests of the Northern Hemisphere in temperate to subarctic climates.
 
-But that doesn't really have anything to do with this project does it?  The better question is probably *"What is __this__ project?"*
+But that doesn't really have anything to do with this project, does it?  The better question is probably *"What is __this__ project?"*
 
 <br/>
 
@@ -37,7 +37,7 @@ Moose is my pet project from college that turned out to be more useful than I an
 
 I solved a lot of these problems I've seen with other applications by creating my own application!
 
-<img alt="moose-main-preview" src="https://prblmtq.com/projects/moose/images/main-frame-preview.png">
+<img alt="moose-main-preview" src="https://github.com/mpfthprblmtq/moose/blob/master/src/resources/wiki/main-frame-preview.png?raw=true">
 
 <br/>
 
@@ -50,8 +50,8 @@ The easiest way to get started with Moose is to just [download a fully working .
 *(I don't have a developer key yet to sign the app, so you'll just have to trust me for now.)*  
 *(But chances are if you're here, I probably know you...)*
 
-If you don't want to download a .dmg file, and you're a nerdy developer like me, you try importing the project into your favorite IDE.
-I have a walkthrough for [IntelliJ IDEA](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-intellij) and [Apache Netbeans](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-netbeans) in my Wiki.
+If you don't want to download a .dmg file, and you're a nerd like me, you try importing the project into your favorite IDE.
+I have a walkthrough for [IntelliJ IDEA](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-intellij) in my Wiki.  Can't guarantee success rates for other IDEs.
 
 <br/>
 

@@ -18,7 +18,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class SpotifyApiService {
 
@@ -32,29 +34,64 @@ public class SpotifyApiService {
     private final int ARTIST_LIMIT = 5;
     private final int ALBUM_LIMIT = 20;
 
-    public String getImages(String artistQuery, String albumQuery) {
+    /**
+     * Automatic function that tries and find the album magically, basically if it finds a 1 to 1 match on the artist
+     * and a 1 to 1 match on the album, just return that url, else return null
+     * @param artistQuery the artist to search for
+     * @param albumQuery the album to search for
+     * @return the url of the image of the found album or null if the album or artist isn't found
+     */
+    public String getImage(String artistQuery, String albumQuery) {
+        List<Artist> artists = new ArrayList<>();
         Artist artist = null;
         Album album = null;
 
-        // authenticate first (also checks if we already have a valid token)
+        // authenticate first
         authenticate();
 
-        // search for the artist
-        try {
-            artist = getArtistFromSearch(artistQuery);
-        } catch (IOException e) {
-            if (e.getClass() == MalformedURLException.class) {
-                logger.logError("Exception while forming URL with artist query: " + artistQuery, e);
-            } else {
-                logger.logError("Exception while getting artist info from Spotify API!", e);
+        // check if the artist is in the list of known spotify artists
+        if (Moose.getSettings().getSpotifyArtists().containsKey(artistQuery)) {
+            try {
+                artist = getArtist(Moose.getSettings().getSpotifyArtists().get(artistQuery));
+            } catch (IOException e) {
+                if (e.getClass() == MalformedURLException.class) {
+                    logger.logError("Exception while forming URL with artist query: " + artistQuery, e);
+                } else {
+                    logger.logError("Exception while getting artist info from Spotify API!", e);
+                }
             }
+        } else {
+            // search for the artist
+            try {
+                artists = getArtistsFromSearch(artistQuery);
+            } catch (IOException e) {
+                if (e.getClass() == MalformedURLException.class) {
+                    logger.logError("Exception while forming URL with artist query: " + artistQuery, e);
+                } else {
+                    logger.logError("Exception while getting artist info from Spotify API!", e);
+                }
+            }
+
+            // if there's multiple artists found, we need to do some manual intervention
+            if (artists.size() != 1) {
+                return null;
+            }
+
+            // grab that artist from the list
+            artist = artists.get(0);
         }
 
+        // if we don't have an artist, we can't search for the album
         if (artist == null) {
             return null;
         }
 
-        // search for the album
+        // add that artist to the list of known artists if it isn't already
+        if (!Moose.getSettings().getSpotifyArtists().containsKey(artist.getName())) {
+            Moose.getSettingsController().addSpotifyArtist(artist.getName(), artist.getId());
+        }
+
+        // search for the album with the found artist
         try {
             String nextUrl = null;
             while (true) {
@@ -88,6 +125,7 @@ public class SpotifyApiService {
             }
         }
 
+        // if we don't have an album, then it wasn't found
         if (album == null) {
             return null;
         }
@@ -126,17 +164,18 @@ public class SpotifyApiService {
 
         } catch (IOException e) {
             // bad things
-            System.err.println(e.getMessage());
+            logger.logError("Error while calling Spotify API's auth!", e);
         }
     }
 
     /**
      * Gets an artist based on a string query from Spotify's API
+     * Assumes we're already authenticated
      * @param query the artist to search for
      * @return an Artist object or null if no artist was found
      * @throws IOException if a url could not be created from the query or if there's an issue calling the API
      */
-    public Artist getArtistFromSearch(String query) throws IOException {
+    public List<Artist> getArtistsFromSearch(String query) throws IOException {
         // create the url
         URL url = new RequestURL()
                 .withBaseUrl(Constants.SPOTIFY_SEARCH_URL)
@@ -162,12 +201,16 @@ public class SpotifyApiService {
         ObjectReader reader = mapper.readerFor(ArtistSearchResponse.class).withRootName("artists");
         ArtistSearchResponse artists = reader.readValue(response);
 
-        // return the first one (or nothing)
-        return artists.getArtists().size() > 0 ? artists.getArtists().get(0) : null;
+        // get rid of any non exact matches (case insensitive, just in case)
+        artists.getArtists().removeIf(x -> !StringUtils.equalsIgnoreCase(x.getName(), query));
+
+        // return the artist list
+        return artists.getArtists();
     }
 
     /**
      * Gets an album based on an artist ID and a name of an album from Spotify's API
+     * Assumes we're already authenticated
      * @param artistId the id of the artist to search on
      * @param nextUrl the "next" url to search on if we need to make subsequent calls
      * @return an album or null if the album wasn't found
@@ -202,5 +245,33 @@ public class SpotifyApiService {
         // map the response to an object
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(response, AlbumSearchResponse.class);
+    }
+
+    /**
+     * Gets an artist based on the artist ID given
+     * Assumes we're already authenticated
+     * @param artistId the id of the artist to get
+     * @return an Artist object
+     * @throws IOException if a url could not be created from the query or if there's an issue calling the API
+     */
+    public Artist getArtist(String artistId) throws IOException {
+        // create the url
+        URL url = new RequestURL()
+                .withBaseUrl(Constants.SPOTIFY_ARTIST_URL)
+                .withUrlParam("id", artistId)
+                .buildUrl();
+
+        // set up the request
+        RequestProperties requestProperties = new RequestProperties()
+                .withProperty("Content_Type", "application/json")
+                .withProperty("Authorization", "Bearer " + token.getToken())
+                .build();
+
+        // make the request
+        String response = WebUtils.get(url, requestProperties.getProperties());
+
+        // map the response to an object
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(response, Artist.class);
     }
 }

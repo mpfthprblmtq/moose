@@ -21,6 +21,7 @@ public class Constants {
     public static final String SPOTIFY_AUTH_URL = "https://accounts.spotify.com/api/token";
     public static final String SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search";
     public static final String SPOTIFY_ALBUMS_URL = "https://api.spotify.com/v1/artists/{id}/albums";
+    public static final String SPOTIFY_ARTIST_URL = "https://api.spotify.com/v1/artists/{id}";
 
     // filename, file path, and other regex needed for auto tagging
     public static final String SINGLES = "Singles";
@@ -111,4 +112,9 @@ public class Constants {
     public static final int FILES = 2;
     public static final int API = 3;
     public static final int FEATURES = 4;
+
+    // album art finder frame tabs
+    public static final int SPOTIFY = 0;
+    public static final int GOOGLE = 1;
+    public static final int MANUAL = 2;
 }

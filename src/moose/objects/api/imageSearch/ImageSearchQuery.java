@@ -25,18 +25,18 @@ public class ImageSearchQuery {
     private File dir;
     private List<Integer> rows;
 
-    public static boolean contains(List<ImageSearchQuery> queries, String artist, String album) {
-        for (ImageSearchQuery imageSearchQuery : queries) {
-            if (imageSearchQuery.getArtist().equals(artist) && imageSearchQuery.getAlbum().equals(album)) {
+    public static boolean contains(List<ImageSearchQuery> queries, String album) {
+        for(ImageSearchQuery imageSearchQuery : queries) {
+            if (imageSearchQuery.getAlbum().equals(album)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static int getIndex(List<ImageSearchQuery> queries, String artist, String album) {
+    public static int getIndex(List<ImageSearchQuery> queries, String album) {
         for (int i = 0; i < queries.size(); i++) {
-            if (queries.get(i).getArtist().equals(artist) && queries.get(i).getAlbum().equals(album)) {
+            if (queries.get(i).getAlbum().equals(album)) {
                 return i;
             }
         }
