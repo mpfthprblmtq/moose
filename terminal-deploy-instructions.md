@@ -1,9 +1,8 @@
 ### Building and Packaging Moose
 
 __Prerequisites__  
-*These are the versions I've tested with, it may work with more combinations*
-* Apache Ant *(v. 1.10.8)*
-* JavaPackager *(v. 10.0.2) (Comes with Java 10.0.2)* 
+*This is the version I've tested with, it may work with more combinations*
+* jpackage *(v. 17.0.3)* 
 
 
 Run the `terminal-deploy.bash` file.  That's it.  There were more steps, like building the app into a single .jar, then 

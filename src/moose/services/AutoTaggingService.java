@@ -177,23 +177,24 @@ public class AutoTaggingService {
             List<ImageSearchQuery> queries = new ArrayList<>();
             for (Integer toReprocess : rowsToReprocess) {
 
-                File file = getFile(toReprocess);
+                File file = songController.getSongs().get(songController.getIndex(toReprocess)).getNewFile();
+                File oldFile = songController.getSongs().get(songController.getIndex(toReprocess)).getFile();
 
                 // get the query to search on
-                String artist = getArtistFromFile(file, null);
+                String artist = getArtistFromFile(file, oldFile);
                 String album = getAlbumFromFileForArtwork(file);
 
                 // get the parent directory to put the cover
                 File dir = file.getParentFile();
 
                 // add a ImageSearchQuery object to the list of queries
-                if (!ImageSearchQuery.contains(queries, artist, album)) {
+                if (!ImageSearchQuery.contains(queries, album)) {
                     ImageSearchQuery imageSearchQuery = new ImageSearchQuery(artist, album, dir, new ArrayList<>());
                     imageSearchQuery.getRows().add(toReprocess);
                     queries.add(imageSearchQuery);
                 } else {
                     // if we already have the query included in the list, add the row to the rows to update
-                    int index = ImageSearchQuery.getIndex(queries, artist, album);
+                    int index = ImageSearchQuery.getIndex(queries, album);
                     queries.get(index).getRows().add(toReprocess);
                 }
             }
@@ -204,7 +205,7 @@ public class AutoTaggingService {
                 List<ImageSearchQuery> queriesToRemove = new ArrayList<>();
                 for (ImageSearchQuery query : queries) {
                     // get the url
-                    String url = spotifyApiService.getImages(query.getArtist(), query.getAlbum());
+                    String url = spotifyApiService.getImage(query.getArtist(), query.getAlbum());
                     // if the url isn't empty, that means we found the cover art automatically
                     if (StringUtils.isNotEmpty(url)) {
                         // grab the image
@@ -473,24 +474,30 @@ public class AutoTaggingService {
         Matcher matcher;
 
         // 01 Kasbo - Play Pretend (ft. Ourchives).mp3
-        pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
-        matcher = pattern.matcher(file.getName());
-        if (matcher.find()) {
-            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+        if (file.getName().matches(TRACKNUM_ARTIST_TITLE_REGEX)) {
+            pattern = Pattern.compile(TRACKNUM_ARTIST_TITLE_REGEX);
+            matcher = pattern.matcher(file.getName());
+            if (matcher.find()) {
+                return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+            }
         }
 
         // 01 Play Pretend (ft. Ourchives).mp3
-        pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
-        matcher = pattern.matcher(file.getName());
-        if (matcher.find()) {
-            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+        if (file.getName().matches(TRACKNUM_TITLE_REGEX)) {
+            pattern = Pattern.compile(TRACKNUM_TITLE_REGEX);
+            matcher = pattern.matcher(file.getName());
+            if (matcher.find()) {
+                return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+            }
         }
 
         // Play Pretend (ft. Ourchives)
-        pattern = Pattern.compile(TITLE_REGEX);
-        matcher = pattern.matcher(file.getName());
-        if (matcher.find()) {
-            return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+        if (file.getName().matches(TITLE_REGEX)) {
+            pattern = Pattern.compile(TITLE_REGEX);
+            matcher = pattern.matcher(file.getName());
+            if (matcher.find()) {
+                return FileUtils.cleanFilenameForOSX(matcher.group("Title"));
+            }
         }
 
         return file.getName().replace(".mp3", StringUtils.EMPTY);
@@ -621,6 +628,14 @@ public class AutoTaggingService {
             if (SongUtils.isPartOfALabel(file, SINGLES) || SongUtils.isPartOfALabel(file, EPS) || SongUtils.isPartOfALabel(file, LPS)) {
                 if (file.getParentFile().getName().matches(YEAR_ARTIST_ALBUM_REGEX)) {
                     pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
+                    matcher = pattern.matcher(file.getParentFile().getName());
+                    if (matcher.find()) {
+                        return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
+                    }
+                }
+            } else {
+                if (file.getParentFile().getName().matches((YEAR_ALBUM_REGEX))) {
+                    pattern = Pattern.compile(YEAR_ALBUM_REGEX);
                     matcher = pattern.matcher(file.getParentFile().getName());
                     if (matcher.find()) {
                         return FileUtils.cleanFilenameForOSX(matcher.group("Album"));
