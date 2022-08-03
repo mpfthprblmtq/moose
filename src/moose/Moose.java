@@ -12,6 +12,7 @@ package moose;
 import java.io.File;
 
 import com.mpfthprblmtq.commons.logger.Logger;
+import moose.controllers.SettingsController;
 import moose.controllers.SongController;
 import moose.objects.Settings;
 import moose.views.AuditFrame;
@@ -31,8 +32,9 @@ public class Moose {
     // logger object
     public static Logger logger;
 
-    // song controller
+    // controllers
     public static SongController songController;
+    public static SettingsController settingsController;
 
     /**
      * Entry point for the app, launches the main Frame
@@ -40,7 +42,8 @@ public class Moose {
      */
     public static void main(String[] args) {
         // instantiate the settings object so we can have some log/settings files
-        settingsFrame = new SettingsFrame();
+        settingsController = new SettingsController();
+        settingsFrame = new SettingsFrame(settingsController);
         
         // instantiate the logger object so we can have some logging
         // TODO make sure this works
@@ -52,7 +55,7 @@ public class Moose {
         
         // go
         launchFrame();
-//        launchFrame(new File("/Users/pat/Music/Library - For Testing/Atoms for Peace/[2013] Amok"));
+//        launchFrame(new File("/Users/mpfthprblmtq/Music/Library - For Testing/bitbirb/Singles/Future Bass"));
     }
 
     /**
@@ -75,14 +78,30 @@ public class Moose {
      * @return the settings object
      */
     public static Settings getSettings() {
-        return settingsFrame.settingsController.getSettings();
+        return settingsController.getSettings();
     }
-    
+
+    /**
+     * Returns the settings controller
+     * @return the settings controller
+     */
+    public static SettingsController getSettingsController() {
+        return settingsController;
+    }
+
     /**
      * Sends a command to update the settings file with the settings object
+     * @param settings the new settings to write
      */
     public static boolean updateSettings(Settings settings) {
         return settingsFrame.settingsController.writeSettingsFile(settings);
+    }
+
+    /**
+     * Sends a command to update the seetings file with the settings we already have
+     */
+    public static void updateSettings() {
+        settingsController.writeSettingsFile(getSettings());
     }
 
     /**
@@ -126,7 +145,6 @@ public class Moose {
      * Controls the SettingsFrame opening and closing
      */
     public static void launchSettingsFrame() {
-        settingsFrame = new SettingsFrame();
         settingsFrame.setLocationRelativeTo(null);
         settingsFrame.setVisible(true);
     }

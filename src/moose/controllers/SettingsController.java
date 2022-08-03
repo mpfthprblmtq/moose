@@ -202,4 +202,14 @@ public class SettingsController {
         }
         return false;
     }
+
+    /**
+     * Adds a spotify artist to the list of known spotify artists
+     * @param name the name of the artist (key)
+     * @param id the id of the artist (value)
+     */
+    public void addSpotifyArtist(String name, String id) {
+        settings.getSpotifyArtists().put(name, id);
+        writeSettingsFile(settings);
+    }
 }

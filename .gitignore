@@ -9,7 +9,7 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
-deploy/
+nbproject/
 
 # IntelliJ specific #
 moose.iml
@@ -19,7 +19,7 @@ out/
 # Class Files #
 *.class
 
-# Package Files #
+# Package/Build Files #
 *.war
 *.ear
 lib/nblibraries.properties
@@ -28,9 +28,10 @@ nbproject/build-impl.xml
 nbproject/genfiles.properties
 nbproject/project.properties
 nbproject/project.xml
-moose.icns
-Moose-1.0.0.pkg
-moose-installer.pkg
+moose-*-installer.pkg
+moose-*-installer.dmg
+META-INF/
+deploy/
 
 # Other random files #
 Application Support - Moose

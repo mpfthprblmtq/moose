@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,12 +77,40 @@ public class ImageUtils {
      */
     public static Icon getScaledImage(byte[] bytes, int dim) {
         Icon thumbnail_icon = null;
+        byte[] scaledBytes;
+
+        if (bytes == null) {
+            return null;
+        }
+
+        // create a bufferedImage to validate size against
+        BufferedImage bi = getBufferedImageFromBytes(bytes);
+        if (bi == null) {
+            return null;
+        }
+
+        // if the dimensions aren't the same, get the non-stretched square version
+        if (bi.getHeight() > bi.getWidth()) {
+            // image is taller
+            int diff = bi.getHeight() - bi.getWidth();
+            bi = bi.getSubimage(0, diff / 2, bi.getWidth(), bi.getWidth());
+            scaledBytes = getBytesFromBufferedImage(bi);
+        } else if (bi.getHeight() < bi.getWidth()) {
+            // image is wider
+            int diff = bi.getWidth() - bi.getHeight();
+            bi = bi.getSubimage(diff / 2, 0, bi.getHeight(), bi.getHeight());
+            scaledBytes = getBytesFromBufferedImage(bi);
+        } else {
+            // image has equal width and height
+            scaledBytes = bytes;
+        }
+
         try {
             // getting the image from the byte array
-            ImageIcon icon = new ImageIcon(bytes);
+            ImageIcon icon = new ImageIcon(scaledBytes);
             Image img = icon.getImage();
 
-            // scaling down the image to put on the row
+            // scaling down the image
             Image thumbnail = img.getScaledInstance(dim, dim, java.awt.Image.SCALE_SMOOTH);
             thumbnail_icon = new ImageIcon(thumbnail);
 
@@ -89,6 +118,32 @@ public class ImageUtils {
             logger.logError("NullPointerException while trying to scale an image!", e);
         }
         return thumbnail_icon;
+    }
+
+    /**
+     * Gets a circular image
+     */
+    public static Icon getCircularScaledImage(byte[] bytes, int dim) {
+        Icon icon = getScaledImage(bytes, dim);
+        if (icon == null) {
+            return null;
+        }
+
+        BufferedImage bi = getBufferedImageFromBytes(getBytesFromImageIcon((ImageIcon) icon));
+        if (bi == null) {
+            return null;
+        }
+
+        BufferedImage out = new BufferedImage(bi.getWidth(), bi.getWidth(), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = out.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.fillOval(0, 0, bi.getWidth(), bi.getWidth());
+        g2.setComposite(AlphaComposite.SrcIn);
+        g2.drawImage(bi, 0, 0, null);
+        g2.dispose();
+
+        return new ImageIcon(out);
     }
 
     /**
@@ -117,7 +172,7 @@ public class ImageUtils {
      */
     public static byte[] getBytesFromImageIcon(ImageIcon icon) {
         // check if icon is blank first
-        if (icon.getIconWidth() < 0 && icon.getIconHeight() < 0) {
+        if (icon == null || (icon.getIconWidth() < 0 && icon.getIconHeight() < 0)) {
             return new byte[]{};
         }
 

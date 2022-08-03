@@ -35,6 +35,7 @@ public class Settings {
     private String spotifyClientId;
     private String spotifyClientSecret;
     private Map<String, Boolean> features;
+    private Map<String, String> spotifyArtists;
 
     public static final String REMOVE_COMMENT_ON_AUTOTAGGING = "removeCommentOnAutoTagging";
     public static final String AUTO_FIND_COVER_ART_WITH_SPOTIFY = "autoFindCoverArtWithSpotify";
@@ -44,46 +45,29 @@ public class Settings {
      * Creates a default settings object
      */
     public Settings() {
-        this.inDebugMode = false;
-        this.inDeveloperMode = false;
-        this.askBeforeClearAll = true;
-        this.genres = new ArrayList<>();
-        this.libraryLocation = StringUtils.EMPTY;
-        this.preferredCoverArtSize = 640;
-        this.albumArtFinderApiKey = StringUtils.EMPTY;
-        this.albumArtFinderCseId = StringUtils.EMPTY;
-        this.albumArtFinderSearchCount = 0;
-        this.albumArtFinderSearchCountDate = DateUtils.formatSimpleDate(new Date());
-        this.spotifyClientId = StringUtils.EMPTY;
-        this.spotifyClientSecret = StringUtils.EMPTY;
-        this.features = new HashMap<>();
-        this.features.put(REMOVE_COMMENT_ON_AUTOTAGGING, true);
-        this.features.put(AUTO_FIND_COVER_ART_WITH_SPOTIFY, true);
+        setInDebugMode(false);
+        setInDeveloperMode(false);
+        setAskBeforeClearAll(true);
+        setGenres(new ArrayList<>());
+        setLibraryLocation(StringUtils.EMPTY);
+        setPreferredCoverArtSize(640);
+        setAlbumArtFinderApiKey(StringUtils.EMPTY);
+        setAlbumArtFinderCseId(StringUtils.EMPTY);
+        setAlbumArtFinderSearchCount(0);
+        setAlbumArtFinderSearchCountDate(DateUtils.formatSimpleDate(new Date()));
+        setSpotifyClientId(StringUtils.EMPTY);
+        setSpotifyClientSecret(StringUtils.EMPTY);
+        setFeatures(new HashMap<>());
+        getFeatures().put(REMOVE_COMMENT_ON_AUTOTAGGING, true);
+        getFeatures().put(AUTO_FIND_COVER_ART_WITH_SPOTIFY, true);
+        setSpotifyArtists(new HashMap<>());
 
         // set the support location since we always know where that'll be
-        setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/Moose/");
+        setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/moose/");
     }
 
     public Settings withVersionNumber(String version) {
         this.setVersion(version);
         return this;
-    }
-    
-    /**
-     * Adds a genre to the genre list
-     * @param genre, the genre to add
-     */
-    public void addGenre(String genre) {
-        if(!getGenres().contains(genre)) {
-            getGenres().add(genre);
-        }
-    }
-
-    /**
-     * Removes a genre from the genre list
-     * @param genre, the genre to remove
-     */
-    public void removeGenre(String genre) {
-        getGenres().remove(genre);
     }
 }

@@ -35,7 +35,7 @@ import javax.swing.JOptionPane;
 public class SettingsFrame extends javax.swing.JFrame {
 
     // controller
-    public SettingsController settingsController = new SettingsController();
+    public SettingsController settingsController;
 
     // logger object
     Logger logger = Moose.getLogger();
@@ -60,8 +60,11 @@ public class SettingsFrame extends javax.swing.JFrame {
     /**
      * Creates new form SettingsFrame
      */
-    public SettingsFrame() {
+    public SettingsFrame(SettingsController sc) {
+        // set field
+        this.settingsController = sc;
 
+        // set up support directory if it's not set up already
         settingsController.setUpSupportDirectory();
 
         // initially load the settings
@@ -1036,7 +1039,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public void addGenreToList(String genre) {
         if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY)) {
-            settings.addGenre(genre);
+            settings.getGenres().add(genre);
             genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
             genreTextField.setText(StringUtils.EMPTY);
             statusLabel.setText(StringUtils.EMPTY);
@@ -1052,7 +1055,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         if (!genreListModel.removeElement(genre)) {
             JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            settings.removeGenre(genre);
+            settings.getGenres().remove(genre);
             genreTextField.setText(StringUtils.EMPTY);
             addGenreButton.setText("Add");
             deleteGenreButton.setEnabled(false);
