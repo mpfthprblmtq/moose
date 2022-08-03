@@ -111,7 +111,7 @@ public class AlbumArtFinderService {
             settings.setAlbumArtFinderSearchCountDate(todaysDate);
             settings.setAlbumArtFinderSearchCount(1);
         }
-        Moose.updateSettings(settings);
+        Moose.updateSettings();
     }
 
     /**
