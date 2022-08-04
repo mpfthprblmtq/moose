@@ -60,6 +60,10 @@ public class SettingsController {
     public void readSettingsFile() {
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
+            if (StringUtils.isEmpty(jsonString)) {
+                fillDefaults();
+                jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
+            }
             settings = mapper.readValue(jsonString, Settings.class);
         } catch (IOException e) {
             logger.logError("Exception while reading the settings json!", e);

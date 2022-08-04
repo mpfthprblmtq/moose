@@ -46,6 +46,10 @@ public class SpotifyApiService {
         Artist artist = null;
         Album album = null;
 
+        if (StringUtils.isEmpty(Moose.getSettings().getSpotifyClientSecret()) || StringUtils.isEmpty(Moose.getSettings().getSpotifyClientId())) {
+            return null;
+        }
+
         // authenticate first
         authenticate();
 

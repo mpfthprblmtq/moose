@@ -28,11 +28,11 @@ import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.commons.utils.WebUtils;
 import moose.Moose;
 import moose.objects.api.imageSearch.ImageSearchQuery;
-import moose.objects.api.imageSearch.ImageSearchResponse;
+import moose.objects.api.imageSearch.ImageSearchResult;
 import moose.objects.api.spotify.Album;
 import moose.objects.api.spotify.AlbumSearchResponse;
 import moose.objects.api.spotify.Artist;
-import moose.services.AlbumArtFinderService;
+import moose.services.GoogleSearchService;
 import moose.services.IconService;
 import moose.services.SpotifyApiService;
 import moose.utilities.Constants;
@@ -42,8 +42,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     static Logger logger = Moose.getLogger();
 
+    // main query field
     ImageSearchQuery query;
-    List<ImageSearchResponse> googleImageSearchResponses;
+
+    // graphics fields
     List<Icon> icons = new ArrayList<>();
     int currentIconIndex;
 
@@ -53,7 +55,11 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     List<Artist> spotifyArtists = new ArrayList<>();
     List<Album> spotifyAlbums = new ArrayList<>();
 
-    AlbumArtFinderService albumArtFinderService = new AlbumArtFinderService();
+    // google fields
+    List<ImageSearchResult> googleImageSearchResults = new ArrayList<>();
+
+    // services
+    GoogleSearchService googleSearchService = new GoogleSearchService();
     SpotifyApiService spotifyApiService = new SpotifyApiService();
 
     /**
@@ -70,38 +76,34 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 String query = googleSearchQueryTextField.getText();
 
                 // iteratively make the calls so that the progress bar can be updated
-                albumArtFinderService.makeFirstCall(query);
-                googleProgressBar.setValue(8);
-                albumArtFinderService.updateAlbumArtSettings();
-                googleProgressBar.setValue(16);
-                albumArtFinderService.makeSecondCall(query);
-                googleProgressBar.setValue(24);
-                albumArtFinderService.updateAlbumArtSettings();
-                googleProgressBar.setValue(32);
-                albumArtFinderService.makeThirdCall(query);
-                googleProgressBar.setValue(40);
-                albumArtFinderService.updateAlbumArtSettings();
-                googleProgressBar.setValue(48);
-                albumArtFinderService.makeFourthCall(query);
-                googleProgressBar.setValue(56);
-                albumArtFinderService.updateAlbumArtSettings();
-                googleProgressBar.setValue(64);
+                googleImageSearchResults.addAll(googleSearchService.doGoogleSearch(query, Constants.LARGE, 1));
+                googleProgressBar.setValue(30);
+                googleImageSearchResults.addAll(googleSearchService.doGoogleSearch(query, Constants.LARGE, 11));
+                googleProgressBar.setValue(30);
+                googleSearchService.updateAlbumArtSettings();
 
-                googleImageSearchResponses = albumArtFinderService.getResponses();
-                double interval = googleImageSearchResponses.size() / 36.0;
-                List<ImageSearchResponse> toRemoveList = new ArrayList<>();
-                googleImageSearchResponses.forEach((isr) -> {
-                    ImageSearchResponse toRemove = albumArtFinderService.processImage(isr);
+                // get the interval to update the progress by based on how much is left
+                double interval = googleImageSearchResults.size() / 40.0;
+
+                // go through each of the results and attempt to grab a buffered image from them
+                List<ImageSearchResult> toRemoveList = new ArrayList<>();
+                googleImageSearchResults.forEach((isr) -> {
+                    ImageSearchResult toRemove = googleSearchService.processImage(isr);
                     if (toRemove != null) {
                         toRemoveList.add(toRemove);
                     }
                     googleProgressBar.setValue((int) (googleProgressBar.getValue() + Math.floor(interval)));
                 });
-                googleImageSearchResponses.removeAll(toRemoveList);
+                // remove all the elements where we couldn't grab the image from
+                googleImageSearchResults.removeAll(toRemoveList);
                 googleProgressBar.setValue(100);
-                googleLoadingLabel.setIcon(IconService.get(IconService.SUCCESS));
 
-                icons = getIconsFromImages(googleImageSearchResponses);
+                // show success or failure
+                googleLoadingLabel.setIcon(googleImageSearchResults.isEmpty() ?
+                        IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
+
+                // show the images
+                icons = getIconsFromImages(googleImageSearchResults);
                 if (icons.size() > 1) {
                     googleAlbumArtImageLabel.setIcon(icons.get(0));
                     currentIconIndex = 0;
@@ -125,10 +127,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                     return null;
                 }
 
-                googleStatusLabel.setText("Result 1 of " + googleImageSearchResponses.size());
-                googleSourceLabel.setText(googleImageSearchResponses.get(currentIconIndex).getLink());
-                googleSourceLabel.setToolTipText(googleImageSearchResponses.get(currentIconIndex).getLink());
-                googleSizeLabel.setText(googleImageSearchResponses.get(currentIconIndex).getBImage().getWidth() + "x" + googleImageSearchResponses.get(currentIconIndex).getBImage().getHeight());
+                googleStatusLabel.setText("Result 1 of " + googleImageSearchResults.size());
+                googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
+                googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
+                googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
                 googleConfirmButton.setEnabled(true);
                 googleImagesButton.setEnabled(true);
 
@@ -903,10 +905,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             }
         }
 
-        googleSourceLabel.setText(googleImageSearchResponses.get(currentIconIndex).getLink());
-        googleSourceLabel.setToolTipText(googleImageSearchResponses.get(currentIconIndex).getLink());
-        googleSizeLabel.setText(googleImageSearchResponses.get(currentIconIndex).getBImage().getWidth() + "x" + googleImageSearchResponses.get(currentIconIndex).getBImage().getHeight());
-        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResponses.size());
+        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
+        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
     }//GEN-LAST:event_googleNextButtonActionPerformed
 
     private void googlePreviousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googlePreviousButtonActionPerformed
@@ -921,15 +923,15 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             }
         }
 
-        googleSourceLabel.setText(googleImageSearchResponses.get(currentIconIndex).getLink());
-        googleSourceLabel.setToolTipText(googleImageSearchResponses.get(currentIconIndex).getLink());
-        googleSizeLabel.setText(googleImageSearchResponses.get(currentIconIndex).getBImage().getWidth() + "x" + googleImageSearchResponses.get(currentIconIndex).getBImage().getHeight());
-        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResponses.size());
+        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
+        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
     }//GEN-LAST:event_googlePreviousButtonActionPerformed
 
     private void googleImagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleImagesButtonActionPerformed
         String url = StringUtils.isEmpty(manualSearchQueryTextField.getText()) ? "https://images.google.com/" :
-                AlbumArtFinderService.buildImageSearchQuery(googleSearchQueryTextField.getText());
+                GoogleSearchService.buildImageSearchQuery(googleSearchQueryTextField.getText());
         try {
             WebUtils.openPage(url);
         } catch (Exception e) {
@@ -952,7 +954,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_spotifySearchButtonActionPerformed
 
     private void googleConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleConfirmButtonActionPerformed
-        foundCover = googleImageSearchResponses.get(currentIconIndex).getBImage();
+        foundCover = googleImageSearchResults.get(currentIconIndex).getBufferedImage();
         confirmImage();
     }//GEN-LAST:event_googleConfirmButtonActionPerformed
 
@@ -1053,7 +1055,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         }
 
         // check to make sure we're below the allowed search threshold
-        if (AlbumArtFinderService.checkIfBelowLimit()) {
+        if (GoogleSearchService.checkIfBelowLimit()) {
 
             // update the gui to signify it starting
             googleSourceLabel.setText(StringUtils.EMPTY);
@@ -1123,10 +1125,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     }
 
-    private List<Icon> getIconsFromImages(List<ImageSearchResponse> responses) {
+    private List<Icon> getIconsFromImages(List<ImageSearchResult> responses) {
         List<Icon> scaledIcons = new ArrayList<>();
-        for (ImageSearchResponse isr : responses) {
-            byte[] bytes = ImageUtils.getBytesFromBufferedImage(isr.getBImage());
+        for (ImageSearchResult isr : responses) {
+            byte[] bytes = ImageUtils.getBytesFromBufferedImage(isr.getBufferedImage());
             scaledIcons.add(ImageUtils.getScaledImage(bytes, 300));
         }
         return scaledIcons;
