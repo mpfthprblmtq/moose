@@ -5,10 +5,6 @@ import java.awt.Color;
 public class Constants {
 
     public static final String DASH = "-";
-
-    public static final String LARGE = "large";
-    public static final String XLARGE = "xlarge";
-    public static final int IMAGE_LIMIT = 100;
     
     public static final Color RED = new Color(130, 0, 50);
     public static final Color GREEN = new Color(0, 130, 50);
@@ -17,11 +13,16 @@ public class Constants {
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
     public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-2022";
 
-    // api constants
+    // spotify api constants
     public static final String SPOTIFY_AUTH_URL = "https://accounts.spotify.com/api/token";
     public static final String SPOTIFY_SEARCH_URL = "https://api.spotify.com/v1/search";
     public static final String SPOTIFY_ALBUMS_URL = "https://api.spotify.com/v1/artists/{id}/albums";
     public static final String SPOTIFY_ARTIST_URL = "https://api.spotify.com/v1/artists/{id}";
+
+    // google search api constants
+    public static final String CUSTOM_SEARCH_URL = "https://www.googleapis.com/customsearch/v1";
+    public static final String LARGE = "large";
+    public static final int IMAGE_LIMIT = 100;
 
     // filename, file path, and other regex needed for auto tagging
     public static final String SINGLES = "Singles";
