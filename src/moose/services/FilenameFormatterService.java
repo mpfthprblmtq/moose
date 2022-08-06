@@ -68,7 +68,6 @@ public class FilenameFormatterService {
      */
     public String getBetterFilename(File file, boolean singleFile) {
         String filename;
-        File originalFile = file;
 
         // apply regex fixes
         String[] result = applyFixes(file, singleFile);
@@ -86,7 +85,7 @@ public class FilenameFormatterService {
             }
 
             // get the manual title and number
-            filename = getManualFilename(file, originalFile);
+            filename = getManualFilename(file);
 
             // if we have a new file name, change the name of the actual file
             if (!filename.equals(file.getName())) {
@@ -168,17 +167,17 @@ public class FilenameFormatterService {
      * Attempts to get the track name/title from the file if there's no track number on the file
      *
      * @param file,         the file we're editing
-     * @param originalFile, the original file that we were editing, used to get the original song info
+//     * @param originalFile, the original file that we were editing, used to get the original song info
      * @return the manual filename
      */
-    private String getManualFilename(File file, File originalFile) {
+    private String getManualFilename(File file) {
 
         String trackTitle = StringUtils.EMPTY;
         String trackNumber = StringUtils.EMPTY;
         String trackArtist = StringUtils.EMPTY;
 
         // get the song data if there is any
-        Song song = SongUtils.getSongFromFile(originalFile);
+        Song song = SongUtils.getSongFromFile(file);
 
         if (song != null) {
             // get the title

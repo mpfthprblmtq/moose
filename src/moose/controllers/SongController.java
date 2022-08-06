@@ -584,9 +584,6 @@ public class SongController {
         for (int row : selectedRows) {
             Song s = songs.get(getIndex(row));
             File file = s.getFile();
-            if (s.getNewFile() != null) {
-                file = s.getNewFile();
-            }
 
             String path = file.getPath().replace(file.getName(), StringUtils.EMPTY);
             String newFilename = filenameFormatterService.formatFilename(file, MP3FileUtils.folderContainsOnlyOneMP3(file.getParentFile()));
