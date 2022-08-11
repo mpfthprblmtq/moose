@@ -161,11 +161,13 @@ public class ViewUtils {
                     case 8:     // genre was changed
                         String genre = tcl.getNewValue().toString();
                         // check and see if the genre exists already
-                        if (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre)) {
-                            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
-                            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
-                                Moose.getSettings().getGenres().add(genre);
-                                Moose.updateSettings();
+                        if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
+                            if (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre)) {
+                                int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
+                                if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
+                                    Moose.getSettings().getGenres().add(genre);
+                                    Moose.updateSettings();
+                                }
                             }
                         }
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
@@ -271,19 +273,24 @@ public class ViewUtils {
             popup.addSeparator();
             popup.add(item = new JMenuItem(AUTO_TAG));
             item.addActionListener(menuListener);
+            // only enable it if the feature is enabled
+            item.setEnabled(Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING));
             popup.add(item = new JMenuItem(FORMAT_FILENAME));
             item.addActionListener(menuListener);
+            // only enable it if the feature is enabled
+            item.setEnabled(Moose.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
             popup.add(item = new JMenuItem(AUTO_TRACK_DISK_NUMBERS));
             item.addActionListener(menuListener);
             popup.add(item = new JMenuItem(AUTO_ARTWORK));
             item.addActionListener(menuListener);
-            popup.addSeparator();
         }
         if (file) {
+            popup.addSeparator();
             popup.add(item = new JMenuItem(MOVE_FILE));
             item.addActionListener(menuListener);
         }
         if (artwork) {
+            popup.addSeparator();
             popup.add(item = new JMenuItem(ADD_ARTWORK));
             item.addActionListener(menuListener);
             popup.add(item = new JMenuItem(REMOVE_ARTWORK));
