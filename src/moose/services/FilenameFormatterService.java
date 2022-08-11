@@ -47,6 +47,7 @@ public class FilenameFormatterService {
      */
     private String cleanupFilename(String filename) {
         filename = filename.replaceAll("(?i)feat.", "ft.");
+        filename = filename.replaceAll("Ft.", "ft.");
 
         // I totally get my music from legit sources, don't judge me
         for (String toReplace : FILENAME_STRINGS_TO_REMOVE) {

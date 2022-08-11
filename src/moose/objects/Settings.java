@@ -37,9 +37,12 @@ public class Settings {
     private Map<String, Boolean> features;
     private Map<String, String> spotifyArtists;
 
+    public static final String AUTOTAGGING = "autotagging";
     public static final String REMOVE_COMMENT_ON_AUTOTAGGING = "removeCommentOnAutoTagging";
+    public static final String ALBUM_ART_FINDER = "albumArtFinder";
     public static final String AUTO_FIND_COVER_ART_WITH_SPOTIFY = "autoFindCoverArtWithSpotify";
-
+    public static final String CHECK_FOR_NEW_GENRES = "checkForNewGenres";
+    public static final String FORMAT_FILENAMES = "formatFilenames";
     
     /**
      * Creates a default settings object

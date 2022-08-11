@@ -233,13 +233,15 @@ public class AutoTaggingService {
 
             // if we still have some images to look for, use the album art finder frame for the rest of them
             if (!queries.isEmpty()) {
-                // ask the user if they want to use the album art finder
-                int useService = confirmUserWantsAlbumArtFinder();
-                if (useService == JOptionPane.YES_OPTION) {
+                if (Moose.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER)) {
+                    // ask the user if they want to use the album art finder
+                    int useService = confirmUserWantsAlbumArtFinder();
+                    if (useService == JOptionPane.YES_OPTION) {
 
-                    // get the queries and dirs to open the frames with
-                    for (ImageSearchQuery query : queries) {
-                        showAlbumArtWindow(query);
+                        // get the queries and dirs to open the frames with
+                        for (ImageSearchQuery query : queries) {
+                            showAlbumArtWindow(query);
+                        }
                     }
                 }
             }

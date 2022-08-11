@@ -26,6 +26,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import moose.objects.Settings;
 
@@ -139,6 +141,15 @@ public class SettingsController {
         // check if successful
         return StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderApiKey())
                 && StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderCseId());
+    }
+
+    public boolean defaultFeatures() {
+        settings.getFeatures().replaceAll((k,v) -> v = true);
+        writeSettingsFile(settings);
+
+        // check if successful (throws values of settings into set to check if only one value type exists)
+        Set<Boolean> values = new HashSet<Boolean>(settings.getFeatures().values());
+        return values.size() == 1 && Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING);
     }
 
     public Settings getSettings() {

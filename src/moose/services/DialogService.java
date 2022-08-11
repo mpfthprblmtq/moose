@@ -11,6 +11,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -22,8 +24,10 @@ public class DialogService {
      * Show the about dialog, includes name, version, and copyright
      */
     public static void showAboutDialog() {
+        int year = LocalDate.now().getYear();
         JOptionPane.showMessageDialog(null,
-                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" + Constants.MOOSE_COPYRIGHT,
+                "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" +
+                        Constants.MOOSE_COPYRIGHT + year,
                 "About Moose", JOptionPane.PLAIN_MESSAGE, IconService.get(IconService.MOOSE_128));
     }
 
@@ -64,6 +68,7 @@ public class DialogService {
         JCheckBox loggingBox = new JCheckBox("Logging");
         JCheckBox filesBox = new JCheckBox("Files");
         JCheckBox apiBox = new JCheckBox("API Configuration");
+        JCheckBox featuresBox = new JCheckBox("Features");
         switch (selectedTab) {
             case Constants.GENRE:
                 genreBox.setSelected(true);
@@ -77,8 +82,11 @@ public class DialogService {
             case Constants.API:
                 apiBox.setSelected(true);
                 break;
+            case Constants.FEATURES:
+                featuresBox.setSelected(true);
+                break;
         }
-        Object[] message = {"Select which Settings you want to clear:", genreBox, loggingBox, filesBox, apiBox};
+        Object[] message = {"Select which Settings you want to clear:", genreBox, loggingBox, filesBox, apiBox, featuresBox};
 
         int option = JOptionPane.showConfirmDialog(
                 context,
@@ -93,6 +101,7 @@ public class DialogService {
             boxes.put(Constants.LOGGING, loggingBox.isSelected());
             boxes.put(Constants.FILES, filesBox.isSelected());
             boxes.put(Constants.API, apiBox.isSelected());
+            boxes.put(Constants.FEATURES, featuresBox.isSelected());
             return boxes;
         }
         return null;

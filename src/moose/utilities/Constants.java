@@ -11,7 +11,7 @@ public class Constants {
     public static final Color BLACK = new Color(0, 0, 0);
 
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
-    public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-2022";
+    public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-";
 
     // spotify api constants
     public static final String SPOTIFY_AUTH_URL = "https://accounts.spotify.com/api/token";
