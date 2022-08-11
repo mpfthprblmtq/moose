@@ -35,7 +35,7 @@ echo "# APP VERSION                                                 #"
 echo "###############################################################"
 echo
 # get the old version using grep from SettingsController.java
-version=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' src/moose/controllers/SettingsController.java)
+version=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' src/main/java/com/mpfthprblmtq/moose/controllers/SettingsController.java)
 echo "New version number:   ${version}"
 echo
 echo
@@ -83,11 +83,11 @@ echo "Done."
 # create resource directory for jpackage
 printf "Creating resource directory..."
 mkdir resources
-cp "$APP_PATH"/src/resources/build-resources/moose-app-icon.icns "$APP_PATH"/deploy/resources
-cp "$APP_PATH"/src/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background.png
-cp "$APP_PATH"/src/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background-darkAqua.png
-# TODO cp "$APP_PATH"/src/resources/build/moose-volume.icns "$APP_PATH"/deploy/resources
-# TODO cp "$APP_PATH"/src/resources/build/moose-background.tiff "$APP_PATH"/deploy/resources/
+cp "$APP_PATH"/src/main/resources/build-resources/moose-app-icon.icns "$APP_PATH"/deploy/resources
+cp "$APP_PATH"/src/main/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background.png
+cp "$APP_PATH"/src/main/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background-darkAqua.png
+# TODO cp "$APP_PATH"/src/main/resources/build/moose-volume.icns "$APP_PATH"/deploy/resources
+# TODO cp "$APP_PATH"/src/main/resources/build/moose-background.tiff "$APP_PATH"/deploy/resources/
 echo "Done."
 # create file association properties files
 printf "Creating file extension properties files..."
@@ -170,7 +170,7 @@ echo "       \`-._\(_ )/__(~\`                   "
 echo "           (ovo)-.__.--._                  "
 echo "           )             \`-.______        "
 echo "  thanks  /                       \`---._  "
-echo "    :)   ( ,// )                        \  "
+echo "    :)   ( ,/ /)                        \  "
 echo "          \`''\/-.                        |"
 echo "                 \                       | "
 echo "                 |                       | "
