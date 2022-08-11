@@ -1,9 +1,9 @@
-package com.mpfthprblmtq.moose.services;
+package com.mpfthprblmtq.moose.utilities.viewUtils;
 
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
+import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
-import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DialogService {
+public class DialogUtils {
 
     /**
-     * Show the about dialog, includes name, version, and copyright
+     * Shows the about dialog, includes name, version, and copyright
      */
     public static void showAboutDialog() {
         int year = LocalDate.now().getYear();
@@ -168,10 +168,21 @@ public class DialogService {
         }
     }
 
+    /**
+     * Shows a simple message dialog
+     * @param component the context of the dialog
+     * @param message the message to display
+     * @param title the title to display
+     * @param messageType the message type (JOptionPane)
+     */
     public static void showMessageDialog(Component component, String message, String title, int messageType) {
         JOptionPane.showMessageDialog(component, message, title, messageType);
     }
 
+    /**
+     * Shows a dialog with options to create a new audit or continue an existing audit
+     * @return the option chosen (0 = cancel, 1 = start new, 2 = continue)
+     */
     public static int showExistingAuditDialog() {
         Object[] options = new Object[]{"Cancel", "Start New", "Continue"};
         return JOptionPane.showOptionDialog(
@@ -185,6 +196,10 @@ public class DialogService {
                 null);
     }
 
+    /**
+     * Shows a dialog with options to edit all albums or marked albums as part of an audit
+     * @return the option chosen (0 = cancel, 1 = only marked albums, 2 = all albums)
+     */
     public static int showShouldAuditAllDialog() {
         Object[] options = new Object[]{"Cancel", "Only Marked Albums", "All Albums"};
         return JOptionPane.showOptionDialog(
@@ -199,6 +214,11 @@ public class DialogService {
         );
     }
 
+    /**
+     * Shows a dialog to confirm if the user wants to exit with unsaved changes
+     * @param component the context of the dialog to show
+     * @return a JOptionPane Yes/No option
+     */
     public static int showUnsavedChangesDialog(Component component) {
         return JOptionPane.showConfirmDialog(
                 component,
@@ -206,4 +226,5 @@ public class DialogService {
                 "Unsaved Changes",
                 JOptionPane.YES_NO_OPTION);
     }
+
 }

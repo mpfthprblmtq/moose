@@ -2,8 +2,8 @@ package com.mpfthprblmtq.moose.controllers;
 
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.services.AuditService;
-import com.mpfthprblmtq.moose.services.DialogService;
 import com.mpfthprblmtq.moose.utilities.AuditCleanupUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 import com.mpfthprblmtq.moose.views.Frame;
 
@@ -68,7 +68,7 @@ public class AuditController {
     public void startAudit() {
 
         // check what type of audit we want to do
-        switch(DialogService.showShouldAuditAllDialog()) {
+        switch(DialogUtils.showShouldAuditAllDialog()) {
             case 2:     // all albums
                 break;
             case 1:     // only marked albums
@@ -88,7 +88,7 @@ public class AuditController {
 
         // check for audit in process
         if (auditService.checkForExistingAudit(albums)) {
-            switch (DialogService.showExistingAuditDialog()) {
+            switch (DialogUtils.showExistingAuditDialog()) {
                 case 2:     // continue
                     continueAudit();
                     break;
@@ -206,7 +206,7 @@ public class AuditController {
         Moose.launchFrame();
 
         // show that the audit is done
-        DialogService.showMessageDialog(null, "Audit is complete!", "Audit Completed", JOptionPane.INFORMATION_MESSAGE);
+        DialogUtils.showMessageDialog(null, "Audit is complete!", "Audit Completed", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

@@ -22,6 +22,7 @@ import com.mpfthprblmtq.moose.objects.api.imageSearch.ImageSearchQuery;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.SongUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import com.mpfthprblmtq.moose.views.modals.AlbumArtFinderFrame;
 
 import javax.imageio.ImageIO;
@@ -741,7 +742,7 @@ public class AutoTaggingService {
             if (s != null && StringUtils.isNotEmpty(s.getTitle())) {
                 title = s.getTitle();
             }
-            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
+            String[] arr = DialogUtils.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
             if (arr != null) {
                 trackNumber = arr[1];
             }

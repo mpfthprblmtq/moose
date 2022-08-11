@@ -5,6 +5,7 @@ import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.utilities.AuditCleanupUtils;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -145,7 +146,7 @@ public class CleanupService {
         }
 
         // show success message with total files deleted
-        DialogService.showMessageDialog(null, filesDeleted + " file(s) successfully deleted!", "Delete Success", JOptionPane.WARNING_MESSAGE);
+        DialogUtils.showMessageDialog(null, filesDeleted + " file(s) successfully deleted!", "Delete Success", JOptionPane.WARNING_MESSAGE);
 
         // clear all the lists to reset counts
         AuditCleanupUtils.clearLists(cleanupFilePathList);
@@ -180,7 +181,7 @@ public class CleanupService {
         }
 
         // show success message with total files deleted
-        DialogService.showMessageDialog(null, filesDeleted + " file(s) successfully deleted!", "Delete Success", JOptionPane.WARNING_MESSAGE);
+        DialogUtils.showMessageDialog(null, filesDeleted + " file(s) successfully deleted!", "Delete Success", JOptionPane.WARNING_MESSAGE);
 
         // clear the list of lists
         AuditCleanupUtils.clearLists(cleanupFilePathList);
