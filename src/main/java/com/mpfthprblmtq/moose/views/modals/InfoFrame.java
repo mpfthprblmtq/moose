@@ -27,8 +27,8 @@ import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Song;
-import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
@@ -665,7 +665,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(1).equals(titleField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = titleField;
     }//GEN-LAST:event_titleFieldKeyReleased
@@ -676,7 +676,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(2).equals(artistField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = artistField;
     }//GEN-LAST:event_artistFieldKeyReleased
@@ -687,7 +687,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(3).equals(albumField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = albumField;
     }//GEN-LAST:event_albumFieldKeyReleased
@@ -698,7 +698,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(4).equals(albumArtistField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = albumArtistField;
     }//GEN-LAST:event_albumArtistFieldKeyReleased
@@ -709,7 +709,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(5).equals(yearField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = yearField;
     }//GEN-LAST:event_yearFieldKeyReleased
@@ -720,7 +720,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(6).equals(genreField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = genreField;
     }//GEN-LAST:event_genreFieldKeyReleased
@@ -731,7 +731,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(7).equals(track1Field.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = track1Field;
     }//GEN-LAST:event_track1FieldKeyReleased
@@ -742,7 +742,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(8).equals(track2Field.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = track2Field;
     }//GEN-LAST:event_track2FieldKeyReleased
@@ -753,7 +753,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(9).equals(disk1Field.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = disk1Field;
     }//GEN-LAST:event_disk1FieldKeyReleased
@@ -764,7 +764,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         if (!originalValues.get(10).equals(disk2Field.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = disk2Field;
     }//GEN-LAST:event_disk2FieldKeyReleased
@@ -774,7 +774,7 @@ public class InfoFrame extends javax.swing.JFrame {
             editSubmitButton.doClick();
         } else if (!originalValues.get(11).equals(commentField.getText())) {
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
         }
         lastEditedField = commentField;
     }//GEN-LAST:event_commentFieldKeyReleased
@@ -803,7 +803,7 @@ public class InfoFrame extends javax.swing.JFrame {
             Icon artwork_icon = ImageUtils.getScaledImage(bytes, 290);
             coverLabel.setIcon(artwork_icon);
             edited = true;
-            editedLabel.setIcon(IconService.get(IconService.EDITED));
+            editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
             newArtwork = bytes;
         }
     }
@@ -814,7 +814,7 @@ public class InfoFrame extends javax.swing.JFrame {
      public void removeAlbumArt() {
          coverLabel.setIcon(null);
          edited = true;
-         editedLabel.setIcon(IconService.get(IconService.EDITED));
+         editedLabel.setIcon(IconUtils.get(IconUtils.EDITED));
      }
     
     /**

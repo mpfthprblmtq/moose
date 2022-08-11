@@ -23,8 +23,8 @@ import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.services.AutocompleteService;
-import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.*;
 import com.mpfthprblmtq.moose.views.modals.InfoFrame;
@@ -377,13 +377,13 @@ public class Frame extends javax.swing.JFrame {
     public void setRowIcon(int icon, int row) {
         switch (icon) {
             case DEFAULT:
-                table.setValueAt(IconService.get(IconService.DEFAULT), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconUtils.get(IconUtils.DEFAULT), row, TABLE_COLUMN_ICON);
                 break;
             case EDITED:
-                table.setValueAt(IconService.get(IconService.EDITED), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconUtils.get(IconUtils.EDITED), row, TABLE_COLUMN_ICON);
                 break;
             case SAVED:
-                table.setValueAt(IconService.get(IconService.SAVED), row, TABLE_COLUMN_ICON);
+                table.setValueAt(IconUtils.get(IconUtils.SAVED), row, TABLE_COLUMN_ICON);
                 break;
         }
     }
@@ -420,7 +420,7 @@ public class Frame extends javax.swing.JFrame {
 
         // add the row to the table
         model.addRow(new Object[]{
-                IconService.get(IconService.DEFAULT), // adds the default status icon
+                IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
                 s.getFile(), // hidden file object
                 cleanedFileName, // actual editable file name
                 s.getTitle(),
@@ -935,7 +935,7 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jLabel3.setIcon(IconService.get(IconService.MOOSE_64));
+        jLabel3.setIcon(IconUtils.get(IconUtils.MOOSE_64));
 
         clearAllButton.setText("Clear All");
         clearAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
