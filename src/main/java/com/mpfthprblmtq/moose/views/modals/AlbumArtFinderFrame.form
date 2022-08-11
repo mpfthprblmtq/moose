@@ -270,7 +270,7 @@
             <Component class="javax.swing.JLabel" name="spotifyArtistImageLabel">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="IconService.get(IconService.CIRCLE)" type="code"/>
+                  <Connection code="IconUtils.get(IconUtils.CIRCLE)" type="code"/>
                 </Property>
               </Properties>
               <Events>

@@ -2,8 +2,8 @@ package com.mpfthprblmtq.moose.utilities.viewUtils;
 
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
-import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -27,7 +27,7 @@ public class DialogUtils {
         JOptionPane.showMessageDialog(null,
                 "<html><b>Moose</b></html>\nVersion: " + Moose.getSettings().getVersion() + "\n" +
                         Constants.MOOSE_COPYRIGHT + year,
-                "About Moose", JOptionPane.PLAIN_MESSAGE, IconService.get(IconService.MOOSE_128));
+                "About Moose", JOptionPane.PLAIN_MESSAGE, IconUtils.get(IconUtils.MOOSE_128));
     }
 
     /**

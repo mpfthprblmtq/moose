@@ -767,7 +767,7 @@
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="IconService.get(IconService.MOOSE_64)" type="code"/>
+              <Connection code="IconUtils.get(IconUtils.MOOSE_64)" type="code"/>
             </Property>
           </Properties>
         </Component>

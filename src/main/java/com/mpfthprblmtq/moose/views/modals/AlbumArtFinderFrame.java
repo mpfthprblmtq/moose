@@ -33,9 +33,9 @@ import com.mpfthprblmtq.moose.objects.api.spotify.Album;
 import com.mpfthprblmtq.moose.objects.api.spotify.AlbumSearchResponse;
 import com.mpfthprblmtq.moose.objects.api.spotify.Artist;
 import com.mpfthprblmtq.moose.services.GoogleSearchService;
-import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.services.SpotifyApiService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
@@ -100,7 +100,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
                 // show success or failure
                 googleLoadingLabel.setIcon(googleImageSearchResults.isEmpty() ?
-                        IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
+                        IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
 
                 // show the images
                 icons = getIconsFromImages(googleImageSearchResults);
@@ -176,7 +176,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                     // update graphics
                     spotifyStatusLabel.setText("No artists found!");
                     spotifyApiStatusLabel.setText("No artists found!");
-                    spotifyLoadingLabel.setIcon(IconService.get(IconService.ERROR));
+                    spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.ERROR));
                     spotifyProgressBar.setValue(100);
                     spotifyAlbumArtImageLabel.setIcon(null);
                     spotifyArtistTextField.setEnabled(true);
@@ -189,7 +189,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                             ImageUtils.getBytesFromBufferedImage(ImageUtils.getImageFromUrl(spotifyArtists.get(currentSpotifyArtistIconIndex).getImages().get(0).getUrl())), 300
                     ));
                     spotifyProgressBar.setValue(100);
-                    spotifyLoadingLabel.setIcon(IconService.get(IconService.SUCCESS));
+                    spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.SUCCESS));
                     spotifyApiStatusLabel.setText(spotifyArtists.size() + " artists found!");
                     spotifyStatusLabel.setHorizontalAlignment(JLabel.CENTER);
                     spotifyStatusLabel.setText("<html><body>(" + (currentSpotifyArtistIconIndex + 1) + " of " + spotifyArtists.size() + ") <a href=''>" + spotifyArtists.get(currentSpotifyArtistIconIndex).getName() + "</a></body></html>");
@@ -201,7 +201,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                     confirmSpotifyArtist();
 
                     // update graphics
-                    spotifyLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+                    spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
                     spotifyProgressBar.setValue(0);
                     spotifyStatusLabel.setText("Searching for albums from " + spotifyArtists.get(currentSpotifyArtistIconIndex).getName() + "...");
 
@@ -262,7 +262,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                         } else {
                             // if the next url is null, we can't search anymore, album wasn't found
                             spotifyApiStatusLabel.setText("<html><body>Artist confirmed!<br>Album wasn't found!</body></html>");
-                            spotifyLoadingLabel.setIcon(IconService.get(IconService.ERROR));
+                            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.ERROR));
                             spotifyProgressBar.setValue(100);
                             spotifyConfirmButton.setEnabled(false);
                             spotifyPreviousButton.setEnabled(false);
@@ -286,7 +286,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 // cover was found
                 spotifyAlbums.add(album);
                 String url = album.getImage().getUrl();
-                spotifyLoadingLabel.setIcon(IconService.get(IconService.SUCCESS));
+                spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.SUCCESS));
                 foundCover = ImageUtils.getImageFromUrl(url);
                 spotifyAlbumArtImageLabel.setIcon(ImageUtils.getScaledImage(ImageUtils.getBytesFromBufferedImage(foundCover), 300));
                 spotifyProgressBar.setValue(100);
@@ -334,7 +334,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             spotifyArtistTextField.setEnabled(false);
             spotifyAlbumTextField.setEnabled(false);
             spotifySearchButton.setEnabled(false);
-            spotifyLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
 
             // create a thread to wait until the dialog box pops up
             (new Thread(this::populateSpotifyArtistInfo)).start();
@@ -542,7 +542,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             }
         });
 
-        spotifyArtistImageLabel.setIcon(IconService.get(IconService.CIRCLE));
+        spotifyArtistImageLabel.setIcon(IconUtils.get(IconUtils.CIRCLE));
         spotifyArtistImageLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 spotifyArtistImageLabelMouseClicked(evt);
@@ -1062,7 +1062,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             googleSourceLabel.setToolTipText(StringUtils.EMPTY);
             googleSizeLabel.setText(StringUtils.EMPTY);
             googleStatusLabel.setText("Searching...");
-            googleLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+            googleLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
             googleSearchButton.setEnabled(false);
             googleConfirmButton.setEnabled(false);
             googleImagesButton.setEnabled(false);
@@ -1100,7 +1100,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             // we don't have a spotify artist id, which means we still need to search for the artist
             // update the gui to signify it starting
             spotifyApiStatusLabel.setText("Searching for artists...");
-            spotifyLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
             spotifySearchButton.setEnabled(false);
             spotifyArtistTextField.setEnabled(false);
             spotifyAlbumTextField.setEnabled(false);
@@ -1111,7 +1111,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
             // we have a spotify artist id, which means we don't need to search for the artist, search for albums straight away
             // update the gui to signify it starting
             spotifyApiStatusLabel.setText("<html><body>Artist confirmed!<br>Searching for albums...</body></html>");
-            spotifyLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
             spotifyProgressBar.setValue(0);
             spotifyStatusLabel.setText("Searching for albums from " + spotifyArtistTextField.getText() + "...");
             spotifyConfirmButton.setEnabled(false);
@@ -1172,7 +1172,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         spotifyArtistImageLabel.setToolTipText(artist.getName());
         spotifyAlbumArtImageLabel.setIcon(null);
         spotifyApiStatusLabel.setText("<html><body>Artist confirmed!<br>Searching for albums...</body></html>");
-        spotifyLoadingLabel.setIcon(IconService.get(IconService.LOADING));
+        spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
         spotifyProgressBar.setValue(0);
         spotifyStatusLabel.setText("Searching for albums from " + artist.getName() + "...");
         spotifyConfirmButton.setEnabled(false);

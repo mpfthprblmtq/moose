@@ -18,8 +18,8 @@ import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.AuditController;
 import com.mpfthprblmtq.moose.controllers.CleanupController;
 import com.mpfthprblmtq.moose.controllers.SongController;
-import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.views.Frame;
 
 import java.awt.Font;
@@ -881,9 +881,9 @@ public class AuditFrame extends javax.swing.JFrame {
         auditController.setIvars(checkResults.get(ID3), checkResults.get(FILENAMES), checkResults.get(COVER), currentDirectory);
 
         // set the pass/fail icons
-        ID3TagCheck.setIcon(checkResults.get(ID3) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
-        filenameCheck.setIcon(checkResults.get(FILENAMES) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
-        coverArtCheck.setIcon(checkResults.get(COVER) ? IconService.get(IconService.ERROR) : IconService.get(IconService.SUCCESS));
+        ID3TagCheck.setIcon(checkResults.get(ID3) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
+        filenameCheck.setIcon(checkResults.get(FILENAMES) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
+        coverArtCheck.setIcon(checkResults.get(COVER) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
 
         // set the attempt fix button to enabled if there's anything to fix
         attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(COVER) || checkResults.get(FILENAMES));
