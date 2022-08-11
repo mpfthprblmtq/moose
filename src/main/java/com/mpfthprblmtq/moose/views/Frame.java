@@ -23,14 +23,10 @@ import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.services.AutocompleteService;
-import com.mpfthprblmtq.moose.services.DialogService;
 import com.mpfthprblmtq.moose.services.IconService;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
-import com.mpfthprblmtq.moose.utilities.viewUtils.AutoCompleteDocument;
-import com.mpfthprblmtq.moose.utilities.viewUtils.FileDrop;
-import com.mpfthprblmtq.moose.utilities.viewUtils.TableCellListener;
-import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.*;
 import com.mpfthprblmtq.moose.views.modals.InfoFrame;
 
 import java.awt.event.*;
@@ -1263,7 +1259,7 @@ public class Frame extends javax.swing.JFrame {
      */
     public void closeWindow() {
         if (songController.hasUnsavedChanges()) {
-            if (DialogService.showUnsavedChangesDialog(this) == JOptionPane.YES_OPTION) {
+            if (DialogUtils.showUnsavedChangesDialog(this) == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
         } else {
@@ -1428,7 +1424,7 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-        DialogService.showAboutDialog();
+        DialogUtils.showAboutDialog();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     /**
@@ -1512,7 +1508,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
         if (Moose.getSettings().isAskBeforeClearAll()) {
-            Boolean result = DialogService.showClearAllDialog(this);
+            Boolean result = DialogUtils.showClearAllDialog(this);
             if (result != null) {
                 boolean dontAskAgain = result;
                 if (dontAskAgain) {
@@ -2014,7 +2010,7 @@ public class Frame extends javax.swing.JFrame {
         song.setYear(multYear.getText().equals(DASH) ? null : multYear.getText());
         song.setGenre(multGenre.getText().equals(DASH) ? null : multGenre.getText());
         if (StringUtils.isNotEmpty(multTrack.getText()) && !multTrack.getText().equals(DASH) && !multTrack.getText().matches(TRACK_DISK_REGEX)) {
-            DialogService.showMessageDialog(this, "Invalid track input: " + multTrack.getText(), "Warning", JOptionPane.WARNING_MESSAGE);
+            DialogUtils.showMessageDialog(this, "Invalid track input: " + multTrack.getText(), "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (StringUtils.isNotEmpty(multTrack.getText()) && !multTrack.getText().equals(DASH)) {
             String[] arr = multTrack.getText().split("/");
             song.setTrack(arr[0]);
@@ -2024,7 +2020,7 @@ public class Frame extends javax.swing.JFrame {
             song.setTotalTracks("");
         }
         if (StringUtils.isNotEmpty(multDisk.getText()) && !multDisk.getText().equals(DASH) && !multDisk.getText().matches(TRACK_DISK_REGEX)) {
-            DialogService.showMessageDialog(this, "Invalid disk input: " + multDisk.getText(), "Warning", JOptionPane.WARNING_MESSAGE);
+            DialogUtils.showMessageDialog(this, "Invalid disk input: " + multDisk.getText(), "Warning", JOptionPane.WARNING_MESSAGE);
         } else if (StringUtils.isNotEmpty(multDisk.getText()) && !multDisk.getText().equals(DASH)) {
             String[] arr = multDisk.getText().split("/");
             song.setDisk(arr[0]);

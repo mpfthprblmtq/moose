@@ -15,6 +15,7 @@ import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.SongUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
@@ -211,7 +212,7 @@ public class FilenameFormatterService {
 
         if (StringUtils.isEmpty(trackNumber)) {
             // show the dialog if we haven't already
-            String[] arr = DialogService.showGetTitleOrTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
+            String[] arr = DialogUtils.showGetTitleOrTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
             if (arr != null) {
                 trackTitle = arr[0];
                 trackNumber = arr[1];

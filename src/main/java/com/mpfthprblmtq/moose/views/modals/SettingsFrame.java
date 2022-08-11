@@ -21,8 +21,8 @@ import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.objects.Settings;
-import com.mpfthprblmtq.moose.services.DialogService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 
 import java.io.File;
 import java.text.ParseException;
@@ -1215,7 +1215,7 @@ public class SettingsFrame extends javax.swing.JFrame {
      */
     public void defaultSettings() {
         // get which settings the user wants to reset
-        Map<Integer, Boolean> settingsToReset = DialogService.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
+        Map<Integer, Boolean> settingsToReset = DialogUtils.showDefaultSettingsDialog(this, tabbedPane.getSelectedIndex());
 
         // go through the map we get back and reset those settings
         if (settingsToReset != null) {
