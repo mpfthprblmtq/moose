@@ -316,7 +316,7 @@ public class ImageUtils {
      */
     public static boolean hasEmptyByteArray(List<byte[]> byteList) {
         for (byte[] bytes : byteList) {
-            if (bytes.length == 0) {
+            if (bytes == null || bytes.length == 0) {
                 return true;
             }
         }

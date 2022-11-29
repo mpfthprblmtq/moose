@@ -180,6 +180,17 @@ public class DialogUtils {
     }
 
     /**
+     * Shows a confirmation dialog
+     * @param component the context of the dialog
+     * @param message the message to display
+     * @param title the title to display
+     * @param messageType the message type (JOptionPane)
+     */
+    public static int showConfirmationDialog(Component component, String message, String title, int messageType) {
+        return JOptionPane.showConfirmDialog(component, message, title, JOptionPane.YES_NO_CANCEL_OPTION, messageType);
+    }
+
+    /**
      * Shows a dialog with options to create a new audit or continue an existing audit
      * @return the option chosen (0 = cancel, 1 = start new, 2 = continue)
      */

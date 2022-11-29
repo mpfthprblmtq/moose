@@ -10,11 +10,14 @@
 package com.mpfthprblmtq.moose.objects;
 
 // imports
+import lombok.Data;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 
 // class Song
+@Data
 public class Song {
 
     private File file;
@@ -35,6 +38,8 @@ public class Song {
     private String sampleRate;
     private String length;
     private String comment;
+
+    private int index;
 
     public Song() {}
 
@@ -118,237 +123,6 @@ public class Song {
         } else {
             return disk + "/" + totalDisks;
         }
-    }
-
-    /**
-     * @return the title
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * @param title the title to set
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
-     * @return the artist
-     */
-    public String getArtist() {
-        return artist;
-    }
-
-    /**
-     * @param artist the artist to set
-     */
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    /**
-     * @return the album
-     */
-    public String getAlbum() {
-        return album;
-    }
-
-    /**
-     * @param album the album to set
-     */
-    public void setAlbum(String album) {
-        this.album = album;
-    }
-
-    /**
-     * @return the albumArtist
-     */
-    public String getAlbumArtist() {
-        return albumArtist;
-    }
-
-    /**
-     * @param albumArtist the albumArtist to set
-     */
-    public void setAlbumArtist(String albumArtist) {
-        this.albumArtist = albumArtist;
-    }
-
-    /**
-     * @return the genre
-     */
-    public String getGenre() {
-        return genre;
-    }
-
-    /**
-     * @param genre the genre to set
-     */
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    /**
-     * @return the track
-     */
-    public String getTrack() {
-        return track;
-    }
-
-    /**
-     * @param track the track to set
-     */
-    public void setTrack(String track) {
-        this.track = track;
-    }
-
-    /**
-     * @return the totalTracks
-     */
-    public String getTotalTracks() {
-        return totalTracks;
-    }
-
-    /**
-     * @param totalTracks the totalTracks to set
-     */
-    public void setTotalTracks(String totalTracks) {
-        this.totalTracks = totalTracks;
-    }
-
-    /**
-     * @return the disk
-     */
-    public String getDisk() {
-        return disk;
-    }
-
-    /**
-     * @param disk the disk to set
-     */
-    public void setDisk(String disk) {
-        this.disk = disk;
-    }
-
-    /**
-     * @return the totalDisks
-     */
-    public String getTotalDisks() {
-        return totalDisks;
-    }
-
-    /**
-     * @param totalDisks the totalDisks to set
-     */
-    public void setTotalDisks(String totalDisks) {
-        this.totalDisks = totalDisks;
-    }
-
-    /**
-     * @return the file
-     */
-    public File getFile() {
-        return file;
-    }
-
-    /**
-     * @param file the file to set
-     */
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    /**
-     * @return the newFile
-     */
-    public File getNewFile() {
-        return newFile;
-    }
-
-    /**
-     * @param newFile the newFile to set
-     */
-    public void setNewFile(File newFile) {
-        this.newFile = newFile;
-    }
-    
-    /**
-     * @return the artwork_bytes
-     */
-    public byte[] getArtwork_bytes() {
-        return artwork_bytes;
-    }
-
-    /**
-     * @param artwork_bytes the artwork_bytes to set
-     */
-    public void setArtwork_bytes(byte[] artwork_bytes) {
-        this.artwork_bytes = artwork_bytes;
-    }
-    
-    /**
-     * @return the year
-     */
-    public String getYear() {
-        return year;
-    }
-
-    /**
-     * @param year the year to set
-     */
-    public void setYear(String year) {
-        this.year = year;
-    }
-
-    /**
-     * @return the bitrate
-     */
-    public String getBitrate() {
-        return bitrate;
-    }
-
-    /**
-     * @return the sampleRate
-     */
-    public String getSampleRate() {
-        return sampleRate;
-    }
-
-    /**
-     * @param sampleRate the sampleRate to set
-     */
-    public void setSampleRate(String sampleRate) {
-        this.sampleRate = sampleRate;
-    }
-
-    /**
-     * @return the length
-     */
-    public String getLength() {
-        return length;
-    }
-
-    /**
-     * @param length the length to set
-     */
-    public void setLength(String length) {
-        this.length = length;
-    }
-
-    /**
-     * @return the comment
-     */
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * @param comment the comment to set
-     */
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     @Override
