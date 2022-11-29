@@ -17,6 +17,7 @@ import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
+import com.mpfthprblmtq.moose.services.AutoMoveService;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService;
 import com.mpfthprblmtq.moose.utilities.Constants;
@@ -28,6 +29,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mpfthprblmtq.commons.utils.FileUtils.launchJFileChooser;
 
@@ -40,13 +42,14 @@ public class SongController {
     // services
     public AutoTaggingService autoTaggingService;
     public FilenameFormatterService filenameFormatterService;
+    public AutoMoveService autoMoveService;
 
     // logger object
     Logger logger = Moose.getLogger();
 
     // lists/maps
-    HashMap<Integer, Song> songs = new HashMap<>();     // hashmap to contain Song objects
-    List<Integer> edited_songs = new ArrayList<>();           // arraylist to contain indices of edited songs to save
+    HashMap<Integer, Song> songs = new HashMap<>(); // hashmap to contain Song objects
+    List<Integer> edited_songs = new ArrayList<>(); // arraylist to contain indices of edited songs to save
 
     // ivar to check if user has unsaved changes
     boolean hasUnsavedChanges = false;
@@ -57,6 +60,7 @@ public class SongController {
     public SongController() {
         autoTaggingService = new AutoTaggingService(this);
         filenameFormatterService = new FilenameFormatterService(this);
+        autoMoveService = new AutoMoveService();
     }
 
     /**
@@ -135,6 +139,7 @@ public class SongController {
                 return;
             }
         }
+        s.setIndex(index);
         songs.put(index, s);
     }
 
@@ -249,10 +254,10 @@ public class SongController {
     /**
      * Helper function to set the album artist of the song in the songs list.
      * @param index, the index of the song
-     * @param albumartist, the albumartist to set
+     * @param albumArtist, the albumArtist to set
      */
-    public void setAlbumArtist(int index, String albumartist) {
-        songs.get(index).setAlbumArtist(albumartist);
+    public void setAlbumArtist(int index, String albumArtist) {
+        songs.get(index).setAlbumArtist(albumArtist);
         songEdited(index);
     }
 
@@ -575,6 +580,20 @@ public class SongController {
 
         // actually do the autotagging
         autoTaggingService.autoTag(selectedRows);
+    }
+
+    /**
+     * Method that auto moves files
+     * @param selectedRows the rows selected on the table
+     */
+    public void autoMoveFiles(int[] selectedRows) {
+        // make a list of all the songs to include
+        List<Song> songsToInclude = Arrays.stream(selectedRows)
+                .mapToObj(row -> getSongs().get(getIndex(row)))
+                .collect(Collectors.toList());
+
+        // actually do the automove
+        autoMoveService.autoMove(songsToInclude, selectedRows);
     }
 
     /**

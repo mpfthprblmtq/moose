@@ -55,7 +55,8 @@ public class Constants {
             "LYRICS",
             "MONSTERCAT RELEASE",
             "MONSTERCAT LYRIC VIDEO",
-            "MONSTERCAT OFFICIAL MUSIC VIDEO"
+            "MONSTERCAT OFFICIAL MUSIC VIDEO",
+            "OFFICIAL VISUALIZER"
     };
 
     // menu options
@@ -65,6 +66,7 @@ public class Constants {
     public static final String PLAY = "Play";
     public static final String SAVE = "Save";
     public static final String AUTO_TAG = "Autotag";
+    public static final String AUTO_MOVE = "Auto Move";
     public static final String AUTO_TRACK_DISK_NUMBERS = "Auto-add track/disk numbers";
     public static final String AUTO_ARTWORK = "Auto-add artwork";
     public static final String MOVE_FILE = "Move file(s)";

@@ -38,6 +38,23 @@ public class MP3FileUtils {
     }
 
     /**
+     * Checks to see if the folder contains no mp3 files
+     */
+    public static boolean folderContainsNoMP3Files(File folder) {
+        List<File> files = new ArrayList<>();
+        FileUtils.listFiles(folder, files);
+
+        int mp3Count = 0;
+        for (File file : files) {
+            if (file.getName().endsWith(".mp3")) {
+                mp3Count++;
+            }
+        }
+
+        return mp3Count == 0;
+    }
+
+    /**
      * Gets the total number of tracks in a folder
      *
      * @param dir, the folder to check

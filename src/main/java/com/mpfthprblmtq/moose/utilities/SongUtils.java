@@ -24,10 +24,10 @@ public class SongUtils {
      */
     public static boolean isPartOfALabel(File dir) {
         String path = dir.getPath();
-        return (path.contains("/" + SINGLES + "/") ||
-                path.contains("/" + COMPILATIONS + "/") ||
-                path.contains("/" + LPS + "/") ||
-                path.contains("/" + EPS + "/"));
+        return (path.contains("/" + SINGLES) ||
+                path.contains("/" + COMPILATIONS) ||
+                path.contains("/" + LPS) ||
+                path.contains("/" + EPS));
     }
 
     /**
