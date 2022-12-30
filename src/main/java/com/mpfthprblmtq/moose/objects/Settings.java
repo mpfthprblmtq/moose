@@ -43,8 +43,7 @@ public class Settings {
     public static final String AUTO_FIND_COVER_ART_WITH_SPOTIFY = "autoFindCoverArtWithSpotify";
     public static final String CHECK_FOR_NEW_GENRES = "checkForNewGenres";
     public static final String FORMAT_FILENAMES = "formatFilenames";
-    public static final String AUTOMOVE = "autoMove";
-    
+
     /**
      * Creates a default settings object
      */
@@ -68,7 +67,6 @@ public class Settings {
         getFeatures().put(AUTO_FIND_COVER_ART_WITH_SPOTIFY, true);
         getFeatures().put(CHECK_FOR_NEW_GENRES, true);
         getFeatures().put(FORMAT_FILENAMES, true);
-        getFeatures().put(AUTOMOVE, true);
         setSpotifyArtists(new HashMap<>());
 
         // set the support location since we always know where that'll be

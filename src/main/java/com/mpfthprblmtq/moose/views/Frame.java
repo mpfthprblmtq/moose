@@ -200,9 +200,6 @@ public class Frame extends javax.swing.JFrame {
                 case AUTO_TAG:
                     autoTag(selectedRows);
                     break;
-                case AUTO_MOVE:
-                    autoMove(selectedRows);
-                    break;
                 case AUTO_TRACK_DISK_NUMBERS:
                     songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
                     updateMultiplePanelFields();
@@ -1325,18 +1322,6 @@ public class Frame extends javax.swing.JFrame {
             table.getCellEditor().stopCellEditing();
         }
         songController.autoTagFiles(selectedRows);
-        updateMultiplePanelFields();
-    }
-
-    /**
-     * Actually does the auto move call
-     * @param selectedRows, the rows to auto move
-     */
-    public void autoMove(int[] selectedRows) {
-        if (table.isEditing()) {
-            table.getCellEditor().stopCellEditing();
-        }
-        songController.autoMoveFiles(selectedRows);
         updateMultiplePanelFields();
     }
 
