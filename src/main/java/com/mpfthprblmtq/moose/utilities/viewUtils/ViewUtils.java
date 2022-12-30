@@ -261,26 +261,36 @@ public class ViewUtils {
         if (base) {
             popup.add(item = new JMenuItem(MORE_INFO));
             item.addActionListener(menuListener);
+
             popup.addSeparator();
+
             popup.add(item = new JMenuItem(REMOVE_FROM_LIST));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(PLAY));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(SAVE));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(SHOW_IN_FINDER));
             item.addActionListener(menuListener);
+
             popup.addSeparator();
+
             popup.add(item = new JMenuItem(AUTO_TAG));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING));
+
             popup.add(item = new JMenuItem(FORMAT_FILENAME));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
+
             popup.add(item = new JMenuItem(AUTO_TRACK_DISK_NUMBERS));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(AUTO_ARTWORK));
             item.addActionListener(menuListener);
         }
@@ -291,13 +301,16 @@ public class ViewUtils {
         }
         if (artwork) {
             popup.addSeparator();
+
             popup.add(item = new JMenuItem(ADD_ARTWORK));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(REMOVE_ARTWORK));
             item.addActionListener(menuListener);
         } else if (artworkMultPanel) {
             popup.add(item = new JMenuItem(ADD_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
+
             popup.add(item = new JMenuItem(REMOVE_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
         }

@@ -43,7 +43,7 @@ public class Settings {
     public static final String AUTO_FIND_COVER_ART_WITH_SPOTIFY = "autoFindCoverArtWithSpotify";
     public static final String CHECK_FOR_NEW_GENRES = "checkForNewGenres";
     public static final String FORMAT_FILENAMES = "formatFilenames";
-    
+
     /**
      * Creates a default settings object
      */
