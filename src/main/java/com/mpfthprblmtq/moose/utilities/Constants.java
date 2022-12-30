@@ -55,7 +55,8 @@ public class Constants {
             "LYRICS",
             "MONSTERCAT RELEASE",
             "MONSTERCAT LYRIC VIDEO",
-            "MONSTERCAT OFFICIAL MUSIC VIDEO"
+            "MONSTERCAT OFFICIAL MUSIC VIDEO",
+            "OFFICIAL VISUALIZER"
     };
 
     // menu options

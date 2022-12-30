@@ -90,7 +90,7 @@ public class AutoTaggingService {
             String genre = StringUtils.isEmpty(s.getGenre()) ? getGenreFromFile(file) : s.getGenre();
 
             // get the index for the setters
-            int index = getIndex(row);
+            int index = s.getIndex();
 
             // title
             Moose.frame.songController.setTitle(index, title);
@@ -161,7 +161,8 @@ public class AutoTaggingService {
         // if we can't find the cover art automatically, add the rows to a list so that we can reprocess them later
         // using the album art finder
         for (int selectedRow : selectedRows) {
-            File dir = getFile(selectedRow).getParentFile();
+            Song s = songController.getSongs().get(getIndex(selectedRow));
+            File dir = s.getNewFile() != null ? s.getNewFile().getParentFile() : s.getFile().getParentFile();
             File cover = folderContainsCover(dir);
             // if we have a cover add it, else add the row to the rowsToReprocess list
             if (cover != null) {
@@ -428,12 +429,16 @@ public class AutoTaggingService {
         if (ImageUtils.checkIfSame(bytesList.get(0), bytesList.toArray(new byte[0][]))) {
             byte[] bytes = bytesList.get(0);
             BufferedImage image = ImageUtils.getBufferedImageFromBytes(bytes);
-            if (image != null) {
-                return ImageUtils.createImageFile(image, folder, image.getHeight());
+            // check if it meets the size requirement first (both size wise, and dimension wise, shouldn't take a cover
+            // with differing height and width
+            if (image != null && image.getHeight() >= Moose.getSettings().getPreferredCoverArtSize() && image.getWidth() >= Moose.getSettings().getPreferredCoverArtSize()) {
+                if (image.getWidth() == image.getHeight()) {
+                    return ImageUtils.createImageFile(image, folder, image.getHeight());
+                }
             }
         }
 
-        // if we reach this point, no image files exist in that directory
+        // if we reach this point, no valid image files exist in that directory
         // perform one final check and recursively call itself
         if (folder.getParentFile().getName().matches(ALBUM_FOLDER_REGEX)) {
             return folderContainsCover(folder.getParentFile());

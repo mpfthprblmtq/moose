@@ -60,7 +60,7 @@ public class Frame extends javax.swing.JFrame {
     int currentColumn;  // keeps track of the current column
 
     // table model used, with some customizations and overrides
-    DefaultTableModel model = ViewUtils.getTableModel();
+//    DefaultTableModel model = ViewUtils.getTableModel();
 
     // ivars for the multPanel to check if the artwork has changed in the multPanel
     byte[] originalMultPanelArtwork;
@@ -140,13 +140,17 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
+    public DefaultTableModel getModel() {
+        return (DefaultTableModel) table.getModel();
+    }
+
     /**
      * More init stuff
      */
     public void init() {
 
         // set the table's model to the custom model
-        table.setModel(model);
+        table.setModel(ViewUtils.getTableModel());
 
         // set the songController's table
         songController.setTable(table);
@@ -229,19 +233,19 @@ public class Frame extends javax.swing.JFrame {
         }; // end menuListener
 
         // create the columns
-        model.addColumn("");
-        model.addColumn("File");
-        model.addColumn("Filename");
-        model.addColumn("Title");
-        model.addColumn("Artist");
-        model.addColumn("Album");
-        model.addColumn("Album Artist");
-        model.addColumn("Year");
-        model.addColumn("Genre");
-        model.addColumn("Track");
-        model.addColumn("Disk");
-        model.addColumn("Artwork");
-        model.addColumn("I");
+        getModel().addColumn("");
+        getModel().addColumn("File");
+        getModel().addColumn("Filename");
+        getModel().addColumn("Title");
+        getModel().addColumn("Artist");
+        getModel().addColumn("Album");
+        getModel().addColumn("Album Artist");
+        getModel().addColumn("Year");
+        getModel().addColumn("Genre");
+        getModel().addColumn("Track");
+        getModel().addColumn("Disk");
+        getModel().addColumn("Artwork");
+        getModel().addColumn("I");
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
@@ -360,7 +364,7 @@ public class Frame extends javax.swing.JFrame {
         // traverse the array of selectedRows and delete them
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int row = table.convertRowIndexToModel(selectedRows[i]);    // get the row
-            model.removeRow(row);
+            getModel().removeRow(row);
         }
         // update some graphics
         enableMultPanel(false);
@@ -419,7 +423,7 @@ public class Frame extends javax.swing.JFrame {
         Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
 
         // add the row to the table
-        model.addRow(new Object[]{
+        getModel().addRow(new Object[]{
                 IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
                 s.getFile(), // hidden file object
                 cleanedFileName, // actual editable file name
@@ -648,7 +652,7 @@ public class Frame extends javax.swing.JFrame {
         });
 
         table.setAutoCreateRowSorter(true);
-        table.setModel(model);
+        table.setModel(getModel());
         table.setRequestFocusEnabled(false);
         table.setRowHeight(20);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -1520,16 +1524,18 @@ public class Frame extends javax.swing.JFrame {
         } else {
             clearAll();
         }
-        Moose.songController = new SongController();
     }//GEN-LAST:event_clearAllButtonActionPerformed
 
     /**
      * Clears the table and all songs, basically resets everything
      */
     public void clearAll() {
-        model.setRowCount(0);
-        table.removeAll();
-        songController.getSongs().clear();
+        // create a new song controller so we can start from scratch
+        Moose.songController = new SongController();
+        this.songController = Moose.getSongController();
+
+        // re init
+        init();
         enableMultPanel(false);
         setActionsEnabled(false);
     }
@@ -2106,7 +2112,7 @@ public class Frame extends javax.swing.JFrame {
     public void showInFolder(int[] selectedRows) {
         List<File> folders = new ArrayList<>();
         for (int row : selectedRows) {
-            File file = (File) model.getValueAt(table.convertRowIndexToModel(row), 1);
+            File file = (File) getModel().getValueAt(table.convertRowIndexToModel(row), 1);
             if (!folders.contains(file)) {
                 folders.add(file);
             }
