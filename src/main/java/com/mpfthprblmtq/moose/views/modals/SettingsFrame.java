@@ -55,7 +55,6 @@ public class SettingsFrame extends javax.swing.JFrame {
     boolean checkForNewGenresEdited = false;
     boolean albumArtFinderEdited = false;
     boolean formatFilenamesEdited = false;
-    boolean autoMoveEdited = false;
     int genresDeleted = 0;
 
     // some html constants
@@ -148,7 +147,6 @@ public class SettingsFrame extends javax.swing.JFrame {
         genreCheckBox = new javax.swing.JCheckBox();
         autoTaggingCheckBox = new javax.swing.JCheckBox();
         albumArtFinderCheckBox = new javax.swing.JCheckBox();
-        autoMoveCheckBox = new javax.swing.JCheckBox();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         formatFilenamesCheckBox = new javax.swing.JCheckBox();
@@ -671,14 +669,6 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
-        autoMoveCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.AUTOMOVE));
-        autoMoveCheckBox.setText("Auto Move");
-        autoMoveCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                autoMoveCheckBoxActionPerformed(evt);
-            }
-        });
-
         jLabel2.setText("Other:");
 
         formatFilenamesCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
@@ -706,8 +696,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addComponent(formatFilenamesCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(featuresPanelLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(autoMoveCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         featuresPanelLayout.setVerticalGroup(
@@ -723,9 +712,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addComponent(autoCoverArtSpotifyCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(formatFilenamesCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(autoMoveCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
@@ -733,7 +720,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addComponent(genreCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(albumArtFinderCheckBox)
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Features", featuresPanel);
@@ -1064,17 +1051,6 @@ public class SettingsFrame extends javax.swing.JFrame {
         statusLabel.setText(StringUtils.EMPTY);
     }//GEN-LAST:event_formatFilenamesCheckBoxActionPerformed
 
-    private void autoMoveCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoMoveCheckBoxActionPerformed
-        if (!autoMoveEdited) {
-            autoMoveCheckBox.setForeground(Constants.GREEN);
-        } else {
-            autoMoveCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.AUTOMOVE, autoMoveCheckBox.isSelected());
-        autoMoveEdited = !autoMoveEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_autoMoveCheckBoxActionPerformed
-
     private void genreCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genreCheckBoxActionPerformed
         if (!checkForNewGenresEdited) {
             genreCheckBox.setForeground(Constants.GREEN);
@@ -1374,7 +1350,6 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JPanel apiPanel;
     private javax.swing.JButton appSupportOpenButton;
     private javax.swing.JCheckBox autoCoverArtSpotifyCheckBox;
-    private javax.swing.JCheckBox autoMoveCheckBox;
     private javax.swing.JCheckBox autoTaggingCheckBox;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton clearErrorLogButton;

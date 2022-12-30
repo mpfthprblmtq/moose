@@ -17,7 +17,6 @@ import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
-import com.mpfthprblmtq.moose.services.AutoMoveService;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService;
 import com.mpfthprblmtq.moose.utilities.Constants;
@@ -42,7 +41,6 @@ public class SongController {
     // services
     public AutoTaggingService autoTaggingService;
     public FilenameFormatterService filenameFormatterService;
-    public AutoMoveService autoMoveService;
 
     // logger object
     Logger logger = Moose.getLogger();
@@ -60,7 +58,6 @@ public class SongController {
     public SongController() {
         autoTaggingService = new AutoTaggingService(this);
         filenameFormatterService = new FilenameFormatterService(this);
-        autoMoveService = new AutoMoveService();
     }
 
     /**
@@ -580,20 +577,6 @@ public class SongController {
 
         // actually do the autotagging
         autoTaggingService.autoTag(selectedRows);
-    }
-
-    /**
-     * Method that auto moves files
-     * @param selectedRows the rows selected on the table
-     */
-    public void autoMoveFiles(int[] selectedRows) {
-        // make a list of all the songs to include
-        List<Song> songsToInclude = Arrays.stream(selectedRows)
-                .mapToObj(row -> getSongs().get(getIndex(row)))
-                .collect(Collectors.toList());
-
-        // actually do the automove
-        autoMoveService.autoMove(songsToInclude, selectedRows);
     }
 
     /**

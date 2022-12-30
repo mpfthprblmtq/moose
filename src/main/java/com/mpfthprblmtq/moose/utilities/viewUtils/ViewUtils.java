@@ -288,11 +288,6 @@ public class ViewUtils {
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
 
-            popup.add(item = new JMenuItem(AUTO_MOVE));
-            item.addActionListener(menuListener);
-            // only enable it if the feature is enabled
-            item.setEnabled(Moose.getSettings().getFeatures().get(Settings.AUTOMOVE));
-
             popup.add(item = new JMenuItem(AUTO_TRACK_DISK_NUMBERS));
             item.addActionListener(menuListener);
 
