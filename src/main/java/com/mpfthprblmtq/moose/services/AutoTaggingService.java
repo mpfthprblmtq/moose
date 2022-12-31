@@ -3,7 +3,7 @@
    File:   AutoTaggingService.java
    Desc:   Service class for auto tagging
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

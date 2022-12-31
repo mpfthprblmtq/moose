@@ -132,7 +132,7 @@ public class AuditController {
 
         // get the most up to date frame and song controller since the frame updates on each album
         this.frame = Moose.getFrame();
-        this.songController = Moose.getFrame().getSongController();
+        this.songController = Moose.getSongController();
 
         // update the table in the songController
         songController.setTable(frame.table);

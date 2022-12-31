@@ -4,7 +4,7 @@
    Desc:   Service class for autocomplete
 
    Copyright Samuel Sjoberg
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

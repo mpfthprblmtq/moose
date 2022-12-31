@@ -3,7 +3,7 @@
    File:   AlbumArtFinderService.java
    Desc:   Service class for the album art finder
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

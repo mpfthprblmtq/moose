@@ -3,7 +3,7 @@
    File:   Settings.java
    Desc:   Pojo for the Settings information
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

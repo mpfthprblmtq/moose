@@ -3,7 +3,7 @@
    File:   InfoFrame.java
    Desc:   Main UI class for the JFrame containing the song info.
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package
@@ -825,7 +825,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Moose.frame.next(this.editModeEnabled, lastEditedField);
+        Moose.frame.nextFromInfoFrame(this.editModeEnabled, lastEditedField);
     }
     
     /**
@@ -837,7 +837,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Moose.frame.previous(this.editModeEnabled, lastEditedField);
+        Moose.frame.previousFromInfoFrame(this.editModeEnabled, lastEditedField);
     }
 
     /**

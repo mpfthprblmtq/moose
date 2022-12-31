@@ -3,7 +3,7 @@
    File:   ImageSearchQuery.java
    Desc:   Pojo for a bundle of search information to provide to the Album Art Finder service
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

@@ -4,16 +4,13 @@
    Desc:   Main UI class for the JFrame containing the everything.
            Works with the SongController to edit albums, this class just handles all the UI.
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package
 package com.mpfthprblmtq.moose.views;
 
 // imports
-
-import java.awt.*;
-
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
@@ -29,18 +26,28 @@ import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.*;
 import com.mpfthprblmtq.moose.views.modals.InfoFrame;
 
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
@@ -107,7 +114,7 @@ public class Frame extends javax.swing.JFrame {
                 enableMultPanel(true);
                 updateMultiplePanelFields();
                 if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
-                    checkForNewGenres(files);
+                    songController.checkForNewGenres(files);
                 }
             }
         } else {
@@ -127,7 +134,7 @@ public class Frame extends javax.swing.JFrame {
                     enableMultPanel(true);
                     updateMultiplePanelFields();
                     if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
-                        checkForNewGenres(files);
+                        songController.checkForNewGenres(files);
                     }
                 }
             });
@@ -139,12 +146,50 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Custom init stuff
+     * Custom init stuff, but that's not a good enough description, so here's what it does pretty much:
+     *  - Sets up the table with a custom model, then creates the columns dynamically
+     *  - Adds a mouse click listener to determine how the UI needs to react
+     *  - Adds a window listener to prevent you from closing the window with unsaved changes
+     *  - Sets up the menu listener for context menu item actions based on the text selected
+     *  - Adds a custom cell editor and table cell listener
+     *  - Sets up the FileDrop configuration
      */
     public void init() {
 
         // set the table's model to the custom model
         table.setModel(ViewUtils.getTableModel());
+
+        // create the columns
+        getModel().addColumn("");
+        getModel().addColumn("File");
+        getModel().addColumn("Filename");
+        getModel().addColumn("Title");
+        getModel().addColumn("Artist");
+        getModel().addColumn("Album");
+        getModel().addColumn("Album Artist");
+        getModel().addColumn("Year");
+        getModel().addColumn("Genre");
+        getModel().addColumn("Track");
+        getModel().addColumn("Disk");
+        getModel().addColumn("Artwork");
+        getModel().addColumn("I");
+
+        // remove the File and Index columns
+        table.removeColumn(table.getColumnModel().getColumn(1));
+        table.removeColumn(table.getColumnModel().getColumn(11));
+
+        // set the widths of the columns
+        // file name and title are left out, so they can take the remainder of the space dynamically
+        ViewUtils.setColumnWidth(table, 0, 12);     // row icon
+        ViewUtils.setColumnWidth(table, 3, 150);    // artist
+        ViewUtils.setColumnWidth(table, 4, 150);    // album
+        ViewUtils.setColumnWidth(table, 5, 150);    // album artist
+        ViewUtils.setColumnWidth(table, 6, 80);     // year
+        ViewUtils.setColumnWidth(table, 7, 150);    // genre
+        ViewUtils.setColumnWidth(table, 8, 50);     // track
+        ViewUtils.setColumnWidth(table, 9, 50);     // disk
+        ViewUtils.setColumnWidth(table, 10, 100);   // album art
+//        ViewUtils.setColumnWidth(table, 11, 20);    // index
 
         // set the songController's table
         songController.setTable(table);
@@ -228,37 +273,16 @@ public class Frame extends javax.swing.JFrame {
             }
         }; // end menuListener
 
-        // create the columns
-        getModel().addColumn("");
-        getModel().addColumn("File");
-        getModel().addColumn("Filename");
-        getModel().addColumn("Title");
-        getModel().addColumn("Artist");
-        getModel().addColumn("Album");
-        getModel().addColumn("Album Artist");
-        getModel().addColumn("Year");
-        getModel().addColumn("Genre");
-        getModel().addColumn("Track");
-        getModel().addColumn("Disk");
-        getModel().addColumn("Artwork");
-        getModel().addColumn("I");
+        // create a customized cell editor
+        DefaultCellEditor editor = ViewUtils.getCellEditor();
+        table.setCellEditor(editor);
 
-        // remove the File and Index columns
-        table.removeColumn(table.getColumnModel().getColumn(1));
-        table.removeColumn(table.getColumnModel().getColumn(11));
-
-        // set the widths of the columns
-        // file name and title are left out, so they can take the remainder of the space dynamically
-        ViewUtils.setColumnWidth(table, 0, 12);     // row icon
-        ViewUtils.setColumnWidth(table, 3, 150);    // artist
-        ViewUtils.setColumnWidth(table, 4, 150);    // album
-        ViewUtils.setColumnWidth(table, 5, 150);    // album artist
-        ViewUtils.setColumnWidth(table, 6, 80);     // year
-        ViewUtils.setColumnWidth(table, 7, 150);    // genre
-        ViewUtils.setColumnWidth(table, 8, 50);     // track
-        ViewUtils.setColumnWidth(table, 9, 50);     // disk
-        ViewUtils.setColumnWidth(table, 10, 100);   // album art
-//        ViewUtils.setColumnWidth(table, 11, 20);    // index
+        // create a table cell listener
+        TableCellListener tcl = ViewUtils.createTCL(table, songController);
+        if (tcl.getTable() == null) {
+            // this line is really just to get rid of the "unused var" warning
+            logger.logError("TCL table is null!");
+        }
 
         // manually set the name so we can use it later
         multImage.setName("multImage");
@@ -287,76 +311,13 @@ public class Frame extends javax.swing.JFrame {
 
             // check for new genres
             if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
-                checkForNewGenres(successfullyAddedFiles);
+                songController.checkForNewGenres(successfullyAddedFiles);
             }
         });
-
-        // create a customized cell editor
-        DefaultCellEditor editor = ViewUtils.getCellEditor();
-        table.setCellEditor(editor);
-
-        // create a table cell listener
-        TableCellListener tcl = ViewUtils.createTCL(table, songController);
-        if (tcl.getTable() == null) {
-            // this line is really just to get rid of the "unused var" warning
-            logger.logError("TCL table is null!");
-        }
-    }
-
-    /**
-     * Returns the song controller
-     *
-     * @return the song controller
-     */
-    public SongController getSongController() {
-        return this.songController;
-    }
-
-    /**
-     * Scans all the files and the mp3tags with them and checks to make sure we
-     * know the genre
-     *
-     * @param list, the list of either Songs or Files to check
-     */
-    public void checkForNewGenres(List<?> list) {
-
-        List<Song> songs = new ArrayList<>();
-
-        // if the list given is a list of files, get the songs from those files first
-        if (!list.isEmpty() && list.get(0) instanceof File) {
-            for (Object file : list) {
-                songs.add(songController.getSongFromFile((File) file));
-            }
-        } else {
-            for (Object song : list) {
-                songs.add((Song) song);
-            }
-        }
-
-        // get all the songs, then the genres from the list of files
-        List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
-
-        // create a list of all the genres that don't exist already
-        List<String> newGenres = new ArrayList<>();
-        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre))).forEachOrdered((genre) -> {
-            if (!newGenres.contains(genre)) {
-                newGenres.add(genre);
-            }
-        });
-
-        // for each new genre, ask if we want to add that one
-        for (String newGenre : newGenres) {
-            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
-            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
-                Moose.getSettings().getGenres().add(newGenre);
-                Moose.updateSettings();
-            }
-        }
     }
 
     /**
      * Removes the rows from the table
-     *
      * @param selectedRows the rows to remove
      */
     public void removeRows(int[] selectedRows) {
@@ -367,15 +328,13 @@ public class Frame extends javax.swing.JFrame {
         }
         // update some graphics
         enableMultPanel(false);
-
         setActionsEnabled(table.getRowCount() > 0);
     }
 
     /**
      * Helper function to set the row icon based on the action of the row.
-     *
-     * @param icon, the icon to set
-     * @param row,  the row to set
+     * @param icon the icon to set
+     * @param row the row to set
      */
     public void setRowIcon(int icon, int row) {
         switch (icon) {
@@ -392,63 +351,11 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Adds the file and all of its pertinent information to the table as a row
-     * Works with the fileDrop functionality
-     *
-     * @param file, the file to add
-     * @return the result of the file add
-     */
-    public boolean addFileToTable(File file) {
-
-        // check to make sure we're not adding duplicate files
-        List<File> filesInTable = songController.getAllFilesInTable();
-        if (filesInTable.contains(file)) {
-            return false;
-        }
-
-        // check if the file is an mp3
-        if (!file.getAbsolutePath().endsWith(".mp3")) {
-            return false;
-        }
-
-        String cleanedFileName = file.getName()
-                .replace(".mp3", StringUtils.EMPTY)
-                .replace(":", "/");
-
-        int index = songController.getSongs().size();
-        Song s = songController.getSongFromFile(file);
-
-        // getting the image to put on the table
-        Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
-
-        // add the row to the table
-        getModel().addRow(new Object[]{
-                IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
-                s.getFile(), // hidden file object
-                cleanedFileName, // actual editable file name
-                s.getTitle(),
-                s.getArtist(),
-                s.getAlbum(),
-                s.getAlbumArtist(),
-                s.getYear(),
-                s.getGenre(),
-                s.getFullTrackString(),
-                s.getFullDiskString(),
-                thumbnail_icon,
-                index // hidden index for the song object
-        });
-
-        // all is well in the world
-        return true;
-    }
-
-    /**
      * Helper function to update the UI's console, just appends a string
-     *
-     * @param s, the string to append
+     * @param s the string to append
      */
     public void updateConsole(String s) {
-        console.append(s + "\n");
+        console.append(s + StringUtils.NEW_LINE);
     }
 
     /**
@@ -460,9 +367,9 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Function used to import files to the table
-     *
-     * @param files, the files to import
+     * Function used to import files to the table. Skips hidden files (.*), duplicate files, etc. Then it updates the
+     * console based on the results. Another example of a method that just "works" so best not touch it.
+     * @param files the files to import
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List<File> importFiles(List<File> files) {
@@ -546,6 +453,55 @@ public class Frame extends javax.swing.JFrame {
 
         // return the list of successfully added files
         return files;
+    }
+
+    /**
+     * Adds the file and all of its pertinent information to the table as a row. Works with the fileDrop functionality.
+     * @param file the file to add
+     * @return the result of the file add, false if the file is a duplicate or not an mp3, true if all is good
+     */
+    public boolean addFileToTable(File file) {
+
+        // check to make sure we're not adding duplicate files
+        List<File> filesInTable = songController.getAllFilesInTable();
+        if (filesInTable.contains(file)) {
+            return false;
+        }
+
+        // check if the file is an mp3
+        if (!file.getAbsolutePath().endsWith(".mp3")) {
+            return false;
+        }
+
+        String cleanedFileName = file.getName()
+                .replace(".mp3", StringUtils.EMPTY)
+                .replace(":", "/");
+
+        int index = songController.getSongs().size();
+        Song s = songController.getSongFromFile(file);
+
+        // getting the image to put on the table
+        Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
+
+        // add the row to the table
+        getModel().addRow(new Object[]{
+                IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
+                s.getFile(), // hidden file object
+                cleanedFileName, // actual editable file name
+                s.getTitle(),
+                s.getArtist(),
+                s.getAlbum(),
+                s.getAlbumArtist(),
+                s.getYear(),
+                s.getGenre(),
+                s.getFullTrackString(),
+                s.getFullDiskString(),
+                thumbnail_icon,
+                index // hidden index for the song object
+        });
+
+        // all is well in the world
+        return true;
     }
 
     /**
@@ -1196,11 +1152,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the open menu item, opens a JFileChooser for the user to select a directory to open
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
-
         File[] dirs = FileUtils.launchJFileChooser(
                 "Select a folder to open...",
                 "Open",
@@ -1227,7 +1181,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the save track menu item, saves all selected rows
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
@@ -1241,7 +1194,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the save all menu item, saves all rows in the table
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void saveAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllMenuItemActionPerformed
@@ -1250,7 +1202,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the exit menu item
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
@@ -1272,7 +1223,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the select all menu item, selects all the rows on the table
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:selectAllMenuItemActionPerformed
@@ -1291,7 +1241,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Audit menu item, launches the audit frame
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void auditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditMenuItemActionPerformed
@@ -1300,7 +1249,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Autotag menu item, auto tags the selected rows
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void autoTagMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTagMenuItemActionPerformed
@@ -1313,7 +1261,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Actually does the auto tag call
-     *
      * @param selectedRows, the rows to auto tag
      */
     public void autoTag(int[] selectedRows) {
@@ -1326,7 +1273,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Add Covers menu item, auto adds the covers
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void addCoversMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCoversMenuItemActionPerformed
@@ -1348,7 +1294,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Find and Replace menu item, opens the Find and Replace dialog
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void findAndReplaceMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findAndReplaceMenuItemActionPerformed
@@ -1388,7 +1333,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Add Track/Disk numbers menu item, auto adds the track numbers and disk numbers
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
@@ -1402,7 +1346,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Format Filenames menu item, formats the filenames
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
@@ -1423,7 +1366,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the About menu item, opens the about dialog
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
@@ -1432,7 +1374,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Wiki menu item, opens the wiki page
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
@@ -1445,11 +1386,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Command Prompt menu item, opens a command prompt dialog
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void commandMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commandMenuItemActionPerformed
-        // prompt the user to enter a command
         String command = JOptionPane.showInputDialog(this, "Enter a command:");
         if (command != null) {
             doCommand(command);
@@ -1458,7 +1397,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Performs a command based on the user input
-     *
      * @param command, the command to execute
      */
     public void doCommand(String command) {
@@ -1482,10 +1420,13 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Action for the Settings menu item, launches the SettingsFrame
+     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     */
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
         Moose.launchSettingsFrame();
     }//GEN-LAST:event_settingsMenuItemActionPerformed
-
     // </editor-fold>
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1497,7 +1438,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Save All button press, saves all tracks currently on the table
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void saveAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllButtonActionPerformed
@@ -1506,7 +1446,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Clear All button, shows a dialog if the user has the isAskBeforeClearAll setting enabled
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
@@ -1529,11 +1468,11 @@ public class Frame extends javax.swing.JFrame {
      * Clears the table and all songs, basically resets everything
      */
     public void clearAll() {
-        // create a new song controller so we can start from scratch
+        // create a new song controller, so we can start from scratch
         Moose.songController = new SongController();
         this.songController = Moose.getSongController();
 
-        // re init
+        // re-init everything
         init();
         enableMultPanel(false);
         setActionsEnabled(false);
@@ -1541,7 +1480,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Open All button press, opens all the tracks currently on the table
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
@@ -1555,7 +1493,6 @@ public class Frame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_openAllButtonActionPerformed
-
     // </editor-fold>
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1567,11 +1504,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * What happens if we click on the table
-     *
-     * @param evt, the MouseEvent we use to determine what to do (left, right, scroll/middle click)
+     * @param evt the MouseEvent we will use to determine what to do (left, right, scroll/middle click)
      */
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
-
         int row = table.rowAtPoint(evt.getPoint());
         int col = table.columnAtPoint(evt.getPoint());
         int rows = table.getSelectedRowCount();
@@ -1583,6 +1518,7 @@ public class Frame extends javax.swing.JFrame {
             // if it's a right click, show context menu
             case java.awt.event.MouseEvent.BUTTON3:
                 if (row >= 0 && col >= 0) {
+                    // clicked in the table, now we determine which menu to show based on the column
                     switch (col) {
                         case 10:
                             ViewUtils.showPopUpContextMenu(
@@ -1604,12 +1540,13 @@ public class Frame extends javax.swing.JFrame {
 
             // if it's a left click
             case java.awt.event.MouseEvent.BUTTON1:
-
                 // check if double click
                 if (evt.getClickCount() == 2) {
+                    // if on column 10, show the artwork context menu
                     if (col == 10) {
                         ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), true, false, true, false, null);
                     } else {
+                        // editable field, let's edit it
                         currentRow = row;
                         currentColumn = col;
                         table.getEditorComponent().requestFocusInWindow();
@@ -1642,8 +1579,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * What happens when we're editing a cell and press a key, mainly used for Enter/Tab navigation
-     *
-     * @param evt, the KeyEvent we use to determine where to go
+     * @param evt, the KeyEvent we will use to determine where to go
      */
     private void tableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_META) {
@@ -1653,6 +1589,11 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tableKeyReleased
 
+    /**
+     * What happens if key is pressed in the table, specifically if Meta (Mac) is held down or pressed.
+     * We need to ignore this
+     * @param evt the event the check
+     */
     private void tableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_META || evt.isMetaDown()) {
             evt.consume();
@@ -1662,8 +1603,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Function that selects the cell being edited. Used mainly when pressing tab or enter to navigate.
      * This is one of those methods that just works, and it's best not to mess with it.
-     *
-     * @param evt, the KeyEvent that we use to determine the type of navigation (Enter, Tab, Shift+Enter, Shift+Tab)
+     * @param evt, the KeyEvent that we will use to determine the type of navigation (Enter, Tab, Shift+Enter, Shift+Tab)
      */
     public void changeSelection(KeyEvent evt) {
 
@@ -1719,7 +1659,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Actually edits the cell using the currentRow and currentColumn ivars
+     * Actually edits the cell using the currentRow and currentColumn field variables
      */
     private void editCell() {
         // edit that cell
@@ -1731,10 +1671,9 @@ public class Frame extends javax.swing.JFrame {
         // set the view to the row we're editing
         table.scrollRectToVisible(table.getCellRect(table.getEditingRow(), table.getEditingColumn(), false));
 
-        // TODO make this better
+        // update the mult panel with the previous changes
         updateMultiplePanelFields();
     }
-
     // </editor-fold>
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1746,7 +1685,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * What happens when the multPanel update button is clicked
-     *
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
     private void multUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multUpdateButtonActionPerformed
@@ -1759,7 +1697,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Opens the context menu for album art on clicking on the multImage box
-     *
      * @param evt, the mouse event, used to get the x,y of the click
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
@@ -1770,7 +1707,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multTitleKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTitleKeyPressed
@@ -1781,7 +1717,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multArtistKeyPressed
@@ -1792,7 +1727,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multAlbumKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumKeyPressed
@@ -1803,7 +1737,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multAlbumArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumArtistKeyPressed
@@ -1814,7 +1747,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multGenreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multGenreKeyPressed
@@ -1825,7 +1757,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multYearKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multYearKeyPressed
@@ -1836,7 +1767,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multTrackKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTrackKeyPressed
@@ -1847,7 +1777,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     *
      * @param evt, the KeyEvent to check against
      */
     private void multDiskKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multDiskKeyPressed
@@ -1858,7 +1787,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, select all text
-     *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multTitleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTitleFocusGained
@@ -1866,8 +1794,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multTitleFocusGained
 
     /**
-     * On focus gain, update auto complete fields and select all
-     *
+     * On focus gain, update auto complete fields and select all text
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multArtistFocusGained
@@ -1876,8 +1803,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multArtistFocusGained
 
     /**
-     * On focus gain, update auto complete fields and select all
-     *
+     * On focus gain, update auto complete fields and select all text
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multAlbumFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumFocusGained
@@ -1886,8 +1812,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multAlbumFocusGained
 
     /**
-     * On focus gain, update auto complete fields and select all
-     *
+     * On focus gain, update auto complete fields and select all text
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multAlbumArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumArtistFocusGained
@@ -1896,8 +1821,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multAlbumArtistFocusGained
 
     /**
-     * On focus gain, update auto complete fields and select all
-     *
+     * On focus gain, update auto complete fields and select all text
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multGenreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multGenreFocusGained
@@ -1906,8 +1830,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_multGenreFocusGained
 
     /**
-     * On focus gain, update auto complete fields and select all
-     *
+     * On focus gain, update auto complete fields and select all text
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multYearFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multYearFocusGained
@@ -1917,7 +1840,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, select all text
-     *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
@@ -1926,7 +1848,6 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, select all text
-     *
      * @param evt, the FocusEvent (not used, but here because Netbeans)
      */
     private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
@@ -1947,7 +1868,7 @@ public class Frame extends javax.swing.JFrame {
             selectedRows = table.getSelectedRows();
             rows = table.getSelectedRowCount();
         } else {
-            clearOutMultPanel();
+            enableMultPanel(false);
             return;
         }
 
@@ -1999,24 +1920,23 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Clears out the multPanel
-     */
-    private void clearOutMultPanel() {
-        multTitle.setText(StringUtils.EMPTY);
-        multArtist.setText(StringUtils.EMPTY);
-        multAlbum.setText(StringUtils.EMPTY);
-        multAlbumArtist.setText(StringUtils.EMPTY);
-        multGenre.setText(StringUtils.EMPTY);
-        multYear.setText(StringUtils.EMPTY);
-        multTrack.setText(StringUtils.EMPTY);
-        multDisk.setText(StringUtils.EMPTY);
-        multImage.setIcon(null);
-    }
+//    /**   DEPRECATED
+//     * Clears out the multPanel
+//     */
+//    private void clearOutMultPanel() {
+//        multTitle.setText(StringUtils.EMPTY);
+//        multArtist.setText(StringUtils.EMPTY);
+//        multAlbum.setText(StringUtils.EMPTY);
+//        multAlbumArtist.setText(StringUtils.EMPTY);
+//        multGenre.setText(StringUtils.EMPTY);
+//        multYear.setText(StringUtils.EMPTY);
+//        multTrack.setText(StringUtils.EMPTY);
+//        multDisk.setText(StringUtils.EMPTY);
+//        multImage.setIcon(null);
+//    }
 
     /**
      * Updates the table from the mult panel fields
-     *
      * @param selectedRows, the selected rows on the table
      */
     public void updateTableFromMultPanelFields(int[] selectedRows) {
@@ -2065,113 +1985,9 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Gets the album art for the mult panel
-     *
-     * @param selectedRows, the selected rows on the table
-     */
-    public void getCoverArtForMultPanel(int[] selectedRows) {
-        int index = songController.getIndex(selectedRows[0]);
-        File startingPoint = songController.getSongs().get(index).getFile();
-        File image = ImageUtils.selectAlbumArt(startingPoint);
-        if (image != null) {
-            try {
-                BufferedImage bi = ImageIO.read(image);
-                newMultPanelArtwork = ImageUtils.getBytesFromBufferedImage(bi);
-                multImage.setIcon(ImageUtils.getScaledImage(newMultPanelArtwork, 150));
-            } catch (IOException e) {
-                logger.logError("IOException when trying to get album art from mult panel!", e);
-            }
-        }
-    }
-
-    // </editor-fold>
-
-    /**
-     * Updates the autocomplete selection for the field
-     *
-     * @param component,    the text field that we're updating
-     * @param isGenreField, a boolean to see if it's a genre field
-     */
-    public void updateAutocompleteFields(JTextField component, boolean isGenreField) {
-        String text = component.getText();
-        component.setDocument(new AutoCompleteDocument(AutocompleteService.getNameService(isGenreField, table), component));
-        component.setText(text);
-    }
-
-    /**
-     * Gets the info for multiple songs
-     *
-     * @param editModeEnabled, a boolean to check if we should be in edit mode or not
-     * @param focusedField,    the field we want to focus on first
-     * @param selectedRows,    the rows currentlyl selected
-     */
-    public void openMoreInfo(boolean editModeEnabled, Component focusedField, int[] selectedRows) {
-        // get the map of songs
-        Map<Integer, Song> songs = new HashMap<>();
-        for (int row : selectedRows) {
-            songs.put(row, songController.getSongs().get(songController.getIndex(row)));
-        }
-
-        InfoFrame infoFrame = new InfoFrame(songs, selectedRows, editModeEnabled, focusedField);
-        infoFrame.setLocationRelativeTo(this);
-        infoFrame.setVisible(true);
-        this.setEnabled(false);
-    }
-
-    /**
-     * Opens the folder where this track lives
-     *
-     * @param selectedRows, the rows currently selected
-     */
-    public void showInFolder(int[] selectedRows) {
-        List<File> folders = new ArrayList<>();
-        for (int row : selectedRows) {
-            File file = (File) getModel().getValueAt(table.convertRowIndexToModel(row), 1);
-            if (!folders.contains(file)) {
-                folders.add(file);
-            }
-        }
-        for (File folder : folders) {
-            try {
-                FileUtils.showInFolder(folder);
-            } catch (Exception e) {
-                logger.logError("Couldn't open file!", e);
-            }
-
-        }
-    }
-
-    /**
-     * Moves to the next song in the table
-     *
-     * @param editModeEnabled, a boolean to see if we should open the frame in edit mode
-     * @param focusedField,    the field to start focus on
-     */
-    public void next(boolean editModeEnabled, Component focusedField) {
-        int row = table.getSelectedRow();
-        table.setRowSelectionInterval(row + 1, row + 1);
-        openMoreInfo(editModeEnabled, focusedField, new int[]{row + 1});
-        this.setEnabled(false);
-    }
-
-    /**
-     * Moves to the previous song in the table
-     *
-     * @param editModeEnabled, a boolean to see if we should open the frame in edit mode
-     * @param focusedField,    the field to start focus on
-     */
-    public void previous(boolean editModeEnabled, Component focusedField) {
-        int row = table.getSelectedRow();
-        table.setRowSelectionInterval(row - 1, row - 1);
-        openMoreInfo(editModeEnabled, focusedField, new int[]{row - 1});
-        this.setEnabled(false);
-    }
-
-    /**
-     * Submits changes to the table with a row to change
-     *
-     * @param row,  the row to update the table with
-     * @param song, the song with updated information
+     * Submits changes to the table with a row to change.  Called from the mult panel and the more info modal.
+     * @param row the row to update the table with
+     * @param song the song with updated information
      */
     public void submitRowChanges(int row, Song song) {
 
@@ -2246,6 +2062,102 @@ public class Frame extends javax.swing.JFrame {
                 table.setValueAt(ImageUtils.getScaledImage(song.getArtwork_bytes(), 100), row, TABLE_COLUMN_ALBUM_ART);
             }
         }
+    }
+
+    /**
+     * Gets the album art for the mult panel
+     * @param selectedRows the selected rows on the table
+     */
+    public void getCoverArtForMultPanel(int[] selectedRows) {
+        int index = songController.getIndex(selectedRows[0]);
+        File startingPoint = songController.getSongs().get(index).getFile();
+        File image = ImageUtils.selectAlbumArt(startingPoint);
+        if (image != null) {
+            try {
+                BufferedImage bi = ImageIO.read(image);
+                newMultPanelArtwork = ImageUtils.getBytesFromBufferedImage(bi);
+                multImage.setIcon(ImageUtils.getScaledImage(newMultPanelArtwork, 150));
+            } catch (IOException e) {
+                logger.logError("IOException when trying to get album art from mult panel!", e);
+            }
+        }
+    }
+    // </editor-fold>
+
+    /**
+     * Updates the autocomplete selection for the field
+     * @param component the text field that we're updating
+     * @param isGenreField a boolean to see if it's a genre field
+     */
+    public void updateAutocompleteFields(JTextField component, boolean isGenreField) {
+        String text = component.getText();
+        component.setDocument(new AutoCompleteDocument(AutocompleteService.getNameService(isGenreField, table), component));
+        component.setText(text);
+    }
+
+    /**
+     * Gets the info for multiple songs
+     * @param editModeEnabled a boolean to check if we should be in edit mode or not
+     * @param focusedField the field we want to focus on first
+     * @param selectedRows the rows currently selected
+     */
+    public void openMoreInfo(boolean editModeEnabled, Component focusedField, int[] selectedRows) {
+        // get the map of songs
+        Map<Integer, Song> songs = new HashMap<>();
+        for (int row : selectedRows) {
+            songs.put(row, songController.getSongs().get(songController.getIndex(row)));
+        }
+
+        InfoFrame infoFrame = new InfoFrame(songs, selectedRows, editModeEnabled, focusedField);
+        infoFrame.setLocationRelativeTo(this);
+        infoFrame.setVisible(true);
+        this.setEnabled(false);
+    }
+
+    /**
+     * Opens the folder where this track lives
+     * @param selectedRows, the rows currently selected
+     */
+    public void showInFolder(int[] selectedRows) {
+        List<File> folders = new ArrayList<>();
+        for (int row : selectedRows) {
+            File file = (File) getModel().getValueAt(table.convertRowIndexToModel(row), 1);
+            if (!folders.contains(file)) {
+                folders.add(file);
+            }
+        }
+        for (File folder : folders) {
+            try {
+                FileUtils.showInFolder(folder);
+            } catch (Exception e) {
+                logger.logError("Couldn't open file!", e);
+            }
+
+        }
+    }
+
+    /**
+     * Moves to the next song in the table. Called from the Info Frame.
+     * @param editModeEnabled a boolean to see if we should open the frame in edit mode
+     * @param focusedField the field to start focus on
+     */
+    public void nextFromInfoFrame(boolean editModeEnabled, Component focusedField) {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row + 1, row + 1);
+        openMoreInfo(editModeEnabled, focusedField, new int[]{row + 1});
+        this.setEnabled(false);
+    }
+
+    /**
+     * Moves to the previous song in the table. Called from the Info Frame.
+     * @param editModeEnabled a boolean to see if we should open the frame in edit mode
+     * @param focusedField the field to start focus on
+     */
+    public void previousFromInfoFrame(boolean editModeEnabled, Component focusedField) {
+        int row = table.getSelectedRow();
+        table.setRowSelectionInterval(row - 1, row - 1);
+        openMoreInfo(editModeEnabled, focusedField, new int[]{row - 1});
+        this.setEnabled(false);
     }
 
     /**

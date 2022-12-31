@@ -3,7 +3,7 @@
    File:   ImageSearchResponse.java
    Desc:   Pojo for the response we get back from the Google CSE API call
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

@@ -4,7 +4,7 @@
    Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
            Works with the AuditController to clean and audit directories, this class just handles all the UI.
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

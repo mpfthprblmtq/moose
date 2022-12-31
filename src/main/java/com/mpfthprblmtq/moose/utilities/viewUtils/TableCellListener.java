@@ -5,7 +5,7 @@
            NOTE:  Not mine
 
    Copyright ???
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package
