@@ -24,6 +24,7 @@ public class Settings {
     private boolean inDebugMode;
     private boolean inDeveloperMode;
     private boolean askBeforeClearAll;
+    private boolean warnBeforeStartingAudit;
     private List<String> genres;
     private String libraryLocation;
     private String applicationSupportLocation;
@@ -51,6 +52,7 @@ public class Settings {
         setInDebugMode(false);
         setInDeveloperMode(false);
         setAskBeforeClearAll(true);
+        setWarnBeforeStartingAudit(true);
         setGenres(new ArrayList<>());
         setLibraryLocation(StringUtils.EMPTY);
         setPreferredCoverArtSize(640);

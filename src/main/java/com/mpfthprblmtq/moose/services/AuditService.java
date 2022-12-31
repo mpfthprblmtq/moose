@@ -58,7 +58,8 @@ public class AuditService {
         double index = 0;
 
         for (File dir : albums) {
-            Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(formatStringForCurrentlyScanningPath(dir.getPath()));
+            Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(
+                    StringUtils.truncateWithEllipsesTrailing(dir.getPath(), 52));
             if (id3TagsHaveErrors(dir)) {
                 auditFilePathList.get(Constants.ID3).add(dir.getPath());
             }
@@ -74,6 +75,7 @@ public class AuditService {
         }
         Moose.getAuditFrame().setAuditCurrentlyScanningLabelHorizontalAlignment(SwingConstants.LEADING);
         Moose.getAuditFrame().updateAuditCurrentlyScanningLabel(albums.size() + " albums successfully scanned!");
+        Moose.getAuditFrame().setLoading(false);
         return getResultsFromFilePathList(auditFilePathList);
     }
 
@@ -105,12 +107,16 @@ public class AuditService {
         // traverse the list of files and add the albums to the albums list
         for (File file : allFiles) {
             if (file.getName().endsWith(".mp3")) {
-                File a = file.getParentFile();
-
+                File a;
                 // folder is a multi-disk album
-                if (a.getPath().matches(CD_FILEPATH_REGEX)) {
-                    a = a.getParentFile();
+                if (file.getPath().matches(CD_FILEPATH_REGEX)) {
+                    a = file.getParentFile().getParentFile();
+                } else {
+                    a = file.getParentFile();
                 }
+
+
+
                 if (!albums.contains(a)) {
                     albums.add(a);
                 }
@@ -119,8 +125,8 @@ public class AuditService {
 
         // sort them alphabetically
         albums.sort((File o1, File o2) -> {
-            String filename1 = o1.getPath().replace(folder.getPath(), "");
-            String filename2 = o2.getPath().replace(folder.getPath(), "");
+            String filename1 = o1.getPath().replace(folder.getPath(), StringUtils.EMPTY);
+            String filename2 = o2.getPath().replace(folder.getPath(), StringUtils.EMPTY);
             return filename1.compareToIgnoreCase(filename2);
         });
 
@@ -131,7 +137,7 @@ public class AuditService {
     }
 
     /**
-     * Gets all of the albums from the filePathList
+     * Gets all the albums from the filePathList
      */
     public List<File> getAllMarkedAlbums(List<List<String>> filePathList) {
         List<File> albums = new ArrayList<>();
@@ -615,7 +621,7 @@ public class AuditService {
         // traverse the file list
         for (File file : files) {
 
-            // check if it's an mp3
+            // check if it's a mp3
             if (file.getName().endsWith(".mp3")) {
 
                 Song song = SongUtils.getSongFromFile(file);

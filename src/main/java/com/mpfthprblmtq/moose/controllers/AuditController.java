@@ -57,7 +57,19 @@ public class AuditController {
     }
 
     public String analyze() {
+
+        // warn the user that this is experimental
+        // TODO remove this once it's not experimental anymore
+        if (Moose.getSettings().isWarnBeforeStartingAudit()) {
+            boolean dontAskAgain = DialogUtils.showAuditWarningDialog(Moose.getAuditFrame());
+            if (dontAskAgain) {
+                Moose.getSettings().setWarnBeforeStartingAudit(false);
+                Moose.settingsFrame.settingsController.writeSettingsFile(Moose.getSettings());
+            }
+        }
+
         AuditCleanupUtils.clearLists(filePathList);
+        auditFrame.setLoading(true);
         albums = auditService.importAlbums(folder);
         return auditService.analyzeForAudit(albums, filePathList);
     }
@@ -130,14 +142,14 @@ public class AuditController {
             auditService.setDone(albums.get(currentIndex));
         }
 
-        // get the most up to date frame and song controller since the frame updates on each album
+        // get the most up-to-date frame and song controller since the frame updates on each album
         this.frame = Moose.getFrame();
         this.songController = Moose.getSongController();
 
         // update the table in the songController
         songController.setTable(frame.table);
 
-        // save all of the tracks in the current screen so the user doesn't have to manually do it
+        // save all the tracks in the current screen so the user doesn't have to manually do it
         songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
 
         // check if the audit is done

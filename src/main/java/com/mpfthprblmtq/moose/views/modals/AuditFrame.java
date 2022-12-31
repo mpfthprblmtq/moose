@@ -57,6 +57,10 @@ public class AuditFrame extends javax.swing.JFrame {
         pathLabel.setText(populatePathLabel());
     }
 
+    public void setLoading(boolean loading) {
+        loadingLabel.setIcon(loading ? IconUtils.get(IconUtils.LOADING) : null);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -88,6 +92,7 @@ public class AuditFrame extends javax.swing.JFrame {
         auditResultsTextArea = new javax.swing.JTextArea();
         jSeparator1 = new javax.swing.JSeparator();
         advanceOnAutoFixCheckbox = new javax.swing.JCheckBox();
+        loadingLabel = new javax.swing.JLabel();
         cleanupPanel = new javax.swing.JPanel();
         cleanupCurrentlyScanningLabel = new javax.swing.JLabel();
         cleanupProgressBar = new javax.swing.JProgressBar();
@@ -208,6 +213,12 @@ public class AuditFrame extends javax.swing.JFrame {
         jScrollPane2.setViewportView(auditResultsTextArea);
 
         advanceOnAutoFixCheckbox.setText("Advance on successful Autofix");
+        advanceOnAutoFixCheckbox.setEnabled(false);
+
+        loadingLabel.setMaximumSize(new java.awt.Dimension(16, 16));
+        loadingLabel.setMinimumSize(new java.awt.Dimension(16, 16));
+        loadingLabel.setPreferredSize(new java.awt.Dimension(16, 16));
+        loadingLabel.setSize(new java.awt.Dimension(16, 16));
 
         javax.swing.GroupLayout auditPanelLayout = new javax.swing.GroupLayout(auditPanel);
         auditPanel.setLayout(auditPanelLayout);
@@ -220,7 +231,6 @@ public class AuditFrame extends javax.swing.JFrame {
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator1)
                             .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(auditPanelLayout.createSequentialGroup()
                                 .addComponent(coverArtCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -242,13 +252,17 @@ public class AuditFrame extends javax.swing.JFrame {
                                         .addComponent(auditViewResultsButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(label2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
+                                .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(auditPanelLayout.createSequentialGroup()
                                 .addComponent(previousFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(advanceOnAutoFixCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(advanceOnAutoFixCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(attemptAutoFixButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -262,7 +276,9 @@ public class AuditFrame extends javax.swing.JFrame {
             auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(auditProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -690,7 +706,15 @@ public class AuditFrame extends javax.swing.JFrame {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
+                // update graphics
+                auditAnalyzeButton.setEnabled(false);
+                auditCurrentlyScanningLabel.setHorizontalAlignment(SwingConstants.LEADING);
+                auditCurrentlyScanningLabel.setText("Importing albums...");
+
+                // do analysis
                 auditResultsTextArea.setText(auditController.analyze());
+
+                // update graphics again
                 auditViewResultsButton.setEnabled(true);    // enable the buttons used for audit now that we have results
                 auditStartButton.setEnabled(true);
                 return null;    // don't return anything since we're just playing with threads
@@ -885,6 +909,9 @@ public class AuditFrame extends javax.swing.JFrame {
         filenameCheck.setIcon(checkResults.get(FILENAMES) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
         coverArtCheck.setIcon(checkResults.get(COVER) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
 
+        // set the advance on auto fix checkbox enabled
+        advanceOnAutoFixCheckbox.setEnabled(true);
+
         // set the attempt fix button to enabled if there's anything to fix
         attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(COVER) || checkResults.get(FILENAMES));
 
@@ -1038,6 +1065,7 @@ public class AuditFrame extends javax.swing.JFrame {
     private javax.swing.JLabel label3;
     private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
+    private javax.swing.JLabel loadingLabel;
     private javax.swing.JCheckBox mp3asdCheckBox;
     private javax.swing.JButton nextFolderButton;
     private javax.swing.JLabel pathLabel;

@@ -31,10 +31,12 @@ public class MP3FileUtils {
         for (File file : files) {
             if (file.getName().endsWith(".mp3")) {
                 mp3Count++;
+                if (mp3Count > 1) {
+                    return false;
+                }
             }
         }
-
-        return mp3Count == 1;
+        return true;
     }
 
     /**
