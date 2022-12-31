@@ -3,7 +3,7 @@
    File:   SettingsController.java
    Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

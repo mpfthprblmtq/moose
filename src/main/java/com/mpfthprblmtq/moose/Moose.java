@@ -3,7 +3,7 @@
    File:   Main.java
    Desc:   Class that controls everything
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

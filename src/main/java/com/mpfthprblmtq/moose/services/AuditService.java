@@ -3,7 +3,7 @@
   File:   AuditController.java
   Desc:   Controller class for AuditFrame, works directly with the data based on input from AuditFrame UI
   <p>
-  Copyright Pat Ripley 2018-2020
+  Copyright Pat Ripley 2018-2023
  */
 
 // package

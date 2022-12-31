@@ -3,7 +3,7 @@
    File:   AlbumArtFinderFrame.java
    Desc:   The UI class for the album art finder service
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package

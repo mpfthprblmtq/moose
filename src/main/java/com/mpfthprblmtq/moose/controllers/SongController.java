@@ -3,7 +3,7 @@
    File:   SongController.java
    Desc:   Controller class for Frame, works directly with the data based on input from Frame UI
 
-   Copyright Pat Ripley 2018-2022
+   Copyright Pat Ripley 2018-2023
  */
 
 // package
@@ -460,6 +460,45 @@ public class SongController {
 
         } catch (IOException | NotSupportedException ex) {
             logger.logError("Exception when trying to save a song!", ex);
+        }
+    }
+
+    /**
+     * Scans all the songs or files' mp3tags with them and checks to make sure we know the genre
+     * @param list the list of either Songs or Files to check
+     */
+    public void checkForNewGenres(List<?> list) {
+        List<Song> songs = new ArrayList<>();
+
+        // if the list given is a list of files, get the songs from those files first
+        if (!list.isEmpty() && list.get(0) instanceof File) {
+            for (Object file : list) {
+                songs.add(getSongFromFile((File) file));
+            }
+        } else {
+            for (Object song : list) {
+                songs.add((Song) song);
+            }
+        }
+
+        // get all the songs, then the genres from the list of files
+        List<String> genres = songs.stream().map(Song::getGenre).collect(Collectors.toList());
+
+        // create a list of all the genres that don't exist already
+        List<String> newGenres = new ArrayList<>();
+        genres.stream().filter((genre) -> (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre))).forEachOrdered((genre) -> {
+            if (!newGenres.contains(genre)) {
+                newGenres.add(genre);
+            }
+        });
+
+        // for each new genre, ask if we want to add that one
+        for (String newGenre : newGenres) {
+            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
+                Moose.getSettings().getGenres().add(newGenre);
+                Moose.updateSettings();
+            }
         }
     }
 

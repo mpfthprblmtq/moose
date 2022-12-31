@@ -4,7 +4,7 @@
    Desc:   Main UI class for the JFrame containing the settings and options.
            Works with the SettingsController to load and update settings, this class just handles all the UI.
 
-   Copyright Pat Ripley 2018
+   Copyright Pat Ripley 2018-2023
  */
 
 // package
