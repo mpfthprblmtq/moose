@@ -201,7 +201,11 @@ public class Frame extends javax.swing.JFrame {
                 MouseEvent mouseEvent = (MouseEvent) event;
                 if (table.rowAtPoint(mouseEvent.getPoint()) == -1 && shouldLoseFocus(mouseEvent)) {
                     table.clearSelection();
-                    jLabel1.requestFocus();
+                    if (this.hasFocus()) {
+                        // only request focus on the header label if the main frame is focused, otherwise you
+                        // won't be able to click on any other modal without the main frame jumping out at you
+                        jLabel1.requestFocus();
+                    }
                     enableMultPanel(false);
                 }
             }

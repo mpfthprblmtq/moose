@@ -57,6 +57,28 @@ public class DialogUtils {
     }
 
     /**
+     * Utility function that shows a dialog when starting an audit
+     * Has a checkbox for "Don't show this again"
+     * @param context, the component to place this over
+     * @return the result of the checkbox, returns null if user hits no or cancels dialog
+     */
+    public static Boolean showAuditWarningDialog(Component context) {
+
+        // build the checkbox component
+        JCheckBox dontShowAgainBox = new JCheckBox("Don't show this again");
+
+        // build the message array thing to show on the box
+        Object[] message = {"Warning: This feature was fleshed out for my own purposes and\n" +
+                "might not work for your own system, user results may vary.", StringUtils.NEW_LINE, dontShowAgainBox};
+
+        // show the dialog
+        JOptionPane.showMessageDialog(context, message, "Warning - Experimental Feature", JOptionPane.WARNING_MESSAGE);
+
+        // return if the "don't show again" box is selected
+        return dontShowAgainBox.isSelected();
+    }
+
+    /**
      * Show the default settings dialog window, which allows the user to select which settings they want to default
      * @param context the component we want to show this dialog over
      * @param selectedTab currently selected tab
