@@ -9,8 +9,6 @@
 // package
 package com.mpfthprblmtq.moose;
 
-import java.io.File;
-
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.controllers.SongController;
@@ -19,7 +17,8 @@ import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 import com.mpfthprblmtq.moose.views.Frame;
 import com.mpfthprblmtq.moose.views.modals.SettingsFrame;
 
-import javax.swing.*;
+import javax.swing.JTable;
+import java.io.File;
 
 // class Main
 public class Moose {
@@ -41,18 +40,18 @@ public class Moose {
      * @param args, the entry arguments
      */
     public static void main(String[] args) {
-        // instantiate the settings object so we can have some log/settings files
-        settingsController = new SettingsController();
-        settingsFrame = new SettingsFrame(settingsController);
-        
         // instantiate the logger object so we can have some logging
-        // TODO make sure this works
         boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
         logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
 
+        // instantiate the settings object, so we can have some log/settings files
+        settingsController = new SettingsController();
+        settingsFrame = new SettingsFrame(settingsController);
+
+
         // instantiate the main song controller object
         songController = new SongController();
-        
+
         // go
         launchFrame();
 //        launchFrame(new File("/Users/mpfthprblmtq/Music/Library - For Testing/bitbirb/Singles/Future Bass"));
@@ -98,7 +97,7 @@ public class Moose {
     }
 
     /**
-     * Sends a command to update the seetings file with the settings we already have
+     * Sends a command to update the settings file with the settings we already have
      */
     public static void updateSettings() {
         settingsController.writeSettingsFile(getSettings());
@@ -117,7 +116,7 @@ public class Moose {
     
     /**
      * Controls the Frame opening
-     * @param dir, the directory to launch with pre-populated in the table
+     * @param dir the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
         songController = new SongController();
