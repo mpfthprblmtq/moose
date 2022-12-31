@@ -59,10 +59,7 @@ public class Frame extends javax.swing.JFrame {
     int currentRow;     // keeps track of the current row
     int currentColumn;  // keeps track of the current column
 
-    // table model used, with some customizations and overrides
-//    DefaultTableModel model = ViewUtils.getTableModel();
-
-    // ivars for the multPanel to check if the artwork has changed in the multPanel
+    // ivars for the multPanel to check if the artwork has changed
     byte[] originalMultPanelArtwork;
     byte[] newMultPanelArtwork;
     boolean multipleArtworks = false;
@@ -71,7 +68,6 @@ public class Frame extends javax.swing.JFrame {
      * Creates new form Frame
      */
     public Frame() {
-
         // init the components
         // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
         if (SwingUtilities.isEventDispatchThread()) {
@@ -90,11 +86,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Creates new form Frame with a folder preloaded
-     *
      * @param folder, the folder we want to start with
      */
     public Frame(File folder) {
-
         // init the components
         // checks if we're in the EDT to prevent NoSuchElementExceptions and ArrayIndexOutOfBoundsExceptions
         if (SwingUtilities.isEventDispatchThread()) {
@@ -145,7 +139,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * More init stuff
+     * Custom init stuff
      */
     public void init() {
 
@@ -160,8 +154,10 @@ public class Frame extends javax.swing.JFrame {
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
             if (event.getID() == MouseEvent.MOUSE_CLICKED) {
                 MouseEvent mouseEvent = (MouseEvent) event;
-                if (table.rowAtPoint(mouseEvent.getPoint()) == -1) {
+                if (table.rowAtPoint(mouseEvent.getPoint()) == -1 && shouldLoseFocus(mouseEvent)) {
                     table.clearSelection();
+                    jLabel1.requestFocus();
+                    enableMultPanel(false);
                 }
             }
         }, AWTEvent.MOUSE_EVENT_MASK);
@@ -263,6 +259,9 @@ public class Frame extends javax.swing.JFrame {
         ViewUtils.setColumnWidth(table, 9, 50);     // disk
         ViewUtils.setColumnWidth(table, 10, 100);   // album art
 //        ViewUtils.setColumnWidth(table, 11, 20);    // index
+
+        // manually set the name so we can use it later
+        multImage.setName("multImage");
 
         // taken from the FileDrop example
         new FileDrop(System.out, tableSP, (File[] files) -> {
@@ -1764,7 +1763,9 @@ public class Frame extends javax.swing.JFrame {
      * @param evt, the mouse event, used to get the x,y of the click
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
-        ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), false, false, false, true, null);
+        if (multImage.isEnabled()) {
+            ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), false, false, false, true, null);
+        }
     }//GEN-LAST:event_multImageMousePressed
 
     /**
@@ -1941,15 +1942,13 @@ public class Frame extends javax.swing.JFrame {
         int[] selectedRows;
         int rows;
 
-        if (table.getSelectedRows().length == 0) {
-            selectedRows = new int[table.getRowCount()];
-            for (int i = 0; i < selectedRows.length; i++) {
-                selectedRows[i] = i;
-            }
-            rows = selectedRows.length;
-        } else {
+        // REFACTORED
+        if (table.getSelectedRows().length != 0) {
             selectedRows = table.getSelectedRows();
             rows = table.getSelectedRowCount();
+        } else {
+            clearOutMultPanel();
+            return;
         }
 
         // make the arrays of values
@@ -1998,6 +1997,21 @@ public class Frame extends javax.swing.JFrame {
             multImage.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
             multipleArtworks = true;
         }
+    }
+
+    /**
+     * Clears out the multPanel
+     */
+    private void clearOutMultPanel() {
+        multTitle.setText(StringUtils.EMPTY);
+        multArtist.setText(StringUtils.EMPTY);
+        multAlbum.setText(StringUtils.EMPTY);
+        multAlbumArtist.setText(StringUtils.EMPTY);
+        multGenre.setText(StringUtils.EMPTY);
+        multYear.setText(StringUtils.EMPTY);
+        multTrack.setText(StringUtils.EMPTY);
+        multDisk.setText(StringUtils.EMPTY);
+        multImage.setIcon(null);
     }
 
     /**
@@ -2236,11 +2250,10 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Enables/Disables the mult panel
-     *
      * @param enabled, the boolean to set the fields enabled
      */
     public void enableMultPanel(boolean enabled) {
-
+        // clear out text/image
         multTitle.setText("");
         multArtist.setText("");
         multAlbum.setText("");
@@ -2249,7 +2262,8 @@ public class Frame extends javax.swing.JFrame {
         multYear.setText("");
         multTrack.setText("");
         multDisk.setText("");
-
+        multImage.setIcon(null);
+        // set fields enabled
         multTitle.setEnabled(enabled);
         multArtist.setEnabled(enabled);
         multAlbum.setEnabled(enabled);
@@ -2258,13 +2272,12 @@ public class Frame extends javax.swing.JFrame {
         multYear.setEnabled(enabled);
         multTrack.setEnabled(enabled);
         multDisk.setEnabled(enabled);
-        multImage.setIcon(null);
+        multImage.setEnabled(enabled);
         multUpdateButton.setEnabled(enabled);
     }
 
     /**
      * Enables/Disables the actions based on the row selection
-     *
      * @param enabled, the boolean to set the fields enabled
      */
     private void setActionsEnabled(boolean enabled) {
@@ -2275,6 +2288,20 @@ public class Frame extends javax.swing.JFrame {
         formatFilenamesMenuItem.setEnabled(Moose.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES) && enabled);
         saveTrackMenuItem.setEnabled(enabled);
         saveAllMenuItem.setEnabled(enabled);
+    }
+
+    /**
+     * Utility function to check if where we clicked determines if we need to lose focus on the rows in the table
+     * Basically, if it's not a text field and not a button and (if the component's name isn't null and the name is
+     * "multImage" which is the multiple album art JLabel), then return true
+     * @param event the event to check
+     * @return the result of the check
+     */
+    private boolean shouldLoseFocus(MouseEvent event) {
+        return !(event.getComponent() instanceof JTextField)
+                && !(event.getComponent() instanceof JButton)
+                && !(StringUtils.isNotEmpty(event.getComponent().getName())
+                && (event.getComponent().getName().equals("multImage")));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
