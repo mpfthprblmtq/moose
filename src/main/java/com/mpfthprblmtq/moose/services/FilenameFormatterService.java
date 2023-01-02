@@ -119,7 +119,7 @@ public class FilenameFormatterService {
         String trackTitle = StringUtils.EMPTY;
 
         // try and replace the artist with already known information before we use the regex
-        if (!SongUtils.isPartOfALabel(file, COMPILATIONS)) {
+        if (!MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
             String artist = autoTaggingService.getArtistFromExistingID3Info(file);
             filename = filename.replace(artist, StringUtils.EMPTY);
         }
@@ -193,7 +193,7 @@ public class FilenameFormatterService {
             trackNumber = song.getTrack();
 
             // get the artist if we're in a compilation
-            if (SongUtils.isPartOfALabel(file, COMPILATIONS)) {
+            if (MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
                 trackArtist = song.getArtist();
                 if (StringUtils.isEmpty(trackArtist)) {
                     if (file.getName().matches(TRACKNUM_ARTIST_TITLE_OPT_REGEX)) {

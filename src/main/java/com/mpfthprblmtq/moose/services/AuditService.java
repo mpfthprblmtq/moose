@@ -17,6 +17,7 @@ import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.AuditCleanupUtils;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.SongUtils;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 
@@ -234,7 +235,7 @@ public class AuditService {
     }
 
     /**
-     * Function used to clear all of the .done files from the albums list
+     * Function used to clear all the .done files from the albums list
      * @param albums, the file list of all albums
      */
     public void clearDoneFiles(List<File> albums) {
@@ -344,20 +345,20 @@ public class AuditService {
         // also check to see if we're in a label so that we can handle the file path differently
         for (File file : files) {
             if (file.getName().endsWith(".mp3")) {
-                if (SongUtils.isPartOfALabel(file)) {
-                    if (SongUtils.isPartOfALabel(file, SINGLES)) {
+                if (MP3FileUtils.isPartOfALabel(file)) {
+                    if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
                         if (!file.getPath().matches(SINGLES_FILEPATH_REGEX) || file.getName().matches(TRACKNUM_ARTIST_TITLE_REGEX)) {
                             return true;
                         }
-                    } else if (SongUtils.isPartOfALabel(file, COMPILATIONS)) {
+                    } else if (MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
                         if (!file.getPath().matches(COMPILATIONS_FILEPATH_REGEX)) {
                             return true;
                         }
-                    } else if (SongUtils.isPartOfALabel(file, LPS)) {
+                    } else if (MP3FileUtils.isPartOfALabel(file, LPS)) {
                         if (!file.getPath().matches(LPS_FILEPATH_REGEX)) {
                             return true;
                         }
-                    } else if (SongUtils.isPartOfALabel(file, EPS)) {
+                    } else if (MP3FileUtils.isPartOfALabel(file, EPS)) {
                         if (!file.getPath().matches(EPS_FILEPATH_REGEX)) {
                             return true;
                         }
@@ -374,7 +375,7 @@ public class AuditService {
     }
 
     /**
-     * This used to be one super ugly method with lots of repeated code, but I broke it into a million pieces and split
+     * This used to be one hideous method with lots of repeated code, but I broke it into a million pieces and split
      * all the functionality into helper functions, this method is really the controller for all of it.
      * This method goes through all the files in the directory given and makes sure all the files and folders are
      * named correctly according to where they are.  Also accounts for labels and multi-CD albums.
@@ -395,15 +396,15 @@ public class AuditService {
         for (File file : mp3Files) {
 
             // check if we're in a label
-            if (SongUtils.isPartOfALabel(updatedDir)) {
+            if (MP3FileUtils.isPartOfALabel(updatedDir)) {
                 // check what type of label directory we're in
-                if (SongUtils.isPartOfALabel(updatedDir, SINGLES)) {
+                if (MP3FileUtils.isPartOfALabel(updatedDir, SINGLES)) {
                     updatedDir = renameAlbum(file, updatedDir, true);
                     renameTrack(file, updatedDir, false);
-                } else if (SongUtils.isPartOfALabel(dir, COMPILATIONS)) {
+                } else if (MP3FileUtils.isPartOfALabel(dir, COMPILATIONS)) {
                     updatedDir = renameAlbum(file, updatedDir, false);
                     renameTrack(file, updatedDir, true);
-                } else if (SongUtils.isPartOfALabel(dir, LPS) || SongUtils.isPartOfALabel(dir, EPS)) {
+                } else if (MP3FileUtils.isPartOfALabel(dir, LPS) || MP3FileUtils.isPartOfALabel(dir, EPS)) {
                     updatedDir = renameAlbum(file, updatedDir, true);
                     renameTrack(file, updatedDir, false);
                 }
@@ -417,8 +418,8 @@ public class AuditService {
 
     /**
      * Updates the file while iterating in the parent method in the case of a parent directory changing
-     * @param file, the file that we're updating
-     * @param updatedDir, the parent directory that has the newest information
+     * @param file the file that we're updating
+     * @param updatedDir the parent directory that has the newest information
      * @return the updated file
      */
     private File updateFile(File file, File updatedDir) {
@@ -441,9 +442,9 @@ public class AuditService {
 
     /**
      * Validates the directory name based on what we send in
-     * @param file, the file with the song information
-     * @param updatedDir, the updated directory from the calling function, where the file lives
-     * @param includeArtist, a boolean to see if we need to include the artist in the directory name
+     * @param file the file with the song information
+     * @param updatedDir the updated directory from the calling function, where the file lives
+     * @param includeArtist a boolean to see if we need to include the artist in the directory name
      * @return updatedDir, just so we can keep track of it in the parent method
      */
     private File renameAlbum(File file, File updatedDir, boolean includeArtist) {
@@ -480,9 +481,9 @@ public class AuditService {
 
     /**
      * Validates the filename based on what we send in
-     * @param file, the file with the song information
-     * @param updatedDir, the updated directory from the calling function, where the file lives
-     * @param includeArtist, a boolean to see if we need to include the artist in the file name
+     * @param file the file with the song information
+     * @param updatedDir the updated directory from the calling function, where the file lives
+     * @param includeArtist a boolean to see if we need to include the artist in the file name
      */
     private void renameTrack(File file, File updatedDir, boolean includeArtist) {
 
@@ -587,19 +588,13 @@ public class AuditService {
      */
     private String getCommonArtist(File dir) {
         // create a list of songs
-        List<Song> songsInAlbum = new ArrayList<>();
-        List<File> filesInDir = new ArrayList<>();
-        FileUtils.listFiles(dir, filesInDir);
-        filesInDir.removeIf(fileInDir -> !fileInDir.getName().endsWith(".mp3"));
-        for (File fileInDir : filesInDir) {
-            Song songFromFile = SongUtils.getSongFromFile(fileInDir);
-            if (songFromFile != null) {
-                songsInAlbum.add(songFromFile);
-            }
-        }
+        List<Song> songs = MP3FileUtils.getAllSongsInDirectory(dir);
 
-        // grab all of the artists and throw them in a string list
-        List<String> artists = songsInAlbum.stream().map(Song::getArtist).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        // grab all the artists and throw them in a string list
+        List<String> artists = songs.stream()
+                .map(Song::getArtist)
+                .filter(StringUtils::isNotEmpty)
+                .collect(Collectors.toList());
 
         // grab the common string (artist) from each string
         String commonArtist = StringUtils.findCommonString(artists);

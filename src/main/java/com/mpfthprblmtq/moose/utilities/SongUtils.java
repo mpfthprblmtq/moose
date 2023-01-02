@@ -19,37 +19,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static com.mpfthprblmtq.moose.utilities.Constants.*;
-
 public class SongUtils {
 
     static Logger logger = Moose.getLogger();
-
-    /**
-     * Check if a directory is from a label
-     *
-     * @param dir, the directory to check
-     * @return the result of the check, true if it is a label, false if it isn't
-     * a label
-     */
-    public static boolean isPartOfALabel(File dir) {
-        String path = dir.getPath();
-        return (path.contains("/" + SINGLES) ||
-                path.contains("/" + COMPILATIONS) ||
-                path.contains("/" + LPS) ||
-                path.contains("/" + EPS));
-    }
-
-    /**
-     * Check if a directory is a single in a label
-     *
-     * @param file, the file to check
-     * @return the result of the check, true if it's a single from a label, false if it isn't
-     */
-    public static boolean isPartOfALabel(File file, String type) {
-        String path = file.getPath();
-        return path.contains("/" + type + "/");
-    }
 
     /**
      * Gets a song object from a file
