@@ -359,7 +359,7 @@ public class AutoTaggingService {
         }
 
         // if the folder isn't an album or part of the label
-        if (!folder.getName().matches(ALBUM_FOLDER_REGEX) && !SongUtils.isPartOfALabel(folder)) {
+        if (!folder.getName().matches(ALBUM_FOLDER_REGEX) && !MP3FileUtils.isPartOfALabel(folder)) {
             return null;
         }
 
@@ -412,16 +412,8 @@ public class AutoTaggingService {
 
         // if we reach this point, an image file wasn't found at all, let's check all the files to see if they
         // share the same cover art, and grab the image if they do
-        List<Song> songs = new ArrayList<>();
-        List<File> fileList = new ArrayList<>();
-        FileUtils.listFiles(folder, fileList);
-        fileList.removeIf(file -> !file.getName().endsWith(".mp3"));
-        for (File file : fileList) {
-            Song song = SongUtils.getSongFromFile(file);
-            if (song != null) {
-                songs.add(song);
-            }
-        }
+        List<Song> songs = MP3FileUtils.getAllSongsInDirectory(folder);
+
         List<byte[]> bytesList = new ArrayList<>();
         for (Song song : songs) {
             bytesList.add(song.getArtwork_bytes());
@@ -595,9 +587,9 @@ public class AutoTaggingService {
             file = file.getParentFile();
         }
 
-        if (SongUtils.isPartOfALabel(file)) {
+        if (MP3FileUtils.isPartOfALabel(file)) {
             // for singles, the album should be the genre
-            if (SongUtils.isPartOfALabel(file, SINGLES)) {
+            if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
                 return file.getParentFile().getParentFile().getName();
             } else {
                 pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
@@ -632,8 +624,8 @@ public class AutoTaggingService {
             file = file.getParentFile();
         }
 
-        if (SongUtils.isPartOfALabel(file)) {
-            if (SongUtils.isPartOfALabel(file, SINGLES) || SongUtils.isPartOfALabel(file, EPS) || SongUtils.isPartOfALabel(file, LPS)) {
+        if (MP3FileUtils.isPartOfALabel(file)) {
+            if (MP3FileUtils.isPartOfALabel(file, SINGLES) || MP3FileUtils.isPartOfALabel(file, EPS) || MP3FileUtils.isPartOfALabel(file, LPS)) {
                 if (file.getParentFile().getName().matches(YEAR_ARTIST_ALBUM_REGEX)) {
                     pattern = Pattern.compile(YEAR_ARTIST_ALBUM_REGEX);
                     matcher = pattern.matcher(file.getParentFile().getName());
@@ -669,13 +661,13 @@ public class AutoTaggingService {
     public String getAlbumArtistFromFile(File file) {
 
         // Library/Label/Singles/Genre/[2021] Artist - Album/01 Title.mp3
-        if (SongUtils.isPartOfALabel(file, SINGLES)) {
+        if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
             return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
 
         // Library/Label/Compilations/Compilation/01 Artist - Title.mp3
         // Library/Label/EPs/Album/01 Title.mp3
         // Library/Label/LPs/Album/CD2/01 Title.mp3
-        } else if (SongUtils.isPartOfALabel(file)) {
+        } else if (MP3FileUtils.isPartOfALabel(file)) {
             if (file.getPath().matches(CD_FILEPATH_REGEX)) {
                 return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getParentFile().getParentFile().getName());
             }
@@ -788,7 +780,7 @@ public class AutoTaggingService {
      * @return a genre string
      */
     public String getGenreFromFile(File file) {
-        if (SongUtils.isPartOfALabel(file, SINGLES)) {
+        if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
             return FileUtils.cleanFilenameForOSX(file.getParentFile().getParentFile().getName());
         }
         return StringUtils.EMPTY;

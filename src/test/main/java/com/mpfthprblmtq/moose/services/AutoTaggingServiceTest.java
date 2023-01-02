@@ -3,6 +3,7 @@ package main.java.com.mpfthprblmtq.moose.services;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
+import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.SongUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -99,7 +100,7 @@ public class AutoTaggingServiceTest {
     public void testGetAlbumFromFile() {
         String expected;
         for (File file : files) {
-            if (SongUtils.isPartOfALabel(file, SINGLES)) {
+            if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
                 expected = "TestGenre";
             } else {
                 if (file.getPath().contains("TestAlbum1")) {
@@ -137,7 +138,7 @@ public class AutoTaggingServiceTest {
     public void testGetGenreFromFile() {
         String expected;
         for (File file : files) {
-            if (SongUtils.isPartOfALabel(file, SINGLES)) {
+            if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
                 expected = "TestGenre";
             } else {
                 expected = StringUtils.EMPTY;
@@ -152,7 +153,7 @@ public class AutoTaggingServiceTest {
         String expected;
         for (File file : files) {
             if (file.getName().startsWith("01")) {
-                if (SongUtils.isPartOfALabel(file, SINGLES)) {
+                if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
                     expected = "1/1";
                 } else {
                     expected = "1/3";
