@@ -1,26 +1,24 @@
 /*
-   Proj:   Moose
-   File:   AuditFrame.java
-   Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
-           Works with the AuditController to clean and audit directories, this class just handles all the UI.
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   AuditFrame.java
+ *  Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
+ *          Works with the AuditController and CleanupController to clean and audit directories,
+ *          this class just handles all the UI interactions.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
 // package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports
-import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.AuditController;
 import com.mpfthprblmtq.moose.controllers.CleanupController;
-import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
-import com.mpfthprblmtq.moose.views.Frame;
 
 import java.awt.Font;
 import java.io.File;
@@ -31,34 +29,108 @@ import javax.swing.*;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
 // class AuditFrame
+@SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
 public class AuditFrame extends javax.swing.JFrame {
 
     // controllers
     public AuditController auditController;
     public CleanupController cleanupController;
 
-    // logger object
-    static Logger logger = Moose.getLogger();
-
     /**
      * Creates new form AuditFrame
      */
-    public AuditFrame(Frame frame, SongController songController) {
+    public AuditFrame() {
         initComponents();
 
         // initialize the controllers
-        auditController = new AuditController(frame, this, songController);
-        cleanupController = new CleanupController(this);
+        auditController = new AuditController();
+        cleanupController = new CleanupController();
 
         init();
     }
 
+    /**
+     * Custom init, just sets the path label to the user's library location if we have it
+     */
     private void init() {
         pathLabel.setText(populatePathLabel());
     }
 
-    public void setLoading(boolean loading) {
-        loadingLabel.setIcon(loading ? IconUtils.get(IconUtils.LOADING) : null);
+    /**
+     * Accessible method to set the audit status to loading, just sets the loading icon on the audit tab
+     * @param loading a boolean to determine if we need to set the loading icon
+     */
+    public void setAuditLoading(boolean loading) {
+        auditLoadingLabel.setIcon(loading ? IconUtils.get(IconUtils.LOADING) : null);
+    }
+
+    /**
+     * Accessible method to set the cleanup status to loading, just sets the loading icon on the cleanup tab
+     * @param loading a boolean to determine if we need to set the loading icon
+     */
+    public void setCleanupLoading(boolean loading) {
+        cleanupLoadingLabel.setIcon(loading ? IconUtils.get(IconUtils.LOADING) : null);
+    }
+
+    /**
+     * Accessible method to set the text on the audit results text area
+     * @param results the results to set on the text area
+     */
+    public void setAuditResults(String results) {
+        auditResultsTextArea.setText(results);
+    }
+
+    /**
+     * Accessible method to set the text on the cleanup results text area
+     * @param results the results to set on the text area
+     */
+    public void setCleanupResults(String results) {
+        cleanupResultsTextArea.setText(results);
+    }
+
+    /**
+     * Function to get the folder to audit/cleanup. Sets the folder field in the auditController and cleanupController.
+     */
+    public void chooseFolder() {
+
+        // choose a folder
+        File folder = Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Select a folder to audit/cleanup",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
+
+        if (folder != null) {
+            // set the file ivar in the controllers
+            auditController.setFolder(folder);
+            cleanupController.setFolder(folder);
+
+            // update some graphics
+            label1.setEnabled(true);
+            pathLabel.setText(folder.getPath());
+            resetAuditFrame();
+        }
+        // else nothing was chosen
+    }
+
+    /**
+     * Populates the path label with the one in settings, or nothing if it's not there
+     */
+    public String populatePathLabel() {
+        if (Moose.getSettings().getLibraryLocation().isEmpty()) {
+            return StringUtils.EMPTY;
+        } else {
+            auditController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
+            cleanupController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
+            label1.setEnabled(true);
+
+            auditAnalyzeButton.setEnabled(true);
+            cleanupAnalyzeButton.setEnabled(true);
+
+            return Moose.getSettings().getLibraryLocation();
+        }
     }
 
     /**
@@ -66,7 +138,7 @@ public class AuditFrame extends javax.swing.JFrame {
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all") // for the everything
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -92,7 +164,7 @@ public class AuditFrame extends javax.swing.JFrame {
         auditResultsTextArea = new javax.swing.JTextArea();
         jSeparator1 = new javax.swing.JSeparator();
         advanceOnAutoFixCheckbox = new javax.swing.JCheckBox();
-        loadingLabel = new javax.swing.JLabel();
+        auditLoadingLabel = new javax.swing.JLabel();
         cleanupPanel = new javax.swing.JPanel();
         cleanupCurrentlyScanningLabel = new javax.swing.JLabel();
         cleanupProgressBar = new javax.swing.JProgressBar();
@@ -109,6 +181,11 @@ public class AuditFrame extends javax.swing.JFrame {
         cleanupViewResultsButton = new javax.swing.JButton();
         deleteAllButton = new javax.swing.JButton();
         deleteSelectedButton = new javax.swing.JButton();
+        customFileExtensionCheckBox = new javax.swing.JCheckBox();
+        customFileExtensionTextField = new javax.swing.JTextField();
+        customFileExtensionLabel = new javax.swing.JLabel();
+        customFileExtensionPrefixLabel = new javax.swing.JLabel();
+        cleanupLoadingLabel = new javax.swing.JLabel();
         chooseFolderButton = new javax.swing.JButton();
         pathLabel = new javax.swing.JLabel();
         label1 = new javax.swing.JLabel();
@@ -215,10 +292,10 @@ public class AuditFrame extends javax.swing.JFrame {
         advanceOnAutoFixCheckbox.setText("Advance on successful Autofix");
         advanceOnAutoFixCheckbox.setEnabled(false);
 
-        loadingLabel.setMaximumSize(new java.awt.Dimension(16, 16));
-        loadingLabel.setMinimumSize(new java.awt.Dimension(16, 16));
-        loadingLabel.setPreferredSize(new java.awt.Dimension(16, 16));
-        loadingLabel.setSize(new java.awt.Dimension(16, 16));
+        auditLoadingLabel.setMaximumSize(new java.awt.Dimension(20, 20));
+        auditLoadingLabel.setMinimumSize(new java.awt.Dimension(20, 20));
+        auditLoadingLabel.setPreferredSize(new java.awt.Dimension(20, 20));
+        auditLoadingLabel.setSize(new java.awt.Dimension(20, 20));
 
         javax.swing.GroupLayout auditPanelLayout = new javax.swing.GroupLayout(auditPanel);
         auditPanel.setLayout(auditPanelLayout);
@@ -230,7 +307,6 @@ public class AuditFrame extends javax.swing.JFrame {
                         .addContainerGap()
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator1)
-                            .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(auditPanelLayout.createSequentialGroup()
                                 .addComponent(coverArtCheck, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -253,16 +329,17 @@ public class AuditFrame extends javax.swing.JFrame {
                                     .addComponent(label2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
-                                .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                            .addGroup(auditPanelLayout.createSequentialGroup()
+                                .addComponent(auditLoadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(8, 8, 8)
+                                .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(auditPanelLayout.createSequentialGroup()
                                 .addComponent(previousFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(advanceOnAutoFixCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
+                            .addComponent(advanceOnAutoFixCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(attemptAutoFixButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -276,11 +353,11 @@ public class AuditFrame extends javax.swing.JFrame {
             auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, auditPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(loadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(auditCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(auditProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(auditLoadingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(auditProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -309,7 +386,7 @@ public class AuditFrame extends javax.swing.JFrame {
                     .addComponent(label5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addGroup(auditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(attemptAutoFixButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(advanceOnAutoFixCheckbox))
@@ -327,9 +404,9 @@ public class AuditFrame extends javax.swing.JFrame {
         cleanupCurrentlyScanningLabel.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
         cleanupCurrentlyScanningLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         cleanupCurrentlyScanningLabel.setToolTipText("");
-        cleanupCurrentlyScanningLabel.setMaximumSize(new java.awt.Dimension(400, 15));
-        cleanupCurrentlyScanningLabel.setMinimumSize(new java.awt.Dimension(400, 15));
-        cleanupCurrentlyScanningLabel.setPreferredSize(new java.awt.Dimension(400, 15));
+        cleanupCurrentlyScanningLabel.setMaximumSize(new java.awt.Dimension(400, 16));
+        cleanupCurrentlyScanningLabel.setMinimumSize(new java.awt.Dimension(400, 16));
+        cleanupCurrentlyScanningLabel.setPreferredSize(new java.awt.Dimension(400, 16));
 
         cleanupAnalyzeButton.setText("Perform Analysis");
         cleanupAnalyzeButton.setEnabled(false);
@@ -398,7 +475,7 @@ public class AuditFrame extends javax.swing.JFrame {
             }
         });
 
-        imagesCheckBox.setText("Images (Excludes cover art images, i.e. cover.*)");
+        imagesCheckBox.setText("Images (Excludes cover art images, e.g. cover.*)");
         imagesCheckBox.setEnabled(false);
         imagesCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -432,6 +509,21 @@ public class AuditFrame extends javax.swing.JFrame {
             }
         });
 
+        customFileExtensionCheckBox.setEnabled(false);
+        customFileExtensionCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                customFileExtensionCheckBoxStateChanged(evt);
+            }
+        });
+
+        customFileExtensionTextField.setEnabled(false);
+
+        customFileExtensionLabel.setText("Custom file extension");
+        customFileExtensionLabel.setEnabled(false);
+
+        customFileExtensionPrefixLabel.setText("*.");
+        customFileExtensionPrefixLabel.setEnabled(false);
+
         javax.swing.GroupLayout cleanupPanelLayout = new javax.swing.GroupLayout(cleanupPanel);
         cleanupPanel.setLayout(cleanupPanelLayout);
         cleanupPanelLayout.setHorizontalGroup(
@@ -449,25 +541,36 @@ public class AuditFrame extends javax.swing.JFrame {
                     .addGroup(cleanupPanelLayout.createSequentialGroup()
                         .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(cleanupPanelLayout.createSequentialGroup()
+                                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cleanupAnalyzeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cleanupViewResultsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane1))
+                            .addGroup(cleanupPanelLayout.createSequentialGroup()
                                 .addComponent(wavCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(mp3asdCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mp3asdCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(windowsCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(cleanupPanelLayout.createSequentialGroup()
-                                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cleanupAnalyzeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cleanupViewResultsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(customFileExtensionCheckBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1))
-                            .addComponent(cleanupProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cleanupCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(customFileExtensionPrefixLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(customFileExtensionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(customFileExtensionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cleanupPanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(deleteAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cleanupPanelLayout.createSequentialGroup()
+                        .addComponent(cleanupLoadingLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cleanupProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cleanupCurrentlyScanningLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         cleanupPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {deleteAllButton, deleteSelectedButton});
@@ -475,10 +578,12 @@ public class AuditFrame extends javax.swing.JFrame {
         cleanupPanelLayout.setVerticalGroup(
             cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cleanupPanelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(7, 7, 7)
                 .addComponent(cleanupCurrentlyScanningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cleanupProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cleanupLoadingLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cleanupProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(cleanupPanelLayout.createSequentialGroup()
@@ -486,7 +591,7 @@ public class AuditFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cleanupViewResultsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(wavCheckBox)
                     .addComponent(windowsCheckBox)
@@ -498,7 +603,16 @@ public class AuditFrame extends javax.swing.JFrame {
                     .addComponent(zipCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(imagesCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(customFileExtensionCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(cleanupPanelLayout.createSequentialGroup()
+                        .addGroup(cleanupPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(customFileExtensionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(customFileExtensionLabel)
+                            .addComponent(customFileExtensionPrefixLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(60, 60, 60)
                 .addComponent(deleteSelectedButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(deleteAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -553,156 +667,38 @@ public class AuditFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void nextFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextFolderButtonActionPerformed
-        auditController.nextFolder();
-        this.toFront();
-        this.requestFocus();
-    }//GEN-LAST:event_nextFolderButtonActionPerformed
-
     /**
-     * Handles the previous folder/album button press
-     *
-     * @param evt
+     * Handles the chooseFolder button press. Calls the chooseFolder method, then checks if we have a valid folder
+     * and enables the analyze buttons based on that.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void previousFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousFolderButtonActionPerformed
-        auditController.previousFolder();
-        this.toFront();
-        this.requestFocus();
-    }//GEN-LAST:event_previousFolderButtonActionPerformed
-
-    /**
-     * Handles the choose folder button press
-     *
-     * @param evt
-     */
+    @SuppressWarnings("unused") // for the evt param
     private void chooseFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFolderButtonActionPerformed
         chooseFolder();
-        
         if(auditController.getFolder() != null) {
             auditAnalyzeButton.setEnabled(true);
             cleanupAnalyzeButton.setEnabled(true);
         }
     }//GEN-LAST:event_chooseFolderButtonActionPerformed
 
-    /**
-     * Handles the start audit button press
-     *
-     * @param evt
-     */
-    private void auditStartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditStartButtonActionPerformed
-        if (auditStartButton.getText().equals("Start Audit")) {
-            startAudit();
-        } else if (auditStartButton.getText().equals("Stop Audit")) {
-            stopAudit();
-        }
-    }//GEN-LAST:event_auditStartButtonActionPerformed
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  AUDIT METHODS
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="AUDIT">
 
     /**
-     * Handles the stop audit button press
-     *
-     * @param evt
+     * Handles the analyze button press for audit
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void auditViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditViewResultsButtonActionPerformed
-        viewResults(Constants.AUDIT);
-    }//GEN-LAST:event_auditViewResultsButtonActionPerformed
-
-    /**
-     * Handles the analyze button press
-     *
-     * @param evt
-     */
-    private void cleanupAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupAnalyzeButtonActionPerformed
-        cleanup();
-    }//GEN-LAST:event_cleanupAnalyzeButtonActionPerformed
-
-    /**
-     * Handles the delete all button press
-     *
-     * @param evt
-     */
-    private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to delete all extra files?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (returnVal == 0) {
-            cleanupController.deleteAll();
-        }
-    }//GEN-LAST:event_deleteAllButtonActionPerformed
-
-    /**
-     * Handles the delete selected button press
-     *
-     * @param evt
-     */
-    private void deleteSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSelectedButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to delete the selected extra files?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (returnVal == 0) {
-            cleanupController.deleteSelected(
-                    mp3asdCheckBox.isSelected(),
-                    flacCheckBox.isSelected(),
-                    wavCheckBox.isSelected(),
-                    zipCheckBox.isSelected(),
-                    imagesCheckBox.isSelected(),
-                    windowsCheckBox.isSelected(),
-                    everythingElseCheckBox.isSelected());
-        }
-    }//GEN-LAST:event_deleteSelectedButtonActionPerformed
-
-    /**
-     * Handles the view results button press
-     *
-     * @param evt
-     */
-    private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
-        viewResults(Constants.CLEANUP);
-    }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
-
-    private void wavCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_wavCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_wavCheckBoxStateChanged
-
-    private void flacCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_flacCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_flacCheckBoxStateChanged
-
-    private void mp3asdCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_mp3asdCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_mp3asdCheckBoxStateChanged
-
-    private void zipCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zipCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_zipCheckBoxStateChanged
-
-    private void windowsCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_windowsCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_windowsCheckBoxStateChanged
-
-    private void everythingElseCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_everythingElseCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_everythingElseCheckBoxStateChanged
-
-    private void imagesCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_imagesCheckBoxStateChanged
-        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
-    }//GEN-LAST:event_imagesCheckBoxStateChanged
-
+    @SuppressWarnings("unused") // for the evt param
     private void auditAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditAnalyzeButtonActionPerformed
         startAuditAnalysis();
     }//GEN-LAST:event_auditAnalyzeButtonActionPerformed
 
-    private void attemptAutoFixButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attemptAutoFixButtonActionPerformed
-        autoFix();
-    }//GEN-LAST:event_attemptAutoFixButtonActionPerformed
-
     public void startAuditAnalysis() {
-        // make a swing worker do the image search in a separate thread so I can update the GUI
+        // make a swing worker do the analysis in a separate thread, so I can update the GUI
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -712,7 +708,7 @@ public class AuditFrame extends javax.swing.JFrame {
                 auditCurrentlyScanningLabel.setText("Importing albums...");
 
                 // do analysis
-                auditResultsTextArea.setText(auditController.analyze());
+                auditController.analyze();
 
                 // update graphics again
                 auditViewResultsButton.setEnabled(true);    // enable the buttons used for audit now that we have results
@@ -726,49 +722,32 @@ public class AuditFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Function to get the folder to audit/cleanup
-     * Sets the folder ivar in the auditController
+     * Handles the audit view results button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    public void chooseFolder() {
-
-        // choose a folder
-        File folder = Objects.requireNonNull(FileUtils.launchJFileChooser(
-                "Select a folder to audit/cleanup",
-                "Select",
-                JFileChooser.DIRECTORIES_ONLY,
-                false,
-                null,
-                null))[0];
-
-        if(folder != null) {
-            // set the file ivar in the controllers
-            auditController.setFolder(folder);
-            cleanupController.setFolder(folder);
-
-            // update some graphics
-            label1.setEnabled(true);
-            pathLabel.setText(folder.getPath());
-            resetAuditFrame();
-        }
-        // else nothing was chosen
-    }
-
-    public void updateConsole(String s) {
-        auditResultsTextArea.setText(s);
-    }
-
-    public boolean shouldAdvanceOnAutofix() {
-        return advanceOnAutoFixCheckbox.isSelected();
-    }
-
-    public void next() {
-        nextFolderButton.doClick();
-    }
+    @SuppressWarnings("unused") // for the evt param
+    private void auditViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditViewResultsButtonActionPerformed
+        viewResults(Constants.AUDIT);
+    }//GEN-LAST:event_auditViewResultsButtonActionPerformed
 
     /**
-     * Starts the audit
+     * Handles the start audit button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void auditStartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditStartButtonActionPerformed
+        if (auditStartButton.getText().equals("Start Audit")) {
+            startAudit();
+        } else if (auditStartButton.getText().equals("Stop Audit")) {
+            auditController.stopAudit(false);
+        }
+    }//GEN-LAST:event_auditStartButtonActionPerformed
+
+    /**
+     * Starts the audit, updates graphics beforehand
      */
     private void startAudit() {
+        // update graphics
         auditAnalyzeButton.setEnabled(false);
         chooseFolderButton.setEnabled(false);
         auditViewResultsButton.setEnabled(true);
@@ -782,88 +761,375 @@ public class AuditFrame extends javax.swing.JFrame {
         cleanupViewResultsButton.setEnabled(false);
         deleteAllButton.setEnabled(false);
         deleteSelectedButton.setEnabled(false);
+
+        // start audit
         auditController.startAudit();
     }
 
     /**
-     * Stops the audit
+     * Handles the next folder/album button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void stopAudit() {
-        auditController.stopAudit();
-        resetAuditFrame();
-        auditStartButton.setEnabled(true);
-        auditStartButton.setText("Start Audit");
+    @SuppressWarnings("unused") // for the evt param
+    private void nextFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextFolderButtonActionPerformed
+        auditController.nextFolder();
+        this.toFront();
+        this.requestFocus();
+    }//GEN-LAST:event_nextFolderButtonActionPerformed
+
+    /**
+     * Simulates a next button press, moving on to the next album
+     */
+    public void next() {
+        nextFolderButton.doClick();
     }
 
     /**
-     * Clean up clean up everybody do your share
+     * Handles the previous folder/album button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void cleanup() {
-        mp3asdCheckBox.setEnabled(true);
-        flacCheckBox.setEnabled(true);
-        wavCheckBox.setEnabled(true);
-        zipCheckBox.setEnabled(true);
-        windowsCheckBox.setEnabled(true);
-        everythingElseCheckBox.setEnabled(true);
-        imagesCheckBox.setEnabled(true);
-        deleteAllButton.setEnabled(true);
-        cleanupResultsTextArea.setEnabled(true);
-        cleanupResultsTextArea.setText(cleanupController.analyze());
-
-        // enable the button used for viewing now that we have results
-        cleanupViewResultsButton.setEnabled(true);
-    }
+    @SuppressWarnings("unused") // for the evt param
+    private void previousFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousFolderButtonActionPerformed
+        auditController.previousFolder();
+        this.toFront();
+        this.requestFocus();
+    }//GEN-LAST:event_previousFolderButtonActionPerformed
 
     /**
-     * Attempts to auto fix things
+     * Handles the attempt auto fix button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void autoFix() {
+    @SuppressWarnings("unused") // for the evt param
+    private void attemptAutoFixButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attemptAutoFixButtonActionPerformed
         auditController.autoFix();
+    }//GEN-LAST:event_attemptAutoFixButtonActionPerformed
+
+    /**
+     * Returns if we should advance on autofix
+     * @return if the advanceOnAutoFixCheckbox is selected
+     */
+    public boolean shouldAdvanceOnAutofix() {
+        return advanceOnAutoFixCheckbox.isSelected();
     }
 
     /**
-     * Populates the path label with the one in settings, or nothing if it's not there
+     * Refreshes the three checks and the current directory when a new album is loaded
+     * @param checkResults the checks to display (ID3, covers, filenames)
+     * @param currentDirectory the directory that we're currently fixing
      */
-    public String populatePathLabel() {
-        if (Moose.getSettings().getLibraryLocation().isEmpty()) {
-            return StringUtils.EMPTY;
-        } else {
-            auditController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
-            cleanupController.setFolder(new File(Moose.getSettings().getLibraryLocation()));
-            label1.setEnabled(true);
+    public void refreshAuditFrameFromAudit(List<Boolean> checkResults, String currentDirectory) {
 
-            auditAnalyzeButton.setEnabled(true);
-            cleanupAnalyzeButton.setEnabled(true);
-            
-            return Moose.getSettings().getLibraryLocation();
-        }
+        // set the controller fields
+        auditController.setFields(checkResults.get(ID3), checkResults.get(FILENAMES), checkResults.get(COVER), currentDirectory);
+
+        // set the pass/fail icons
+        ID3TagCheck.setIcon(checkResults.get(ID3) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
+        filenameCheck.setIcon(checkResults.get(FILENAMES) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
+        coverArtCheck.setIcon(checkResults.get(COVER) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
+
+        // set the advance on auto fix checkbox enabled
+        advanceOnAutoFixCheckbox.setEnabled(true);
+
+        // set the attempt fix button to enabled if there's anything to fix
+        attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(COVER) || checkResults.get(FILENAMES));
+
+        // update the current directory label
+        currentDirLabel.setText(StringUtils.truncateWithEllipsesTrailing(currentDirectory, 64));
     }
 
     /**
      * Sets the next button text
+     * @param text the text to set on the button
      */
     public void setNextButtonText(String text) {
         nextFolderButton.setText(text);
     }
 
     /**
-     * Shows the result of the audit/cleanup
+     * Sets the horizontal alignment of the audit currently scanning label
+     * @param alignment the alignment type (SwingConstants.LEADING or SwingConstants.TRAILING)
+     */
+    public void setAuditCurrentlyScanningLabelHorizontalAlignment(int alignment) {
+        auditCurrentlyScanningLabel.setHorizontalAlignment(alignment);
+    }
+
+    /**
+     * Updates the currentlyScanningLabel
+     */
+    public void updateAuditCurrentlyScanningLabel(String s) {
+        auditCurrentlyScanningLabel.setText(s);
+    }
+
+    /**
+     * Updates the audit progress bar
+     * @param percentage the percentage that the bar should be filled up
+     */
+    public void updateAuditProgressBar(int percentage) {
+        auditProgressBar.setValue(percentage);
+    }
+
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  CLEANUP METHODS
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="CLEANUP">
+
+    /**
+     * Handles the cleanup analyze button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void cleanupAnalyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupAnalyzeButtonActionPerformed
+        startCleanupAnalysis();
+    }//GEN-LAST:event_cleanupAnalyzeButtonActionPerformed
+
+    /**
+     * Handles the delete all button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void deleteAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteAllButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to delete all extra files?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (returnVal == 0) {
+            cleanupController.deleteAll();
+        }
+    }//GEN-LAST:event_deleteAllButtonActionPerformed
+
+    /**
+     * Handles delete selected button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void deleteSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSelectedButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to delete the selected extra files?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (returnVal == JOptionPane.YES_OPTION) {
+            cleanupController.deleteSelected(
+                    mp3asdCheckBox.isSelected(),
+                    flacCheckBox.isSelected(),
+                    wavCheckBox.isSelected(),
+                    zipCheckBox.isSelected(),
+                    imagesCheckBox.isSelected(),
+                    windowsCheckBox.isSelected(),
+                    everythingElseCheckBox.isSelected(),
+                    customFileExtensionCheckBox.isSelected() ? customFileExtensionTextField.getText() : null);
+        }
+    }//GEN-LAST:event_deleteSelectedButtonActionPerformed
+
+    /**
+     * Handles the view results button press
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void cleanupViewResultsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cleanupViewResultsButtonActionPerformed
+        viewResults(Constants.CLEANUP);
+    }//GEN-LAST:event_cleanupViewResultsButtonActionPerformed
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void wavCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_wavCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_wavCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void flacCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_flacCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_flacCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void mp3asdCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_mp3asdCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_mp3asdCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void zipCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_zipCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_zipCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void windowsCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_windowsCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_windowsCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void everythingElseCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_everythingElseCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_everythingElseCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void imagesCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_imagesCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+    }//GEN-LAST:event_imagesCheckBoxStateChanged
+
+    /**
+     * Handles when the checkbox's state is changed. Sets the deletedSelected button enabled based on if at least one
+     * checkbox is checked. This one also enables the text field and other labels too.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void customFileExtensionCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_customFileExtensionCheckBoxStateChanged
+        deleteSelectedButton.setEnabled(getDeleteSelectedButtonStatus());
+        customFileExtensionTextField.setEnabled(customFileExtensionCheckBox.isSelected());
+        customFileExtensionLabel.setEnabled(customFileExtensionCheckBox.isSelected());
+        customFileExtensionPrefixLabel.setEnabled(customFileExtensionCheckBox.isSelected());
+    }//GEN-LAST:event_customFileExtensionCheckBoxStateChanged
+
+    /**
+     * Analyzes things for cleanup
+     */
+    private void startCleanupAnalysis() {
+        // make a swing worker do the analysis in a separate thread, so I can update the GUI
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                // update graphics
+                cleanupAnalyzeButton.setEnabled(false);
+                cleanupViewResultsButton.setEnabled(false);
+
+                // analyze
+                cleanupController.analyze();
+
+                // update graphics again now that we have analysis data
+                cleanupViewResultsButton.setEnabled(true);
+                deleteAllButton.setEnabled(true);
+                cleanupResultsTextArea.setEnabled(true);
+                setCleanupCheckBoxesEnabled(true);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+
+        // e x e c u t e
+        worker.execute();
+    }
+
+    public void setCleanupCheckBoxesEnabled(boolean enabled) {
+        if (!enabled) {
+            wavCheckBox.setSelected(false);
+            mp3asdCheckBox.setSelected(false);
+            windowsCheckBox.setSelected(false);
+            flacCheckBox.setSelected(false);
+            zipCheckBox.setSelected(false);
+            everythingElseCheckBox.setSelected(false);
+            imagesCheckBox.setSelected(false);
+            customFileExtensionCheckBox.setSelected(false);
+            customFileExtensionTextField.setText(StringUtils.EMPTY);
+        }
+
+        mp3asdCheckBox.setEnabled(enabled);
+        flacCheckBox.setEnabled(enabled);
+        wavCheckBox.setEnabled(enabled);
+        zipCheckBox.setEnabled(enabled);
+        windowsCheckBox.setEnabled(enabled);
+        everythingElseCheckBox.setEnabled(enabled);
+        imagesCheckBox.setEnabled(enabled);
+        customFileExtensionCheckBox.setEnabled(enabled);
+    }
+
+    /**
+     * Checks to see if the deleteSelectedButton should be set enabled
      *
-     * @param type the type of results needed
+     * @return the result of the check
+     */
+    public boolean getDeleteSelectedButtonStatus() {
+        return (wavCheckBox.isSelected()
+                || flacCheckBox.isSelected()
+                || mp3asdCheckBox.isSelected()
+                || zipCheckBox.isSelected()
+                || windowsCheckBox.isSelected()
+                || imagesCheckBox.isSelected()
+                || everythingElseCheckBox.isSelected()
+                || customFileExtensionCheckBox.isSelected());
+    }
+
+    /**
+     * Sets the horizontal alignment of the cleanup currently scanning label
+     * @param alignment the alignment type (SwingConstants.LEADING or SwingConstants.TRAILING)
+     */
+    public void setCleanupCurrentlyScanningLabelHorizontalAlignment(int alignment) {
+        cleanupCurrentlyScanningLabel.setHorizontalAlignment(alignment);
+    }
+
+    /**
+     * Updates the currentlyScanningLabel
+     */
+    public void updateCleanupCurrentlyScanningLabel(String s) {
+        cleanupCurrentlyScanningLabel.setText(s);
+    }
+
+    /**
+     * Updates the cleanup progress bar
+     * @param percentage the percentage that the bar should be filled up
+     */
+    public void updateCleanupProgressBar(int percentage) {
+        cleanupProgressBar.setValue(percentage);
+    }
+
+    // </editor-fold>
+
+    /**
+     * Shows the result of the audit or cleanup
+     * @param type the type of results needed, either AUDIT or CLEANUP
      */
     public void viewResults(int type) {
         if (type == Constants.AUDIT) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.AUDIT), "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.AUDIT),
+                    "Audit Analysis Results", JOptionPane.PLAIN_MESSAGE);
         } else if (type == Constants.CLEANUP) {
-            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.CLEANUP), "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, buildResultsPanel(Constants.CLEANUP),
+                    "Cleanup Analysis Results", JOptionPane.PLAIN_MESSAGE);
         }
     }
 
     /**
-     * Assembles the JPanel for the dialog that shows the results of a cleanup
-     * audit
-     *
-     * @param type the type of results needed
+     * Assembles the JPanel for the dialog that shows the results of a cleanup or audit
+     * @param type the type of results needed (AUDIT or CLEANUP)
      * @return a fully assembled JPanel
      */
     public JPanel buildResultsPanel(int type) {
@@ -896,88 +1162,7 @@ public class AuditFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Refreshes the three checks and the current directory when a new album is
-     * loaded
-     */
-    public void refreshAuditFrame(List<Boolean> checkResults, String currentDirectory) {
-
-        // set the controller ivars
-        auditController.setIvars(checkResults.get(ID3), checkResults.get(FILENAMES), checkResults.get(COVER), currentDirectory);
-
-        // set the pass/fail icons
-        ID3TagCheck.setIcon(checkResults.get(ID3) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
-        filenameCheck.setIcon(checkResults.get(FILENAMES) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
-        coverArtCheck.setIcon(checkResults.get(COVER) ? IconUtils.get(IconUtils.ERROR) : IconUtils.get(IconUtils.SUCCESS));
-
-        // set the advance on auto fix checkbox enabled
-        advanceOnAutoFixCheckbox.setEnabled(true);
-
-        // set the attempt fix button to enabled if there's anything to fix
-        attemptAutoFixButton.setEnabled(checkResults.get(ID3) || checkResults.get(COVER) || checkResults.get(FILENAMES));
-
-        // update the current directory label
-        currentDirLabel.setText(auditController.getCurrentDirString(currentDirectory));
-    }
-
-    /**
-     * Checks to see if the deleteSelectedButton should be set enabled
-     *
-     * @return the result of the check
-     */
-    public boolean getDeleteSelectedButtonStatus() {
-        return (wavCheckBox.isSelected()
-                || flacCheckBox.isSelected()
-                || mp3asdCheckBox.isSelected()
-                || zipCheckBox.isSelected()
-                || windowsCheckBox.isSelected()
-                || imagesCheckBox.isSelected()
-                || everythingElseCheckBox.isSelected());
-    }
-
-    /**
-     * Updates the currentlyScanningLabel
-     */
-    public void updateAuditCurrentlyScanningLabel(String s) {
-        auditCurrentlyScanningLabel.setText(s);
-    }
-
-    /**
-     * Updates the currentlyScanningLabel
-     */
-    public void updateCleanupCurrentlyScanningLabel(String s) {
-        cleanupCurrentlyScanningLabel.setText(s);
-    }
-
-    /**
-     * Updates the audit progressBar
-     */
-    public void updateAuditProgressBar(int percentage) {
-        auditProgressBar.setValue(percentage);
-    }
-
-    /**
-     * Updates the cleanup progressBar
-     */
-    public void updateCleanupProgressBar(int percentage) {
-        cleanupProgressBar.setValue(percentage);
-    }
-
-    /**
-     * Sets the horizontal alignment of the given label
-     */
-    public void setAuditCurrentlyScanningLabelHorizontalAlignment(int alignment) {
-        auditCurrentlyScanningLabel.setHorizontalAlignment(alignment);
-    }
-
-    /**
-     * Sets the horizontal alignment of the given label
-     */
-    public void setCleanupCurrentlyScanningLabelHorizontalAlignment(int alignment) {
-        cleanupCurrentlyScanningLabel.setHorizontalAlignment(alignment);
-    }
-
-    /**
-     * Sets the audit frame back to disabled
+     * Sets the audit frame back to its starting point
      */
     public void resetAuditFrame() {
 
@@ -994,6 +1179,7 @@ public class AuditFrame extends javax.swing.JFrame {
         // audit fields
         auditCurrentlyScanningLabel.setText(StringUtils.EMPTY);
         auditProgressBar.setValue(0);
+        auditAnalyzeButton.setEnabled(true);
         auditStartButton.setEnabled(false);
         auditStartButton.setText("Start Audit");
         auditViewResultsButton.setEnabled(false);
@@ -1006,25 +1192,13 @@ public class AuditFrame extends javax.swing.JFrame {
         nextFolderButton.setEnabled(false);
         attemptAutoFixButton.setEnabled(false);
         nextFolderButton.setText("Save & Next -->");
+        advanceOnAutoFixCheckbox.setEnabled(false);
 
         // cleanup fields
+        setCleanupCheckBoxesEnabled(false);
         cleanupAnalyzeButton.setEnabled(true);
         cleanupViewResultsButton.setEnabled(false);
         cleanupResultsTextArea.setText(StringUtils.EMPTY);
-        wavCheckBox.setSelected(false);
-        wavCheckBox.setEnabled(false);
-        mp3asdCheckBox.setSelected(false);
-        mp3asdCheckBox.setEnabled(false);
-        windowsCheckBox.setSelected(false);
-        windowsCheckBox.setEnabled(false);
-        flacCheckBox.setSelected(false);
-        flacCheckBox.setEnabled(false);
-        zipCheckBox.setSelected(false);
-        zipCheckBox.setEnabled(false);
-        everythingElseCheckBox.setSelected(false);
-        everythingElseCheckBox.setEnabled(false);
-        imagesCheckBox.setSelected(false);
-        imagesCheckBox.setEnabled(false);
         deleteAllButton.setEnabled(false);
         deleteSelectedButton.setEnabled(false);
         this.toFront();
@@ -1037,6 +1211,7 @@ public class AuditFrame extends javax.swing.JFrame {
     private javax.swing.JButton attemptAutoFixButton;
     private javax.swing.JButton auditAnalyzeButton;
     private javax.swing.JLabel auditCurrentlyScanningLabel;
+    private javax.swing.JLabel auditLoadingLabel;
     private javax.swing.JPanel auditPanel;
     private javax.swing.JProgressBar auditProgressBar;
     private javax.swing.JTextArea auditResultsTextArea;
@@ -1045,12 +1220,17 @@ public class AuditFrame extends javax.swing.JFrame {
     private javax.swing.JButton chooseFolderButton;
     private javax.swing.JButton cleanupAnalyzeButton;
     private javax.swing.JLabel cleanupCurrentlyScanningLabel;
+    private javax.swing.JLabel cleanupLoadingLabel;
     private javax.swing.JPanel cleanupPanel;
     private javax.swing.JProgressBar cleanupProgressBar;
     private javax.swing.JTextArea cleanupResultsTextArea;
     private javax.swing.JButton cleanupViewResultsButton;
     private javax.swing.JLabel coverArtCheck;
     private javax.swing.JLabel currentDirLabel;
+    private javax.swing.JCheckBox customFileExtensionCheckBox;
+    private javax.swing.JLabel customFileExtensionLabel;
+    private javax.swing.JLabel customFileExtensionPrefixLabel;
+    private javax.swing.JTextField customFileExtensionTextField;
     private javax.swing.JButton deleteAllButton;
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JCheckBox everythingElseCheckBox;
@@ -1065,7 +1245,6 @@ public class AuditFrame extends javax.swing.JFrame {
     private javax.swing.JLabel label3;
     private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
-    private javax.swing.JLabel loadingLabel;
     private javax.swing.JCheckBox mp3asdCheckBox;
     private javax.swing.JButton nextFolderButton;
     private javax.swing.JLabel pathLabel;
