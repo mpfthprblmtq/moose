@@ -1,10 +1,10 @@
 /*
-   Proj:   Moose
-   File:   Frame.java
-   Desc:   Main UI class for the JFrame containing the everything.
-           Works with the SongController to edit albums, this class just handles all the UI.
-
-   Copyright Pat Ripley 2018-2023
+ * Proj:   Moose
+ * File:   Frame.java
+ * Desc:   Main UI class for the JFrame containing the everything.
+ *         Works with the SongController to edit albums, this class just handles all the UI.
+ *
+ * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
 // package
@@ -52,6 +52,7 @@ import javax.swing.table.TableCellEditor;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
 // class Frame
+@SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
 public class Frame extends javax.swing.JFrame {
 
     // logger object
@@ -60,13 +61,13 @@ public class Frame extends javax.swing.JFrame {
     // controller
     public SongController songController = Moose.getSongController();
 
-    // some graphics ivars
+    // some graphics fields
     ActionListener menuListener;        // listener for the popup menu objects
 
     int currentRow;     // keeps track of the current row
     int currentColumn;  // keeps track of the current column
 
-    // ivars for the multPanel to check if the artwork has changed
+    // fields for the multPanel to check if the artwork has changed
     byte[] originalMultPanelArtwork;
     byte[] newMultPanelArtwork;
     boolean multipleArtworks = false;
@@ -462,7 +463,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Adds the file and all of its pertinent information to the table as a row. Works with the fileDrop functionality.
      * @param file the file to add
-     * @return the result of the file add, false if the file is a duplicate or not an mp3, true if all is good
+     * @return the result of the file add, false if the file is a duplicate mp3 file or not, true if all is good
      */
     public boolean addFileToTable(File file) {
 
@@ -472,7 +473,7 @@ public class Frame extends javax.swing.JFrame {
             return false;
         }
 
-        // check if the file is an mp3
+        // check if the file is of type mp3
         if (!file.getAbsolutePath().endsWith(".mp3")) {
             return false;
         }
@@ -1158,7 +1159,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the open menu item, opens a JFileChooser for the user to select a directory to open
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // for the evt
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
         File[] dirs = FileUtils.launchJFileChooser(
                 "Select a folder to open...",
@@ -1188,6 +1189,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the save track menu item, saves all selected rows
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             int[] selectedRows = table.getSelectedRows();
@@ -1201,6 +1203,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the save all menu item, saves all rows in the table
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void saveAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllMenuItemActionPerformed
         songController.saveTracks(IntStream.range(0, table.getRowCount()).toArray());
     }//GEN-LAST:event_saveAllMenuItemActionPerformed
@@ -1209,6 +1212,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the exit menu item
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
         closeWindow();
     }//GEN-LAST:event_exitMenuItemActionPerformed
@@ -1230,6 +1234,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the select all menu item, selects all the rows on the table
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:selectAllMenuItemActionPerformed
         selectAll();
     }//GEN-LAST:selectAllMenuItemActionPerformed
@@ -1248,6 +1253,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Audit menu item, launches the audit frame
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void auditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditMenuItemActionPerformed
         Moose.launchAuditFrame();
     }//GEN-LAST:event_auditMenuItemActionPerformed
@@ -1256,6 +1262,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Autotag menu item, auto tags the selected rows
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void autoTagMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTagMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             autoTag(table.getSelectedRows());
@@ -1280,6 +1287,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Add Covers menu item, auto adds the covers
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void addCoversMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCoversMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             autoAddCoverArt(table.getSelectedRows());
@@ -1301,6 +1309,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Find and Replace menu item, opens the Find and Replace dialog
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void findAndReplaceMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findAndReplaceMenuItemActionPerformed
         showFindAndReplaceDialog();
     }//GEN-LAST:event_findAndReplaceMenuItemActionPerformed
@@ -1340,6 +1349,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Add Track/Disk numbers menu item, auto adds the track numbers and disk numbers
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             songController.autoTaggingService.addTrackAndDiskNumbers(table.getSelectedRows());
@@ -1353,6 +1363,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Format Filenames menu item, formats the filenames
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
             formatFilenames(table.getSelectedRows());
@@ -1373,6 +1384,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the About menu item, opens the about dialog
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
         DialogUtils.showAboutDialog();
     }//GEN-LAST:event_aboutMenuItemActionPerformed
@@ -1381,6 +1393,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Wiki menu item, opens the wiki page
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
         try {
             WebUtils.openPage(MOOSE_WIKI);
@@ -1393,6 +1406,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Command Prompt menu item, opens a command prompt dialog
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void commandMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commandMenuItemActionPerformed
         String command = JOptionPane.showInputDialog(this, "Enter a command:");
         if (command != null) {
@@ -1429,6 +1443,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Settings menu item, launches the SettingsFrame
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
         Moose.launchSettingsFrame();
     }//GEN-LAST:event_settingsMenuItemActionPerformed
@@ -1445,6 +1460,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Save All button press, saves all tracks currently on the table
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void saveAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllButtonActionPerformed
         songController.saveTracks(IntStream.range(0, table.getRowCount()).toArray());
     }//GEN-LAST:event_saveAllButtonActionPerformed
@@ -1453,6 +1469,7 @@ public class Frame extends javax.swing.JFrame {
      * Clear All button, shows a dialog if the user has the isAskBeforeClearAll setting enabled
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
         if (Moose.getSettings().isAskBeforeClearAll()) {
             Boolean result = DialogUtils.showClearAllDialog(this);
@@ -1487,6 +1504,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the Open All button press, opens all the tracks currently on the table
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
         for (int i = 0; i < table.getRowCount(); i++) {
             File file = songController.autoTaggingService.getFile(i);
@@ -1584,7 +1602,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * What happens when we're editing a cell and press a key, mainly used for Enter/Tab navigation
-     * @param evt, the KeyEvent we will use to determine where to go
+     * @param evt the KeyEvent we will use to determine where to go
      */
     private void tableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_META) {
@@ -1608,7 +1626,7 @@ public class Frame extends javax.swing.JFrame {
     /**
      * Function that selects the cell being edited. Used mainly when pressing tab or enter to navigate.
      * This is one of those methods that just works, and it's best not to mess with it.
-     * @param evt, the KeyEvent that we will use to determine the type of navigation (Enter, Tab, Shift+Enter, Shift+Tab)
+     * @param evt the KeyEvent that we will use to determine the type of navigation (Enter, Tab, Shift+Enter, Shift+Tab)
      */
     public void changeSelection(KeyEvent evt) {
 
@@ -1690,8 +1708,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * What happens when the multPanel update button is clicked
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multUpdateButtonActionPerformed
         int[] selectedRows = table.getSelectedRows();
         if (selectedRows != null && selectedRows.length == 0) {
@@ -1702,7 +1721,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Opens the context menu for album art on clicking on the multImage box
-     * @param evt, the mouse event, used to get the x,y of the click
+     * @param evt the mouse event, used to get the x,y of the click
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
         if (multImage.isEnabled()) {
@@ -1712,7 +1731,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multTitleKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTitleKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1722,7 +1741,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multArtistKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1732,7 +1751,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multAlbumKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1742,7 +1761,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multAlbumArtistKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multAlbumArtistKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1752,7 +1771,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multGenreKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multGenreKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1762,7 +1781,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multYearKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multYearKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1772,7 +1791,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multTrackKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multTrackKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1782,7 +1801,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * If enter is pressed while field is in focus, simulate update button click
-     * @param evt, the KeyEvent to check against
+     * @param evt the KeyEvent to check against
      */
     private void multDiskKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_multDiskKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -1792,16 +1811,18 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multTitleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTitleFocusGained
         multTitle.selectAll();
     }//GEN-LAST:event_multTitleFocusGained
 
     /**
      * On focus gain, update auto complete fields and select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multArtistFocusGained
         updateAutocompleteFields(multArtist, false);
         multArtist.selectAll();
@@ -1809,8 +1830,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, update auto complete fields and select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multAlbumFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumFocusGained
         updateAutocompleteFields(multAlbum, false);
         multAlbum.selectAll();
@@ -1818,8 +1840,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, update auto complete fields and select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multAlbumArtistFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multAlbumArtistFocusGained
         updateAutocompleteFields(multAlbumArtist, false);
         multAlbumArtist.selectAll();
@@ -1827,8 +1850,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, update auto complete fields and select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multGenreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multGenreFocusGained
         updateAutocompleteFields(multGenre, true);
         multGenre.selectAll();
@@ -1836,8 +1860,9 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, update auto complete fields and select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multYearFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multYearFocusGained
         updateAutocompleteFields(multYear, false);
         multYear.selectAll();
@@ -1845,16 +1870,18 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * On focus gain, select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multTrackFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multTrackFocusGained
         multTrack.selectAll();
     }//GEN-LAST:event_multTrackFocusGained
 
     /**
      * On focus gain, select all text
-     * @param evt, the FocusEvent (not used, but here because Netbeans)
+     * @param evt the FocusEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused") // for the evt
     private void multDiskFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_multDiskFocusGained
         multDisk.selectAll();
     }//GEN-LAST:event_multDiskFocusGained
@@ -1924,21 +1951,6 @@ public class Frame extends javax.swing.JFrame {
             multipleArtworks = true;
         }
     }
-
-//    /**   DEPRECATED
-//     * Clears out the multPanel
-//     */
-//    private void clearOutMultPanel() {
-//        multTitle.setText(StringUtils.EMPTY);
-//        multArtist.setText(StringUtils.EMPTY);
-//        multAlbum.setText(StringUtils.EMPTY);
-//        multAlbumArtist.setText(StringUtils.EMPTY);
-//        multGenre.setText(StringUtils.EMPTY);
-//        multYear.setText(StringUtils.EMPTY);
-//        multTrack.setText(StringUtils.EMPTY);
-//        multDisk.setText(StringUtils.EMPTY);
-//        multImage.setIcon(null);
-//    }
 
     /**
      * Updates the table from the mult panel fields
