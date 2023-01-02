@@ -1158,6 +1158,7 @@ public class Frame extends javax.swing.JFrame {
      * Action for the open menu item, opens a JFileChooser for the user to select a directory to open
      * @param evt, the ActionEvent (not used, but here because Netbeans)
      */
+    @SuppressWarnings("unused")
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
         File[] dirs = FileUtils.launchJFileChooser(
                 "Select a folder to open...",

@@ -19,6 +19,12 @@ import java.util.regex.Pattern;
 
 public class DialogUtils {
 
+    // constants used in custom dialogs
+    public static final int ONLY_MARKED_ALBUMS = 1;
+    public static final int ALL_ALBUMS = 2;
+    public static final int START_NEW_AUDIT = 1;
+    public static final int CONTINUE_AUDIT = 2;
+
     /**
      * Shows the about dialog, includes name, version, and copyright
      */
@@ -199,17 +205,6 @@ public class DialogUtils {
      */
     public static void showMessageDialog(Component component, String message, String title, int messageType) {
         JOptionPane.showMessageDialog(component, message, title, messageType);
-    }
-
-    /**
-     * Shows a confirmation dialog
-     * @param component the context of the dialog
-     * @param message the message to display
-     * @param title the title to display
-     * @param messageType the message type (JOptionPane)
-     */
-    public static int showConfirmationDialog(Component component, String message, String title, int messageType) {
-        return JOptionPane.showConfirmDialog(component, message, title, JOptionPane.YES_NO_CANCEL_OPTION, messageType);
     }
 
     /**

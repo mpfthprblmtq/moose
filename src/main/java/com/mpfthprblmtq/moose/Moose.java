@@ -54,7 +54,6 @@ public class Moose {
 
         // go
         launchFrame();
-//        launchFrame(new File("/Users/mpfthprblmtq/Music/Library - For Testing/bitbirb/Singles/Future Bass"));
     }
 
     /**
@@ -152,7 +151,7 @@ public class Moose {
      * Controls the AuditFrame opening and closing
      */
     public static void launchAuditFrame() {
-        auditFrame = new AuditFrame(frame, frame.songController);
+        auditFrame = new AuditFrame();
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
     }
