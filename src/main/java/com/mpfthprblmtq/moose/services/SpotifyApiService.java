@@ -1,5 +1,14 @@
+/*
+ *  Proj:   Moose
+ *  File:   SpotifyApiService.java
+ *  Desc:   Service class for Spotify search functionality on the Album Art Finder window.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.services;
 
+// imports
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -22,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+// class SpotifyApiService
 public class SpotifyApiService {
 
     // logger

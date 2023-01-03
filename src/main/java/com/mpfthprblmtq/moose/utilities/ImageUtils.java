@@ -1,5 +1,14 @@
+/*
+ *  Proj:   Moose
+ *  File:   ImageUtils.java
+ *  Desc:   A utility class to pull out common logic with image functionality.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.moose.Moose;
@@ -15,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// class ImageUtils
 public class ImageUtils {
 
     static Logger logger = Moose.getLogger();

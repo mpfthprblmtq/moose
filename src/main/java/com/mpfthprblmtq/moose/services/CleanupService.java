@@ -1,13 +1,12 @@
 /*
- * Proj:   Moose
- * File:   CleanupService.java
- * Desc:   Service class for AuditFrame and CleanupController, works directly with CleanupController and has the bulk
- *         of the logic for cleanup functionality.
+ *  Proj:   Moose
+ *  File:   CleanupService.java
+ *  Desc:   Service class for AuditFrame and CleanupController, works directly with CleanupController and has the bulk
+ *          of the logic for cleanup functionality.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.services;
 
 // imports

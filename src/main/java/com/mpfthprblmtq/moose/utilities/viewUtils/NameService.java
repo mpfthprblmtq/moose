@@ -1,15 +1,16 @@
 /*
-   Proj:   Moose
-   File:   NameService.java
-   Desc:   Service class for autocomplete
-
-   Copyright Samuel Sjoberg
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   NameService.java
+ *  Desc:   Service class for autocomplete
+ *          NOTE: Not mine, but edited to fit my use case
+ *
+ *  Copyright Samuel Sjoberg
+ *  Copyright Pat Ripley 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
+// imports
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ import java.util.List;
  * @author Samuel Sjoberg, http://samuelsjoberg.com
  * @version 1.0.0
  */
+// class NameService
 public class NameService implements CompletionService<String> {
 
     /** Our name data. */

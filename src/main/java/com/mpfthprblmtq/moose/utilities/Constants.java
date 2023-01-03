@@ -1,7 +1,17 @@
+/*
+ *  Proj:   Moose
+ *  File:   Constants.java
+ *  Desc:   Home to many random constant values.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import java.awt.Color;
 
+// class Constants
 public class Constants {
 
     public static final String DASH = "-";

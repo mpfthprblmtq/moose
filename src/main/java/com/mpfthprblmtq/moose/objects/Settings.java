@@ -1,12 +1,11 @@
 /*
- * Proj:   Moose
- * File:   Settings.java
- * Desc:   Pojo for the Settings information
+ *  Proj:   Moose
+ *  File:   Settings.java
+ *  Desc:   Pojo for the Settings information
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects;
 
 // imports

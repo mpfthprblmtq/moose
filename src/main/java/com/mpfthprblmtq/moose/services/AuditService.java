@@ -1,13 +1,12 @@
 /*
- * Proj:   Moose
- * File:   AuditService.java
- * Desc:   Service class for AuditFrame and AuditController, works directly with AuditController and has the bulk of the
- *         logic for auditing functionality.
+ *  Proj:   Moose
+ *  File:   AuditService.java
+ *  Desc:   Service class for AuditFrame and AuditController, works directly with AuditController and has the bulk of the
+ *          logic for auditing functionality.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.services;
 
 //imports

@@ -1,5 +1,15 @@
+/*
+ *  Proj:   Moose
+ *  File:   SongUtils.java
+ *  Desc:   A utility class to pull out common logic from interacting with Song data.  Includes a function used to
+ *          retrieve existing ID3 information from a file and throws it in a Song object.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v1Tag;
 import com.mpatric.mp3agic.ID3v2;
@@ -19,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+// class SongUtils
 public class SongUtils {
 
     static Logger logger = Moose.getLogger();

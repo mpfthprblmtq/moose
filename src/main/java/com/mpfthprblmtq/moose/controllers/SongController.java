@@ -1,12 +1,12 @@
 /*
-   Proj:   Moose
-   File:   SongController.java
-   Desc:   Controller class for Frame, works directly with the data based on input from Frame UI
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   SongController.java
+ *  Desc:   Controller class for Frame (mostly) and other classes interacting with songs. Controls the main song list
+ *          along with any modifications to songs or song data.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.controllers;
 
 // imports

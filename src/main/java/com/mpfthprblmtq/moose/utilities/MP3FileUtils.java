@@ -1,5 +1,14 @@
+/*
+ *  Proj:   Moose
+ *  File:   MP3FileUtils.java
+ *  Desc:   A utility class to pull out common logic from interacting with mp3 files.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.objects.Song;
@@ -10,6 +19,7 @@ import java.util.List;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
+// class MP3FileUtils
 public class MP3FileUtils {
 
     /**

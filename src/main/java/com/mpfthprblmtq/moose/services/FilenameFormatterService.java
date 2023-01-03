@@ -1,10 +1,15 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Proj:   Moose
+ *  File:   FilenameFormatterService.java
+ *  Desc:   Service class for filename formatting. Was once part of the AutoTaggingService, but that became a monolithic
+ *          garbage can, so split it into its own service.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
+
 package com.mpfthprblmtq.moose.services;
 
+// imports
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +24,7 @@ import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
+// class FilenameFormatterService
 public class FilenameFormatterService {
 
     // auto tagging service

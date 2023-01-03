@@ -1,5 +1,14 @@
+/*
+ *  Proj:   Moose
+ *  File:   DialogUtils.java
+ *  Desc:   Common functions/methods that deal with Dialogs and JOptionPanes.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
+// imports
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.utilities.Constants;
@@ -17,6 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// class DialogUtils
 public class DialogUtils {
 
     // constants used in custom dialogs

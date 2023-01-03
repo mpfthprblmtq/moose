@@ -1,13 +1,13 @@
 /*
-   Proj:   Moose
-   File:   AutoCompleteDocument.java
-   Desc:   Service class for auto tagging
-
-   Copyright Samuel Sjoberg
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   AutoCompleteDocument.java
+ *  Desc:   Service class for auto tagging
+ *          NOTE: Not mine, but edited to fit my use case
+ *
+ *  Copyright Samuel Sjoberg
+ *  Copyright Pat Ripley 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
 // imports
@@ -26,6 +26,7 @@ import javax.swing.text.*;
  * @author Samuel Sjoberg, http://samuelsjoberg.com
  * @version 1.0.0
  */
+// class AutoCompleteDocument
 public class AutoCompleteDocument extends PlainDocument {
 
     /** Default serial version UID. */
@@ -83,6 +84,7 @@ public class AutoCompleteDocument extends PlainDocument {
     }
 }
 
+// interface CompletionService
 interface CompletionService<T> {
 
     /**

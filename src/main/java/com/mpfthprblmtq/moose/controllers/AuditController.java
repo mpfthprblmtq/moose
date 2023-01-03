@@ -1,13 +1,12 @@
 /*
- * Proj:   Moose
- * File:   AuditController.java
- * Desc:   Driver class for the audit functionality.  Takes input from the AuditFrame and uses the AuditService
- *         to perform audit functions.
+ *  Proj:   Moose
+ *  File:   AuditController.java
+ *  Desc:   Driver class for the audit functionality.  Takes input from the AuditFrame and uses the AuditService
+ *          to perform audit functions.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.controllers;
 
 // imports

@@ -1,13 +1,12 @@
 /*
- * Proj:   Moose
- * File:   Frame.java
- * Desc:   Main UI class for the JFrame containing the everything.
- *         Works with the SongController to edit albums, this class just handles all the UI.
+ *  Proj:   Moose
+ *  File:   Frame.java
+ *  Desc:   Main UI class for the JFrame containing the everything.
+ *          Works with the SongController to edit albums, this class just handles all the UI.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views;
 
 // imports

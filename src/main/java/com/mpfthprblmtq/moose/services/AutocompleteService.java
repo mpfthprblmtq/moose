@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   AutoCompleteService.java
-   Desc:   Pojo for a bundle of search information to provide to the Album Art Finder service
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   AutocompleteService.java
+ *  Desc:   Service class for auto complete logic
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.services;
 
 // imports
@@ -19,6 +18,7 @@ import com.mpfthprblmtq.moose.utilities.viewUtils.NameService;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
+// class AutocompleteService
 public class AutocompleteService {
 
     /**

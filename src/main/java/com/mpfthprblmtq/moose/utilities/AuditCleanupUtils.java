@@ -1,12 +1,11 @@
 /*
- * Proj:   Moose
- * File:   AuditCleanupUtils.java
- * Desc:   A utility class to pull out common logic from the audit and cleanup functionality.
+ *  Proj:   Moose
+ *  File:   AuditCleanupUtils.java
+ *  Desc:   A utility class to pull out common logic from the audit and cleanup functionality.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.utilities;
 
 // imports

@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   ImageSearchResponse.java
-   Desc:   Pojo for the response we get back from the Google CSE API call
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   ImageSearchResponse.java
+ *  Desc:   Pojo for a bundle of search information retrieved with the Google CSE
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects.api.imageSearch;
 
 // imports
