@@ -1,9 +1,9 @@
 /*
-   Proj:   Moose
-   File:   Settings.java
-   Desc:   Pojo for the Settings information
-
-   Copyright Pat Ripley 2018-2023
+ * Proj:   Moose
+ * File:   Settings.java
+ * Desc:   Pojo for the Settings information
+ *
+ * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
 // package
@@ -14,7 +14,11 @@ import com.mpfthprblmtq.commons.utils.DateUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // class Settings
 @Data
@@ -75,6 +79,11 @@ public class Settings {
         setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/moose/");
     }
 
+    /**
+     * Builder pattern method to append a version to a settings object while getting it
+     * @param version the version to set on the Settings object
+     * @return the Settings object with the version
+     */
     public Settings withVersionNumber(String version) {
         this.setVersion(version);
         return this;
