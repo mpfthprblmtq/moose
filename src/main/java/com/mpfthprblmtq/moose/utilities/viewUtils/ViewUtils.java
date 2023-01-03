@@ -1,5 +1,14 @@
+/*
+ *  Proj:   Moose
+ *  File:   ViewUtils.java
+ *  Desc:   Common functions/methods that deal with Views, Frames, and JTables. (oh, my!)
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
+// imports
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
@@ -21,6 +30,7 @@ import java.util.EventObject;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
+// class ViewUtils
 public class ViewUtils {
 
     // logger

@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   AlbumArtFinderService.java
-   Desc:   Service class for the album art finder
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   GoogleSearchService.java
+ *  Desc:   Service class for Google search functionality on the Album Art Finder window.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.services;
 
 // imports

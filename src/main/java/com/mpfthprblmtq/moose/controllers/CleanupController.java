@@ -1,13 +1,12 @@
 /*
- * Proj:   Moose
- * File:   CleanupController.java
- * Desc:   Driver class for the cleanup functionality.  Takes input from the AuditFrame and uses the CleanupService
- *         to perform cleanup functions.
+ *  Proj:   Moose
+ *  File:   CleanupController.java
+ *  Desc:   Driver class for the cleanup functionality.  Takes input from the AuditFrame and uses the CleanupService
+ *          to perform cleanup functions.
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.controllers;
 
 // imports

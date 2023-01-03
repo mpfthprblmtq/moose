@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   InfoFrame.java
-   Desc:   Main UI class for the JFrame containing the song info.
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   InfoFrame.java
+ *  Desc:   Main UI class for the JFrame containing the song info.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports
@@ -38,7 +37,7 @@ import static com.mpfthprblmtq.moose.utilities.Constants.*;
 // class InfoFrame
 public class InfoFrame extends javax.swing.JFrame {
 
-    // some graphics ivars
+    // some graphics fields
     ActionListener menuListener;        // listener for the popup menu objects
     
     // songController object

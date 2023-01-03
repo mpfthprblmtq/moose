@@ -7,7 +7,6 @@
  *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose;
 
 // imports
@@ -21,7 +20,7 @@ import com.mpfthprblmtq.moose.views.modals.SettingsFrame;
 
 import java.io.File;
 
-// class Main
+// class Moose
 public class Moose {
     
     // create and instantiate the frames

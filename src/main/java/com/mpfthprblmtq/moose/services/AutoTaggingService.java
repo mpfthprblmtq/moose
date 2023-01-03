@@ -1,16 +1,14 @@
 /*
-   Proj:   Moose
-   File:   AutoTaggingService.java
-   Desc:   Service class for auto tagging
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   AutoTaggingService.java
+ *  Desc:   Service class for AutoTagging
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.services;
 
 // imports
-
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;

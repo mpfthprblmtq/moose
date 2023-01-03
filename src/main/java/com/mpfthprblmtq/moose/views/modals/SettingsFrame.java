@@ -7,7 +7,6 @@
  *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports

@@ -2,13 +2,12 @@
  *  Proj:   Moose
  *  File:   AuditFrame.java
  *  Desc:   Main UI class for the JFrame containing the Audit/Cleanup functionality.
- *         Works with the AuditController and CleanupController to clean and audit directories,
- *         this class just handles all the UI interactions.
+ *          Works with the AuditController and CleanupController to clean and audit directories,
+ *          this class just handles all the UI interactions.
  *
  *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports

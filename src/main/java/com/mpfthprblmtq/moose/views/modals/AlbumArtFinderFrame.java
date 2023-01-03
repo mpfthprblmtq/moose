@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   AlbumArtFinderFrame.java
-   Desc:   The UI class for the album art finder service
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   AlbumArtFinderFrame.java
+ *  Desc:   UI class responsible for the album art finder
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports
@@ -38,6 +37,7 @@ import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 
+// class AlbumArtFinderFrame
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     static Logger logger = Moose.getLogger();

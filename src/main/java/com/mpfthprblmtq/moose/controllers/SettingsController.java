@@ -1,12 +1,11 @@
 /*
- * Proj:   Moose
- * File:   SettingsController.java
- * Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
+ *  Proj:   Moose
+ *  File:   SettingsController.java
+ *  Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
  *
- * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.controllers;
 
 // imports

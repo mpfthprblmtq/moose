@@ -1,17 +1,16 @@
 /*
-   Proj:   Moose
-   File:   FileDrop.java
-   Desc:   Helper class that controls the dropping of files
-           NOTE:  Not mine
-
-   Copyright Robert Harder 2007
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   FileDrop.java
+ *  Desc:   Helper class that controls the dropping of files into a component
+ *          NOTE:  Not mine, but edited to fit my use case
+ *
+ *  Copyright Robert Harder 2007
+ *  Copyright Pat Ripley 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
-//imports
+// imports
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
 import java.io.File;

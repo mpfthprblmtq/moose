@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   Song.java
-   Desc:   Object class for the Song object
-
-   Copyright Pat Ripley 2018-2023
+ *  Proj:   Moose
+ *  File:   Song.java
+ *  Desc:   Pojo for the Song information
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects;
 
 // imports
