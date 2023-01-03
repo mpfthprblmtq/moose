@@ -1,9 +1,9 @@
 /*
-   Proj:   Moose
-   File:   SettingsController.java
-   Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
-
-   Copyright Pat Ripley 2018-2023
+ * Proj:   Moose
+ * File:   SettingsController.java
+ * Desc:   Controller class for SettingsFrame, works directly with the data based on input from AuditFrame UI
+ *
+ * Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
 // package
@@ -51,6 +51,9 @@ public class SettingsController {
     // logger object
     Logger logger = Moose.getLogger();
 
+    /**
+     * Creates new SettingsController and sets up the JsonMapper and Settings object
+     */
     public SettingsController() {
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
@@ -59,6 +62,9 @@ public class SettingsController {
         this.settings = new Settings();
     }
 
+    /**
+     * Reads the settings file into the settings field object
+     */
     public void readSettingsFile() {
         try {
             String jsonString = new String(Files.readAllBytes(settingsFile.toPath()));
@@ -72,6 +78,9 @@ public class SettingsController {
         }
     }
 
+    /**
+     * Creates the application support directory and the main settings file if it doesn't exist
+     */
     public void setUpSupportDirectory() {
         // create the logging directory if it doesn't already exist
         File settingsDir = new File(settings.getApplicationSupportLocation());
@@ -91,7 +100,7 @@ public class SettingsController {
                     throw new IOException("IOException when trying to create the settings file " + settings_path);
                 }
 
-                // since we've created a brand new file, fill it with some default values
+                // since we've created a new file, fill it with some default values
                 fillDefaults();
             } catch (IOException ex) {
                 logger.logError("Couldn't create settings file!", ex);
@@ -107,6 +116,10 @@ public class SettingsController {
         writeSettingsFile(settings);
     }
 
+    /**
+     * Blanks out the genre list in settings
+     * @return if the list of genres is empty
+     */
     public boolean defaultGenres() {
         settings.setGenres(new ArrayList<>());
         writeSettingsFile(settings);
@@ -115,6 +128,10 @@ public class SettingsController {
         return Moose.getSettings().getGenres().isEmpty();
     }
 
+    /**
+     * Defaults the logging level
+     * @return the result of setting the values to default
+     */
     public boolean defaultLogging() {
         settings.setInDeveloperMode(false);
         settings.setInDebugMode(false);
@@ -124,6 +141,10 @@ public class SettingsController {
         return !Moose.getSettings().isInDebugMode() && !Moose.getSettings().isInDeveloperMode();
     }
 
+    /**
+     * Defaults the files configuration
+     * @return the result of setting the values to default
+     */
     public boolean defaultFiles() {
         settings.setLibraryLocation(StringUtils.EMPTY);
         writeSettingsFile(settings);
@@ -132,10 +153,19 @@ public class SettingsController {
         return StringUtils.isEmpty(Moose.getSettings().getLibraryLocation());
     }
 
+    /**
+     * Clears out and defaults any Spotify API, Google Search API keys and ids
+     * @return the result of defaulting those values
+     */
     public boolean defaultApi() {
+        // search api
         settings.setAlbumArtFinderApiKey(StringUtils.EMPTY);
         settings.setAlbumArtFinderCseId(StringUtils.EMPTY);
         settings.setPreferredCoverArtSize(640);
+        // spotify api
+        settings.setSpotifyClientId(StringUtils.EMPTY);
+        settings.setSpotifyClientSecret(StringUtils.EMPTY);
+
         writeSettingsFile(settings);
 
         // check if successful
@@ -143,6 +173,10 @@ public class SettingsController {
                 && StringUtils.isEmpty(Moose.getSettings().getAlbumArtFinderCseId());
     }
 
+    /**
+     * Defaults all features to true
+     * @return the result of setting those features to true
+     */
     public boolean defaultFeatures() {
         settings.getFeatures().replaceAll((k,v) -> v = true);
         writeSettingsFile(settings);
@@ -152,12 +186,16 @@ public class SettingsController {
         return values.size() == 1 && Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING);
     }
 
+    /**
+     * Returns the settings object with a version number
+     * @return the settings object with a version number
+     */
     public Settings getSettings() {
         return this.settings.withVersionNumber(version);
     }
 
     /**
-     * Opens the event log
+     * Opens the event log. Logs exception if it can't open the file.
      */
     public void openEventLog() {
         try {
@@ -168,7 +206,7 @@ public class SettingsController {
     }
 
     /**
-     * Opens the error log
+     * Opens the error log. Logs exception if it can't open the file.
      */
     public void openErrorLog() {
         try {
@@ -179,7 +217,7 @@ public class SettingsController {
     }
 
     /**
-     * Clears the event log
+     * Clears the event log. Logs exception if it can't clear out the file.
      */
     public void clearEventLog() {
         try {
@@ -190,7 +228,7 @@ public class SettingsController {
     }
 
     /**
-     * Clears the error log
+     * Clears the error log. Logs exception if it can't clear out the file.
      */
     public void clearErrorLog() {
         try {
@@ -201,7 +239,8 @@ public class SettingsController {
     }
 
     /**
-     * Writes the settingsFile file from the ivars that were set in the program
+     * Writes the settingsFile file from the fields that were set at any point in the application.
+     * @param settings the Settings object to write
      */
     public boolean writeSettingsFile(Settings settings) {
         try {
