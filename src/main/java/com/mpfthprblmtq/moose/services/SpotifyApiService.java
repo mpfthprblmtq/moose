@@ -41,11 +41,13 @@ public class SpotifyApiService {
     private SpotifyToken token;
 
     // limits of results for each API
+    @SuppressWarnings("FieldCanBeLocal")
     private final int ARTIST_LIMIT = 5;
+    @SuppressWarnings("FieldCanBeLocal")
     private final int ALBUM_LIMIT = 20;
 
     /**
-     * Automatic function that tries and find the album magically, basically if it finds a 1 to 1 match on the artist
+     * Automatic function that tries and find the album magically. Basically if it finds a 1 to 1 match on the artist
      * and a 1 to 1 match on the album, just return that url, else return null
      * @param artistQuery the artist to search for
      * @param albumQuery the album to search for
@@ -56,7 +58,8 @@ public class SpotifyApiService {
         Artist artist = null;
         Album album = null;
 
-        if (StringUtils.isEmpty(Moose.getSettings().getSpotifyClientSecret()) || StringUtils.isEmpty(Moose.getSettings().getSpotifyClientId())) {
+        if (StringUtils.isEmpty(Moose.getSettings().getSpotifyClientSecret())
+                || StringUtils.isEmpty(Moose.getSettings().getSpotifyClientId())) {
             return null;
         }
 
@@ -148,13 +151,15 @@ public class SpotifyApiService {
     }
 
     /**
-     * Authentication method that calls out to Spotify's auth url with the client id and client secret stored in the settings.
-     * Sets the global token for use later and checks if token is still valid (to prevent subsequent auth calls)
+     * Authentication method that calls out to Spotify's auth url with the client id and client secret stored in the
+     * settings. Sets the global token for use later and checks if token is still valid (to prevent subsequent auth
+     * calls)
      */
     public void authenticate() {
 
         // check to see if we need to authenticate first
-        if (token != null && System.currentTimeMillis() > (token.getTimestamp() * 1000) + ((long) token.getExpiration() * 1000)) {
+        if (token != null
+                && System.currentTimeMillis() > (token.getTimestamp() * 1000) + ((long) token.getExpiration() * 1000)) {
             return;
         }
 
@@ -183,11 +188,10 @@ public class SpotifyApiService {
     }
 
     /**
-     * Gets an artist based on a string query from Spotify's API
-     * Assumes we're already authenticated
+     * Gets an artist based on a string query from Spotify's API. Assumes we're already authenticated.
      * @param query the artist to search for
      * @return an Artist object or null if no artist was found
-     * @throws IOException if a url could not be created from the query or if there's an issue calling the API
+     * @throws IOException if url could not be created from the query or if there's an issue calling the API
      */
     public List<Artist> getArtistsFromSearch(String query) throws IOException {
         // create the url
@@ -215,7 +219,7 @@ public class SpotifyApiService {
         ObjectReader reader = mapper.readerFor(ArtistSearchResponse.class).withRootName("artists");
         ArtistSearchResponse artists = reader.readValue(response);
 
-        // get rid of any non exact matches (case insensitive, just in case)
+        // get rid of any non-exact matches (case-insensitive, just in case)
         artists.getArtists().removeIf(x -> !StringUtils.equalsIgnoreCase(x.getName(), query));
 
         // return the artist list
@@ -223,12 +227,12 @@ public class SpotifyApiService {
     }
 
     /**
-     * Gets an album based on an artist ID and a name of an album from Spotify's API
-     * Assumes we're already authenticated
+     * Gets an album based on an artist ID and a name of an album from Spotify's API.
+     * Assumes we're already authenticated.
      * @param artistId the id of the artist to search on
      * @param nextUrl the "next" url to search on if we need to make subsequent calls
      * @return an album or null if the album wasn't found
-     * @throws IOException if a url could not be created from the query or if there's an issue calling the API
+     * @throws IOException if url could not be created from the query or if there's an issue calling the API
      */
     public AlbumSearchResponse getAlbumFromArtist(String artistId, String nextUrl) throws IOException {
 
@@ -262,11 +266,10 @@ public class SpotifyApiService {
     }
 
     /**
-     * Gets an artist based on the artist ID given
-     * Assumes we're already authenticated
+     * Gets an artist based on the artist ID given. Assumes we're already authenticated.
      * @param artistId the id of the artist to get
      * @return an Artist object
-     * @throws IOException if a url could not be created from the query or if there's an issue calling the API
+     * @throws IOException if url could not be created from the query or if there's an issue calling the API
      */
     public Artist getArtist(String artistId) throws IOException {
         // create the url

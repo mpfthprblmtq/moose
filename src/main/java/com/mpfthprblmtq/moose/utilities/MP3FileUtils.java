@@ -43,9 +43,8 @@ public class MP3FileUtils {
 
     /**
      * Check if a directory is from a label
-     * @param dir, the directory to check
-     * @return the result of the check, true if it is a label, false if it isn't
-     * a label
+     * @param dir the directory to check
+     * @return the result of the check, true if it is a label, false if it isn't a label
      */
     public static boolean isPartOfALabel(File dir) {
         return (dir.getPath().contains("/" + SINGLES) ||
@@ -56,7 +55,8 @@ public class MP3FileUtils {
 
     /**
      * Check if a directory is a single in a label
-     * @param file, the file to check
+     * @param file the file to check
+     * @param type the type of work to check explicitly for (Singles, LPs, EPs, Compilations)
      * @return the result of the check, true if it's a single from a label, false if it isn't
      */
     public static boolean isPartOfALabel(File file, String type) {
@@ -65,6 +65,8 @@ public class MP3FileUtils {
 
     /**
      * Creates a new file with the same path, just a different name
+     * @param oldFile the original file
+     * @param newFilename the name to change the original file to
      */
     public static File getNewMP3FileFromOld(File oldFile, String newFilename) {
         String path = oldFile.getPath().replace(oldFile.getName(), StringUtils.EMPTY);
@@ -76,6 +78,8 @@ public class MP3FileUtils {
 
     /**
      * Checks to see if the folder only has one mp3 file in it
+     * @param folder the directory to check
+     * @return the result of the check, true if the folder only has one mp3 file in it, false if not
      */
     public static boolean folderContainsOnlyOneMP3(File folder) {
         List<File> files = new ArrayList<>();
@@ -95,8 +99,7 @@ public class MP3FileUtils {
 
     /**
      * Gets the total number of tracks in a folder
-     *
-     * @param dir, the folder to check
+     * @param dir the folder to check
      * @return an int count of mp3 files in a folder
      */
     public static int getNumberOfMP3Files(File dir) {
@@ -113,8 +116,7 @@ public class MP3FileUtils {
 
     /**
      * Gets the total disks from a folder
-     *
-     * @param dir, the folder to check
+     * @param dir the folder to check
      * @return an int count of disks
      */
     public static int getTotalDisksFromFolder(File dir) {

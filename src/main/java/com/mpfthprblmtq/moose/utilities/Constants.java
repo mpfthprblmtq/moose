@@ -15,11 +15,13 @@ import java.awt.Color;
 public class Constants {
 
     public static final String DASH = "-";
-    
+
+    // colors
     public static final Color RED = new Color(130, 0, 50);
     public static final Color GREEN = new Color(0, 130, 50);
     public static final Color BLACK = new Color(0, 0, 0);
 
+    // about modal
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
     public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-";
 
@@ -85,6 +87,7 @@ public class Constants {
     public static final String REMOVE_ARTWORK = "Remove artwork";
     public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
 
+    // row icon constants
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
     public static final int SAVED = 2;
@@ -124,9 +127,4 @@ public class Constants {
     public static final int FILES = 2;
     public static final int API = 3;
     public static final int FEATURES = 4;
-
-    // album art finder frame tabs
-    public static final int SPOTIFY = 0;
-    public static final int GOOGLE = 1;
-    public static final int MANUAL = 2;
 }

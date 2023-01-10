@@ -47,10 +47,9 @@ public class DialogUtils {
     }
 
     /**
-     * Utility function that shows a dialog when clearing the main song list
+     * Utility function that shows a dialog when clearing the main song list.
      * Has a checkbox for "Don't show this again"
-     *
-     * @param context, the component to place this over
+     * @param context the component to place this over
      * @return the result of the checkbox, returns null if user hits no or cancels dialog
      */
     public static Boolean showClearAllDialog(Component context) {
@@ -73,9 +72,9 @@ public class DialogUtils {
     }
 
     /**
-     * Utility function that shows a dialog when starting an audit
+     * Utility function that shows a dialog when starting an audit.
      * Has a checkbox for "Don't show this again"
-     * @param context, the component to place this over
+     * @param context the component to place this over
      * @return the result of the checkbox, returns null if user hits no or cancels dialog
      */
     public static Boolean showAuditWarningDialog(Component context) {

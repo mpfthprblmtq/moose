@@ -1544,15 +1544,15 @@ public class Frame extends javax.swing.JFrame {
                     switch (col) {
                         case 10:
                             ViewUtils.showPopUpContextMenu(
-                                    evt, menuListener, rows, true, false, true, false, null);
+                                    evt, menuListener, true, false, true, false, null);
                             break;
                         case 1:
                             ViewUtils.showPopUpContextMenu(
-                                    evt, menuListener, rows, true, true, false, false, null);
+                                    evt, menuListener, true, true, false, false, null);
                             break;
                         default:
                             ViewUtils.showPopUpContextMenu(
-                                    evt, menuListener, rows, true, false, false, false, null);
+                                    evt, menuListener, true, false, false, false, null);
                             break;
                     }
                 } else {
@@ -1566,7 +1566,7 @@ public class Frame extends javax.swing.JFrame {
                 if (evt.getClickCount() == 2) {
                     // if on column 10, show the artwork context menu
                     if (col == 10) {
-                        ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), true, false, true, false, null);
+                        ViewUtils.showPopUpContextMenu(evt, menuListener, true, false, true, false, null);
                     } else {
                         // editable field, let's edit it
                         currentRow = row;
@@ -1724,7 +1724,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private void multImageMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_multImageMousePressed
         if (multImage.isEnabled()) {
-            ViewUtils.showPopUpContextMenu(evt, menuListener, table.getSelectedRowCount(), false, false, false, true, null);
+            ViewUtils.showPopUpContextMenu(evt, menuListener, false, false, false, true, null);
         }
     }//GEN-LAST:event_multImageMousePressed
 

@@ -786,7 +786,7 @@ public class InfoFrame extends javax.swing.JFrame {
 
     private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
         if (this.editModeEnabled) {
-            ViewUtils.showPopUpContextMenu(evt, menuListener, 0, false, false, true, false, new String[] {AUTO_ARTWORK});
+            ViewUtils.showPopUpContextMenu(evt, menuListener,  false, false, true, false, new String[] {AUTO_ARTWORK});
         }
     }//GEN-LAST:event_coverLabelMouseClicked
 
