@@ -23,9 +23,8 @@ public class AutocompleteService {
 
     /**
      * Gets the name service based on the column
-     *
-     * @param isGenreField, a boolean to pre-check if it's a genre
-     * @param table, the table to search on
+     * @param isGenreField a boolean to pre-check if it's a genre
+     * @param table the table to search on
      * @return the NameService to use
      */
     public static NameService getNameService(boolean isGenreField, JTable table) {
@@ -46,9 +45,8 @@ public class AutocompleteService {
     }
 
     /**
-     * Gets all of the fields in the column we're typing in so we can create the NameService based on them
-     *
-     * @param table, the table to search on
+     * Gets all the fields in the column we're typing in, so we can create the NameService based on them
+     * @param table the table to search on
      * @return a list of all strings in that column
      */
     private static List<String> getAllColumnFields(JTable table) {

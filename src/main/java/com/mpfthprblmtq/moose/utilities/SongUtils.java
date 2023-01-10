@@ -73,7 +73,7 @@ public class SongUtils {
                 mp3file.setId3v1Tag(tag);
             }
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
-            // things borked
+            // things broke
             logger.logError("Exception when trying to read data from file: " + file.getName(), e);
             return null;
         }
@@ -114,8 +114,10 @@ public class SongUtils {
     }
 
     /**
-     * Utility function to get the year from the mp3 file.  Since the
-     * @param mp3file, the mp3 file object to read from
+     * Utility function to get the year from the mp3 file.  Since the year can be in both the ID3v2.3 tag AND the
+     * ID3v2.4 tag, want to make sure we're getting at least one of those.
+     * @param mp3file the mp3 file object to read from
+     * @param id3v24Tag the id3v2.4 tag
      */
     private static String getYear(Mp3File mp3file, ID3v24Tag id3v24Tag) {
         String v2Year = mp3file.getId3v2Tag().getYear();

@@ -27,6 +27,7 @@ import java.util.List;
 // class ImageUtils
 public class ImageUtils {
 
+    // logger object
     static Logger logger = Moose.getLogger();
 
     /**
@@ -48,8 +49,8 @@ public class ImageUtils {
 
     /**
      * Returns a byte array from a File
-     * @param file, the file to read from
-     * @return bytes, the byte array
+     * @param file the file to read from
+     * @return the byte array
      */
     public static byte[] getBytesFromFile(File file) {
         byte[] bytes = null;
@@ -63,7 +64,7 @@ public class ImageUtils {
     }
 
     /**
-     * Returns a BufferedImage from a url
+     * Returns a BufferedImage from url
      * @param imageUrl the url to get the image from
      * @return a buffered image
      */
@@ -79,9 +80,8 @@ public class ImageUtils {
 
     /**
      * Gets the scaled instance of album art
-     *
-     * @param bytes, the album art in a byte array type
-     * @param dim, the dimension of the image
+     * @param bytes the album art in a byte array type
+     * @param dim the dimension of the image
      * @return the scaled instance of the image
      */
     public static Icon getScaledImage(byte[] bytes, int dim) {
@@ -157,8 +157,7 @@ public class ImageUtils {
 
     /**
      * Returns a byte array from a BufferedImage
-     *
-     * @param image, the image to convert
+     * @param image the image to convert
      * @return the byte array representation of the image
      */
     public static byte[] getBytesFromBufferedImage(BufferedImage image) {
@@ -177,7 +176,7 @@ public class ImageUtils {
 
     /**
      * Returns a byte array from an ImageIcon
-     * @param icon, the imageIcon to scan
+     * @param icon the imageIcon to scan
      */
     public static byte[] getBytesFromImageIcon(ImageIcon icon) {
         // check if icon is blank first
@@ -195,7 +194,7 @@ public class ImageUtils {
 
     /**
      * Returns a buffered image from a byte array
-     * @param bytes, the bytes to read from
+     * @param bytes the bytes to read from
      */
     public static BufferedImage getBufferedImageFromBytes(byte[] bytes) {
         try {
@@ -208,10 +207,10 @@ public class ImageUtils {
     }
 
     /**
-     * Creates a img file
-     * @param img, the img file to create
-     * @param dir, the directory of the file to create
-     * @param dim, the dimension of the image (width and height)
+     * Creates an img file
+     * @param img the img file to create
+     * @param dir the directory of the file to create
+     * @param dim the dimension of the image (width and height)
      * @return the file created from the bufferedImage
      */
     public static File createImageFile(BufferedImage img, File dir, int dim) {
@@ -335,8 +334,8 @@ public class ImageUtils {
 
     /**
      * Checks if a byte array is the same throughout an array
-     * @param bytes, the byte array to check
-     * @param arr,   the array of byte arrays
+     * @param bytes the byte array to check
+     * @param arr the array of byte arrays
      * @return the result of the check
      */
     public static boolean checkIfSame(byte[] bytes, byte[][] arr) {

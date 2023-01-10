@@ -83,9 +83,8 @@ public class ViewUtils {
 
     /**
      * Sets the specified column width
-     *
-     * @param column, the column to set
-     * @param width,  width in pixels
+     * @param column the column to set
+     * @param width width in pixels
      */
     public static void setColumnWidth(JTable table, int column, int width) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
@@ -257,7 +256,6 @@ public class ViewUtils {
      * Creates a popup context menu based on the booleans given
      * @param evt the MouseEvent we're using to show the popup
      * @param menuListener the ActionListener that handles all the events from this context menu
-     * @param rows the number of rows currently selected
      * @param base a boolean to determine if we're showing the base popup options
      * @param file a boolean to determine if we're showing the file popup options
      * @param artwork a boolean to determine if we're showing the artwork popup options
@@ -265,7 +263,7 @@ public class ViewUtils {
      * @param customItems a list of custom item strings to add to the bottom
      */
     public static void showPopUpContextMenu(
-            MouseEvent evt, ActionListener menuListener, int rows, boolean base, boolean file, boolean artwork, boolean artworkMultPanel, String[] customItems) {
+            MouseEvent evt, ActionListener menuListener, boolean base, boolean file, boolean artwork, boolean artworkMultPanel, String[] customItems) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
         if (base) {
@@ -338,18 +336,18 @@ public class ViewUtils {
 
     /**
      * Shows an error dialog
-     * @param message, the message to show
-     * @param ex, the exception that occurred
-     * @param component, the component context
+     * @param message the message to show
+     * @param ex the exception that occurred
+     * @param component the component context
      */
     public static void showErrorDialog(String message, Exception ex, Component component) {
         JOptionPane.showMessageDialog(component, message + "\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     /**
-     * Autofocuses on a textfield or component in a dialog using threads
-     * @param component, the component to focus on
-     * @param context, where the dialog is
+     * Autofocuses on a textField or component in a dialog using threads
+     * @param component the component to focus on
+     * @param context where the dialog is
      */
     public static void focusOnField(Component component, String context) {
         // create a thread to wait until the dialog box pops up

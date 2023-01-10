@@ -10,6 +10,7 @@ package com.mpfthprblmtq.moose.objects;
 
 // imports
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import java.util.Objects;
 
 // class Song
 @Data
+@NoArgsConstructor
 public class Song {
 
     private File file;
@@ -40,14 +42,26 @@ public class Song {
 
     private int index;
 
-    public Song() {}
-
     public Song(File file, File newFile) {
         setFile(file);
         setNewFile(newFile);
     }
 
-    public Song(File file, String title, String artist, String album, String albumArtist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int sampleRate, long len, String comment) {
+    public Song(
+            File file,
+            String title,
+            String artist,
+            String album,
+            String albumArtist,
+            String genre,
+            String year,
+            String track,
+            String disk,
+            byte[] artwork_bytes,
+            int bitrate,
+            int sampleRate,
+            long len,
+            String comment) {
 
         // standard string stuff
         this.file = file;
