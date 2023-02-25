@@ -25,7 +25,30 @@ public class FilenameFormatterService_V2 {
     // services
     AutoTaggingService_V2 autoTaggingService_v2;
 
-    public String formatFilename(File file) {
+    /**
+     * Formats the filenames of all songs in the list given to us, sets the new file in the songs map in the
+     * SongController, then sets the new value in the table
+     * @param songs the list of songs to format filenames for
+     */
+    public void formatFilenames(List<Song> songs) {
+        for (Song song : songs) {
+            String newFilename = formatFilename(song.getFile());
+            if (StringUtils.isNotEmpty(newFilename) && !newFilename.equals(song.getFile().getName())) {
+                String path = song.getFile().getPath().replace(song.getFile().getName(), StringUtils.EMPTY);
+                Moose.getSongController().setNewFile(song.getIndex(), new File(path + newFilename));
+                Moose.getFrame().getTable().setValueAt((path + newFilename)
+                        .replace(".mp3", StringUtils.EMPTY)
+                        .replace(":", "/"), Moose.getSongController().getRow(song.getIndex()), 1);
+            }
+        }
+    }
+
+    /**
+     * Method used to do the heavy lifting of the actual filename change
+     * @param file the file to change the name of
+     * @return a better filename
+     */
+    protected String formatFilename(File file) {
         String filename = file.getName();
 
         filename = cleanupFeaturingTag(filename);

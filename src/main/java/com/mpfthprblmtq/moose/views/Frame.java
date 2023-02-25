@@ -318,7 +318,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getImportFilesSwingWorker(File[] files) {
         // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 // create an arraylist of files and traverse it
@@ -359,7 +359,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getAutotagSwingWorker() {
         // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 // do the autotagging
@@ -379,7 +379,7 @@ public class Frame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getTrackDiskNumberSwingWorker() {
         // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 // add track numbers and disk numbers

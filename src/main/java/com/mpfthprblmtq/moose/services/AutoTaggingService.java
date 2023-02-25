@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
+@Deprecated
 public class AutoTaggingService {
 
     JTable table;
@@ -63,6 +64,7 @@ public class AutoTaggingService {
      *
      * @param rows, the row to update
      */
+    @Deprecated
     public void autoTag(int[] rows) {
 
         for (int row : rows) {
@@ -151,6 +153,7 @@ public class AutoTaggingService {
      *
      * @param selectedRows, the rows to update
      */
+    @Deprecated
     public void autoAddCoverArt(int[] selectedRows) {
 
         List<Integer> rowsToReprocess = new ArrayList<>();

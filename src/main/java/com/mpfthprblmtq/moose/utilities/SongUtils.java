@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 // class SongUtils
+@Deprecated
 public class SongUtils {
 
     static Logger logger = Moose.getLogger();

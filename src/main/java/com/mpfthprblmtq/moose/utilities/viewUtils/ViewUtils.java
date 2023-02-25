@@ -345,6 +345,15 @@ public class ViewUtils {
     }
 
     /**
+     * Shows an error dialog
+     * @param message the message to show
+     * @param component the component context
+     */
+    public static void showErrorDialog(String message, Component component) {
+        JOptionPane.showMessageDialog(component, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
      * Autofocuses on a textField or component in a dialog using threads
      * @param component the component to focus on
      * @param context where the dialog is
