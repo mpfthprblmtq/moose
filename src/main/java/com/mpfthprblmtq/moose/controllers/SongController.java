@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.mpfthprblmtq.commons.utils.FileUtils.launchJFileChooser;
 
 // class SongController
+@Deprecated
 public class SongController {
 
     // table object that references the JTable on the form
@@ -55,6 +56,7 @@ public class SongController {
     /**
      * Default constructor
      */
+    @Deprecated
     public SongController() {
         autoTaggingService = new AutoTaggingService(this);
         filenameFormatterService = new FilenameFormatterService(this);
@@ -63,6 +65,7 @@ public class SongController {
     /**
      * Returns the autoTaggingService
      */
+    @Deprecated
     public AutoTaggingService getAutoTaggingService() {
         return this.autoTaggingService;
     }
@@ -71,6 +74,7 @@ public class SongController {
      * Sets the table ivar
      * @param table, the table to set
      */
+    @Deprecated
     public void setTable(JTable table) {
         this.table = table;
         autoTaggingService.setTable(this.table);
@@ -80,6 +84,7 @@ public class SongController {
      * Returns the songs map
      * @return the songs map
      */
+    @Deprecated
     public HashMap<Integer, Song> getSongs() {
         return songs;
     }
@@ -87,6 +92,7 @@ public class SongController {
     /**
      * Returns the hasUnsavedChanges flag
      */
+    @Deprecated
     public boolean hasUnsavedChanges() {
         return this.hasUnsavedChanges;
     }
@@ -94,6 +100,7 @@ public class SongController {
     /**
      * Returns a list of all the files in the table currently
      */
+    @Deprecated
     public List<File> getAllFilesInTable() {
         List<File> files = new ArrayList<>();
         for (Song song : getSongs().values()) {
@@ -107,6 +114,7 @@ public class SongController {
      * @param file, the file to get info from
      * @return a song object
      */
+    @Deprecated
     public Song getSongFromFile(File file) {
 
         // get the song from the file
@@ -129,6 +137,7 @@ public class SongController {
      * @param index, the index key
      * @param s, the song to add
      */
+    @Deprecated
     private void addSong(int index, Song s) {
         Collection<Song> existingSongs = getSongs().values();
         for (Song song : existingSongs) {
@@ -144,6 +153,7 @@ public class SongController {
      * Adds the song index to edited_songs to save, and updates the row icon
      * @param index, the index to add to edited_songs
      */
+    @Deprecated
     public void songEdited(int index) {
         if (!edited_songs.contains(index)) {
             edited_songs.add(index);
@@ -159,6 +169,7 @@ public class SongController {
      * @param index, the index of the song
      * @return the row where the index matches
      */
+    @Deprecated
     public int getRow(int index) {
         for (int i = 0; i < table.getRowCount(); i++) {
             if (getIndex(i) == index) {
@@ -173,6 +184,7 @@ public class SongController {
      * @param row, the row to search from
      * @return the index of that row
      */
+    @Deprecated
     public int getIndex(int row) {
         row = table.convertRowIndexToModel(row);
         return Integer.parseInt(table.getModel().getValueAt(row, 12).toString());
@@ -183,6 +195,7 @@ public class SongController {
      * @param song, the song with the data to compare against
      * @return the index of the song
      */
+    @Deprecated
     public int getIndex(Song song) {
         // check for an exact match first
         for (Integer index : getSongs().keySet()) {
@@ -196,6 +209,7 @@ public class SongController {
         return -1;
     }
 
+    @Deprecated
     public int getIndex(File oldFile, File newFile) {
         for (Integer index : getSongs().keySet()) {
             Song songInMap = getSongs().get(index);
@@ -213,6 +227,7 @@ public class SongController {
      * @param index, the index of the song
      * @param newFile, the new file to set
      */
+    @Deprecated
     public void setNewFile(int index, File newFile) {
         songs.get(index).setNewFile(newFile);
         songEdited(index);
@@ -223,6 +238,7 @@ public class SongController {
      * @param index, the index of the song
      * @param title, the title to set
      */
+    @Deprecated
     public void setTitle(int index, String title) {
         songs.get(index).setTitle(title);
         songEdited(index);
@@ -233,6 +249,7 @@ public class SongController {
      * @param index, the index of the song
      * @param artist, the artist to set
      */
+    @Deprecated
     public void setArtist(int index, String artist) {
         songs.get(index).setArtist(artist);
         songEdited(index);
@@ -243,6 +260,7 @@ public class SongController {
      * @param index, the index of the song
      * @param album, the album to set
      */
+    @Deprecated
     public void setAlbum(int index, String album) {
         songs.get(index).setAlbum(album);
         songEdited(index);
@@ -253,6 +271,7 @@ public class SongController {
      * @param index, the index of the song
      * @param albumArtist, the albumArtist to set
      */
+    @Deprecated
     public void setAlbumArtist(int index, String albumArtist) {
         songs.get(index).setAlbumArtist(albumArtist);
         songEdited(index);
@@ -263,6 +282,7 @@ public class SongController {
      * @param index, the index of the song
      * @param genre, the genre to set
      */
+    @Deprecated
     public void setGenre(int index, String genre) {
         songs.get(index).setGenre(genre);
         songEdited(index);
@@ -273,6 +293,7 @@ public class SongController {
      * @param index, the index of the song
      * @param year, the year to set
      */
+    @Deprecated
     public void setYear(int index, String year) {
         songs.get(index).setYear(year);
         songEdited(index);
@@ -283,6 +304,7 @@ public class SongController {
      * @param index, the index of the song
      * @param track, the track to set
      */
+    @Deprecated
     public void setTrack(int index, String track) {
         songs.get(index).setTrack(track);
         songEdited(index);
@@ -293,6 +315,7 @@ public class SongController {
      * @param index, the index of the song
      * @param totalTracks, the totalTracks to set
      */
+    @Deprecated
     public void setTotalTracks(int index, String totalTracks) {
         songs.get(index).setTotalTracks(totalTracks);
         songEdited(index);
@@ -303,6 +326,7 @@ public class SongController {
      * @param index, the index of the song
      * @param disk, the disk to set
      */
+    @Deprecated
     public void setDisk(int index, String disk) {
         songs.get(index).setDisk(disk);
         songEdited(index);
@@ -313,6 +337,7 @@ public class SongController {
      * @param index, the index of the song
      * @param totalDisks, the totalDisks to set
      */
+    @Deprecated
     public void setTotalDisks(int index, String totalDisks) {
         songs.get(index).setTotalDisks(totalDisks);
         songEdited(index);
@@ -323,6 +348,7 @@ public class SongController {
      * @param index, the index of the song
      * @param bytes, the byte array of the album image to set
      */
+    @Deprecated
     public void setAlbumImage(int index, byte[] bytes) {
         songs.get(index).setArtwork_bytes(bytes);
         songEdited(index);
@@ -333,6 +359,7 @@ public class SongController {
      * @param index, the index of the song
      * @param comment, the comment to set
      */
+    @Deprecated
     public void setComment(int index, String comment) {
         songs.get(index).setComment(comment);
         songEdited(index);
@@ -343,6 +370,7 @@ public class SongController {
      *
      * @param selectedRows, the row indices to save
      */
+    @Deprecated
     public void saveTracks(int[] selectedRows) {
 
         int count = 0;
@@ -365,6 +393,7 @@ public class SongController {
      * Saves an individual track
      * @param index, the index of the song to save in the songs map
      */
+    @Deprecated
     public void save(int index) {
 
         // get the song
@@ -441,6 +470,7 @@ public class SongController {
      * @param mp3file, the mp3 file to source the information from
      * @param file, the actual file to save as
      */
+    @Deprecated
     public void saveID3Info(Mp3File mp3file, File file) {
         try {
             // save the new mp3file
@@ -467,18 +497,24 @@ public class SongController {
      * Scans all the songs or files' mp3tags with them and checks to make sure we know the genre
      * @param list the list of either Songs or Files to check
      */
+    @Deprecated
     public void checkForNewGenres(List<?> list) {
         List<Song> songs = new ArrayList<>();
 
         // if the list given is a list of files, get the songs from those files first
-        if (!list.isEmpty() && list.get(0) instanceof File) {
+        if (list.isEmpty()) {
+            return;
+        }
+        if (list.get(0) instanceof File) {
             for (Object file : list) {
                 songs.add(getSongFromFile((File) file));
             }
-        } else {
+        } else if (list.get(0) instanceof Song) {
             for (Object song : list) {
                 songs.add((Song) song);
             }
+        } else {
+            return;
         }
 
         // get all the songs, then the genres from the list of files
@@ -495,7 +531,8 @@ public class SongController {
         // for each new genre, ask if we want to add that one
         for (String newGenre : newGenres) {
             int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
-            if (res == JOptionPane.YES_OPTION) {// add the genre to the settings and update
+            if (res == JOptionPane.YES_OPTION) {
+                // add the genre to the settings and update
                 Moose.getSettings().getGenres().add(newGenre);
                 Moose.updateSettings();
             }
@@ -507,8 +544,9 @@ public class SongController {
      * @param find, the string to find
      * @param replace, the string to replace
      * @param includeFiles, a boolean to check if we're including the file names in the search
-     * @return the results of the replace, true if there was something to replace, false if not
+     * @return the results of the replacement, true if there was something to replace, false if not
      */
+    @Deprecated
     public int findAndReplace(String find, String replace, boolean includeFiles) {
         int count = 0;
         for (int i = 0; i < table.getRowCount(); i++) {
@@ -581,6 +619,7 @@ public class SongController {
      *
      * @param selectedRows, the rows selected on the table
      */
+    @Deprecated
     public void removeAlbumArt(int[] selectedRows) {
 
         for (int selectedRow : selectedRows) {
@@ -607,6 +646,7 @@ public class SongController {
      *
      * @param selectedRows, the rows selected on the table
      */
+    @Deprecated
     public void autoTagFiles(int[] selectedRows) {
         // set the table in case of an uncaught update
         autoTaggingService.setTable(table);
@@ -621,6 +661,7 @@ public class SongController {
     /**
      * Formats the filenames
      */
+    @Deprecated
     public void formatFilenames(int[] selectedRows) {
         for (int row : selectedRows) {
             Song s = songs.get(getIndex(row));
@@ -643,6 +684,7 @@ public class SongController {
      *
      * @param selectedRows, the rows to move
      */
+    @Deprecated
     public void moveFiles(int[] selectedRows) {
 
         File[] files = launchJFileChooser(
@@ -667,6 +709,7 @@ public class SongController {
      * @param old_file,     the file to move
      * @param new_location, the destination file to move it to
      */
+    @Deprecated
     public void moveFile(int row, File old_file, File new_location) {
         File new_file = new File(new_location.getPath() + "/" + old_file.getName());
         if (!old_file.renameTo(new_file)) {
@@ -683,6 +726,7 @@ public class SongController {
      * Plays the files using the default mp3 player
      * @param selectedRows the rows of files to play
      */
+    @Deprecated
     public void playFiles(int[] selectedRows) {
         // traverse the array of rows and play each file sequentially
         for (int selectedRow : selectedRows) {

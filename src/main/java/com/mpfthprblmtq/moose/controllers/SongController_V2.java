@@ -1,19 +1,29 @@
 package com.mpfthprblmtq.moose.controllers;
 
 import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.moose.Moose;
+import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService;
+import com.mpfthprblmtq.moose.services.FilenameFormatterService_V2;
+import com.mpfthprblmtq.moose.services.SongService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 import lombok.Data;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.mpfthprblmtq.commons.utils.FileUtils.launchJFileChooser;
 
 @Data
 public class SongController_V2 {
@@ -21,6 +31,8 @@ public class SongController_V2 {
     // services
     public AutoTaggingService autoTaggingService;
     public FilenameFormatterService filenameFormatterService;
+    SongService songService;
+    FilenameFormatterService_V2 filenameFormatterService_v2;
 
     // logger object
     Logger logger = Moose.getLogger();
@@ -29,7 +41,7 @@ public class SongController_V2 {
     HashMap<Integer, Song> songs = new HashMap<>(); // hashmap to contain Song objects
     List<Integer> edited_songs = new ArrayList<>(); // arraylist to contain indices of edited songs to save
 
-    // ivar to check if user has unsaved changes
+    // field to check if user has unsaved changes
     boolean hasUnsavedChanges = false;
 
     /**
@@ -38,6 +50,8 @@ public class SongController_V2 {
     public SongController_V2() {
 //        autoTaggingService = new AutoTaggingService(this);
 //        filenameFormatterService = new FilenameFormatterService(this);
+        songService = new SongService();
+        filenameFormatterService_v2 = new FilenameFormatterService_V2();
     }
 
     /**
@@ -269,5 +283,228 @@ public class SongController_V2 {
         return -1; // index wasn't found
     }
 
+    /**
+     * Method for removing album art for songs manually. This method is called when the "Remove" selection is pressed
+     * in the context menu
+     * @param selectedRows the rows selected on the table
+     */
+    public void removeAlbumArt(int[] selectedRows) {
+        for (int selectedRow : selectedRows) {
+            // get the row and index of the track
+            int row = Moose.getFrame().getTable().convertRowIndexToModel(selectedRow);
+            int index = getIndex(selectedRow);
 
+            // set that index's artwork to null
+            setAlbumImage(index, null);
+
+            // update graphics
+            Moose.getFrame().getTable().getModel().setValueAt(null, row, 11);
+            Moose.frame.multImage.setIcon(null);
+        }
+    }
+
+    /**
+     * Function that looks at the file's name and location and auto generates
+     * some tags
+     *
+     * @param selectedRows, the rows selected on the table
+     */
+    public void autoTagFiles(int[] selectedRows) {
+
+        // clean up the file names first by creating a list of songs with the rows
+        List<Song> songs = Arrays.stream(selectedRows)
+                .boxed()
+                .map((row) -> getSongs().get(getIndex(row)))
+                .collect(Collectors.toList());
+        filenameFormatterService_v2.formatFilenames(songs);
+
+        // actually do the autotagging
+        autoTaggingService.autoTag(selectedRows);
+    }
+
+    /**
+     * Saves each file sequentially
+     * @param selectedRows the rows to save
+     */
+    public void saveTracks(int[] selectedRows) {
+        // count to show how many files were saved
+        int count = 0;
+
+        // traverse the array of rows and save each file sequentially
+        for (int selectedRow : selectedRows) {
+            int row = Moose.getFrame().getTable().convertRowIndexToModel(selectedRow);    // get the row
+            int index = getIndex(row);
+            // check to see if the index is even edited before saving
+            if (edited_songs.contains(index)) {
+                // do the save
+                if (songService.save(getSongs().get(index))) {
+                    // set the value of the File on the table's row to the new file
+                    Moose.getFrame().getTable().getModel().setValueAt(songs.get(index).getFile(), row, 1);
+
+                    // update the row graphic
+                    Moose.getFrame().setRowIcon(Constants.SAVED, getRow(index));
+
+                    // done saving, remove it
+                    // gives an IndexOutOfBoundsException when trying to remove() with one element in it
+                    if (edited_songs.size() == 1) {
+                        edited_songs.clear();
+                    } else if (edited_songs.size() > 1) {
+                        edited_songs.remove(index);
+                    }
+
+                    // increment the number of successful saves
+                    count++;
+                }
+            }
+        }
+
+        Moose.getFrame().updateConsole(count + " file(s) updated!");
+        this.hasUnsavedChanges = !edited_songs.isEmpty();
+    }
+
+    /**
+     * Plays the files using the default mp3 player
+     * @param selectedRows the rows of files to play
+     */
+    public void playFiles(int[] selectedRows) {
+        // traverse the array of rows and play each file sequentially
+        for (int selectedRow : selectedRows) {
+            int row = Moose.getFrame().getTable().convertRowIndexToModel(selectedRow);    // get the row
+            File file = (File) Moose.getFrame().getTable().getModel().getValueAt(row, 1);
+            try {
+                FileUtils.openFile(file);
+            } catch (Exception e) {
+                logger.logError("Couldn't play file: " + file.getName(), e);
+                ViewUtils.showErrorDialog("Couldn't play file: " + file.getName(), e, Moose.getFrame());
+            }
+        }
+    }
+
+    /**
+     * Moves selected files to a new destination
+     * @param selectedRows the rows of files to move
+     */
+    public void moveFiles(int[] selectedRows) {
+        // show the JFileChooser for the user to select destination folder
+        File[] files = launchJFileChooser(
+                "Choose the destination folder...",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null);
+
+        // if files is null, user exited or cancelled
+        if (files != null) {
+            // go through the selected rows and move the files
+            for (int selectedRow : selectedRows) {
+                // get the new location, which is the first element of the files array
+                File newLocation = files[0];
+
+                // get the old file from the table
+                File oldFile = (File) Moose.getFrame().getTable().getModel().getValueAt(
+                        Moose.getFrame().getTable().convertRowIndexToModel(selectedRow), 1);
+
+                // create the new file
+                File newFile = new File(newLocation.getPath() + "/" + oldFile.getName());
+
+                // actually move the file
+                if (!oldFile.renameTo(newFile)) {
+                    logger.logError("Couldn't move file " + oldFile.getPath() + " to " + newLocation.getPath() + "!");
+                    ViewUtils.showErrorDialog("Couldn't move file " + oldFile.getPath() + " to " + newLocation.getPath() + "!", Moose.getFrame());
+                } else {
+                    // update the song in the songs map
+                    setNewFile(getIndex(selectedRow), newFile);
+                    // update graphics
+                    Moose.getFrame().getTable().getModel().setValueAt(newFile, selectedRow, 1);
+                }
+            }
+        }
+    }
+
+    /**
+     * Method for checking to see if any of the new additions to the table have new genres to add.  Checks to see
+     * if that feature is enabled in settings beforehand
+     * @param list the list of either Files or Songs to check
+     */
+    public void checkForNewGenres(List<?> list) {
+        if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
+            songService.checkForNewGenres(list);
+        }
+    }
+
+    /**
+     * Does the finding and replacing from showFindAndReplaceDialog()
+     * @param find the string to find
+     * @param replace the string to replace
+     * @param includeFiles a boolean to check if we're including the file names in the search
+     * @return a count of successful replacements
+     */
+    public int findAndReplace(String find, String replace, boolean includeFiles) {
+        int count = 0;
+        JTable table = Moose.getFrame().getTable();
+
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                if (table.getValueAt(i, j).toString().contains(find)) {
+                    String toReplace = table.getValueAt(i, j).toString().replace(find, replace);
+                    int index = getIndex(i);
+                    switch (j) {
+                        case 1:     // filename
+                            if (includeFiles) {
+                                File oldFile = (File) table.getModel().getValueAt(table.convertRowIndexToModel(i), 1);
+                                File newFile = MP3FileUtils.getNewMP3FileFromOld(oldFile, toReplace);
+                                setNewFile(table.convertRowIndexToModel(i), newFile);
+                                table.setValueAt(toReplace, i, 1);
+                                count++;
+                            }
+                            break;
+                        case 2:     // title
+                            table.setValueAt(toReplace, i, j);
+                            setTitle(index, toReplace);
+                            count++;
+                            break;
+                        case 3:     // artist
+                            table.setValueAt(toReplace, i, j);
+                            setArtist(index, toReplace);
+                            count++;
+                            break;
+                        case 4:     // album
+                            table.setValueAt(toReplace, i, j);
+                            setAlbum(index, toReplace);
+                            count++;
+                            break;
+                        case 5:     // album artist
+                            table.setValueAt(toReplace, i, j);
+                            setAlbumArtist(index, toReplace);
+                            count++;
+                            break;
+                        case 6:     // year
+                            table.setValueAt(toReplace, i, j);
+                            setYear(index, toReplace);
+                            count++;
+                            break;
+                        case 7:     // genre
+                            table.setValueAt(toReplace, i, j);
+                            setGenre(index, toReplace);
+                            count++;
+                            break;
+                        case 8:     // tracks
+                            table.setValueAt(toReplace, i, j);
+                            setTrack(index, toReplace);
+                            count++;
+                            break;
+                        case 9:     // disks
+                            table.setValueAt(toReplace, i, j);
+                            setDisk(index, toReplace);
+                            count++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        return count;
+    }
 }

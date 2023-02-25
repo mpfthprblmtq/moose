@@ -25,6 +25,7 @@ import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
 // class FilenameFormatterService
+@Deprecated
 public class FilenameFormatterService {
 
     // auto tagging service
@@ -41,6 +42,7 @@ public class FilenameFormatterService {
      * @param singleFile, a boolean to tell us if the file is a single, so there's only one
      * @return a new and improved file name
      */
+    @Deprecated
     public String formatFilename(File file, boolean singleFile) {
         return getBetterFilename(file, singleFile);
     }
@@ -52,6 +54,7 @@ public class FilenameFormatterService {
      * @param filename, the filename to clean up
      * @return the cleaned up filename
      */
+    @Deprecated
     private String cleanupFilename(String filename) {
         filename = filename.replaceAll("(?i)feat.", "ft.");
         filename = filename.replaceAll("Ft.", "ft.");
@@ -74,6 +77,7 @@ public class FilenameFormatterService {
      * @param singleFile a boolean to tell us if the file is single, so there's only one
      * @return a good filename, or null if the fix couldn't be applied
      */
+    @Deprecated
     public String getBetterFilename(File file, boolean singleFile) {
         String filename;
 
