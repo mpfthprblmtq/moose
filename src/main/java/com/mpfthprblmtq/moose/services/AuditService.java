@@ -162,7 +162,7 @@ public class AuditService {
         updateLabelAndProgressBarForAudit(index, albums.size());
 
         // open up a new AuditFrame and a Frame with the album preloaded
-        Moose.frame.dispose();
+        Moose.getFrame().dispose();
         Moose.launchFrame(albums.get(index));
         auditFrame = Moose.getAuditFrame();
         auditFrame.refreshAuditFrameFromAudit(getCheckResults(albums.get(index)), albums.get(index).getPath());

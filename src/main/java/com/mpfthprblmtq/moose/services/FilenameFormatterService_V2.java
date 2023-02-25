@@ -35,10 +35,10 @@ public class FilenameFormatterService_V2 {
             String newFilename = formatFilename(song.getFile());
             if (StringUtils.isNotEmpty(newFilename) && !newFilename.equals(song.getFile().getName())) {
                 String path = song.getFile().getPath().replace(song.getFile().getName(), StringUtils.EMPTY);
-                Moose.getSongController().setNewFile(song.getIndex(), new File(path + newFilename));
+                Moose.songController_v2.setNewFile(song.getIndex(), new File(path + newFilename));
                 Moose.getFrame().getTable().setValueAt((path + newFilename)
                         .replace(".mp3", StringUtils.EMPTY)
-                        .replace(":", "/"), Moose.getSongController().getRow(song.getIndex()), 1);
+                        .replace(":", "/"), Moose.songController_v2.getRow(song.getIndex()), 1);
             }
         }
     }

@@ -6,6 +6,7 @@ import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
+import com.mpfthprblmtq.moose.services.AutoTaggingService_V2;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService_V2;
 import com.mpfthprblmtq.moose.services.SongService;
@@ -33,6 +34,7 @@ public class SongController_V2 {
     public FilenameFormatterService filenameFormatterService;
     SongService songService;
     FilenameFormatterService_V2 filenameFormatterService_v2;
+    AutoTaggingService_V2 autoTaggingService_v2;
 
     // logger object
     Logger logger = Moose.getLogger();
@@ -52,6 +54,7 @@ public class SongController_V2 {
 //        filenameFormatterService = new FilenameFormatterService(this);
         songService = new SongService();
         filenameFormatterService_v2 = new FilenameFormatterService_V2();
+        autoTaggingService_v2 = new AutoTaggingService_V2();
     }
 
     /**
@@ -299,7 +302,7 @@ public class SongController_V2 {
 
             // update graphics
             Moose.getFrame().getTable().getModel().setValueAt(null, row, 11);
-            Moose.frame.multImage.setIcon(null);
+            Moose.getFrame().multImage.setIcon(null);
         }
     }
 

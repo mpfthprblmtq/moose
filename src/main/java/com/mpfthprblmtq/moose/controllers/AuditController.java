@@ -243,7 +243,7 @@ public class AuditController {
         }
 
         // save all the tracks in the current screen so the user doesn't have to manually do it
-        Moose.frame.songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
+        Moose.getFrame().songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
 
         // prevent a negative index
         if (currentIndex >= 0) {
@@ -266,7 +266,7 @@ public class AuditController {
         currentIndex = 0;
 
         // launch a blank frame
-        Moose.frame.dispose();
+        Moose.getFrame().dispose();
         Moose.frame = new Frame();
         Moose.launchFrame();
 

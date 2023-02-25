@@ -1268,10 +1268,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         assert outputFile != null;
         if (outputFile.exists()) {
             for (Integer row : this.rows) {
-                Moose.frame.songController.autoTaggingService.addIndividualCover(row, outputFile);
+                Moose.getFrame().songController.autoTaggingService.addIndividualCover(row, outputFile);
             }
         }
-        Moose.frame.updateMultiplePanelFields();
+        Moose.getFrame().updateMultiplePanelFields();
         this.dispose();
     }
 
