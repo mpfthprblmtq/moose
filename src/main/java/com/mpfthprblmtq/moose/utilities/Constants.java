@@ -71,6 +71,16 @@ public class Constants {
             "OFFICIAL VISUALIZER"
     };
 
+    // V2 REGEXES
+    public static final String FEATURED_NO_PARENS_WITH_REMIXED_BY_ARTIST =
+            "(?<title>.+)[^(]ft\\. (?<featured>.*)[^)]*(?<remixedBy>\\(.*\\))";
+    public static final String FEATURED_NO_PARENS = "(?<title>.+)[^(]ft\\. (?<featured>.+)[^)]*";
+    public static final String FILENAME_TRACK_NUMBER_TITLE = "(?<track>\\d{1,3})\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_ARTIST_TITLE = "(?<track>\\d{1,3})\\s{1}(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_ARIST_TITLE = "(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_PERIOD = "(?<track>\\d{1,3})\\.\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_HYPHEN = "(?<track>\\d{1,3})\\s*-\\s*(?<title>.+)";
+
     // menu options
     public static final String MORE_INFO = "More info...";
     public static final String SHOW_IN_FINDER = "Show in Finder...";

@@ -147,9 +147,9 @@ public class DialogUtils {
      * A dialog that allows the user to enter a track number if there isn't one
      * @param component the component we want to show this dialog over
      * @param title the track title to show the track number context
-     * @return the track and title (because we can edit the title as well)
+     * @return the title and track (in that order)
      */
-    public static String[] showGetTitleOrTrackNumberDialog(Component component, String title) {
+    public static String[] showGetTitleAndTrackNumberDialog(Component component, String title) {
         // create and configure the title field
         JTextField titleField = new JTextField(20);
         titleField.setText(StringUtils.isNotEmpty(title) ? title.replace(":", "/") : StringUtils.EMPTY);
@@ -199,7 +199,83 @@ public class DialogUtils {
         int option = JOptionPane.showConfirmDialog(component, message, "Manual Set Track Number", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
-            return new String[]{titleField.getText().replace("/", ":"), trackField.getText()};
+            return new String[]{trackField.getText(), titleField.getText().replace("/", ":")};
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * A dialog that allows the user to enter a track number, artist, and title if there isn't one
+     * @param component the component we want to show this dialog over
+     * @param title the track title to show the track number context
+     * @param artist the artist to show the track number context
+     * @return a string array with the track, artist, and title (in that order)
+     */
+    public static String[] showGetTitleAndTrackNumberAndArtistDialog(Component component, String title, String artist) {
+        // create and configure the title field
+        JTextField titleField = new JTextField(20);
+        titleField.setText(StringUtils.isNotEmpty(title) ? title.replace(":", "/") : StringUtils.EMPTY);
+
+        // create and configure the artist field
+        JTextField artistField = new JTextField(20);
+        artistField.setText(StringUtils.isNotEmpty(artist) ? artist.replace(":", "/") : StringUtils.EMPTY);
+
+        // create and configure the track number field
+        JTextField trackField = new JTextField();
+        ((AbstractDocument)trackField.getDocument()).setDocumentFilter(new DocumentFilter(){
+            final Pattern regex = Pattern.compile("\\d*");
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                Matcher matcher = regex.matcher(text);
+                if(!matcher.matches()){
+                    return;
+                }
+                super.replace(fb, offset, length, text, attrs);
+            }
+        });
+        Dimension d = trackField.getPreferredSize();
+        d.setSize(75, d.getHeight());
+        trackField.setMinimumSize(d);
+        trackField.setMaximumSize(d);
+        trackField.setPreferredSize(d);
+
+        // create labels
+        JLabel titleLabel = new JLabel("Title:");
+        JLabel artistLabel = new JLabel("Artist:");
+        JLabel trackLabel = new JLabel("Track #:");
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(artistLabel);
+        panel.add(artistField);
+        panel.add(new JLabel(StringUtils.SPACE));
+        panel.add(titleLabel);
+        panel.add(titleField);
+        panel.add(new JLabel(StringUtils.SPACE));
+        panel.add(trackLabel);
+        panel.add(trackField);
+        artistLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        artistField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titleField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        trackLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        trackField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // create the list of items
+        Object[] message = {panel};
+
+        ViewUtils.focusOnField(trackField, "Manual Set Track Number");
+
+        // show the dialog
+        int option = JOptionPane.showConfirmDialog(component, message, "Manual Set Track Number", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            return new String[]{
+                    trackField.getText(),
+                    artistField.getText().replace("/", ":"),
+                    titleField.getText().replace("/", ":")};
         } else {
             return null;
         }

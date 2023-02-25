@@ -732,12 +732,12 @@ public class AutoTaggingService {
 
         // if we didn't get it, ask the user
         if (StringUtils.isEmpty(trackNumber)) {
-            Song s = songController.getSongFromFile(file);
+            Song s = SongUtils.getSongFromFile(file);
             String title = file.getName().replace(".mp3", StringUtils.EMPTY);
             if (s != null && StringUtils.isNotEmpty(s.getTitle())) {
                 title = s.getTitle();
             }
-            String[] arr = DialogUtils.showGetTitleOrTrackNumberDialog(Moose.getFrame(), title);
+            String[] arr = DialogUtils.showGetTitleAndTrackNumberDialog(Moose.getFrame(), title);
             if (arr != null) {
                 trackNumber = arr[1];
             }

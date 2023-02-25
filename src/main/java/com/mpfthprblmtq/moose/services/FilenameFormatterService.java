@@ -218,7 +218,7 @@ public class FilenameFormatterService {
 
         if (StringUtils.isEmpty(trackNumber)) {
             // show the dialog if we haven't already
-            String[] arr = DialogUtils.showGetTitleOrTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
+            String[] arr = DialogUtils.showGetTitleAndTrackNumberDialog(Moose.getFrame(), trackTitle.trim());
             if (arr != null) {
                 trackTitle = arr[0];
                 trackNumber = arr[1];
