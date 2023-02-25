@@ -279,7 +279,7 @@ public class SongService {
 
         // for each new genre, ask if we want to add that one
         for (String newGenre : newGenres) {
-            int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
+            int res = JOptionPane.showConfirmDialog(Moose.getFrame(), "\"" + newGenre + "\" isn't in your built-in genre list, would you like to add it?");
             if (res == JOptionPane.YES_OPTION) {
                 // add the genre to the settings and update
                 Moose.getSettings().getGenres().add(newGenre);

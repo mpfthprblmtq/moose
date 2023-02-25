@@ -13,10 +13,12 @@ package com.mpfthprblmtq.moose;
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.controllers.SongController;
+import com.mpfthprblmtq.moose.controllers.SongController_V2;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 import com.mpfthprblmtq.moose.views.Frame;
 import com.mpfthprblmtq.moose.views.modals.SettingsFrame;
+import lombok.Getter;
 
 import java.io.File;
 
@@ -24,15 +26,23 @@ import java.io.File;
 public class Moose {
     
     // create and instantiate the frames
+    @Getter
     public static Frame frame;
+    @Getter
     public static SettingsFrame settingsFrame;
+    @Getter
     public static AuditFrame auditFrame;
 
     // logger object
+    @Getter
     public static Logger logger;
 
     // controllers
+    @Getter
     public static SongController songController;
+    @Getter
+    public static SongController_V2 songController_v2;
+    @Getter
     public static SettingsController settingsController;
 
     /**
@@ -72,22 +82,6 @@ public class Moose {
         // create the frame now that we have our settings
         settingsFrame = new SettingsFrame();
     }
-
-    /**
-     * Returns the songController
-     * @return the songController
-     */
-    public static SongController getSongController() {
-        return songController;
-    }
-
-    /**
-     * Returns the logger object
-     * @return the logger object
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
     
     /**
      * Returns the settings object
@@ -95,14 +89,6 @@ public class Moose {
      */
     public static Settings getSettings() {
         return settingsController.getSettings();
-    }
-
-    /**
-     * Returns the settingsController
-     * @return the settingsController
-     */
-    public static SettingsController getSettingsController() {
-        return settingsController;
     }
 
     /**
@@ -124,7 +110,7 @@ public class Moose {
      * Launches a new blank Frame
      */
     public static void launchFrame() {
-        songController = new SongController();
+        songController_v2 = new SongController_V2();
         frame = new Frame();
         frame.setLocation(20, 20);
         frame.setVisible(true);
@@ -135,18 +121,10 @@ public class Moose {
      * @param dir the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
-        songController = new SongController();
+        songController_v2 = new SongController_V2();
         frame = new Frame(dir);
         frame.setLocation(20, 20);
         frame.setVisible(true);
-    }
-
-    /**
-     * Returns the main Frame
-     * @return the main Frame object
-     */
-    public static Frame getFrame() {
-        return frame;
     }
 
     /**
@@ -164,13 +142,5 @@ public class Moose {
         auditFrame = new AuditFrame();
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
-    }
-
-    /**
-     * Returns the AuditFrame
-     * @return the AuditFrame object
-     */
-    public static AuditFrame getAuditFrame() {
-        return auditFrame;
     }
 }

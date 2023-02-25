@@ -172,7 +172,7 @@ public class ViewUtils {
                         // check and see if the genre exists already
                         if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
                             if (!Moose.getSettings().getGenres().contains(genre) && StringUtils.isNotEmpty(genre)) {
-                                int res = JOptionPane.showConfirmDialog(Moose.frame, "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
+                                int res = JOptionPane.showConfirmDialog(Moose.getFrame(), "\"" + genre + "\" isn't in your built-in genre list, would you like to add it?");
                                 if (res == JOptionPane.YES_OPTION) {// add the genre to the settings
                                     Moose.getSettings().getGenres().add(genre);
                                     Moose.updateSettings();

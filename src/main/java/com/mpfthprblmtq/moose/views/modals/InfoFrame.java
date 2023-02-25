@@ -644,7 +644,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Moose.frame.nextFromInfoFrame(this.editModeEnabled, lastEditedField);
+        Moose.getFrame().nextFromInfoFrame(this.editModeEnabled, lastEditedField);
     }//GEN-LAST:event_nextButtonActionPerformed
 
     /**
@@ -658,7 +658,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Moose.frame.previousFromInfoFrame(this.editModeEnabled, lastEditedField);
+        Moose.getFrame().previousFromInfoFrame(this.editModeEnabled, lastEditedField);
     }//GEN-LAST:event_previousButtonActionPerformed
 
     private void editSubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editSubmitButtonActionPerformed
@@ -856,7 +856,7 @@ public class InfoFrame extends javax.swing.JFrame {
         }
         submit();
         this.dispose();
-        Moose.frame.nextFromInfoFrame(this.editModeEnabled, lastEditedField);
+        Moose.getFrame().nextFromInfoFrame(this.editModeEnabled, lastEditedField);
     }
 
     /**
@@ -865,7 +865,7 @@ public class InfoFrame extends javax.swing.JFrame {
     public void setNavigationButtons() {
         if (this.selectedRows.length == 1) {
             int row = selectedRows[0];
-            if (row == Moose.frame.table.getRowCount() - 1) {
+            if (row == Moose.getFrame().table.getRowCount() - 1) {
                 previousButton.setEnabled(true);
                 nextButton.setEnabled(false);
             } else if (row == 0) {
@@ -1014,7 +1014,7 @@ public class InfoFrame extends javax.swing.JFrame {
     public void submit() {
         if (edited) {
 
-            JTable table = Moose.frame.table;
+            JTable table = Moose.getFrame().table;
 
             for (Integer row : songs.keySet()) {
 
@@ -1059,7 +1059,7 @@ public class InfoFrame extends javax.swing.JFrame {
                 }
 
                 // submit sequentially
-                Moose.frame.submitRowChanges(row, song);
+                Moose.getFrame().submitRowChanges(row, song);
             }
         }
         this.edited = false;

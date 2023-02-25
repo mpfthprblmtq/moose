@@ -1,6 +1,7 @@
 package com.mpfthprblmtq.moose.services;
 
 import com.mpfthprblmtq.commons.utils.StringUtils;
+import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.SongUtils;
 
@@ -16,7 +17,7 @@ public class AutoTaggingService_V2 {
      * @return the artist if found, else a blank string
      */
     public String getArtistFromExistingID3Info(File file) {
-        Song s = SongUtils.getSongFromFile(file);
+        Song s = Moose.getSongController_v2().getSongService().getSongFromFile(file);
         if (s != null) {
             return s.getArtist();
         }
