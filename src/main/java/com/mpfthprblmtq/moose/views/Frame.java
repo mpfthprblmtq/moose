@@ -22,6 +22,7 @@ import com.mpfthprblmtq.moose.services.AutocompleteService;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
+import com.mpfthprblmtq.moose.utilities.SongUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.*;
 import com.mpfthprblmtq.moose.views.modals.InfoFrame;
 
@@ -145,6 +146,18 @@ public class Frame extends javax.swing.JFrame {
         return (DefaultTableModel) table.getModel();
     }
 
+    public JTable getTable() {
+        return table;
+    }
+
+    /**
+     * Helper method to set the loading state on the frame
+     * @param isLoading the boolean to check
+     */
+    public void setLoading(boolean isLoading) {
+        loadingIcon.setIcon(isLoading ? IconUtils.get(IconUtils.LOADING_BIG) : null);
+    }
+
     /**
      * Custom init stuff, but that's not a good enough description, so here's what it does pretty much:
      *  - Sets up the table with a custom model, then creates the columns dynamically
@@ -184,7 +197,7 @@ public class Frame extends javax.swing.JFrame {
         ViewUtils.setColumnWidth(table, 3, 150);    // artist
         ViewUtils.setColumnWidth(table, 4, 150);    // album
         ViewUtils.setColumnWidth(table, 5, 150);    // album artist
-        ViewUtils.setColumnWidth(table, 6, 80);     // year
+        ViewUtils.setColumnWidth(table, 6, 50);     // year
         ViewUtils.setColumnWidth(table, 7, 150);    // genre
         ViewUtils.setColumnWidth(table, 8, 50);     // track
         ViewUtils.setColumnWidth(table, 9, 50);     // disk
@@ -243,11 +256,12 @@ public class Frame extends javax.swing.JFrame {
                     songController.saveTracks(selectedRows);
                     break;
                 case AUTO_TAG:
-                    autoTag(selectedRows);
+                    setLoading(true);
+                    getAutotagSwingWorker().execute();
                     break;
                 case AUTO_TRACK_DISK_NUMBERS:
-                    songController.autoTaggingService.addTrackAndDiskNumbers(selectedRows);
-                    updateMultiplePanelFields();
+                    setLoading(true);
+                    getTrackDiskNumberSwingWorker().execute();
                     break;
                 case AUTO_ARTWORK:
                     autoAddCoverArt(selectedRows);
@@ -293,31 +307,91 @@ public class Frame extends javax.swing.JFrame {
 
         // taken from the FileDrop example
         new FileDrop(System.out, tableSP, (File[] files) -> {
-
-            // create an arraylist of files and traverse it
-            List<File> fileList = new ArrayList<>();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    FileUtils.listFiles(file, fileList);
-                } else {
-                    fileList.add(file);
-                }
-            }
-
-            // sort the file list
-            fileList.sort(Comparator.comparing(File::getName));
-
-            // import them all
-            List<File> successfullyAddedFiles = importFiles(fileList);
-
-            // check to see if the actions can be enabled
-            setActionsEnabled(!successfullyAddedFiles.isEmpty());
-
-            // check for new genres
-            if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
-                songController.checkForNewGenres(successfullyAddedFiles);
-            }
+            setLoading(true);
+            getImportFilesSwingWorker(files).execute();
         });
+    }
+
+    /**
+     * Returns the import albums swing worker, so I can use it multiple times
+     * @return an import albums swing worker
+     */
+    private SwingWorker<Void, Void> getImportFilesSwingWorker(File[] files) {
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                // create an arraylist of files and traverse it
+                List<File> fileList = new ArrayList<>();
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        FileUtils.listFiles(file, fileList);
+                    } else {
+                        fileList.add(file);
+                    }
+                }
+
+                // sort the file list
+                fileList.sort(Comparator.comparing(File::getName));
+
+                // import them all
+                List<File> successfullyAddedFiles = importFiles(fileList);
+
+                // check to see if the actions can be enabled
+                setActionsEnabled(!successfullyAddedFiles.isEmpty());
+
+                // check for new genres
+                if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
+                    songController.checkForNewGenres(successfullyAddedFiles);
+                }
+
+                // update graphics
+                setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the autotag swing worker, so I can use it multiple times
+     * @return an autotag swing worker
+     */
+    private SwingWorker<Void, Void> getAutotagSwingWorker() {
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                // do the autotagging
+                autoTag(table.getSelectedRows());
+
+                // update graphics
+                setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the track/disk number swing worker, so I can use it multiple times
+     * @return a track/disk number swing worker
+     */
+    private SwingWorker<Void, Void> getTrackDiskNumberSwingWorker() {
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                // add track numbers and disk numbers
+                songController.autoTaggingService.addTrackAndDiskNumbers(table.getSelectedRows());
+                updateMultiplePanelFields();
+
+                // update graphics
+                setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
     }
 
     /**
@@ -482,30 +556,36 @@ public class Frame extends javax.swing.JFrame {
                 .replace(":", "/");
 
         int index = songController.getSongs().size();
-        Song s = songController.getSongFromFile(file);
+        Song s = SongUtils.getSongFromFile(file);
 
-        // getting the image to put on the table
-        Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
+        if (s != null) {
+            s.setIndex(index);
+            songController.getSongs().put(index, s);
 
-        // add the row to the table
-        getModel().addRow(new Object[]{
-                IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
-                s.getFile(), // hidden file object
-                cleanedFileName, // actual editable file name
-                s.getTitle(),
-                s.getArtist(),
-                s.getAlbum(),
-                s.getAlbumArtist(),
-                s.getYear(),
-                s.getGenre(),
-                s.getFullTrackString(),
-                s.getFullDiskString(),
-                thumbnail_icon,
-                index // hidden index for the song object
-        });
+            // getting the image to put on the table
+            Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
 
-        // all is well in the world
-        return true;
+            // add the row to the table
+            getModel().addRow(new Object[]{
+                    IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
+                    s.getFile(), // hidden file object
+                    cleanedFileName, // actual editable file name
+                    s.getTitle(),
+                    s.getArtist(),
+                    s.getAlbum(),
+                    s.getAlbumArtist(),
+                    s.getYear(),
+                    s.getGenre(),
+                    s.getFullTrackString(),
+                    s.getFullDiskString(),
+                    thumbnail_icon,
+                    index // hidden index for the song object
+            });
+
+            // all is well in the world
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -569,6 +649,7 @@ public class Frame extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         clearAllButton = new javax.swing.JButton();
         openAllButton = new javax.swing.JButton();
+        loadingIcon = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -920,6 +1001,12 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
+        loadingIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        loadingIcon.setMaximumSize(new java.awt.Dimension(68, 68));
+        loadingIcon.setMinimumSize(new java.awt.Dimension(68, 68));
+        loadingIcon.setPreferredSize(new java.awt.Dimension(68, 68));
+        loadingIcon.setSize(new java.awt.Dimension(68, 68));
+
         javax.swing.GroupLayout containerLayout = new javax.swing.GroupLayout(container);
         container.setLayout(containerLayout);
         containerLayout.setHorizontalGroup(
@@ -933,6 +1020,8 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(loadingIcon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -949,13 +1038,15 @@ public class Frame extends javax.swing.JFrame {
             containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(containerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(openAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(saveAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(containerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(openAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(saveAllButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(clearAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(loadingIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tableSP)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1156,7 +1247,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the open menu item, opens a JFileChooser for the user to select a directory to open
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
@@ -1186,7 +1277,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the save track menu item, saves all selected rows
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
@@ -1200,7 +1291,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the save all menu item, saves all rows in the table
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void saveAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllMenuItemActionPerformed
@@ -1209,7 +1300,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the exit menu item
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
@@ -1231,7 +1322,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the select all menu item, selects all the rows on the table
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void selectAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:selectAllMenuItemActionPerformed
@@ -1250,7 +1341,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Audit menu item, launches the audit frame
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void auditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_auditMenuItemActionPerformed
@@ -1259,12 +1350,13 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Autotag menu item, auto tags the selected rows
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void autoTagMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTagMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
-            autoTag(table.getSelectedRows());
+            setLoading(true);
+            getAutotagSwingWorker().execute();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -1272,7 +1364,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Actually does the auto tag call
-     * @param selectedRows, the rows to auto tag
+     * @param selectedRows the rows to auto tag
      */
     public void autoTag(int[] selectedRows) {
         if (table.isEditing()) {
@@ -1284,7 +1376,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Add Covers menu item, auto adds the covers
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void addCoversMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addCoversMenuItemActionPerformed
@@ -1297,7 +1389,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Actually does the auto add cover art call
-     * @param selectedRows, the rows to add cover art to
+     * @param selectedRows the rows to add cover art to
      */
     public void autoAddCoverArt(int[] selectedRows) {
         songController.autoTaggingService.autoAddCoverArt(selectedRows);
@@ -1306,7 +1398,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Find and Replace menu item, opens the Find and Replace dialog
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void findAndReplaceMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findAndReplaceMenuItemActionPerformed
@@ -1346,13 +1438,13 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Add Track/Disk numbers menu item, auto adds the track numbers and disk numbers
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
-            songController.autoTaggingService.addTrackAndDiskNumbers(table.getSelectedRows());
-            updateMultiplePanelFields();
+            setLoading(true);
+            getTrackDiskNumberSwingWorker().execute();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -1360,7 +1452,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Format Filenames menu item, formats the filenames
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void formatFilenamesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesMenuItemActionPerformed
@@ -1381,7 +1473,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the About menu item, opens the about dialog
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
@@ -1390,7 +1482,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Wiki menu item, opens the wiki page
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void wikiMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wikiMenuItemActionPerformed
@@ -1403,7 +1495,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Command Prompt menu item, opens a command prompt dialog
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void commandMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commandMenuItemActionPerformed
@@ -1440,7 +1532,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Settings menu item, launches the SettingsFrame
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
@@ -1457,7 +1549,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Save All button press, saves all tracks currently on the table
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void saveAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllButtonActionPerformed
@@ -1466,7 +1558,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Clear All button, shows a dialog if the user has the isAskBeforeClearAll setting enabled
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void clearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllButtonActionPerformed
@@ -1501,7 +1593,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Action for the Open All button press, opens all the tracks currently on the table
-     * @param evt, the ActionEvent (not used, but here because Netbeans)
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
     @SuppressWarnings("unused") // for the evt
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
@@ -1531,7 +1623,6 @@ public class Frame extends javax.swing.JFrame {
     private void tableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMousePressed
         int row = table.rowAtPoint(evt.getPoint());
         int col = table.columnAtPoint(evt.getPoint());
-        int rows = table.getSelectedRowCount();
         int[] selectedRows = table.getSelectedRows();
 
         // check what type of click
@@ -2261,6 +2352,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JLabel loadingIcon;
     private javax.swing.JMenu macroMenu;
     private javax.swing.JTextField multAlbum;
     private javax.swing.JTextField multAlbumArtist;

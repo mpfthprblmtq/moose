@@ -25,6 +25,7 @@ public class IconUtils {
     public static final String MOOSE_64 = "moose64.png";
     public static final String MOOSE_128 = "moose128.png";
     public static final String LOADING = "loading-icon.gif";
+    public static final String LOADING_BIG = "loading-icon-big.gif";
     public static final String CIRCLE = "circle-outline.png";
 
     /**

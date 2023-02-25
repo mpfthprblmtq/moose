@@ -38,6 +38,7 @@ import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 
 // class AlbumArtFinderFrame
+@SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
 public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
     static Logger logger = Moose.getLogger();
@@ -62,12 +63,50 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     GoogleSearchService googleSearchService = new GoogleSearchService();
     SpotifyApiService spotifyApiService = new SpotifyApiService();
 
+    File dir;
+    List<Integer> rows;
+
+    BufferedImage foundCover;
+
     /**
-     * Returns the google search worker so I can use it multiple times
-     * @return a google search worker
+     * Creates new form AlbumArtFinderFrame
+     * @param query the ImageSearchQuery to search by
+     */
+    public AlbumArtFinderFrame(ImageSearchQuery query) {
+        // init the components
+        initComponents();
+
+        // set the fields
+        this.query = query;
+        this.dir = query.getDir();
+        this.rows = query.getRows();
+
+        // set starting values for the header and tabs
+        headerLabel.setText("<html>Finding album art for:<br>\"" + query.getArtist() + " - " + query.getAlbum() + "\"</html>");
+        googleSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
+        spotifyArtistTextField.setText(getPrimaryArtist(query.getArtist()));
+        spotifyAlbumTextField.setText(query.getAlbum());
+        manualSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
+        dropImageLabel.setTransferHandler(createTransferHandler());
+
+        // set spotify artist info if we have it
+        if (Moose.getSettings().getSpotifyArtists().containsKey(spotifyArtistTextField.getText())) {
+            spotifyArtistTextField.setEnabled(false);
+            spotifyAlbumTextField.setEnabled(false);
+            spotifySearchButton.setEnabled(false);
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
+
+            // create a thread to wait until the dialog box pops up
+            (new Thread(this::populateSpotifyArtistInfo)).start();
+        }
+    }
+
+    /**
+     * Returns the Google search worker, so I can use it multiple times
+     * @return a Google search worker
      */
     private SwingWorker<Void, Void> getGoogleSearchWorker() {
-        // make a swing worker do the image search in a separate thread so I can update the GUI
+        // make a swing worker do the image search in a separate thread, so I can update the GUI
         return new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -140,11 +179,11 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Returns the spotify artist search worker so I can use it multiple times
+     * Returns the spotify artist search worker, so I can use it multiple times
      * @return a spotify artist search worker
      */
     private SwingWorker<Void, Void> getSpotifyArtistSearchWorker() {
-        // make a swing worker do the spotify search in a separate thread so I can update the GUI
+        // make a swing worker do the spotify search in a separate thread, so I can update the GUI
         return new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -215,11 +254,11 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Returns the spotify album search worker so I can use it multiple times
+     * Returns the spotify album search worker, so I can use it multiple times
      * @return a spotify album search worker
      */
     private SwingWorker<Void, Void> getSpotifyAlbumSearchWorker() {
-        // make a swing worker do the spotify search in a separate thread so I can update the GUI
+        // make a swing worker do the spotify search in a separate thread, so I can update the GUI
         return new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -302,45 +341,6 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         };
     }
 
-    File dir;
-    List<Integer> rows;
-
-    BufferedImage foundCover;
-
-    /**
-     * Creates new form AlbumArtFinderFrame
-     *
-     * @param query, the ImageSearchQuery to search by
-     */
-    public AlbumArtFinderFrame(ImageSearchQuery query) {
-        // init the components
-        initComponents();
-
-        // set the ivars
-        this.query = query;
-        this.dir = query.getDir();
-        this.rows = query.getRows();
-
-        // set starting values for the header and tabs
-        headerLabel.setText("<html>Finding album art for:<br>\"" + query.getArtist() + " - " + query.getAlbum() + "\"</html>");
-        googleSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
-        spotifyArtistTextField.setText(getPrimaryArtist(query.getArtist()));
-        spotifyAlbumTextField.setText(query.getAlbum());
-        manualSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
-        dropImageLabel.setTransferHandler(createTransferHandler());
-
-        // set spotify artist info if we have it
-        if (Moose.getSettings().getSpotifyArtists().containsKey(spotifyArtistTextField.getText())) {
-            spotifyArtistTextField.setEnabled(false);
-            spotifyAlbumTextField.setEnabled(false);
-            spotifySearchButton.setEnabled(false);
-            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
-
-            // create a thread to wait until the dialog box pops up
-            (new Thread(this::populateSpotifyArtistInfo)).start();
-        }
-    }
-
     /**
      * Populates spotify artist info if we have it
      */
@@ -379,7 +379,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Creates a transfer handler for the manual image label so you can drag an image onto the panel
+     * Creates a transfer handler for the manual image label, so you can drag an image onto the panel
      * @return a transfer handler capable of processing images dragged in from the world wide web
      */
     private TransferHandler createTransferHandler(){
@@ -430,6 +430,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
+    @SuppressWarnings("all")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -889,75 +890,71 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void googleSearchQueryTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_googleSearchQueryTextFieldKeyReleased
-        googleSearchButton.setEnabled(!googleSearchQueryTextField.getText().equals(""));
-    }//GEN-LAST:event_googleSearchQueryTextFieldKeyReleased
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  SPOTIFY TAB METHODS
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="SPOTIFY TAB METHODS">
 
-    private void googleNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleNextButtonActionPerformed
-        if (currentIconIndex < icons.size() - 1) {
-            currentIconIndex++;
-            googleAlbumArtImageLabel.setIcon(icons.get(currentIconIndex));
-            googlePreviousButton.setEnabled(true);
-
-            if (currentIconIndex == icons.size() - 1) {
-                googleNextButton.setEnabled(false);
-                googlePreviousButton.setEnabled(true);
-            }
-        }
-
-        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
-        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
-        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
-        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
-    }//GEN-LAST:event_googleNextButtonActionPerformed
-
-    private void googlePreviousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googlePreviousButtonActionPerformed
-        if (currentIconIndex > 0) {
-            currentIconIndex--;
-            googleAlbumArtImageLabel.setIcon(icons.get(currentIconIndex));
-            googleNextButton.setEnabled(true);
-
-            if (currentIconIndex == 0) {
-                googlePreviousButton.setEnabled(false);
-                googleNextButton.setEnabled(true);
-            }
-        }
-
-        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
-        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
-        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
-        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
-    }//GEN-LAST:event_googlePreviousButtonActionPerformed
-
-    private void googleImagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleImagesButtonActionPerformed
-        String url = StringUtils.isEmpty(manualSearchQueryTextField.getText()) ? "https://images.google.com/" :
-                GoogleSearchService.buildImageSearchQuery(googleSearchQueryTextField.getText());
-        try {
-            WebUtils.openPage(url);
-        } catch (Exception e) {
-            logger.logError("Couldn't open web page: " + url, e);
-        }
-    }//GEN-LAST:event_googleImagesButtonActionPerformed
-
-    private void googleSearchQueryTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_googleSearchQueryTextFieldKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            googleSearchButton.doClick();
-        }
-    }//GEN-LAST:event_googleSearchQueryTextFieldKeyPressed
-
-    private void googleSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleSearchButtonActionPerformed
-        doGoogleSearch();
-    }//GEN-LAST:event_googleSearchButtonActionPerformed
-
+    /**
+     * Handles the search button press. Does the spotify search.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifySearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spotifySearchButtonActionPerformed
         doSpotifySearch();
     }//GEN-LAST:event_spotifySearchButtonActionPerformed
 
-    private void googleConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleConfirmButtonActionPerformed
-        foundCover = googleImageSearchResults.get(currentIconIndex).getBufferedImage();
-        confirmImage();
-    }//GEN-LAST:event_googleConfirmButtonActionPerformed
+    /**
+     * Checks to see if we have the client id/client secret before doing a search.
+     * Updates the gui to signify it starting, then starts up the spotify swing worker
+     */
+    private void doSpotifySearch() {
+        // check to see if we have a valid client id and client secret
+        if (StringUtils.isEmpty(Moose.getSettings().getSpotifyClientId())
+                || StringUtils.isEmpty(Moose.getSettings().getSpotifyClientSecret())) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid/Missing Client ID or Client Secret, open Settings to configure.",
+                    "Error with Album Art Finder",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // check if we already have an artist
+        if (StringUtils.isEmpty(spotifyArtistId)) {
+            // we don't have a spotify artist id, which means we still need to search for the artist
+            // update the gui to signify it starting
+            spotifyApiStatusLabel.setText("Searching for artists...");
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
+            spotifySearchButton.setEnabled(false);
+            spotifyArtistTextField.setEnabled(false);
+            spotifyAlbumTextField.setEnabled(false);
+
+            // do the artist search
+            getSpotifyArtistSearchWorker().execute();
+        } else {
+            // we have a spotify artist id, which means we don't need to search for the artist, search for albums straight away
+            // update the gui to signify it starting
+            spotifyApiStatusLabel.setText("<html><body>Artist confirmed!<br>Searching for albums...</body></html>");
+            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
+            spotifyProgressBar.setValue(0);
+            spotifyStatusLabel.setText("Searching for albums from " + spotifyArtistTextField.getText() + "...");
+            spotifyConfirmButton.setEnabled(false);
+            spotifyPreviousButton.setEnabled(false);
+            spotifyNextButton.setEnabled(false);
+
+            // do the search
+            getSpotifyAlbumSearchWorker().execute();
+        }
+    }
+
+    /**
+     * Handles the confirm button press. Confirms both the image and the spotify artist and saves it.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spotifyConfirmButtonActionPerformed
         if (!spotifyArtists.isEmpty() && spotifyAlbums.isEmpty()) {
             confirmSpotifyArtist();
@@ -966,20 +963,11 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_spotifyConfirmButtonActionPerformed
 
-    private void manualConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualConfirmButtonActionPerformed
-        confirmImage();
-    }//GEN-LAST:event_manualConfirmButtonActionPerformed
-
-    private void spotifyPreviousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spotifyPreviousButtonActionPerformed
-        currentSpotifyArtistIconIndex--;
-        spotifyPreviousButton.setEnabled(currentSpotifyArtistIconIndex != 0);
-        spotifyNextButton.setEnabled(currentSpotifyArtistIconIndex < spotifyArtists.size() - 1);
-        spotifyAlbumArtImageLabel.setIcon(ImageUtils.getScaledImage(
-                ImageUtils.getBytesFromBufferedImage(ImageUtils.getImageFromUrl(spotifyArtists.get(currentSpotifyArtistIconIndex).getImages().get(0).getUrl())), 300
-        ));
-        spotifyStatusLabel.setText("<html><body>(" + (currentSpotifyArtistIconIndex + 1) + " of " + spotifyArtists.size() + ") <a href=''>" + spotifyArtists.get(currentSpotifyArtistIconIndex).getName() + "</a></body></html>");
-    }//GEN-LAST:event_spotifyPreviousButtonActionPerformed
-
+    /**
+     * Handles the next button press. Goes to the next artist/album if there is one.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spotifyNextButtonActionPerformed
         currentSpotifyArtistIconIndex++;
         spotifyPreviousButton.setEnabled(currentSpotifyArtistIconIndex != 0);
@@ -990,10 +978,35 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         spotifyStatusLabel.setText("<html><body>(" + (currentSpotifyArtistIconIndex + 1) + " of " + spotifyArtists.size() + ") <a href=''>" + spotifyArtists.get(currentSpotifyArtistIconIndex).getName() + "</a></body></html>");
     }//GEN-LAST:event_spotifyNextButtonActionPerformed
 
+    /**
+     * Handles the previous button press. Goes to the previous artist/album if there is one.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void spotifyPreviousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spotifyPreviousButtonActionPerformed
+        currentSpotifyArtistIconIndex--;
+        spotifyPreviousButton.setEnabled(currentSpotifyArtistIconIndex != 0);
+        spotifyNextButton.setEnabled(currentSpotifyArtistIconIndex < spotifyArtists.size() - 1);
+        spotifyAlbumArtImageLabel.setIcon(ImageUtils.getScaledImage(
+                ImageUtils.getBytesFromBufferedImage(ImageUtils.getImageFromUrl(spotifyArtists.get(currentSpotifyArtistIconIndex).getImages().get(0).getUrl())), 300
+        ));
+        spotifyStatusLabel.setText("<html><body>(" + (currentSpotifyArtistIconIndex + 1) + " of " + spotifyArtists.size() + ") <a href=''>" + spotifyArtists.get(currentSpotifyArtistIconIndex).getName() + "</a></body></html>");
+    }//GEN-LAST:event_spotifyPreviousButtonActionPerformed
+
+    /**
+     * Handles the event for when mouse enters the artist image label, just makes it look clickable.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyArtistImageLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyArtistImageLabelMouseEntered
         spotifyArtistImageLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_spotifyArtistImageLabelMouseEntered
 
+    /**
+     * Handles the click event for the artist image label. Opens the artist page of that artist.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyArtistImageLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyArtistImageLabelMouseClicked
         if (StringUtils.isNotEmpty(spotifyArtistId)) {
             String url = "https://open.spotify.com/artist/" + spotifyArtistId;
@@ -1005,18 +1018,38 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_spotifyArtistImageLabelMouseClicked
 
+    /**
+     * Handles the event for when mouse exits the artist image label, just sets the cursor back to normal.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyArtistImageLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyArtistImageLabelMouseExited
         spotifyArtistImageLabel.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_spotifyArtistImageLabelMouseExited
 
+    /**
+     * Handles the event for when mouse enters the spotify status label, just makes it look clickable.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyStatusLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyStatusLabelMouseEntered
         spotifyStatusLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_spotifyStatusLabelMouseEntered
 
+    /**
+     * Handles the event for when mouse exits the spotify status label, just sets the cursor back to normal.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyStatusLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyStatusLabelMouseExited
         spotifyStatusLabel.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_spotifyStatusLabelMouseExited
 
+    /**
+     * Handles the click event for the spotify status label. Opens the artist page of that artist.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void spotifyStatusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_spotifyStatusLabelMouseClicked
         if (spotifyStatusLabel.getText().matches(".*\\(\\d+ of \\d+\\).*")) {
             String url = "https://open.spotify.com/artist/" + spotifyArtists.get(currentSpotifyArtistIconIndex).getId();
@@ -1028,17 +1061,26 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_spotifyStatusLabelMouseClicked
 
-    private void resetMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMenuItemActionPerformed
-        int selectedTab = tabbedPane.getSelectedIndex();
-        this.dispose();
-        AlbumArtFinderFrame newFrame = new AlbumArtFinderFrame(query);
-        newFrame.setLocationRelativeTo(Moose.getFrame());
-        newFrame.setVisible(true);
-        newFrame.tabbedPane.setSelectedIndex(selectedTab);
-    }//GEN-LAST:event_resetMenuItemActionPerformed
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  GOOGLE TAB METHODS
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="GOOGLE TAB METHODS">
 
     /**
-     * Checks to see if the google search CSE id and google search api key before running the search
+     * Handles the search button press.  Does the Google Search.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void googleSearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleSearchButtonActionPerformed
+        doGoogleSearch();
+    }//GEN-LAST:event_googleSearchButtonActionPerformed
+
+    /**
+     * Checks to see if the Google search CSE id and google search api key before running the search
      * Also checks to see if the api call limit has been reached before searching
      */
     public void doGoogleSearch() {
@@ -1080,51 +1122,134 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Checks to see if we have the client id/client secret before doing a search
-     * Updates the gui to signify it starting, then starts up the spotify swing worker
+     * Handles the confirm button press. Sets the class field and confirms image.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void doSpotifySearch() {
-        // check to see if we have a valid client id and client secret
-        if (StringUtils.isEmpty(Moose.getSettings().getSpotifyClientId())
-                || StringUtils.isEmpty(Moose.getSettings().getSpotifyClientSecret())) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid/Missing Client ID or Client Secret, open Settings to configure.",
-                    "Error with Album Art Finder",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+    @SuppressWarnings("unused") // for the evt param
+    private void googleConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleConfirmButtonActionPerformed
+        foundCover = googleImageSearchResults.get(currentIconIndex).getBufferedImage();
+        confirmImage();
+    }//GEN-LAST:event_googleConfirmButtonActionPerformed
+
+    /**
+     * Handles the key pressing for the Google search query field.  Sets the search button enabled based on text
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void googleSearchQueryTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_googleSearchQueryTextFieldKeyReleased
+        googleSearchButton.setEnabled(!googleSearchQueryTextField.getText().equals(""));
+    }//GEN-LAST:event_googleSearchQueryTextFieldKeyReleased
+
+    /**
+     * Handles the next button press.  Goes to the next image if there is one.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void googleNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleNextButtonActionPerformed
+        if (currentIconIndex < icons.size() - 1) {
+            currentIconIndex++;
+            googleAlbumArtImageLabel.setIcon(icons.get(currentIconIndex));
+            googlePreviousButton.setEnabled(true);
+
+            if (currentIconIndex == icons.size() - 1) {
+                googleNextButton.setEnabled(false);
+                googlePreviousButton.setEnabled(true);
+            }
         }
 
-        // check if we already have an artist
-        if (StringUtils.isEmpty(spotifyArtistId)) {
-            // we don't have a spotify artist id, which means we still need to search for the artist
-            // update the gui to signify it starting
-            spotifyApiStatusLabel.setText("Searching for artists...");
-            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
-            spotifySearchButton.setEnabled(false);
-            spotifyArtistTextField.setEnabled(false);
-            spotifyAlbumTextField.setEnabled(false);
+        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
+        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
+    }//GEN-LAST:event_googleNextButtonActionPerformed
 
-            // do the artist search
-            getSpotifyArtistSearchWorker().execute();
-        } else {
-            // we have a spotify artist id, which means we don't need to search for the artist, search for albums straight away
-            // update the gui to signify it starting
-            spotifyApiStatusLabel.setText("<html><body>Artist confirmed!<br>Searching for albums...</body></html>");
-            spotifyLoadingLabel.setIcon(IconUtils.get(IconUtils.LOADING));
-            spotifyProgressBar.setValue(0);
-            spotifyStatusLabel.setText("Searching for albums from " + spotifyArtistTextField.getText() + "...");
-            spotifyConfirmButton.setEnabled(false);
-            spotifyPreviousButton.setEnabled(false);
-            spotifyNextButton.setEnabled(false);
+    /**
+     * Handles the previous button press.  Goes to the previous image if there is one.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void googlePreviousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googlePreviousButtonActionPerformed
+        if (currentIconIndex > 0) {
+            currentIconIndex--;
+            googleAlbumArtImageLabel.setIcon(icons.get(currentIconIndex));
+            googleNextButton.setEnabled(true);
 
-            // do the search
-            getSpotifyAlbumSearchWorker().execute();
+            if (currentIconIndex == 0) {
+                googlePreviousButton.setEnabled(false);
+                googleNextButton.setEnabled(true);
+            }
         }
 
+        googleSourceLabel.setText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSourceLabel.setToolTipText(googleImageSearchResults.get(currentIconIndex).getUrl());
+        googleSizeLabel.setText(googleImageSearchResults.get(currentIconIndex).getImageDimensions().getWidth() + "x" + googleImageSearchResults.get(currentIconIndex).getImageDimensions().getHeight());
+        googleStatusLabel.setText("Result " + (currentIconIndex + 1) + " of " + googleImageSearchResults.size());
+    }//GEN-LAST:event_googlePreviousButtonActionPerformed
 
-    }
+    /**
+     * Handles the "Open Google Images" button press.  Opens a web page with the search filled out.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void googleImagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleImagesButtonActionPerformed
+        String url = StringUtils.isEmpty(manualSearchQueryTextField.getText()) ? "https://images.google.com/" :
+                GoogleSearchService.buildImageSearchQuery(googleSearchQueryTextField.getText());
+        try {
+            WebUtils.openPage(url);
+        } catch (Exception e) {
+            logger.logError("Couldn't open web page: " + url, e);
+        }
+    }//GEN-LAST:event_googleImagesButtonActionPerformed
 
+    /**
+     * Handles the search query key press. Checks if the key code is of type Enter, which means button click.
+     * @param evt the ActionEvent
+     */
+    private void googleSearchQueryTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_googleSearchQueryTextFieldKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            googleSearchButton.doClick();
+        }
+    }//GEN-LAST:event_googleSearchQueryTextFieldKeyPressed
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  MANUAL TAB METHODS
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="MANUAL TAB METHODS">
+
+    /**
+     * Handles the confirm button press. Confirms the image.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void manualConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualConfirmButtonActionPerformed
+        confirmImage();
+    }//GEN-LAST:event_manualConfirmButtonActionPerformed
+
+    // </editor-fold>
+
+    /**
+     * Handles the event for resetting the screen.
+     * TODO don't dispose, just clear the fields
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
+    private void resetMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMenuItemActionPerformed
+        int selectedTab = tabbedPane.getSelectedIndex();
+        this.dispose();
+        AlbumArtFinderFrame newFrame = new AlbumArtFinderFrame(query);
+        newFrame.setLocationRelativeTo(Moose.getFrame());
+        newFrame.setVisible(true);
+        newFrame.tabbedPane.setSelectedIndex(selectedTab);
+    }//GEN-LAST:event_resetMenuItemActionPerformed
+
+    /**
+     * Gets a list of Icons from a list of image search results containing BufferedImages to display on the modal.
+     * @param responses the image search results to parse
+     * @return a list of Icons to display on the modal
+     */
     private List<Icon> getIconsFromImages(List<ImageSearchResult> responses) {
         List<Icon> scaledIcons = new ArrayList<>();
         for (ImageSearchResult isr : responses) {
@@ -1134,6 +1259,9 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         return scaledIcons;
     }
 
+    /**
+     * Confirms the image with the foundCover class field. Creates the image file and closes the modal.
+     */
     private void confirmImage() {
         int dim = Moose.getSettings().getPreferredCoverArtSize();
         File outputFile = ImageUtils.createImageFile(foundCover, dir, dim);
@@ -1147,6 +1275,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         this.dispose();
     }
 
+    /**
+     * Confirms the spotify artist that was found.
+     * Updates some graphics and adds the artist id to the list of known artists in settings.
+     */
     private void confirmSpotifyArtist() {
         // set artist local value
         Artist artist = spotifyArtists.get(currentSpotifyArtistIconIndex);
@@ -1181,28 +1313,6 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
         // do the search
         getSpotifyAlbumSearchWorker().execute();
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            logger.logError("Exception thrown while adding theme to Swing GUI!", ex);
-        }
-        //</editor-fold>
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

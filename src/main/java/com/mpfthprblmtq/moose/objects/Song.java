@@ -9,6 +9,8 @@
 package com.mpfthprblmtq.moose.objects;
 
 // imports
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +21,8 @@ import java.util.Objects;
 // class Song
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Song {
 
     private File file;
