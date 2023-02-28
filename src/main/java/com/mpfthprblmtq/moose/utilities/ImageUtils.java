@@ -162,9 +162,9 @@ public class ImageUtils {
      */
     public static byte[] getBytesFromBufferedImage(BufferedImage image) {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", baos);
-            return baos.toByteArray();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
         } catch (IOException ex) {
             logger.logError("IOException when trying to read a BufferedImage to a byte array!", ex);
             return null;

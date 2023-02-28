@@ -22,8 +22,11 @@ import com.mpfthprblmtq.moose.services.AutocompleteService;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
-import com.mpfthprblmtq.moose.utilities.SongUtils;
-import com.mpfthprblmtq.moose.utilities.viewUtils.*;
+import com.mpfthprblmtq.moose.utilities.viewUtils.AutoCompleteDocument;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.FileDrop;
+import com.mpfthprblmtq.moose.utilities.viewUtils.TableCellListener;
+import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 import com.mpfthprblmtq.moose.views.modals.InfoFrame;
 
 import java.awt.*;
@@ -87,9 +90,6 @@ public class Frame extends javax.swing.JFrame {
                 init();
             });
         }
-
-        // set up the song controller
-        songController.setTable(table);
     }
 
     /**
@@ -102,9 +102,6 @@ public class Frame extends javax.swing.JFrame {
         if (SwingUtilities.isEventDispatchThread()) {
             initComponents();
             init();
-
-            // set up the song controller
-            songController.setTable(table);
 
             // add the songs in the folder param to start
             List<File> files = new ArrayList<>();
@@ -122,9 +119,6 @@ public class Frame extends javax.swing.JFrame {
             SwingUtilities.invokeLater(() -> {
                 initComponents();
                 init();
-
-                // set up the song controller
-                songController.setTable(table);
 
                 // add the songs in the folder param to start
                 List<File> files = new ArrayList<>();
@@ -204,9 +198,6 @@ public class Frame extends javax.swing.JFrame {
         ViewUtils.setColumnWidth(table, 10, 100);   // album art
 //        ViewUtils.setColumnWidth(table, 11, 20);    // index
 
-        // set the songController's table
-        songController.setTable(table);
-
         // mouse event listener to listen for clicking on the table outside the available rows
         // deselects the current row selection
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
@@ -273,7 +264,7 @@ public class Frame extends javax.swing.JFrame {
                     formatFilenames(selectedRows);
                     break;
                 case ADD_ARTWORK:
-                    songController.autoTaggingService.addAlbumArt(selectedRows);
+                    songController.addAlbumArtFromFileChooser(selectedRows);
                     updateMultiplePanelFields();
                     break;
                 case ADD_ARTWORK_SELECTED:
@@ -383,7 +374,7 @@ public class Frame extends javax.swing.JFrame {
             @Override
             protected Void doInBackground() {
                 // add track numbers and disk numbers
-                songController.autoTaggingService.addTrackAndDiskNumbers(table.getSelectedRows());
+                songController.autoAddTrackAndDiskNumbers(table.getSelectedRows());
                 updateMultiplePanelFields();
 
                 // update graphics
@@ -556,7 +547,7 @@ public class Frame extends javax.swing.JFrame {
                 .replace(":", "/");
 
         int index = songController.getSongs().size();
-        Song s = SongUtils.getSongFromFile(file);
+        Song s = songController.getSongService().getSongFromFile(file);
 
         if (s != null) {
             s.setIndex(index);
@@ -1392,7 +1383,7 @@ public class Frame extends javax.swing.JFrame {
      * @param selectedRows the rows to add cover art to
      */
     public void autoAddCoverArt(int[] selectedRows) {
-        songController.autoTaggingService.autoAddCoverArt(selectedRows);
+        songController.autoAddCoverArt(selectedRows);
         updateMultiplePanelFields();
     }
 
@@ -1598,7 +1589,7 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("unused") // for the evt
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
         for (int i = 0; i < table.getRowCount(); i++) {
-            File file = songController.autoTaggingService.getFile(i);
+            File file = songController.getSongs().get(songController.getIndex(i)).getFile();
             try {
                 FileUtils.openFile(file);
             } catch (Exception e) {
@@ -1671,7 +1662,7 @@ public class Frame extends javax.swing.JFrame {
             case java.awt.event.MouseEvent.BUTTON2:
                 for (int selectedRow : selectedRows) {
                     try {
-                        FileUtils.openFile(songController.autoTaggingService.getFile(selectedRow));
+                        FileUtils.openFile(songController.getSongs().get(songController.getIndex(selectedRow)).getFile());
                     } catch (Exception e) {
                         logger.logError("Couldn't open file!", e);
                     }

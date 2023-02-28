@@ -6,9 +6,9 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AutoTaggingService_V2Test {
+class AutoTaggingServiceTest {
 
-    AutoTaggingService_V2 underTest = new AutoTaggingService_V2();
+    AutoTaggingService underTest = new AutoTaggingService();
 
     @Test
     public void testGetTitleFromFile_processesTrackNumArtistTitleFilename() {

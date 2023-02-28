@@ -661,6 +661,11 @@ public class InfoFrame extends javax.swing.JFrame {
         Moose.getFrame().previousFromInfoFrame(this.editModeEnabled, lastEditedField);
     }//GEN-LAST:event_previousButtonActionPerformed
 
+    /**
+     * Handles the edit or submit button press. Checks if we're editing or submitting and does the action based on that.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void editSubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editSubmitButtonActionPerformed
         if(editSubmitButton.getText().equals("Edit")) {
             editSubmitButton.setText("Submit");
@@ -674,6 +679,11 @@ public class InfoFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_editSubmitButtonActionPerformed
 
+    /**
+     * Handles the window closing action
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt param
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         setFieldsEditable(false);
         Moose.getFrame().setEnabled(true);
@@ -812,7 +822,7 @@ public class InfoFrame extends javax.swing.JFrame {
     private void commentFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_commentFieldKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             commentField.transferFocus();
-            evt.consume();  // consume prilosec
+            evt.consume();
         }
     }//GEN-LAST:event_commentFieldKeyPressed
 

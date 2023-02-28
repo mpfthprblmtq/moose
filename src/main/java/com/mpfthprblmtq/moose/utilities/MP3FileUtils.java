@@ -41,7 +41,7 @@ public class MP3FileUtils {
         FileUtils.listFiles(dir, filesInDir);
         filesInDir.removeIf(fileInDir -> !fileInDir.getName().endsWith(".mp3"));
         for (File fileInDir : filesInDir) {
-            Song songFromFile = SongUtils.getSongFromFile(fileInDir);
+            Song songFromFile = Moose.getSongController().getSongService().getSongFromFile(fileInDir);
             if (songFromFile != null) {
                 songs.add(songFromFile);
             }
@@ -232,7 +232,7 @@ public class MP3FileUtils {
 
         // if we reach this point, no valid image files exist in that directory
         // perform one final check and recursively call itself
-        if (folder.getParentFile().getName().matches(ALBUM_FOLDER_REGEX)) {
+        if (folder.getParentFile().getName().matches(FILENAME_YEAR_ALBUM)) {
             return getCoverIfExists(folder.getParentFile());
         }
 

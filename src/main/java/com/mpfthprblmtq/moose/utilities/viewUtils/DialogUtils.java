@@ -358,7 +358,7 @@ public class DialogUtils {
 
     /**
      * Shows a window for the album art
-     * @param query the ImageSearchQuery object to use in the album art finder window
+     * @param query the ImageSearchQuery object to use with the album art finder window
      */
     public static void showAlbumArtWindow(ImageSearchQuery query) {
         if (SwingUtilities.isEventDispatchThread()) {
