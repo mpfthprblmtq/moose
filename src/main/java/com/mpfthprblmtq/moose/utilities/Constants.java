@@ -77,9 +77,12 @@ public class Constants {
     public static final String FEATURED_NO_PARENS = "(?<title>.+)[^(]ft\\. (?<featured>.+)[^)]*";
     public static final String FILENAME_TRACK_NUMBER_TITLE = "(?<track>\\d{1,3})\\s(?<title>.+)";
     public static final String FILENAME_TRACK_NUMBER_ARTIST_TITLE = "(?<track>\\d{1,3})\\s{1}(?<artist>.+)\\s-\\s(?<title>.+)";
-    public static final String FILENAME_ARIST_TITLE = "(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_ARTIST_TITLE = "(?<artist>.+)\\s-\\s(?<title>.+)";
     public static final String FILENAME_TRACK_NUMBER_PERIOD = "(?<track>\\d{1,3})\\.\\s(?<title>.+)";
     public static final String FILENAME_TRACK_NUMBER_HYPHEN = "(?<track>\\d{1,3})\\s*-\\s*(?<title>.+)";
+    public static final String FILENAME_YEAR_ARTIST_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_YEAR_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<title>.+)";
+    public static final String FILENAME_MULTIPLE_CD_FILEPATH = ".*\\/CD(?<diskNumber>\\d+)\\/.*";
 
     // menu options
     public static final String MORE_INFO = "More info...";

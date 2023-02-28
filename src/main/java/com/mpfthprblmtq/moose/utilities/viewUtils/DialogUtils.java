@@ -11,8 +11,10 @@ package com.mpfthprblmtq.moose.utilities.viewUtils;
 // imports
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
+import com.mpfthprblmtq.moose.objects.api.imageSearch.ImageSearchQuery;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
+import com.mpfthprblmtq.moose.views.modals.AlbumArtFinderFrame;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -338,6 +340,38 @@ public class DialogUtils {
                 "You have unsaved changes, are you sure you want to exit?",
                 "Unsaved Changes",
                 JOptionPane.YES_NO_OPTION);
+    }
+
+    /**
+     * Checks to see if user wants to use the Album Art Finder Service
+     * @return if the user wants to use the album art finder
+     */
+    public static int confirmUserWantsAlbumArtFinder() {
+        return JOptionPane.showConfirmDialog(
+                Moose.frame,
+                "Cover art wasn't automatically found, would you like\n"
+                        + "to use the Album Art Finder service in Moose?",
+                "Album Art Finder Service",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Shows a window for the album art
+     * @param query the ImageSearchQuery object to use in the album art finder window
+     */
+    public static void showAlbumArtWindow(ImageSearchQuery query) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
+            albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
+            albumArtFinderFrame.setVisible(true);
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                AlbumArtFinderFrame albumArtFinderFrame = new AlbumArtFinderFrame(query);
+                albumArtFinderFrame.setLocationRelativeTo(Moose.frame);
+                albumArtFinderFrame.setVisible(true);
+            });
+        }
     }
 
 }

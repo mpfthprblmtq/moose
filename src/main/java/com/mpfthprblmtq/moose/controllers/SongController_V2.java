@@ -11,6 +11,7 @@ import com.mpfthprblmtq.moose.services.FilenameFormatterService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService_V2;
 import com.mpfthprblmtq.moose.services.SongService;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 import lombok.Data;
@@ -282,6 +283,14 @@ public class SongController_V2 {
                     return index;
                 }
             }
+
+        } else if (t instanceof File) {
+            for (Integer index : getSongs().keySet()) {
+                Song songInMap = getSongs().get(index);
+                if (songInMap.getFile().getPath().equals(songInMap.getFile().getPath())) {
+                    return index;
+                }
+            }
         }
         return -1; // index wasn't found
     }
@@ -314,15 +323,17 @@ public class SongController_V2 {
      */
     public void autoTagFiles(int[] selectedRows) {
 
-        // clean up the file names first by creating a list of songs with the rows
+        // create a list of songs with the rows, so we can use them for processing
         List<Song> songs = Arrays.stream(selectedRows)
                 .boxed()
                 .map((row) -> getSongs().get(getIndex(row)))
                 .collect(Collectors.toList());
+
+        // format the filenames first
         filenameFormatterService_v2.formatFilenames(songs);
 
         // actually do the autotagging
-        autoTaggingService.autoTag(selectedRows);
+        autoTaggingService_v2.autoTag(songs);
     }
 
     /**
@@ -363,6 +374,36 @@ public class SongController_V2 {
 
         Moose.getFrame().updateConsole(count + " file(s) updated!");
         this.hasUnsavedChanges = !edited_songs.isEmpty();
+    }
+
+    /**
+     * Method for adding album art for songs manually, using a JFileChooser.  This method is called when the "Add"
+     * selection is pressed in the context menu.
+     * @param selectedRows the current selected rows on the table
+     */
+    public void addAlbumArtFromFileChooser(int[] selectedRows) {
+        File cover = null;
+        boolean dialogShown = false;
+
+        for (int row : selectedRows) {
+            // get the song
+            Song song = getSongs().get(getIndex(row));
+
+            // only want to show the dialog once, so check to see if we've seen the dialog already
+            if (!dialogShown) {
+                // show the image file choose dialog with the song's file as the starting point
+                cover = ImageUtils.selectAlbumArt(song.getFile());
+                if (cover == null) {
+                    return;
+                } else {
+                    dialogShown = true;
+                }
+            }
+
+            // we should have the cover at this point
+            autoTaggingService_v2.addCoverForFile(song, cover);
+
+        }
     }
 
     /**
