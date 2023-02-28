@@ -22,9 +22,6 @@ import static com.mpfthprblmtq.moose.utilities.Constants.*;
 @NoArgsConstructor
 public class FilenameFormatterService_V2 {
 
-    // services
-    AutoTaggingService_V2 autoTaggingService_v2;
-
     /**
      * Formats the filenames of all songs in the list given to us, sets the new file in the songs map in the
      * SongController, then sets the new value in the table
@@ -36,7 +33,8 @@ public class FilenameFormatterService_V2 {
             if (StringUtils.isNotEmpty(newFilename) && !newFilename.equals(song.getFile().getName())) {
                 String path = song.getFile().getPath().replace(song.getFile().getName(), StringUtils.EMPTY);
                 Moose.songController_v2.setNewFile(song.getIndex(), new File(path + newFilename));
-                Moose.getFrame().getTable().setValueAt((path + newFilename)
+                Moose.getFrame().getTable().getModel().setValueAt(new File(path + newFilename), Moose.getSongController_v2().getRow(song.getIndex()), 1);
+                Moose.getFrame().getTable().setValueAt((newFilename)
                         .replace(".mp3", StringUtils.EMPTY)
                         .replace(":", "/"), Moose.songController_v2.getRow(song.getIndex()), 1);
             }
@@ -186,10 +184,10 @@ public class FilenameFormatterService_V2 {
             if (filename.matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
                 // we have all three, which means we need to cut it down to just track number and title,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService_v2.getArtistFromExistingID3Info(file);
+                String id3Artist = Moose.getSongController_v2().getAutoTaggingService_v2().getArtistFromExistingID3Info(file);
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService_v2.setArtistOnSong(file, filenameArtist);
+                    Moose.getSongController_v2().getAutoTaggingService_v2().setArtistOnSong(file, filenameArtist);
                 }
 
                 // build the file name with just the track and title
@@ -198,18 +196,18 @@ public class FilenameFormatterService_V2 {
                 filename = track + StringUtils.SPACE + title;
 
             // check to see if we have the artist and title, so we can just grab the title
-            } else if (filename.matches(FILENAME_ARIST_TITLE)) {
+            } else if (filename.matches(FILENAME_ARTIST_TITLE)) {
                 // we have only the artist and title, which means we need to cut it down to just the title,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService_v2.getArtistFromExistingID3Info(file);
-                String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_ARIST_TITLE, "artist");
+                String id3Artist = Moose.getSongController_v2().getAutoTaggingService_v2().getArtistFromExistingID3Info(file);
+                String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService_v2.setArtistOnSong(file, filenameArtist);
+                    Moose.getSongController_v2().getAutoTaggingService_v2().setArtistOnSong(file, filenameArtist);
                 }
 
                 // build the file name with just the track and title
                 // if we don't already have the track, just set the filename to the title
-                title = RegexUtils.getMatchedGroup(filename, FILENAME_ARIST_TITLE, "title");
+                title = RegexUtils.getMatchedGroup(filename, FILENAME_ARTIST_TITLE, "title");
                 filename = StringUtils.isNotEmpty(track) ? track + StringUtils.SPACE + title : title;
 
             // check to see if we have the track number and title, so we can just grab the title normally
@@ -224,10 +222,10 @@ public class FilenameFormatterService_V2 {
             if (filename.matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
                 // we have all three, which means we can get all that we need,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService_v2.getArtistFromExistingID3Info(file);
+                String id3Artist = Moose.getSongController_v2().getAutoTaggingService_v2().getArtistFromExistingID3Info(file);
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService_v2.setArtistOnSong(file, filenameArtist);
+                    Moose.getSongController_v2().getAutoTaggingService_v2().setArtistOnSong(file, filenameArtist);
                 }
 
                 // we can just get the title like normal
@@ -236,7 +234,7 @@ public class FilenameFormatterService_V2 {
                 // we only have the track number and title, so let's try and get the artist to add it to the filename
                 if (filename.matches(FILENAME_TRACK_NUMBER_TITLE)) {
                     title = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_TITLE, "title");
-                    String artist = autoTaggingService_v2.getArtistFromExistingID3Info(file);
+                    String artist = Moose.getSongController_v2().getAutoTaggingService_v2().getArtistFromExistingID3Info(file);
                     title = StringUtils.isNotEmpty(artist) ? artist + " - " + title : filename;
                 } else {
                     title = filename;

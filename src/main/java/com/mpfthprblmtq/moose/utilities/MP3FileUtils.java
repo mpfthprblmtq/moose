@@ -9,11 +9,17 @@
 package com.mpfthprblmtq.moose.utilities;
 
 // imports
+import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
+import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
+import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +27,8 @@ import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
 // class MP3FileUtils
 public class MP3FileUtils {
+
+    static Logger logger = Moose.getLogger();
 
     /**
      * Gets all mp3 files and converts them to Song objects from a directory and its subdirectories
@@ -129,5 +137,106 @@ public class MP3FileUtils {
             }
         }
         return count;
+    }
+
+    /**
+     * Helper function to check and see if a directory has a cover image file
+     * @param folder the folder to check
+     * @return the cover file, or null if it doesn't exist
+     */
+    public static File getCoverIfExists(File folder) {
+
+        // if the folder is a cd in a multi-cd album
+        if (folder.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
+            folder = folder.getParentFile();
+        }
+
+        // if the folder isn't an album
+        if (!folder.getName().matches(FILENAME_YEAR_ALBUM)) {
+            return null;
+        }
+
+        // get list of files in this directory
+        List<File> files = FileUtils.listFilesShallow(folder);
+
+        // check to see if we have a "cover.*" file, or if there are any images in general
+        List<File> images = new ArrayList<>();
+        for (File file : files) {
+            if (file.getName().equals("cover.png") || file.getName().equals("cover.jpg") || file.getName().equals("cover.jpeg")) {
+                return file;
+            }
+            if (file.getName().endsWith(".png") || file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")) {
+                images.add(file);
+            }
+        }
+
+        // if we reach this point, an image file named cover.* wasn't found
+        // now we check to see if a single image file exists
+        if (images.size() == 1) {
+            // try to get the image from the file
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = ImageIO.read(images.get(0));
+            } catch (IOException ex) {
+                logger.logError("IOException while trying to reach buffered image: ".concat(images.get(0).getPath()));
+                ViewUtils.showErrorDialog("IOException while trying to reach buffered image: "
+                        .concat(images.get(0).getPath()), ex, Moose.getFrame());
+            }
+            // do some processing on the image if we need to
+            BufferedImage newBufferedImage = null;
+            if (bufferedImage != null) {
+                // check to see if it is the same width/height, resize if not
+                if (bufferedImage.getWidth() != bufferedImage.getHeight()) {
+                    newBufferedImage = ImageUtils.resize(bufferedImage, Math.min(bufferedImage.getHeight(), bufferedImage.getWidth()));
+                }
+            }
+            // now that we have a bufferedImage, let's create the file
+            File resultFile;
+            if (newBufferedImage != null) {
+                resultFile = ImageUtils.createImageFile(newBufferedImage, images.get(0).getParentFile(), newBufferedImage.getHeight());
+                if (images.get(0).delete()) {
+                    return resultFile;
+                }
+            } else {
+                String parent = images.get(0).getParentFile().getPath();
+                String filename = images.get(0).getName();
+                String type = filename.substring(filename.lastIndexOf("."));
+                resultFile = new File(parent.concat("/cover").concat(type));
+                if (!images.get(0).renameTo(resultFile)) {
+                    logger.logError("Error while renaming image file: ".concat(resultFile.getPath()));
+                }
+            }
+
+            return resultFile;
+        }
+
+        // if we reach this point, an image file wasn't found at all, let's check all the files to see if they
+        // share the same cover art, and grab the image if they do
+        List<Song> songs = MP3FileUtils.getAllSongsInDirectory(folder);
+
+        List<byte[]> bytesList = new ArrayList<>();
+        for (Song song : songs) {
+            bytesList.add(song.getArtwork_bytes());
+        }
+        if (ImageUtils.checkIfSame(bytesList.get(0), bytesList.toArray(new byte[0][]))) {
+            byte[] bytes = bytesList.get(0);
+            BufferedImage image = ImageUtils.getBufferedImageFromBytes(bytes);
+            // check if it meets the size requirement first (both size wise, and dimension wise, shouldn't take a cover
+            // with differing height and width
+            if (image != null && image.getHeight() >= Moose.getSettings().getPreferredCoverArtSize() && image.getWidth() >= Moose.getSettings().getPreferredCoverArtSize()) {
+                if (image.getWidth() == image.getHeight()) {
+                    return ImageUtils.createImageFile(image, folder, image.getHeight());
+                }
+            }
+        }
+
+        // if we reach this point, no valid image files exist in that directory
+        // perform one final check and recursively call itself
+        if (folder.getParentFile().getName().matches(ALBUM_FOLDER_REGEX)) {
+            return getCoverIfExists(folder.getParentFile());
+        }
+
+        // no cover files were found, returning null
+        return null;
     }
 }
