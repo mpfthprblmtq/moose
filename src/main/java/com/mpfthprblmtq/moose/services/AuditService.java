@@ -12,13 +12,13 @@ package com.mpfthprblmtq.moose.services;
 //imports
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.RegexUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.AuditCleanupUtils;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
-import com.mpfthprblmtq.moose.utilities.SongUtils;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 
 import javax.swing.SwingConstants;
@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,7 +66,7 @@ public class AuditService {
             if (file.getName().endsWith(".mp3")) {
                 File a;
                 // folder is a multi-disk album
-                if (file.getPath().matches(CD_FILEPATH_REGEX)) {
+                if (file.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
                     a = file.getParentFile().getParentFile();
                 } else {
                     a = file.getParentFile();
@@ -293,7 +291,7 @@ public class AuditService {
             // check if it's a mp3
             if (file.getName().endsWith(".mp3")) {
 
-                Song song = SongUtils.getSongFromFile(file);
+                Song song = Moose.getSongController().getSongService().getSongFromFile(file);
                 if (song == null) {
                     return true;
                 }
@@ -329,7 +327,7 @@ public class AuditService {
      */
     public boolean coverHasErrors(File dir) {
 
-        if (dir.getPath().matches(CD_FILEPATH_REGEX)) {
+        if (dir.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
             dir = dir.getParentFile();
         }
 
@@ -348,8 +346,7 @@ public class AuditService {
      * Attempts to auto fix the covers by automatically finding/adding the cover
      */
     public void autoFixCovers() {
-        Moose.getSongController().getAutoTaggingService()
-                .autoAddCoverArt(IntStream.range(0, Moose.getFrame().table.getRowCount()).toArray());
+        Moose.getSongController().autoAddCoverArt(IntStream.range(0, Moose.getFrame().table.getRowCount()).toArray());
     }
 
     /**
@@ -369,7 +366,7 @@ public class AuditService {
             if (file.getName().endsWith(".mp3")) {
                 if (MP3FileUtils.isPartOfALabel(file)) {
                     if (MP3FileUtils.isPartOfALabel(file, SINGLES)) {
-                        if (!file.getPath().matches(SINGLES_FILEPATH_REGEX) || file.getName().matches(TRACKNUM_ARTIST_TITLE_REGEX)) {
+                        if (!file.getPath().matches(SINGLES_FILEPATH_REGEX) || file.getName().matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
                             return true;
                         }
                     } else if (MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
@@ -386,7 +383,7 @@ public class AuditService {
                         }
                     }
                 } else {
-                    if (!file.getPath().matches(GENERAL_FILEPATH_REGEX)) {
+                    if (!file.getPath().matches(GENERAL_FILEPATH)) {
                         return true;
                     }
                 }
@@ -447,14 +444,8 @@ public class AuditService {
     private File updateFile(File file, File updatedDir) {
         String path;
         // check to see if we're in a multiple CD album, we need to build the path differently then
-        if (file.getPath().matches(CD_FILEPATH_REGEX)) {
-            Pattern pattern = Pattern.compile(CD_FILEPATH_REGEX);
-            Matcher matcher = pattern.matcher(file.getPath());
-            if (matcher.find()) {
-                path = updatedDir.getPath() + "/" + matcher.group("CDNumber");
-            } else {
-                path = updatedDir.getPath();
-            }
+        if (file.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
+            path = updatedDir.getPath() + "/" + RegexUtils.getMatchedGroup(file.getPath(), FILENAME_MULTIPLE_CD_FILEPATH, "diskNumber");
         } else {
             path = updatedDir.getPath();
         }
@@ -471,12 +462,12 @@ public class AuditService {
      */
     private File renameAlbum(File file, File updatedDir, boolean includeArtist) {
         // grab the song data
-        Song song = SongUtils.getSongFromFile(file);
+        Song song = Moose.getSongController().getSongService().getSongFromFile(file);
 
         if (includeArtist) {
             // library/label/lps/[year] artist - album/01 title.mp3
             // check if parent folder matches [year] artist - album standard
-            if (!file.getParentFile().getName().matches(YEAR_ARTIST_ALBUM_REGEX)
+            if (!file.getParentFile().getName().matches(FILENAME_YEAR_ARTIST_ALBUM)
                     && song != null
                     && StringUtils.isNotEmpty(song.getYear())
                     && StringUtils.isNotEmpty(song.getArtist())
@@ -491,7 +482,7 @@ public class AuditService {
         } else {
             // library/album artist/[year] album/01 title.mp3
             // check to see if parent folder matches [year] album standard
-            if (!file.getParentFile().getName().matches(YEAR_ALBUM_REGEX)
+            if (!file.getParentFile().getName().matches(FILENAME_YEAR_ALBUM)
                     && song != null
                     && StringUtils.isNotEmpty(song.getYear())
                     && StringUtils.isNotEmpty(song.getAlbum())) {
@@ -509,28 +500,25 @@ public class AuditService {
      */
     private void renameTrack(File file, File updatedDir, boolean includeArtist) {
 
-        // for change tracking
-        File oldFile = null;
-
         // this if check is for if the directory changes, we need to update the file object with the new path
         if (!file.exists()) {
-            oldFile = file;
             file = updateFile(file, updatedDir);
         }
 
         // grab the song data
-        Song song = SongUtils.getSongFromFile(file);
+        // TODO can clean this up now that index is part of the song
+        Song song = Moose.getSongController().getSongService().getSongFromFile(file);
         int index = Moose.getSongController().getIndex(song);
 
         // if the index wasn't found from the song, that means that the table data doesn't match the file data
         // so grab the index from the actual file(s)
         if (index == -1) {
-            index = Moose.getSongController().getIndex(oldFile, file);
+            index = Moose.getSongController().getIndex(file);
         }
 
         if (includeArtist) {
             // check if file matches 01 artist - title.mp3 standard
-            if (!file.getName().matches(TRACKNUM_ARTIST_TITLE_REGEX)
+            if (!file.getName().matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)
                     && song != null
                     && StringUtils.isNotEmpty(song.getTrack())
                     && StringUtils.isNotEmpty(song.getArtist())
@@ -542,7 +530,7 @@ public class AuditService {
             }
         } else {
             // check if file matches 01 title.mp3 standard
-            if ((!file.getName().matches(TRACKNUM_TITLE_REGEX) || file.getName().matches(TRACKNUM_ARTIST_TITLE_REGEX))
+            if ((!file.getName().matches(FILENAME_TRACK_NUMBER_TITLE) || file.getName().matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE))
                     && song != null
                     && StringUtils.isNotEmpty(song.getTitle())
                     && StringUtils.isNotEmpty(song.getTrack())) {
@@ -566,7 +554,7 @@ public class AuditService {
     private File renameDirectory(File dir, String newDirName) {
         // check if we're in a multiple CD album
         File album = dir;
-        if (dir.getPath().matches(CD_FILEPATH_REGEX)) {
+        if (dir.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
             album = album.getParentFile();
         }
         String path = album.getParentFile().getPath();

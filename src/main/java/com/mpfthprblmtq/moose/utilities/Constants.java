@@ -45,21 +45,6 @@ public class Constants {
     public static final String COMPILATIONS_FILEPATH_REGEX = ".*/.*/Compilations/\\[\\d{4}\\] .*/\\d{1,3} .* - .*\\.mp3";
     public static final String LPS_FILEPATH_REGEX = ".*/.*/LPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
     public static final String EPS_FILEPATH_REGEX = ".*/.*/EPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
-    public static final String GENERAL_FILEPATH_REGEX = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
-    public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
-    public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
-    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
-    public static final String FILENAME_TRIM_REGEX = "(?<Title>\\w.*).*";
-    public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<Title>.*)";
-    public static final String TITLE_REGEX = "(?<Title>.*).mp3";
-    public static final String TRACKNUM_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Title>.*).mp3";
-    public static final String ARTIST_TITLE_REGEX = "(?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String YEAR_ARTIST_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Artist>.*) - (?<Album>.*)";
-    public static final String YEAR_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Album>.*)";
-    public static final String TRACKNUM_ARTIST_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String TRACKNUM_ARTIST_TITLE_OPT_REGEX = "(\\d{1,2} )*(?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String CD_FILEPATH_REGEX = ".*\\/(?<CDNumber>CD\\d+)\\/.*";
-    public static final String YOUTUBE_FILENAME_REGEX = "\\w+\\.\\w{2} - (?<FileName>.*)-.{11}-\\d{3}k-\\d{13}.mp3";
     public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
             "LYRIC VIDEO",
             "OFFICIAL LYRIC VIDEO",
@@ -70,8 +55,7 @@ public class Constants {
             "MONSTERCAT OFFICIAL MUSIC VIDEO",
             "OFFICIAL VISUALIZER"
     };
-
-    // V2 REGEXES
+    public static final String GENERAL_FILEPATH = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
     public static final String FEATURED_NO_PARENS_WITH_REMIXED_BY_ARTIST =
             "(?<title>.+)[^(]ft\\. (?<featured>.*)[^)]*(?<remixedBy>\\(.*\\))";
     public static final String FEATURED_NO_PARENS = "(?<title>.+)[^(]ft\\. (?<featured>.+)[^)]*";
@@ -83,6 +67,7 @@ public class Constants {
     public static final String FILENAME_YEAR_ARTIST_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<artist>.+)\\s-\\s(?<title>.+)";
     public static final String FILENAME_YEAR_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<title>.+)";
     public static final String FILENAME_MULTIPLE_CD_FILEPATH = ".*\\/CD(?<diskNumber>\\d+)\\/.*";
+    public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
 
     // menu options
     public static final String MORE_INFO = "More info...";

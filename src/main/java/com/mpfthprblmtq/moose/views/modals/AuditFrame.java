@@ -698,7 +698,7 @@ public class AuditFrame extends javax.swing.JFrame {
 
     public void startAuditAnalysis() {
         // make a swing worker do the analysis in a separate thread, so I can update the GUI
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 // update graphics
@@ -1024,7 +1024,7 @@ public class AuditFrame extends javax.swing.JFrame {
      */
     private void startCleanupAnalysis() {
         // make a swing worker do the analysis in a separate thread, so I can update the GUI
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 // update graphics

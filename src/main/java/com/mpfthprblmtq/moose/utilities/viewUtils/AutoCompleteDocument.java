@@ -14,7 +14,7 @@ package com.mpfthprblmtq.moose.utilities.viewUtils;
 import javax.swing.text.*;
 
 /**
- * A {@link Document} performing auto completion on the inserted text. This
+ * A {@link Document} performing auto-completion on the inserted text. This
  * document can be used on any {@link JTextComponent}.
  * <p>
  * The completion will only happen for inserts, that is, when characters are

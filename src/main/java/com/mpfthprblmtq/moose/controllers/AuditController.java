@@ -213,9 +213,6 @@ public class AuditController {
         this.frame = Moose.getFrame();
         this.songController = Moose.getSongController();
 
-        // update the table in the songController
-        songController.setTable(frame.table);
-
         // save all the tracks in the current screen so the user doesn't have to manually do it
         songController.saveTracks(IntStream.range(0, frame.table.getRowCount()).toArray());
 

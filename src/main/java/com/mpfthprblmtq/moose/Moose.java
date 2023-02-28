@@ -13,7 +13,6 @@ package com.mpfthprblmtq.moose;
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.controllers.SongController;
-import com.mpfthprblmtq.moose.controllers.SongController_V2;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 import com.mpfthprblmtq.moose.views.Frame;
@@ -40,8 +39,6 @@ public class Moose {
     // controllers
     @Getter
     public static SongController songController;
-    @Getter
-    public static SongController_V2 songController_v2;
     @Getter
     public static SettingsController settingsController;
 
@@ -110,7 +107,7 @@ public class Moose {
      * Launches a new blank Frame
      */
     public static void launchFrame() {
-        songController_v2 = new SongController_V2();
+        songController = new SongController();
         frame = new Frame();
         frame.setLocation(20, 20);
         frame.setVisible(true);
@@ -121,7 +118,7 @@ public class Moose {
      * @param dir the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
-        songController_v2 = new SongController_V2();
+        songController = new SongController();
         frame = new Frame(dir);
         frame.setLocation(20, 20);
         frame.setVisible(true);

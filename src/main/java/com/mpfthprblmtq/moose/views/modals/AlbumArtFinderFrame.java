@@ -26,6 +26,7 @@ import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.commons.utils.WebUtils;
 import com.mpfthprblmtq.moose.Moose;
+import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.objects.api.imageSearch.ImageSearchQuery;
 import com.mpfthprblmtq.moose.objects.api.imageSearch.ImageSearchResult;
 import com.mpfthprblmtq.moose.objects.api.spotify.Album;
@@ -107,7 +108,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getGoogleSearchWorker() {
         // make a swing worker do the image search in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
 
@@ -184,7 +185,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getSpotifyArtistSearchWorker() {
         // make a swing worker do the spotify search in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
 
@@ -259,7 +260,7 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
      */
     private SwingWorker<Void, Void> getSpotifyAlbumSearchWorker() {
         // make a swing worker do the spotify search in a separate thread, so I can update the GUI
-        return new SwingWorker<Void, Void>() {
+        return new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
 
@@ -1267,8 +1268,10 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         File outputFile = ImageUtils.createImageFile(foundCover, dir, dim);
         assert outputFile != null;
         if (outputFile.exists()) {
-            for (Integer row : this.rows) {
-                Moose.getFrame().songController.autoTaggingService.addIndividualCover(row, outputFile);
+            List<Song> songs = Moose.getSongController().getSongsFromRows(
+                    this.rows.stream().mapToInt(Integer::intValue).toArray());
+            for (Song song : songs) {
+                Moose.getSongController().getAutoTaggingService().addCoverForFile(song, outputFile);
             }
         }
         Moose.getFrame().updateMultiplePanelFields();

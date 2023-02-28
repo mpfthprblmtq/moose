@@ -2,7 +2,6 @@ package com.mpfthprblmtq.moose.services;
 
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
-import com.mpfthprblmtq.moose.utilities.SongUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,20 +21,22 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FilenameFormatterService_V2Test {
+class FilenameFormatterServiceTest {
 
     // mocks
     @Mock
-    private static AutoTaggingService_V2 autoTaggingServiceMock;
+    private AutoTaggingService autoTaggingServiceMock;
+
+    @Mock
+    private SongService songService;
 
     @InjectMocks
-    private static FilenameFormatterService_V2 underTest;
+    private static FilenameFormatterService underTest;
 
     @BeforeAll
     static void setup() {
-        underTest = new FilenameFormatterService_V2();
+        underTest = new FilenameFormatterService();
         mockStatic(MP3FileUtils.class);
-        mockStatic(SongUtils.class);
         mockStatic(DialogUtils.class);
     }
 
@@ -140,7 +141,7 @@ class FilenameFormatterService_V2Test {
     public void testFormatFilename_givenRegularTrackWithNoTrackNumberAndExistingID3Information_formatsFilename(String filename) {
         File file = new File("./test/" + filename);
         when(MP3FileUtils.isPartOfALabel(file, COMPILATIONS)).thenReturn(false);
-        when(SongUtils.getSongFromFile(file)).thenReturn(Song.builder().track("3").build());
+        when(songService.getSongFromFile(file)).thenReturn(Song.builder().track("3").build());
 
         String expectedFilename = "03 Track Title.mp3";
         String actualFilename = underTest.formatFilename(file);
@@ -153,7 +154,7 @@ class FilenameFormatterService_V2Test {
     public void testFormatFilename_givenRegularTrackWithNoTrackNumberAndNoExistingID3Information_formatsFilenameWithUserInput(String filename) {
         File file = new File("./test/" + filename);
         when(MP3FileUtils.isPartOfALabel(file, COMPILATIONS)).thenReturn(false);
-        when(SongUtils.getSongFromFile(file)).thenReturn(new Song());
+        when(songService.getSongFromFile(file)).thenReturn(new Song());
         when(DialogUtils.showGetTitleAndTrackNumberDialog(any(), anyString())).thenReturn(new String[]{"2", "Track Title"});
 
         String expectedFilename = "02 Track Title.mp3";
@@ -167,7 +168,6 @@ class FilenameFormatterService_V2Test {
     public void testFormatFilename_givenTrackInCompilation_formatsFilenameWithArtistAndSetsArtistOnSong(String filename) {
         File file = new File("./test/" + filename);
         when(MP3FileUtils.isPartOfALabel(file, COMPILATIONS)).thenReturn(true);
-        when(SongUtils.getSongFromFile(file)).thenReturn(new Song());
 
         String expectedFilename = "01 Artist - Title.mp3";
         String actualFilename = underTest.formatFilename(file);

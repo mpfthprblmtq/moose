@@ -212,7 +212,7 @@ public class ViewUtils {
                         // else do nothing, nothing was changed
                         break;
 
-                    case 10:     // disks was changed
+                    case 10:     // disk was changed
                         if (!tcl.getNewValue().equals(tcl.getOldValue())) {
                             String disk = tcl.getNewValue().toString();
 
@@ -242,7 +242,7 @@ public class ViewUtils {
                         // TODO:  Check to see if we can use this?
                         //setAlbumImage(index, tcl.getNewValue().toString());
                     default:    // not accounted for
-                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldvalue=" + tcl.getOldValue() + ", newvalue=" + tcl.getNewValue());
+                        logger.logError("Unaccounted case in TCL at col " + tcl.getColumn() + ", row " + tcl.getRow() + ": oldValue=" + tcl.getOldValue() + ", newValue=" + tcl.getNewValue());
                         break;
                 }
             }
