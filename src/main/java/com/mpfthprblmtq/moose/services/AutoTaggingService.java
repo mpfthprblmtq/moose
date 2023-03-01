@@ -53,30 +53,30 @@ public class AutoTaggingService {
 
             // get row and index for the setters
             int index = song.getIndex();
-            int row = songController.getRow(index);
+            int row = Moose.getSongController().getRow(index);
 
             // title
-            songController.setTitle(index, title);
+            Moose.getSongController().setTitle(index, title);
             Moose.getFrame().getTable().setValueAt(title, row, TABLE_COLUMN_TITLE);
 
             // artist
-            songController.setArtist(index, artist);
+            Moose.getSongController().setArtist(index, artist);
             Moose.getFrame().getTable().setValueAt(artist, row, TABLE_COLUMN_ARTIST);
 
             // album
-            songController.setAlbum(index, album);
+            Moose.getSongController().setAlbum(index, album);
             Moose.getFrame().getTable().setValueAt(album, row, TABLE_COLUMN_ALBUM);
 
             // album artist
-            songController.setAlbumArtist(index, albumArtist);
+            Moose.getSongController().setAlbumArtist(index, albumArtist);
             Moose.getFrame().getTable().setValueAt(albumArtist, row, TABLE_COLUMN_ALBUM_ARTIST);
 
             // year
-            songController.setYear(index, year);
+            Moose.getSongController().setYear(index, year);
             Moose.getFrame().getTable().setValueAt(year, row, TABLE_COLUMN_YEAR);
 
             // genre
-            songController.setGenre(index, genre);
+            Moose.getSongController().setGenre(index, genre);
             Moose.getFrame().getTable().setValueAt(genre, row, TABLE_COLUMN_GENRE);
         }
 
@@ -113,7 +113,7 @@ public class AutoTaggingService {
      */
     public String getArtistFromFile(File file) {
         // check if we already have an artist from the filename processing
-        Song song = songController.getSongs().get(songController.getIndex(file));
+        Song song = Moose.getSongController().getSongs().get(Moose.getSongController().getIndex(file));
         if (StringUtils.isNotEmpty(song.getArtist())) {
             return song.getArtist();
         }
@@ -323,7 +323,7 @@ public class AutoTaggingService {
             // only care about mp3 files
             if (fileInList.getName().endsWith(".mp3")) {
                 // grab the song's genre
-                Song song = songController.getSongService().getSongFromFile(fileInList);
+                Song song = Moose.getSongController().getSongService().getSongFromFile(fileInList);
                 if (StringUtils.isNotEmpty(song.getGenre())) {
                     // place the genre count in the map if it doesn't exist, else increment the count
                     if (!genreCounts.containsKey(song.getGenre())) {
@@ -373,12 +373,12 @@ public class AutoTaggingService {
                     // we don't have this query in the list, so let's create one and add the row to the query's rows
                     ImageSearchQuery query = new ImageSearchQuery(
                             song.getArtist(), song.getAlbum(), song.getFile().getParentFile(), new ArrayList<>());
-                    query.getRows().add(songController.getRow(song.getIndex()));
+                    query.getRows().add(Moose.getSongController().getRow(song.getIndex()));
                     queries.add(query);
                 } else {
                     // if we already have the query included in the list, add the row to the rows to update
                     queries.get(ImageSearchQuery.getIndex(queries, song.getAlbum()))
-                            .getRows().add(songController.getRow(song.getIndex()));
+                            .getRows().add(Moose.getSongController().getRow(song.getIndex()));
                 }
             }
 
@@ -399,8 +399,8 @@ public class AutoTaggingService {
                         // with that new file, auto add the cover art
                         if (outputFile != null && outputFile.exists()) {
                             for (Integer row : query.getRows()) {
-                                Song song = songController.getSongs().get(
-                                        songController.getIndex(row));
+                                Song song = Moose.getSongController().getSongs().get(
+                                        Moose.getSongController().getIndex(row));
                                 addCoverForFile(song, outputFile);
                             }
                         }
@@ -441,12 +441,12 @@ public class AutoTaggingService {
         byte[] bytes = ImageUtils.getBytesFromFile(cover);
 
         // update the song in the song controller
-        songController.setAlbumImage(song.getIndex(), bytes);
+        Moose.getSongController().setAlbumImage(song.getIndex(), bytes);
 
         // update graphics
         Moose.getFrame().getTable().setValueAt(
                 ImageUtils.getScaledImage(bytes, 100),
-                songController.getRow(song.getIndex()), TABLE_COLUMN_ALBUM_ART);
+                Moose.getSongController().getRow(song.getIndex()), TABLE_COLUMN_ALBUM_ART);
     }
 
     /**
@@ -458,7 +458,7 @@ public class AutoTaggingService {
         // traverse the song list and set each row with the changes
         for (Song song : songs) {
             // get the row so we can update the table
-            int row = songController.getRow(song.getIndex());
+            int row = Moose.getSongController().getRow(song.getIndex());
 
             // get the tracks and disks
             String tracks = getTracksFromFile(song.getFile());
@@ -467,23 +467,23 @@ public class AutoTaggingService {
             // track
             String[] trackArr = tracks.split("/");
             if (trackArr.length == 2) {
-                songController.setTrack(song.getIndex(), trackArr[0]);
-                songController.setTotalTracks(song.getIndex(), trackArr[1]);
+                Moose.getSongController().setTrack(song.getIndex(), trackArr[0]);
+                Moose.getSongController().setTotalTracks(song.getIndex(), trackArr[1]);
                 Moose.getFrame().getTable().setValueAt(tracks, row, TABLE_COLUMN_TRACK);
             } else {
-                songController.setTrack(song.getIndex(), StringUtils.EMPTY);
-                songController.setTotalTracks(song.getIndex(), StringUtils.EMPTY);
+                Moose.getSongController().setTrack(song.getIndex(), StringUtils.EMPTY);
+                Moose.getSongController().setTotalTracks(song.getIndex(), StringUtils.EMPTY);
             }
 
             // disk
             String[] diskArr = disks.split("/");
             if (diskArr.length == 2) {
-                songController.setDisk(song.getIndex(), diskArr[0]);
-                songController.setTotalDisks(song.getIndex(), diskArr[1]);
+                Moose.getSongController().setDisk(song.getIndex(), diskArr[0]);
+                Moose.getSongController().setTotalDisks(song.getIndex(), diskArr[1]);
                 Moose.getFrame().getTable().setValueAt(disks, row, TABLE_COLUMN_DISK);
             } else {
-                songController.setDisk(song.getIndex(), StringUtils.EMPTY);
-                songController.setTotalDisks(song.getIndex(), StringUtils.EMPTY);
+                Moose.getSongController().setDisk(song.getIndex(), StringUtils.EMPTY);
+                Moose.getSongController().setTotalDisks(song.getIndex(), StringUtils.EMPTY);
             }
         }
     }
@@ -494,7 +494,7 @@ public class AutoTaggingService {
      * @return the artist if found, else a blank string
      */
     public String getArtistFromExistingID3Info(File file) {
-        Song s = songController.getSongService().getSongFromFile(file);
+        Song s = Moose.getSongController().getSongService().getSongFromFile(file);
         if (s != null) {
             return s.getArtist();
         }
@@ -507,9 +507,9 @@ public class AutoTaggingService {
      * @param artist the artist to set
      */
     public void setArtistOnSong(File file, String artist) {
-        int index = songController.getIndex(file);
+        int index = Moose.getSongController().getIndex(file);
         if (index != -1) {
-            songController.setArtist(index, artist);
+            Moose.getSongController().setArtist(index, artist);
         }
     }
 }

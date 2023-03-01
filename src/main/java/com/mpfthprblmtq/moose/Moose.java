@@ -51,9 +51,6 @@ public class Moose {
         // initialize settings
         initSettings();
 
-        // instantiate the main song controller object
-        songController = new SongController();
-
         // go
         launchFrame();
     }
