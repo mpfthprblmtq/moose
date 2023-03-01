@@ -370,7 +370,7 @@ public class SongController {
                     if (edited_songs.size() == 1) {
                         edited_songs.clear();
                     } else if (edited_songs.size() > 1) {
-                        edited_songs.remove(index);
+                        edited_songs.remove(Integer.valueOf(index));
                     }
 
                     // increment the number of successful saves

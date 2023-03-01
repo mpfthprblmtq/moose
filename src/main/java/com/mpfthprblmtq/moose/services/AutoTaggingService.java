@@ -338,11 +338,14 @@ public class AutoTaggingService {
         }
 
         // now let's look and see what the most common genre is
-        return Objects.requireNonNull(
-                genreCounts.entrySet()
-                        .stream()
-                        .max(Comparator.comparingInt(Map.Entry::getValue))
-                        .orElse(null)).getKey();
+        if (!genreCounts.isEmpty()) {
+            return Objects.requireNonNull(
+                    genreCounts.entrySet()
+                            .stream()
+                            .max(Comparator.comparingInt(Map.Entry::getValue))
+                            .orElse(null)).getKey();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -371,8 +374,9 @@ public class AutoTaggingService {
             for (Song song : songsToReprocess) {
                 if (!ImageSearchQuery.contains(queries, song.getAlbum())) {
                     // we don't have this query in the list, so let's create one and add the row to the query's rows
+                    String mainArtist = getMainArtist(song.getArtist());
                     ImageSearchQuery query = new ImageSearchQuery(
-                            song.getArtist(), song.getAlbum(), song.getFile().getParentFile(), new ArrayList<>());
+                            mainArtist, song.getAlbum(), song.getFile().getParentFile(), new ArrayList<>());
                     query.getRows().add(Moose.getSongController().getRow(song.getIndex()));
                     queries.add(query);
                 } else {
@@ -489,27 +493,18 @@ public class AutoTaggingService {
     }
 
     /**
-     * Gets the artist from existing ID3 information
-     * @param file the file with the ID3 information to check
-     * @return the artist if found, else a blank string
+     * Helper method to get the main artist in a situation where there's more than one artist on the track
+     * @param artist the artist string to parse
+     * @retun the main artist
      */
-    public String getArtistFromExistingID3Info(File file) {
-        Song s = Moose.getSongController().getSongService().getSongFromFile(file);
-        if (s != null) {
-            return s.getArtist();
+    private String getMainArtist(String artist) {
+        if (artist.contains(" & ")) {
+            return artist.split(" & ")[0];
+        } else if (artist.contains(", ")) {
+            return artist.split(", ")[0];
+        } else if (artist.contains(" with ")) {
+            return artist.split(" with ")[0];
         }
-        return StringUtils.EMPTY;
-    }
-
-    /**
-     * Sets the artist on the song object.  Called from the FilenameFormatterService when cleaning up filename.
-     * @param file the file to get data from
-     * @param artist the artist to set
-     */
-    public void setArtistOnSong(File file, String artist) {
-        int index = Moose.getSongController().getIndex(file);
-        if (index != -1) {
-            Moose.getSongController().setArtist(index, artist);
-        }
+        return artist;
     }
 }

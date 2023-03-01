@@ -183,7 +183,7 @@ public class SpotifyApiService {
 
         } catch (IOException e) {
             // bad things
-            logger.logError("Error while calling Spotify API's auth!", e);
+            logger.logError("Error while calling Spotify API auth!", e);
         }
     }
 
@@ -197,7 +197,7 @@ public class SpotifyApiService {
         // create the url
         URL url = new RequestURL()
                 .withBaseUrl(Constants.SPOTIFY_SEARCH_URL)
-                .withQueryParam("q", URLEncoder.encode(query, StandardCharsets.UTF_8.toString()))
+                .withQueryParam("q", URLEncoder.encode(query, StandardCharsets.UTF_8))
                 .withQueryParam("type", "artist")
                 .withQueryParam("limit", String.valueOf(ARTIST_LIMIT))
                 .buildUrl();

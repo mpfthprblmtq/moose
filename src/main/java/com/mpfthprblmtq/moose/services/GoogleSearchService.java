@@ -58,8 +58,8 @@ public class GoogleSearchService {
      */
     public ImageSearchResult processImage(ImageSearchResult isr) {
         // if the image isn't square or if the image is smaller than the desired size
-        if ((isr.getImageDimensions().getHeight() != isr.getImageDimensions().getWidth())
-                || (isr.getImageDimensions().getHeight() < img_size && isr.getImageDimensions().getWidth() < img_size)) {
+        if (isr.getImageDimensions().getHeight() != isr.getImageDimensions().getWidth()
+                || isr.getImageDimensions().getHeight() < img_size) {
             return isr;
         } else {
             try {
@@ -156,12 +156,7 @@ public class GoogleSearchService {
      * @return the encoded string
      */
     private static String encodeForUrl(String toEncode) {
-        try {
-            return URLEncoder.encode(toEncode, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            logger.logError("Couldn't encode url: " + toEncode);
-        }
-        return StringUtils.EMPTY;
+        return URLEncoder.encode(toEncode, StandardCharsets.UTF_8);
     }
 
     /**

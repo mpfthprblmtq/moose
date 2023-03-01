@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mpfthprblmtq.moose.utilities.Constants.TRACK_DISK_REGEX;
+
 public class SongService {
 
     // logger object
@@ -87,6 +89,7 @@ public class SongService {
         // get the year using both because year can be in two places for some reason?
         String year = getYear(mp3file, id3v24tag);
 
+        // get the extra fields
         String bitrate = String.valueOf(mp3file.getBitrate());
         String sampleRate = String.valueOf(mp3file.getSampleRate());
         String len = String.valueOf(mp3file.getLengthInSeconds());
@@ -99,10 +102,24 @@ public class SongService {
         albumArtist = StringUtils.validateString(albumArtist);
         genre = StringUtils.validateString(genre);
         year = StringUtils.validateString(year);
-        track = StringUtils.validateString(track);
-        disk = StringUtils.validateString(disk);
         comment = StringUtils.validateString(comment);
         artwork_bytes = artwork_bytes != null ? artwork_bytes : new byte[0];
+
+        // do some special processing with track
+        track = StringUtils.validateString(track);
+        String totalTracks = StringUtils.EMPTY;
+        if (StringUtils.isNotEmpty(track) && track.matches(TRACK_DISK_REGEX)) {
+            String[] arr = track.split("/");
+            track = arr[0];
+            totalTracks = arr[1];
+        }
+        disk = StringUtils.validateString(disk);
+        String totalDisks = StringUtils.EMPTY;
+        if (StringUtils.isNotEmpty(disk) && disk.matches(TRACK_DISK_REGEX)) {
+            String[] arr = disk.split("/");
+            disk = arr[0];
+            totalDisks = arr[1];
+        }
 
         // create a song object with the information
         return Song.builder()
@@ -114,7 +131,9 @@ public class SongService {
                 .genre(genre)
                 .year(year)
                 .track(track)
+                .totalTracks(totalTracks)
                 .disk(disk)
+                .totalDisks(totalDisks)
                 .artwork_bytes(artwork_bytes)
                 .bitrate(bitrate)
                 .sampleRate(sampleRate)
