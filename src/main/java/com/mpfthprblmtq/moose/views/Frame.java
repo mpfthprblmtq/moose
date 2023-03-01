@@ -11,6 +11,7 @@ package com.mpfthprblmtq.moose.views;
 
 // imports
 import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.CollectionUtils;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.commons.utils.WebUtils;
@@ -45,7 +46,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -62,7 +62,7 @@ public class Frame extends javax.swing.JFrame {
     Logger logger = Moose.getLogger();
 
     // controller
-    public SongController songController = Moose.getSongController();
+    public SongController songController;
 
     // some graphics fields
     ActionListener menuListener;        // listener for the popup menu objects
@@ -162,6 +162,9 @@ public class Frame extends javax.swing.JFrame {
      *  - Sets up the FileDrop configuration
      */
     public void init() {
+
+        // initialize songController
+        songController = Moose.getSongController();
 
         // set the table's model to the custom model
         table.setModel(ViewUtils.getTableModel());
@@ -437,45 +440,33 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Function used to import files to the table. Skips hidden files (.*), duplicate files, etc. Then it updates the
-     * console based on the results. Another example of a method that just "works" so best not touch it.
+     * console based on the results.
      * @param files the files to import
+     * @return a list of valid mp3 files
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked"})    // for the DefaultRowSorter warnings
     public List<File> importFiles(List<File> files) {
+        List<File> toRemove = new ArrayList<>();
+        int duplicates = 0;
 
-        List<File> filesToRemove = new ArrayList<>();
-        List<File> hiddenFilesToIgnore = new ArrayList<>();
-        AtomicInteger duplicateFiles = new AtomicInteger();
-
-        // iterate through the files and try to add them
-        files.forEach((file) -> {
-
-            if (file.getName().endsWith(".mp3")) {
-
-                // check to make sure it's a valid mp3 file (not blank file name)
-                if (StringUtils.isEmpty(file.getName().replace(".mp3", StringUtils.EMPTY))) {
-                    hiddenFilesToIgnore.add(file);
-                } else {
-                    // try to add it to the table
-                    // if no luck, remove it from the file list and increment the duplicate file count
-                    // since the only chance we'd get a false from that method is the case of a duplicate file
-                    if (!addFileToTable(file)) {
-                        duplicateFiles.getAndIncrement();
-                        filesToRemove.add(file);
-                    }
+        for (File file : files) {
+            if (file.getName().startsWith(".")) {
+                toRemove.add(file);
+            } else if (file.getName().endsWith(".mp3")) {
+                // try to add it to the table
+                // if no luck, remove it from the file list, since the only chance we'd get a false from that method
+                // is the case of a duplicate file
+                if (!addFileToTable(file)) {
+                    toRemove.add(file);
+                    duplicates++;
                 }
-
-            } else if (file.getName().startsWith(".")) {
-                // just straight up skip it
-                hiddenFilesToIgnore.add(file);
             } else {
-                filesToRemove.add(file);
+                toRemove.add(file);
             }
-        });
+        }
 
-        filesToRemove.forEach(files::remove);
-        hiddenFilesToIgnore.forEach(files::remove);
-        int duplicates = duplicateFiles.get();
+        // clean up our list of files
+        files.removeAll(toRemove);
 
         // sorts the table on the filename, then the album by default
         DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
@@ -489,38 +480,19 @@ public class Frame extends javax.swing.JFrame {
         sorter.setSortKeys(list);
         sorter.sort();
 
-        // update the log table when you're done with the file iteration
-        // including all possible iterations of file combinations, because I hate myself
-        if (!files.isEmpty() && filesToRemove.isEmpty() && duplicates == 0) {
-            // all files were mp3s
+        // update the console with some valid messaging
+        if (CollectionUtils.isNotEmpty(files) && CollectionUtils.isEmpty(toRemove) && duplicates == 0) {
+            // all files were MP3s
             updateConsole(files.size() + " mp3 file(s) loaded!");
-        } else if (!files.isEmpty() && !filesToRemove.isEmpty() && duplicates == 0) {
-            // some mp3s, some bad files
-            updateConsole(files.size() + " mp3 file(s) loaded, " + filesToRemove.size() +
-                    (filesToRemove.size() > 1 ? " files weren't mp3s!" : " file wasn't an mp3!"));
-        } else if (!files.isEmpty() && !filesToRemove.isEmpty() && duplicates > 0) {
-            // some mp3s, some bad files, some duplicates
-            updateConsole(files.size() + " mp3 file(s) loaded, " + filesToRemove.size() +
-                    (filesToRemove.size() > 1 ? " files weren't mp3s, " : " file wasn't an mp3, ") +
-                    duplicates + " duplicate file(s) skipped.");
-        } else if (!files.isEmpty() && filesToRemove.isEmpty() && duplicates > 0) {
-            // some mp3s, some duplicates
-            updateConsole(files.size() + " mp3 file(s) loaded, " + duplicates + " duplicate file(s) skipped.");
-        } else if (files.isEmpty() && !filesToRemove.isEmpty() && duplicates == 0) {
-            // just non mp3s
-            updateConsole("No files provided were mp3s!");
-        } else if (files.isEmpty() && filesToRemove.isEmpty() && duplicates > 0) {
-            // just duplicates
-            updateConsole("No mp3 files loaded, " + duplicates + " duplicate files skipped.");
-        } else if (files.isEmpty() && !filesToRemove.isEmpty() && duplicates > 0) {
-            // just bad files and duplicates
-            updateConsole("No mp3s loaded, " + filesToRemove.size() + " invalid file(s) provided and " +
-                    duplicates + " duplicate files skipped.");
-        } else {
-            updateConsole("No files loaded!");
+        } else if (CollectionUtils.isNotEmpty(files) && (CollectionUtils.isNotEmpty(toRemove) || duplicates > 0)) {
+            // some mp3s, some invalid/duplicate
+            updateConsole(files.size() + " mp3 file(s) loaded, " +
+                    (toRemove.size() + duplicates) + " invalid/duplicate files not loaded!");
+        } else if (CollectionUtils.isEmpty(files) && (CollectionUtils.isNotEmpty(toRemove) || duplicates > 0)) {
+            updateConsole("No mp3 files loaded, " + (toRemove.size() + duplicates) + " invalid/duplicate files given!");
         }
 
-        // return the list of successfully added files
+        // return our list of files
         return files;
     }
 

@@ -9,6 +9,7 @@
 package com.mpfthprblmtq.moose.objects;
 
 // imports
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -124,7 +125,7 @@ public class Song {
      * @return the full track string
      */
     public String getFullTrackString() {
-        if (track.equals("") && totalTracks.equals("")) {
+        if (StringUtils.isEmpty(track) && StringUtils.isEmpty(totalTracks)) {
             return "";
         } else {
             return track + "/" + totalTracks;
@@ -135,7 +136,7 @@ public class Song {
      * @return the full disk string
      */
     public String getFullDiskString() {
-        if (disk.equals("") && totalDisks.equals("")) {
+        if (StringUtils.isEmpty(disk) && StringUtils.isEmpty(totalDisks)) {
             return "";
         } else {
             return disk + "/" + totalDisks;
