@@ -94,7 +94,7 @@ public class Frame extends javax.swing.JFrame {
 
     /**
      * Creates new form Frame with a folder preloaded
-     * @param folder, the folder we want to start with
+     * @param folder the folder we want to start with
      */
     public Frame(File folder) {
         // init the components

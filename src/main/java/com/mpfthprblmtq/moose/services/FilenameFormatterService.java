@@ -34,7 +34,7 @@ public class FilenameFormatterService {
      */
     public void formatFilenames(List<Song> songs) {
         for (Song song : songs) {
-            String newFilename = formatFilename(song.getFile());
+            String newFilename = formatFilename(song);
             if (StringUtils.isNotEmpty(newFilename) && !newFilename.equals(song.getFile().getName())) {
                 String path = song.getFile().getPath().replace(song.getFile().getName(), StringUtils.EMPTY);
                 Moose.getSongController().setNewFile(song.getIndex(), new File(path + newFilename));
@@ -48,16 +48,16 @@ public class FilenameFormatterService {
 
     /**
      * Method used to do the heavy lifting of the actual filename change
-     * @param file the file to change the name of
+     * @param song the file to change the name of
      * @return a better filename
      */
-    protected String formatFilename(File file) {
-        String filename = file.getName();
+    protected String formatFilename(Song song) {
+        String filename = song.getFile().getName();
 
         filename = cleanupFeaturingTag(filename);
         filename = cleanupCommonReplaceableStrings(filename);
         filename = cleanupTrackNumber(filename);
-        filename = modifyFilename(file, filename);
+        filename = modifyFilename(song, filename);
 
         return filename;
     }
@@ -158,11 +158,11 @@ public class FilenameFormatterService {
     /**
      * Function that does the majority of the heavy lifting, sets the filename based on the exiting ID3 data, folder
      * structure, and a few other factors.
-     * @param file the original file
+     * @param song the song with the original file
      * @param filename the newly cleaned up filename
      * @return a modified filename with the new information
      */
-    protected String modifyFilename(File file, String filename) {
+    protected String modifyFilename(Song song, String filename) {
         String track;
         String title;
 
@@ -174,25 +174,23 @@ public class FilenameFormatterService {
             track = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_TITLE, "track");
         } else {
             // see if it's a single file, which means it can be "01"
-            track = MP3FileUtils.folderContainsOnlyOneMP3(file.getParentFile()) ? "01" : StringUtils.EMPTY;
+            track = MP3FileUtils.folderContainsOnlyOneMP3(song.getFile().getParentFile()) ? "01" : StringUtils.EMPTY;
 
             // if it's still empty, try and get it from existing ID3 information
             if (StringUtils.isEmpty(track)) {
-                Song s = songService.getSongFromFile(file);
-                track = s != null ? s.getTrack() : StringUtils.EMPTY;
+                track = song.getTrack();
             }
         }
 
         // try to find the title
-        if (!MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
+        if (!MP3FileUtils.isPartOfALabel(song.getFile(), COMPILATIONS)) {
             // we're not in a compilation, check if we have the track number, artist, and title
             if (filename.matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
                 // we have all three, which means we need to cut it down to just track number and title,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService.getArtistFromExistingID3Info(file);
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
-                if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService.setArtistOnSong(file, filenameArtist);
+                if (!filenameArtist.equals(song.getArtist())) {
+                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // build the file name with just the track and title
@@ -204,10 +202,9 @@ public class FilenameFormatterService {
             } else if (filename.matches(FILENAME_ARTIST_TITLE)) {
                 // we have only the artist and title, which means we need to cut it down to just the title,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService.getArtistFromExistingID3Info(file);
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_ARTIST_TITLE, "artist");
-                if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService.setArtistOnSong(file, filenameArtist);
+                if (!filenameArtist.equals(song.getArtist())) {
+                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // build the file name with just the track and title
@@ -227,10 +224,9 @@ public class FilenameFormatterService {
             if (filename.matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
                 // we have all three, which means we can get all that we need,
                 // but before we do, let's set the artist on the song if it's not already set
-                String id3Artist = autoTaggingService.getArtistFromExistingID3Info(file);
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
-                if (!filenameArtist.equals(id3Artist)) {
-                    autoTaggingService.setArtistOnSong(file, filenameArtist);
+                if (!filenameArtist.equals(song.getArtist())) {
+                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // we can just get the title like normal
@@ -239,8 +235,7 @@ public class FilenameFormatterService {
                 // we only have the track number and title, so let's try and get the artist to add it to the filename
                 if (filename.matches(FILENAME_TRACK_NUMBER_TITLE)) {
                     title = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_TITLE, "title");
-                    String artist = autoTaggingService.getArtistFromExistingID3Info(file);
-                    title = StringUtils.isNotEmpty(artist) ? artist + " - " + title : filename;
+                    title = StringUtils.isNotEmpty(song.getArtist()) ? song.getArtist() + " - " + title : filename;
                 } else {
                     title = filename;
                 }
@@ -249,7 +244,7 @@ public class FilenameFormatterService {
 
         // if either track or title are still empty, get them from the user using the dialog
         if (StringUtils.isEmpty(track) || StringUtils.isEmpty(title)) {
-            if (MP3FileUtils.isPartOfALabel(file, COMPILATIONS)) {
+            if (MP3FileUtils.isPartOfALabel(song.getFile(), COMPILATIONS)) {
 
                 // we're in a compilation, so let's show the dialog with track, artist, and title
                 String[] arr = DialogUtils.showGetTitleAndTrackNumberAndArtistDialog(
