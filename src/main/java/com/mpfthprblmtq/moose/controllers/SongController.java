@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.mpfthprblmtq.commons.utils.FileUtils.launchJFileChooser;
+import static com.mpfthprblmtq.moose.utilities.Constants.TABLE_COLUMN_GENRE;
 
 @Data
 public class SongController {
@@ -58,7 +59,7 @@ public class SongController {
     public SongController() {
         songService = new SongService();
         autoTaggingService = new AutoTaggingService(this);
-        filenameFormatterService = new FilenameFormatterService(songService, autoTaggingService);
+        filenameFormatterService = new FilenameFormatterService(this);
     }
 
     /**
@@ -362,8 +363,14 @@ public class SongController {
                     // set the value of the File on the table's row to the new file
                     Moose.getFrame().getTable().getModel().setValueAt(songs.get(index).getFile(), row, 1);
 
+                    // update the genre on the table in case we need to remove the INFO icon
+                    Moose.getFrame().getTable().setValueAt(songs.get(index).getGenre(), selectedRow, TABLE_COLUMN_GENRE);
+
                     // update the row graphic
                     Moose.getFrame().setRowIcon(Constants.SAVED, getRow(index));
+
+                    // update the multPanelFields
+                    Moose.getFrame().updateMultiplePanelFields();
 
                     // done saving, remove it
                     // gives an IndexOutOfBoundsException when trying to remove() with one element in it

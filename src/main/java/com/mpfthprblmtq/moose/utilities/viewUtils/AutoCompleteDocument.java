@@ -23,7 +23,7 @@ import javax.swing.text.*;
  *
  * @see CompletionService
  *
- * @author Samuel Sjoberg, http://samuelsjoberg.com
+ * @author Samuel Sjoberg, <a href="http://samuelsjoberg.com">samuelsjoberg.com</a>
  * @version 1.0.0
  */
 // class AutoCompleteDocument

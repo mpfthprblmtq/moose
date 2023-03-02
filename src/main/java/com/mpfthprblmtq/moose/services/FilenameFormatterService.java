@@ -3,6 +3,7 @@ package com.mpfthprblmtq.moose.services;
 import com.mpfthprblmtq.commons.utils.RegexUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
+import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
@@ -23,9 +24,8 @@ import static com.mpfthprblmtq.moose.utilities.Constants.*;
 @AllArgsConstructor
 public class FilenameFormatterService {
 
-    // services
-    SongService songService;
-    AutoTaggingService autoTaggingService;
+    // controllers
+    SongController songController;
 
     /**
      * Formats the filenames of all songs in the list given to us, sets the new file in the songs map in the
@@ -37,11 +37,11 @@ public class FilenameFormatterService {
             String newFilename = formatFilename(song);
             if (StringUtils.isNotEmpty(newFilename) && !newFilename.equals(song.getFile().getName())) {
                 String path = song.getFile().getPath().replace(song.getFile().getName(), StringUtils.EMPTY);
-                Moose.getSongController().setNewFile(song.getIndex(), new File(path + newFilename));
-                Moose.getFrame().getTable().getModel().setValueAt(new File(path + newFilename), Moose.getSongController().getRow(song.getIndex()), 1);
+                songController.setNewFile(song.getIndex(), new File(path + newFilename));
+                Moose.getFrame().getTable().getModel().setValueAt(new File(path + newFilename), songController.getRow(song.getIndex()), 1);
                 Moose.getFrame().getTable().setValueAt((newFilename)
                         .replace(".mp3", StringUtils.EMPTY)
-                        .replace(":", "/"), Moose.getSongController().getRow(song.getIndex()), 1);
+                        .replace(":", "/"), songController.getRow(song.getIndex()), 1);
             }
         }
     }
@@ -190,7 +190,7 @@ public class FilenameFormatterService {
                 // but before we do, let's set the artist on the song if it's not already set
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(song.getArtist())) {
-                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
+                    songController.setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // build the file name with just the track and title
@@ -204,7 +204,7 @@ public class FilenameFormatterService {
                 // but before we do, let's set the artist on the song if it's not already set
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(song.getArtist())) {
-                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
+                    songController.setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // build the file name with just the track and title
@@ -226,7 +226,7 @@ public class FilenameFormatterService {
                 // but before we do, let's set the artist on the song if it's not already set
                 String filenameArtist = RegexUtils.getMatchedGroup(filename, FILENAME_TRACK_NUMBER_ARTIST_TITLE, "artist");
                 if (!filenameArtist.equals(song.getArtist())) {
-                    autoTaggingService.getSongController().setArtist(song.getIndex(), filenameArtist);
+                    songController.setArtist(song.getIndex(), filenameArtist);
                 }
 
                 // we can just get the title like normal
@@ -264,6 +264,11 @@ public class FilenameFormatterService {
                     title = arr[1];
                 }
             }
+        }
+
+        // no track, just return the title
+        if (StringUtils.isEmpty(track)) {
+            return title + ".mp3";
         }
 
         // pad the track if we haven't already

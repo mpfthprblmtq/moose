@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mpfthprblmtq.moose.utilities.Constants.INFO;
 import static com.mpfthprblmtq.moose.utilities.Constants.TRACK_DISK_REGEX;
 
 public class SongService {
@@ -44,7 +45,7 @@ public class SongService {
             return null;
         }
 
-        // mp3agic Mp3File and the ID3v24 tag objects, used for the id3tags
+        // mp3agic Mp3File and the ID3v24 tag objects, used for the id3 tags
         Mp3File mp3file;
         ID3v24Tag id3v24tag;
         try {
@@ -163,7 +164,7 @@ public class SongService {
             }
         }
 
-        // try to get the mp3file object from the file
+        // try to get the mp3 file object from the file
         Mp3File mp3file;
         try {
             mp3file = new Mp3File(song.getFile().getAbsolutePath());
@@ -183,7 +184,9 @@ public class SongService {
             mp3file.getId3v2Tag().setAlbum(song.getAlbum());
             mp3file.getId3v2Tag().setAlbumArtist(song.getAlbumArtist());
             mp3file.getId3v2Tag().setYear(song.getYear());
-            mp3file.getId3v2Tag().setGenreDescription(song.getGenre());
+            mp3file.getId3v2Tag().setGenreDescription(song.getGenre().startsWith(INFO) ?
+                    song.getGenre().replace(INFO, StringUtils.EMPTY) : song.getGenre());
+            song.setGenre(mp3file.getId3v2Tag().getGenreDescription());
             mp3file.getId3v2Tag().setTrack(song.getFullTrackString());
             mp3file.getId3v2Tag().setPartOfSet(song.getFullDiskString());
             mp3file.getId3v2Tag().setComment(song.getComment());
@@ -209,7 +212,7 @@ public class SongService {
      */
     public boolean saveID3Info(Mp3File mp3file, File file) {
         try {
-            // save the new mp3file
+            // save the new mp3 file
             mp3file.save(file.getAbsolutePath().replace(".mp3", "_.mp3"));
 
             // delete the old file
@@ -263,7 +266,7 @@ public class SongService {
     }
 
     /**
-     * Scans all the songs or files' mp3tags with them and checks to make sure we know the genre
+     * Scans all the songs or files' ID3 tags with them and checks to make sure we know the genre
      * @param list the list of either Songs or Files to check
      */
     public void checkForNewGenres(List<?> list) {

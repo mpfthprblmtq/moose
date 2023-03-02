@@ -177,7 +177,7 @@ public class SettingsController {
      * @return the result of setting those features to true
      */
     public boolean defaultFeatures() {
-        settings.getFeatures().replaceAll((k,v) -> v = true);
+        settings.getFeatures().replaceAll((k,v) -> true);
         writeSettingsFile(settings);
 
         // check if successful (throws values of settings into set to check if only one value type exists)

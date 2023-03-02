@@ -10,6 +10,7 @@ package com.mpfthprblmtq.moose.utilities.viewUtils;
 
 // imports
 import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.utils.CollectionUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.SongController;
@@ -322,7 +323,7 @@ public class ViewUtils {
             popup.add(item = new JMenuItem(REMOVE_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
         }
-        if (customItems != null && customItems.length > 0) {
+        if (CollectionUtils.isNotEmpty(customItems)) {
             for (String str : customItems) {
                 popup.addSeparator();
                 popup.add(item = new JMenuItem(str));
