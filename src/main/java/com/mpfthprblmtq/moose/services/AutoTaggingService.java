@@ -220,7 +220,7 @@ public class AutoTaggingService {
         }
 
         // grab the year from the parent file
-        // this regex covers both [XXXX] Artist - Album and [XXXX] Album
+        // this regex covers both [1234] Artist - Album and [1234] Album
         if (file.getParentFile().getName().matches(FILENAME_YEAR_ALBUM)) {
             return RegexUtils.getMatchedGroup(file.getParentFile().getName(), FILENAME_YEAR_ALBUM, "year");
         }
@@ -292,15 +292,19 @@ public class AutoTaggingService {
         }
 
         // get the common genre from the artist to assume its genre
-        return getCommonGenreForArtist(song.getFile());
+        return getCommonGenreForArtist(song);
     }
 
     /**
      * Helper method that gets the most occurring genre for the artist
-     * @param file the file to check
+     * @param song the song with the file to check
      * @return the most common genre from that song's artist
      */
-    private String getCommonGenreForArtist(File file) {
+    private String getCommonGenreForArtist(Song song) {
+
+        // grab the file from the song
+        File file = song.getFile();
+
         // don't care about labels for now
         if (MP3FileUtils.isPartOfALabel(file)) {
             return StringUtils.EMPTY;
@@ -323,15 +327,15 @@ public class AutoTaggingService {
             // only care about mp3 files
             if (fileInList.getName().endsWith(".mp3")) {
                 // grab the song's genre
-                Song song = Moose.getSongController().getSongService().getSongFromFile(fileInList);
-                if (StringUtils.isNotEmpty(song.getGenre())) {
+                Song songInList = Moose.getSongController().getSongService().getSongFromFile(fileInList);
+                if (StringUtils.isNotEmpty(songInList.getGenre())) {
                     // place the genre count in the map if it doesn't exist, else increment the count
-                    if (!genreCounts.containsKey(song.getGenre())) {
+                    if (!genreCounts.containsKey(songInList.getGenre())) {
                         // we don't have the genre in the map yet, insert it with an initial value of 1
-                        genreCounts.put(song.getGenre(), 1);
+                        genreCounts.put(songInList.getGenre(), 1);
                     } else {
                         // we have the genre in the map already, increment count by 1
-                        genreCounts.put(song.getGenre(), genreCounts.get(song.getGenre()) + 1);
+                        genreCounts.put(songInList.getGenre(), genreCounts.get(songInList.getGenre()) + 1);
                     }
                 }
             }
@@ -339,11 +343,14 @@ public class AutoTaggingService {
 
         // now let's look and see what the most common genre is
         if (!genreCounts.isEmpty()) {
-            return Objects.requireNonNull(
+            String genre = Objects.requireNonNull(
                     genreCounts.entrySet()
                             .stream()
                             .max(Comparator.comparingInt(Map.Entry::getValue))
                             .orElse(null)).getKey();
+            if (StringUtils.isNotEmpty(genre)) {
+                return INFO + genre;
+            }
         }
         return StringUtils.EMPTY;
     }
@@ -495,7 +502,7 @@ public class AutoTaggingService {
     /**
      * Helper method to get the main artist in a situation where there's more than one artist on the track
      * @param artist the artist string to parse
-     * @retun the main artist
+     * @return the main artist
      */
     private String getMainArtist(String artist) {
         if (artist.contains(" & ")) {

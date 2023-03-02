@@ -26,7 +26,6 @@ import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.objects.RequestProperties;
 import com.mpfthprblmtq.commons.objects.RequestURL;
 import com.mpfthprblmtq.commons.utils.DateUtils;
-import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.commons.utils.WebUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Settings;

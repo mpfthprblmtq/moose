@@ -153,7 +153,7 @@ public class AuditService {
     }
 
     /**
-     * Opens a new audit window and a new frame with a pre-loaded album
+     * Opens a new audit window and a new frame with a preloaded album
      */
     public void openAuditWindow(List<File> albums, int index) {
         // update graphics

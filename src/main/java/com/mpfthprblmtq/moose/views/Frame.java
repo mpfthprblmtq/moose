@@ -423,7 +423,7 @@ public class Frame extends javax.swing.JFrame {
     }
 
     /**
-     * Helper function to update the UI's console, just appends a string
+     * Helper function to update the UI console, just appends a string
      * @param s the string to append
      */
     public void updateConsole(String s) {
@@ -518,12 +518,10 @@ public class Frame extends javax.swing.JFrame {
                 .replace(".mp3", StringUtils.EMPTY)
                 .replace(":", "/");
 
-        int index = songController.getSongs().size();
         Song s = songController.getSongService().getSongFromFile(file);
 
         if (s != null) {
-            s.setIndex(index);
-            songController.getSongs().put(index, s);
+            songController.addSong(s);
 
             // getting the image to put on the table
             Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
@@ -542,7 +540,7 @@ public class Frame extends javax.swing.JFrame {
                     s.getFullTrackString(),
                     s.getFullDiskString(),
                     thumbnail_icon,
-                    index // hidden index for the song object
+                    s.getIndex() // hidden index for the song object
             });
 
             // all is well in the world
@@ -640,7 +638,7 @@ public class Frame extends javax.swing.JFrame {
         setTitle("Moose");
         setResizable(false);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", Font.BOLD, 36)); // NOI18N
         jLabel1.setText("Moose");
 
         saveAllButton.setText("Save All");
@@ -678,7 +676,7 @@ public class Frame extends javax.swing.JFrame {
 
         console.setEditable(false);
         console.setColumns(20);
-        console.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        console.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 11)); // NOI18N
         console.setRows(5);
         console.setMaximumSize(new java.awt.Dimension(611, 219));
         console.setMinimumSize(new java.awt.Dimension(611, 219));
@@ -686,7 +684,7 @@ public class Frame extends javax.swing.JFrame {
 
         multPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        L1.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
+        L1.setFont(new java.awt.Font("SansSerif", Font.BOLD, 13)); // NOI18N
         L1.setText("Edit Multiple Items:");
 
         L2.setText("Title:");

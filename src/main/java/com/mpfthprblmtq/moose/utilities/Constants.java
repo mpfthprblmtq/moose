@@ -15,6 +15,7 @@ import java.awt.Color;
 public class Constants {
 
     public static final String DASH = "-";
+    public static final String INFO = "ⓘ ";
 
     // colors
     public static final Color RED = new Color(130, 0, 50);
