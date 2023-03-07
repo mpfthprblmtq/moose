@@ -1,20 +1,20 @@
 /*
-   Proj:   Moose
-   File:   AutoCompleteDocument.java
-   Desc:   Service class for auto tagging
-
-   Copyright Samuel Sjoberg
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   AutoCompleteDocument.java
+ *  Desc:   Service class for auto tagging
+ *          NOTE: Not mine, but edited to fit my use case
+ *
+ *  Copyright Samuel Sjoberg
+ *  Copyright Pat Ripley 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.utilities.viewUtils;
 
 // imports
 import javax.swing.text.*;
 
 /**
- * A {@link Document} performing auto completion on the inserted text. This
+ * A {@link Document} performing auto-completion on the inserted text. This
  * document can be used on any {@link JTextComponent}.
  * <p>
  * The completion will only happen for inserts, that is, when characters are
@@ -23,9 +23,10 @@ import javax.swing.text.*;
  *
  * @see CompletionService
  *
- * @author Samuel Sjoberg, http://samuelsjoberg.com
+ * @author Samuel Sjoberg, <a href="http://samuelsjoberg.com">samuelsjoberg.com</a>
  * @version 1.0.0
  */
+// class AutoCompleteDocument
 public class AutoCompleteDocument extends PlainDocument {
 
     /** Default serial version UID. */
@@ -83,6 +84,7 @@ public class AutoCompleteDocument extends PlainDocument {
     }
 }
 
+// interface CompletionService
 interface CompletionService<T> {
 
     /**

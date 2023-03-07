@@ -1,15 +1,28 @@
+/*
+ *  Proj:   Moose
+ *  File:   Constants.java
+ *  Desc:   Home to many random constant values.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import java.awt.Color;
 
+// class Constants
 public class Constants {
 
     public static final String DASH = "-";
-    
+    public static final String INFO = "ⓘ ";
+
+    // colors
     public static final Color RED = new Color(130, 0, 50);
     public static final Color GREEN = new Color(0, 130, 50);
     public static final Color BLACK = new Color(0, 0, 0);
 
+    // about modal
     public static final String MOOSE_WIKI = "https://www.github.com/mpfthprblmtq/moose/wiki";
     public static final String MOOSE_COPYRIGHT = "© Pat Ripley 2018-";
 
@@ -33,21 +46,6 @@ public class Constants {
     public static final String COMPILATIONS_FILEPATH_REGEX = ".*/.*/Compilations/\\[\\d{4}\\] .*/\\d{1,3} .* - .*\\.mp3";
     public static final String LPS_FILEPATH_REGEX = ".*/.*/LPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
     public static final String EPS_FILEPATH_REGEX = ".*/.*/EPs/\\[\\d{4}\\] .* - .*/\\d{1,3} .*\\.mp3";
-    public static final String GENERAL_FILEPATH_REGEX = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
-    public static final String ALBUM_FOLDER_REGEX = "\\[\\d{4}\\] .*";
-    public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
-    public static final String FILENAME_PRECHECK_REGEX = "\\d{1,3}.*";
-    public static final String FILENAME_TRIM_REGEX = "(?<Title>\\w.*).*";
-    public static final String FILENAME_REGEX = "(?<TrackNumber>\\d{1,3})[\\.\\s-]*(?<Title>.*)";
-    public static final String TITLE_REGEX = "(?<Title>.*).mp3";
-    public static final String TRACKNUM_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Title>.*).mp3";
-    public static final String ARTIST_TITLE_REGEX = "(?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String YEAR_ARTIST_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Artist>.*) - (?<Album>.*)";
-    public static final String YEAR_ALBUM_REGEX = "\\[(?<Year>\\d{4})\\] (?<Album>.*)";
-    public static final String TRACKNUM_ARTIST_TITLE_REGEX = "(?<TrackNumber>\\d{1,3}) (?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String TRACKNUM_ARTIST_TITLE_OPT_REGEX = "(\\d{1,2} )*(?<Artist>.*) - (?<Title>.*).mp3";
-    public static final String CD_FILEPATH_REGEX = ".*\\/(?<CDNumber>CD\\d+)\\/.*";
-    public static final String YOUTUBE_FILENAME_REGEX = "\\w+\\.\\w{2} - (?<FileName>.*)-.{11}-\\d{3}k-\\d{13}.mp3";
     public static final String[] FILENAME_STRINGS_TO_REMOVE = new String[] {
             "LYRIC VIDEO",
             "OFFICIAL LYRIC VIDEO",
@@ -58,6 +56,19 @@ public class Constants {
             "MONSTERCAT OFFICIAL MUSIC VIDEO",
             "OFFICIAL VISUALIZER"
     };
+    public static final String GENERAL_FILEPATH = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
+    public static final String FEATURED_NO_PARENS_WITH_REMIXED_BY_ARTIST =
+            "(?<title>.+)[^(]ft\\. (?<featured>.*)[^)]*(?<remixedBy>\\(.*\\))";
+    public static final String FEATURED_NO_PARENS = "(?<title>.+)[^(]ft\\. (?<featured>.+)[^)]*";
+    public static final String FILENAME_TRACK_NUMBER_TITLE = "(?<track>\\d{1,3})\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_ARTIST_TITLE = "(?<track>\\d{1,3})\\s{1}(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_ARTIST_TITLE = "(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_PERIOD = "(?<track>\\d{1,3})\\.\\s(?<title>.+)";
+    public static final String FILENAME_TRACK_NUMBER_HYPHEN = "(?<track>\\d{1,3})\\s*-\\s*(?<title>.+)";
+    public static final String FILENAME_YEAR_ARTIST_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<artist>.+)\\s-\\s(?<title>.+)";
+    public static final String FILENAME_YEAR_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<title>.+)";
+    public static final String FILENAME_MULTIPLE_CD_FILEPATH = ".*\\/CD(?<diskNumber>\\d+)\\/.*";
+    public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
 
     // menu options
     public static final String MORE_INFO = "More info...";
@@ -75,6 +86,7 @@ public class Constants {
     public static final String REMOVE_ARTWORK = "Remove artwork";
     public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
 
+    // row icon constants
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
     public static final int SAVED = 2;
@@ -114,9 +126,4 @@ public class Constants {
     public static final int FILES = 2;
     public static final int API = 3;
     public static final int FEATURES = 4;
-
-    // album art finder frame tabs
-    public static final int SPOTIFY = 0;
-    public static final int GOOGLE = 1;
-    public static final int MANUAL = 2;
 }

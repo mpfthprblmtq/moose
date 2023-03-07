@@ -1,16 +1,19 @@
 /*
-   Proj:   Moose
-   File:   Song.java
-   Desc:   Object class for the Song object
-
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   Song.java
+ *  Desc:   Pojo for the Song information
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects;
 
 // imports
+import com.mpfthprblmtq.commons.utils.StringUtils;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,6 +21,9 @@ import java.util.Objects;
 
 // class Song
 @Data
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Song {
 
     private File file;
@@ -41,14 +47,26 @@ public class Song {
 
     private int index;
 
-    public Song() {}
-
     public Song(File file, File newFile) {
         setFile(file);
         setNewFile(newFile);
     }
 
-    public Song(File file, String title, String artist, String album, String albumArtist, String genre, String year, String track, String disk, byte[] artwork_bytes, int bitrate, int sampleRate, long len, String comment) {
+    public Song(
+            File file,
+            String title,
+            String artist,
+            String album,
+            String albumArtist,
+            String genre,
+            String year,
+            String track,
+            String disk,
+            byte[] artwork_bytes,
+            int bitrate,
+            int sampleRate,
+            long len,
+            String comment) {
 
         // standard string stuff
         this.file = file;
@@ -107,7 +125,7 @@ public class Song {
      * @return the full track string
      */
     public String getFullTrackString() {
-        if (track.equals("") && totalTracks.equals("")) {
+        if (StringUtils.isEmpty(track) && StringUtils.isEmpty(totalTracks)) {
             return "";
         } else {
             return track + "/" + totalTracks;
@@ -118,7 +136,7 @@ public class Song {
      * @return the full disk string
      */
     public String getFullDiskString() {
-        if (disk.equals("") && totalDisks.equals("")) {
+        if (StringUtils.isEmpty(disk) && StringUtils.isEmpty(totalDisks)) {
             return "";
         } else {
             return disk + "/" + totalDisks;

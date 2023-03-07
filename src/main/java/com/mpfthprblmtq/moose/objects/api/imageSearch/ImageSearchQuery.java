@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   ImageSearchQuery.java
-   Desc:   Pojo for a bundle of search information to provide to the Album Art Finder service
-
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   ImageSearchQuery.java
+ *  Desc:   Pojo for a bundle of search information to provide to the Google CSE
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects.api.imageSearch;
 
 // imports

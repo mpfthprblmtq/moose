@@ -1,9 +1,19 @@
+/*
+ *  Proj:   Moose
+ *  File:   IconUtils.java
+ *  Desc:   A utility class to return an Icon based on constant values.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
+ */
+
 package com.mpfthprblmtq.moose.utilities;
 
+// imports
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import java.util.Objects;
 
+// class IconUtils
 public class IconUtils {
 
     // constants that determine which file to use
@@ -15,6 +25,7 @@ public class IconUtils {
     public static final String MOOSE_64 = "moose64.png";
     public static final String MOOSE_128 = "moose128.png";
     public static final String LOADING = "loading-icon.gif";
+    public static final String LOADING_BIG = "loading-icon-big.gif";
     public static final String CIRCLE = "circle-outline.png";
 
     /**
