@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Comparator;
 import java.util.EventObject;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
@@ -369,5 +370,19 @@ public class ViewUtils {
             }
             component.requestFocus();
         })).start();
+    }
+
+    public static Comparator<String> getTrackDiskNumberSorter() {
+        return (o1, o2) -> {
+            if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2)
+                    && o1.matches(TRACK_DISK_REGEX) && o2.matches(TRACK_DISK_REGEX)) {
+                String o1Number = o1.split("/")[0];
+                String o2Number = o2.split("/")[0];
+                int o1int = Integer.parseInt(o1Number);
+                int o2int = Integer.parseInt(o2Number);
+                return Integer.compare(o1int, o2int);
+            }
+            return 0;
+        };
     }
 }
