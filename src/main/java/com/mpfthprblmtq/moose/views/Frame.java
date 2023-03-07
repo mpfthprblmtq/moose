@@ -51,6 +51,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableRowSorter;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
@@ -160,7 +161,9 @@ public class Frame extends javax.swing.JFrame {
      *  - Sets up the menu listener for context menu item actions based on the text selected
      *  - Adds a custom cell editor and table cell listener
      *  - Sets up the FileDrop configuration
+     *  - Adds a custom row sorter for  track and disk number, so it sorts 1, 2, 3...10, 11 instead of 1, 10, 11, etc.
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void init() {
 
         // initialize songController
@@ -304,6 +307,12 @@ public class Frame extends javax.swing.JFrame {
             setLoading(true);
             getImportFilesSwingWorker(files).execute();
         });
+
+        // create a custom row sorter for track number and disk number
+        TableRowSorter tableRowSorter = new TableRowSorter(table.getModel());
+        tableRowSorter.setComparator(TABLE_COLUMN_TRACK, ViewUtils.getTrackDiskNumberSorter());
+        tableRowSorter.setComparator(TABLE_COLUMN_DISK, ViewUtils.getTrackDiskNumberSorter());
+        table.setRowSorter(tableRowSorter);
     }
 
     /**
