@@ -572,8 +572,7 @@ public class Frame extends javax.swing.JFrame {
         saveAllButton = new javax.swing.JButton();
         tableSP = new javax.swing.JScrollPane();
         table = new JTable() {
-            public Component prepareEditor(TableCellEditor editor, int row, int col)
-            {
+            public Component prepareEditor(TableCellEditor editor, int row, int col) {
                 Component result = super.prepareEditor(editor, row, col);
                 if (result instanceof JTextField) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -593,7 +592,21 @@ public class Frame extends javax.swing.JFrame {
                 }
                 return result;
             }
+
+            public String getToolTipText(MouseEvent e) {
+                String tip = null;
+                int row = rowAtPoint(e.getPoint());
+                int col = columnAtPoint(e.getPoint());
+                if (col == TABLE_COLUMN_GENRE) {
+                    if (table.getValueAt(row, col).toString().startsWith(INFO)) {
+                        String genre = table.getValueAt(row, col).toString().replace(INFO, StringUtils.EMPTY);
+                        tip = "Genre \"" + genre + "\" was inferred from other genres from same artist.";
+                    }
+                }
+                return tip;
+            }
         };
+
         consoleSP = new javax.swing.JScrollPane();
         console = new javax.swing.JTextArea();
         multPanel = new javax.swing.JPanel();
@@ -647,7 +660,7 @@ public class Frame extends javax.swing.JFrame {
         setTitle("Moose");
         setResizable(false);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", Font.BOLD, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel1.setText("Moose");
 
         saveAllButton.setText("Save All");
@@ -685,7 +698,7 @@ public class Frame extends javax.swing.JFrame {
 
         console.setEditable(false);
         console.setColumns(20);
-        console.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 11)); // NOI18N
+        console.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
         console.setRows(5);
         console.setMaximumSize(new java.awt.Dimension(611, 219));
         console.setMinimumSize(new java.awt.Dimension(611, 219));
@@ -693,7 +706,7 @@ public class Frame extends javax.swing.JFrame {
 
         multPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        L1.setFont(new java.awt.Font("SansSerif", Font.BOLD, 13)); // NOI18N
+        L1.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
         L1.setText("Edit Multiple Items:");
 
         L2.setText("Title:");

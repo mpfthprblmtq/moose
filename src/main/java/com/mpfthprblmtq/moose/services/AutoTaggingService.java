@@ -44,7 +44,7 @@ public class AutoTaggingService {
     public void autoTag(List<Song> songs) {
         for (Song song : songs) {
 
-            String title = getTitleFromFile(song.getFile());
+            String title = getTitleFromFile(song);
             String artist = getArtistFromFile(song.getFile());
             String album = getAlbumFromFile(song.getFile());
             String albumArtist = getAlbumArtistFromFile(song.getFile());
@@ -89,10 +89,13 @@ public class AutoTaggingService {
 
     /**
      * Gets the title from the filename after doing some processing
-     * @param file the file to check
+     * @param song the song to check
      * @return the title
      */
-    public String getTitleFromFile(File file) {
+    public String getTitleFromFile(Song song) {
+        // check to see if we can use the new file or not
+        File file = song.getNewFile() != null ? song.getNewFile() : song.getFile();
+
         if (file.getName().matches(FILENAME_TRACK_NUMBER_ARTIST_TITLE)) {
             return FileUtils.cleanFilenameForOSX(
                             RegexUtils.getMatchedGroup(file.getName(), FILENAME_TRACK_NUMBER_ARTIST_TITLE, "title"))
@@ -230,10 +233,13 @@ public class AutoTaggingService {
     /**
      * Gets the tracks from the file location.  Looks at the track number on the file first (which we should have got
      * from the FilenameFormatterService call), then looks at the total number of mp3 files in the parent folder
-     * @param file the file to check
+     * @param song the song to check
      * @return the tracks string in X/XX format
      */
-    public String getTracksFromFile(File file) {
+    public String getTracksFromFile(Song song) {
+        // check to see if we can use the new file
+        File file = song.getNewFile() != null ? song.getNewFile() : song.getFile();
+
         // get the total number of tracks from the parent directory
         File dir = file.getParentFile();
         String totalTracks = String.valueOf(MP3FileUtils.getNumberOfMP3Files(dir));
@@ -472,7 +478,7 @@ public class AutoTaggingService {
             int row = Moose.getSongController().getRow(song.getIndex());
 
             // get the tracks and disks
-            String tracks = getTracksFromFile(song.getFile());
+            String tracks = getTracksFromFile(song);
             String disks = getDisksFromFile(song.getFile());
 
             // track

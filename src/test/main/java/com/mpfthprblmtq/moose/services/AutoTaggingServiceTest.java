@@ -1,6 +1,7 @@
 package main.java.com.mpfthprblmtq.moose.services;
 
 import com.mpfthprblmtq.commons.utils.StringUtils;
+import com.mpfthprblmtq.moose.objects.Song;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -75,7 +76,9 @@ public class AutoTaggingServiceTest {
     public void testGetTitleFromFile() {
         String expected = "TestTitle";
         for (File file : files) {
-            String actual = autoTaggingService.getTitleFromFile(file);
+            Song song = new Song();
+            song.setFile(file);
+            String actual = autoTaggingService.getTitleFromFile(song);
             assertEquals(expected, actual);
         }
     }
@@ -163,8 +166,10 @@ public class AutoTaggingServiceTest {
             } else {
                 expected = StringUtils.EMPTY;
             }
+            Song song = new Song();
+            song.setFile(file);
 
-            String actual = autoTaggingService.getTracksFromFile(file);
+            String actual = autoTaggingService.getTracksFromFile(song);
             assertEquals(expected, actual);
         }
     }
