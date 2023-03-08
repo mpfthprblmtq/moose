@@ -521,6 +521,18 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
 
         jLabel4.setText("Album:");
 
+        spotifyArtistTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                spotifyArtistTextFieldKeyPressed(evt);
+            }
+        });
+
+        spotifyAlbumTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                spotifyAlbumTextFieldKeyPressed(evt);
+            }
+        });
+
         spotifySearchButton.setText("Search");
         spotifySearchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1245,6 +1257,28 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         newFrame.setVisible(true);
         newFrame.tabbedPane.setSelectedIndex(selectedTab);
     }//GEN-LAST:event_resetMenuItemActionPerformed
+
+    /**
+     * Handles the event for a key press on the album text field, just listens to Enter pressed, simulates a click on
+     * the search button.
+     * @param evt the ActionEvent
+     */
+    private void spotifyAlbumTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyAlbumTextFieldKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            spotifySearchButton.doClick();
+        }
+    }//GEN-LAST:event_spotifyAlbumTextFieldKeyPressed
+
+    /**
+     * Handles the event for a key press on the artist text field, just listens to Enter pressed, simulates a click on
+     * the search button.
+     * @param evt the ActionEvent
+     */
+    private void spotifyArtistTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyArtistTextFieldKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            spotifySearchButton.doClick();
+        }
+    }//GEN-LAST:event_spotifyArtistTextFieldKeyPressed
 
     /**
      * Gets a list of Icons from a list of image search results containing BufferedImages to display on the modal.
