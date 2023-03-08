@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.objects.RequestProperties;
 import com.mpfthprblmtq.commons.objects.RequestURL;
+import com.mpfthprblmtq.commons.utils.CollectionUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.commons.utils.WebUtils;
 import com.mpfthprblmtq.moose.Moose;
@@ -221,6 +222,9 @@ public class SpotifyApiService {
 
         // get rid of any non-exact matches (case-insensitive, just in case)
         artists.getArtists().removeIf(x -> !StringUtils.equalsIgnoreCase(x.getName(), query));
+
+        // get rid of any artists without an image
+        artists.getArtists().removeIf(x -> CollectionUtils.isEmpty(x.getImages()));
 
         // return the artist list
         return artists.getArtists();
