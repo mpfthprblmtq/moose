@@ -46,6 +46,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -462,6 +463,12 @@ public class Frame extends javax.swing.JFrame {
         int duplicates = 0;
 
         // TODO handle files with zero bytes or files with no id3 frames
+
+        // remove any directories, DS_Store files
+        files = files.stream()
+                .filter(File::isFile)
+                .filter(file -> !file.getName().equals(".DS_Store"))
+                .collect(Collectors.toList());
 
         for (File file : files) {
             if (file.getName().startsWith(".")) {

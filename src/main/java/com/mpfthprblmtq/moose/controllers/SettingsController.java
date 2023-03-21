@@ -9,6 +9,8 @@
 package com.mpfthprblmtq.moose.controllers;
 
 // imports
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
@@ -19,8 +21,6 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonParser;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
