@@ -83,9 +83,12 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
         this.rows = query.getRows();
 
         // set starting values for the header and tabs
-        headerLabel.setText("<html>Finding album art for:<br>\"" + query.getArtist() + " - " + query.getAlbum() + "\"</html>");
+        headerLabel.setText("<html>Finding album art for" +
+                ((StringUtils.isEmpty(query.getArtist()) && StringUtils.isEmpty(query.getAlbum())) ?
+                        " " + query.getRows().size() + " row(s)" :
+                        ":<br>\"" + query.getArtist() + " - " + query.getAlbum() + "\"</html>"));
         googleSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
-        spotifyArtistTextField.setText(getPrimaryArtist(query.getArtist()));
+        spotifyArtistTextField.setText(query.getArtist());
         spotifyAlbumTextField.setText(query.getAlbum());
         manualSearchQueryTextField.setText(query.getArtist() + StringUtils.SPACE + query.getAlbum());
         dropImageLabel.setTransferHandler(createTransferHandler());
@@ -415,15 +418,6 @@ public class AlbumArtFinderFrame extends javax.swing.JFrame {
                 return true;
             }
         };
-    }
-
-    /**
-     * Gets the primary artist from the given artist (really just the first one)
-     * @param artist the artist to split up
-     */
-    public String getPrimaryArtist(String artist) {
-        String[] individualArtists = artist.split("( & )|( x )|( X )|(, & )|(, )");
-        return individualArtists[0];
     }
 
     /**

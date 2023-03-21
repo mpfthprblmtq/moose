@@ -161,18 +161,18 @@ public class AutoTaggingService {
             }
 
             // not a single, so get the album from the EP/LP/Compilation title
-            if (file.getName().matches(FILENAME_YEAR_ARTIST_ALBUM)) {
+            if (file.getParentFile().getName().matches(FILENAME_YEAR_ARTIST_ALBUM)) {
                 return FileUtils.cleanFilenameForOSX(
-                        RegexUtils.getMatchedGroup(file.getName(), FILENAME_YEAR_ARTIST_ALBUM, "album"));
-            } else if (file.getName().matches(FILENAME_YEAR_ALBUM)) {
+                        RegexUtils.getMatchedGroup(file.getParentFile().getName(), FILENAME_YEAR_ARTIST_ALBUM, "album"));
+            } else if (file.getParentFile().getName().matches(FILENAME_YEAR_ALBUM)) {
                 return FileUtils.cleanFilenameForOSX(
-                        RegexUtils.getMatchedGroup(file.getName(), FILENAME_YEAR_ALBUM, "album"));
+                        RegexUtils.getMatchedGroup(file.getParentFile().getName(), FILENAME_YEAR_ALBUM, "album"));
             }
         } else {
             // not in a label, get the album normally
             if (file.getParentFile().getName().matches(FILENAME_YEAR_ALBUM)) {
                 return FileUtils.cleanFilenameForOSX(
-                        RegexUtils.getMatchedGroup(file.getParentFile().getName(), FILENAME_YEAR_ALBUM, "title"));
+                        RegexUtils.getMatchedGroup(file.getParentFile().getName(), FILENAME_YEAR_ALBUM, "album"));
             }
         }
 
@@ -271,8 +271,8 @@ public class AutoTaggingService {
         if (file.getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH)) {
             int disk = Integer.parseInt(
                     RegexUtils.getMatchedGroup(
-                            file.getParentFile().getPath(), FILENAME_MULTIPLE_CD_FILEPATH, "diskNumber"));
-            int totalDisks = MP3FileUtils.getTotalDisksFromFolder(file.getParentFile());
+                            file.getPath(), FILENAME_MULTIPLE_CD_FILEPATH, "diskNumber"));
+            int totalDisks = MP3FileUtils.getTotalDisksFromFolder(file.getParentFile().getParentFile());
             return disk + "/" + totalDisks;
         } else {
             // not a multi disk album, so just return 1/1
@@ -387,9 +387,13 @@ public class AutoTaggingService {
             for (Song song : songsToReprocess) {
                 if (!ImageSearchQuery.contains(queries, song.getAlbum())) {
                     // we don't have this query in the list, so let's create one and add the row to the query's rows
-                    String mainArtist = getMainArtist(song.getArtist());
+                    String artist = ImageSearchQuery.getPrimaryArtist(song.getArtist());
+                    String album = MP3FileUtils.isPartOfALabel(song.getFile(), SINGLES) ?
+                            song.getTitle() : song.getAlbum();
+                    File parentFile = song.getFile().getPath().matches(FILENAME_MULTIPLE_CD_FILEPATH) ?
+                            song.getFile().getParentFile().getParentFile() : song.getFile().getParentFile();
                     ImageSearchQuery query = new ImageSearchQuery(
-                            mainArtist, song.getAlbum(), song.getFile().getParentFile(), new ArrayList<>());
+                            artist, album, parentFile, new ArrayList<>());
                     query.getRows().add(Moose.getSongController().getRow(song.getIndex()));
                     queries.add(query);
                 } else {
@@ -503,21 +507,5 @@ public class AutoTaggingService {
                 Moose.getSongController().setTotalDisks(song.getIndex(), StringUtils.EMPTY);
             }
         }
-    }
-
-    /**
-     * Helper method to get the main artist in a situation where there's more than one artist on the track
-     * @param artist the artist string to parse
-     * @return the main artist
-     */
-    private String getMainArtist(String artist) {
-        if (artist.contains(" & ")) {
-            return artist.split(" & ")[0];
-        } else if (artist.contains(", ")) {
-            return artist.split(", ")[0];
-        } else if (artist.contains(" with ")) {
-            return artist.split(" with ")[0];
-        }
-        return artist;
     }
 }

@@ -317,12 +317,22 @@ public class ViewUtils {
 
             popup.add(item = new JMenuItem(REMOVE_ARTWORK));
             item.addActionListener(menuListener);
+
+            popup.add(item = new JMenuItem(USE_ALBUM_ART_FINDER));
+            item.addActionListener(menuListener);
+            // only enable it if the feature is enabled
+            item.setEnabled(Moose.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER));
         } else if (artworkMultPanel) {
             popup.add(item = new JMenuItem(ADD_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
 
             popup.add(item = new JMenuItem(REMOVE_ARTWORK_SELECTED));
             item.addActionListener(menuListener);
+
+            popup.add(item = new JMenuItem(USE_ALBUM_ART_FINDER));
+            item.addActionListener(menuListener);
+            // only enable it if the feature is enabled
+            item.setEnabled(Moose.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER));
         }
         if (CollectionUtils.isNotEmpty(customItems)) {
             for (String str : customItems) {

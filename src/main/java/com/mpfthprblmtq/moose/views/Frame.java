@@ -283,6 +283,9 @@ public class Frame extends javax.swing.JFrame {
                     newMultPanelArtwork = null;
                     multImage.setIcon(null);
                     break;
+                case USE_ALBUM_ART_FINDER:
+                    songController.addArtworkFromAlbumArtFinder(selectedRows);
+                    break;
                 default:
                     break;
             }
@@ -457,6 +460,8 @@ public class Frame extends javax.swing.JFrame {
     public List<File> importFiles(List<File> files) {
         List<File> toRemove = new ArrayList<>();
         int duplicates = 0;
+
+        // TODO handle files with zero bytes or files with no id3 frames
 
         for (File file : files) {
             if (file.getName().startsWith(".")) {

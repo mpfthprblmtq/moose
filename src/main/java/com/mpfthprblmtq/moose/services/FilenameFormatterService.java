@@ -74,7 +74,7 @@ public class FilenameFormatterService {
         filename = filename.substring(0, filename.length() - 4);
 
         // initial cleanup
-        filename = filename.replaceAll("(?i)feat\\.", "ft.");
+        filename = filename.replaceAll("(?i)feat\\.", "ft.").replaceAll("Ft.", "ft.");
 
         // then specific regex cleanup (handles no parentheses, remixed by artists, etc.)
         if (filename.contains("ft.")) {
