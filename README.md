@@ -1,7 +1,7 @@
 # Moose
 A music management system capable of reading and modifying dynamic id3 tags.
 
-![Generic badge](https://img.shields.io/badge/version-1.3.0-brightgreen.svg)
+![Generic badge](https://img.shields.io/badge/version-1.4.0-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 [View project on GitHub](https://www.github.com/mpfthprblmtq/moose)
@@ -14,9 +14,7 @@ Compatible with:
 * OS X (Mac)
 * ~~Windows~~ *(Coming soon to a future release near you)*
 
-<br/>
-
----
+<img alt="moose-main-preview" src="https://github.com/mpfthprblmtq/moose/blob/master/src/main/resources/wiki-resources/main-frame-preview.png?raw=true">
 
 <br/>
 
@@ -26,9 +24,7 @@ The moose (North America) or elk (Eurasia), *Alces alces*, is a member of the Ne
 
 But that doesn't really have anything to do with this project, does it?  The better question is probably *"What is __this__ project?"*
 
-<br/>
-
-## What is this project?
+## What *is* this project?
 
 Moose is my pet project from college that turned out to be more useful than I anticipated.  It's basically just a mp3 information editor, where you can edit the Title, Artist, Album, Year, Genre, etc. for mp3 files.  There are a few different apps out there that do this same thing, but I've found that:
 * I have to pay for them *(gross)*
@@ -36,12 +32,6 @@ Moose is my pet project from college that turned out to be more useful than I an
 * Most apps out there are very simple.  They only provide the ability to edit files one at a time, or just simply changing information about those files, with no automatic functionality.
 
 I solved a lot of these problems I've seen with other applications by creating my own application!
-
-<img alt="moose-main-preview" src="https://github.com/mpfthprblmtq/moose/blob/master/src/main/resources/wiki-resources/main-frame-preview.png?raw=true">
-
-<br/>
-
-<br/>
 
 ## Running the project
 
@@ -52,12 +42,6 @@ The easiest way to get started with Moose is to just [download a fully working .
 
 If you don't want to download a .dmg file, and you're a nerd like me, you try importing the project into your favorite IDE.
 I have a walkthrough for [IntelliJ IDEA](https://github.com/mpfthprblmtq/moose/wiki/Getting-Started#for-intellij) in my Wiki.  Can't guarantee success rates for other IDEs.
-
-<br/>
-
----
-
-<br/>
 
 ## Using Moose
 
