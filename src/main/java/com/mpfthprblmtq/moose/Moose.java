@@ -60,9 +60,10 @@ public class Moose {
      * and loads up the application settings.
      */
     private static void initSettings() {
-        // instantiate the logger object so we can have some logging
-        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
-        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
+        // instantiate the logger object, so we can have some logging
+//        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
+//        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
+        logger = new Logger();
 
         // instantiate the settings object, so we can have some log/settings files
         settingsController = new SettingsController();

@@ -11,15 +11,18 @@ package com.mpfthprblmtq.moose.controllers;
 
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.FileUtils;
+import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.objects.Song;
+import com.mpfthprblmtq.moose.objects.api.imageSearch.ImageSearchQuery;
 import com.mpfthprblmtq.moose.services.AutoTaggingService;
 import com.mpfthprblmtq.moose.services.FilenameFormatterService;
 import com.mpfthprblmtq.moose.services.SongService;
 import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 import lombok.Data;
 
@@ -291,7 +294,7 @@ public class SongController {
         } else if (t instanceof File) {
             for (Integer index : getSongs().keySet()) {
                 Song songInMap = getSongs().get(index);
-                if (songInMap.getFile().getPath().equals(songInMap.getFile().getPath())) {
+                if (songInMap.getFile().getPath().equals(((File) t).getPath())) {
                     return index;
                 }
             }
@@ -408,9 +411,8 @@ public class SongController {
         File cover = null;
         boolean dialogShown = false;
 
-        for (int row : selectedRows) {
-            // get the song
-            Song song = getSongs().get(getIndex(row));
+        List<Song> songs = getSongsFromRows(selectedRows);
+        for (Song song : songs) {
 
             // only want to show the dialog once, so check to see if we've seen the dialog already
             if (!dialogShown) {
@@ -427,6 +429,39 @@ public class SongController {
             autoTaggingService.addCoverForFile(song, cover);
 
         }
+    }
+
+    public void addArtworkFromAlbumArtFinder(int[] selectedRows) {
+        // check if parent file matches for all selected rows
+        List<Song> songs = getSongsFromRows(selectedRows);
+        boolean hasSameParentFile = true;
+        for (Song song : songs) {
+            if (!song.getFile().getParentFile().getPath().equals(songs.get(0).getFile().getParentFile().getPath())) {
+                hasSameParentFile = false;
+                break;
+            }
+        }
+        if (!hasSameParentFile) {
+            ViewUtils.showErrorDialog("Parent file does not match across all selected rows!", Moose.getFrame());
+            return;
+        }
+
+        // parent file is the same, we can show the album art finder
+        ImageSearchQuery query = new ImageSearchQuery();
+        query.setRows(new ArrayList<>());
+        // check for the same artist and album
+        String artist = StringUtils.checkIfSame(songs.get(0).getArtist(),
+                songs.stream().map(Song::getArtist).collect(Collectors.toList())) ? songs.get(0).getArtist() : null;
+        String album = StringUtils.checkIfSame(songs.get(0).getAlbum(),
+                songs.stream().map(Song::getAlbum).collect(Collectors.toList())) ? songs.get(0).getAlbum() : null;
+        for (int row : selectedRows) {
+            Song song = getSongs().get(getIndex(row));
+            query.setArtist(ImageSearchQuery.getPrimaryArtist(artist));
+            query.setAlbum(album);
+            query.getRows().add(row);
+            query.setDir(song.getFile().getParentFile());
+        }
+        DialogUtils.showAlbumArtWindow(query);
     }
 
     /**

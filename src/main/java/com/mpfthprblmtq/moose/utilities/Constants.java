@@ -54,7 +54,8 @@ public class Constants {
             "MONSTERCAT RELEASE",
             "MONSTERCAT LYRIC VIDEO",
             "MONSTERCAT OFFICIAL MUSIC VIDEO",
-            "OFFICIAL VISUALIZER"
+            "OFFICIAL VISUALIZER",
+            "OFFICIAL VIDEO"
     };
     public static final String GENERAL_FILEPATH = ".*/.*/\\[\\d{4}\\] .*/\\d{1,3} .*\\.mp3";
     public static final String FEATURED_NO_PARENS_WITH_REMIXED_BY_ARTIST =
@@ -65,10 +66,13 @@ public class Constants {
     public static final String FILENAME_ARTIST_TITLE = "(?<artist>.+)\\s-\\s(?<title>.+)";
     public static final String FILENAME_TRACK_NUMBER_PERIOD = "(?<track>\\d{1,3})\\.\\s(?<title>.+)";
     public static final String FILENAME_TRACK_NUMBER_HYPHEN = "(?<track>\\d{1,3})\\s*-\\s*(?<title>.+)";
-    public static final String FILENAME_YEAR_ARTIST_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<artist>.+)\\s-\\s(?<title>.+)";
-    public static final String FILENAME_YEAR_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<title>.+)";
+    public static final String FILENAME_YEAR_ARTIST_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<artist>.+)\\s-\\s(?<album>.+)";
+    public static final String FILENAME_YEAR_ALBUM = "\\[(?<year>\\d{4})\\]\\s(?<album>.+)";
     public static final String FILENAME_MULTIPLE_CD_FILEPATH = ".*\\/CD(?<diskNumber>\\d+)\\/.*";
     public static final String TRACK_DISK_REGEX = "\\d{1,3}\\/\\d{1,3}";
+    public static final String TITLE_FEATURING_ARTIST = "(?<title>.+)(?<featuredArtist>\\s\\(ft\\..+\\))";
+    public static final String TITLE_FEATURING_AND_REMIX_ARTIST =
+            "(?<title>.+)(?<featuredArtist>\\s\\(ft\\..+\\))(?<remixArtist>\\s\\(.+\\))";
 
     // menu options
     public static final String MORE_INFO = "More info...";
@@ -85,6 +89,7 @@ public class Constants {
     public static final String ADD_ARTWORK_SELECTED = "Add artwork for selected...";
     public static final String REMOVE_ARTWORK = "Remove artwork";
     public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
+    public static final String USE_ALBUM_ART_FINDER = "Use Album Art Finder";
 
     // row icon constants
     public static final int DEFAULT = 0;
