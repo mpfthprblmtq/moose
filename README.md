@@ -37,7 +37,7 @@ Moose is my pet project from college that turned out to be more useful than I an
 
 I solved a lot of these problems I've seen with other applications by creating my own application!
 
-<img alt="moose-main-preview" src="https://github.com/mpfthprblmtq/moose/blob/master/src/resources/wiki/main-frame-preview.png?raw=true">
+<img alt="moose-main-preview" src="https://github.com/mpfthprblmtq/moose/blob/master/src/main/resources/wiki-resources/main-frame-preview.png?raw=true">
 
 <br/>
 
