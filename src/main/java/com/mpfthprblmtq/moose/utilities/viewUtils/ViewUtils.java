@@ -11,6 +11,7 @@ package com.mpfthprblmtq.moose.utilities.viewUtils;
 // imports
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.commons.utils.CollectionUtils;
+import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.SongController;
@@ -27,8 +28,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EventObject;
+import java.util.List;
 
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
 
@@ -222,14 +225,14 @@ public class ViewUtils {
                             if (StringUtils.isEmpty(disk)) {
                                 songController.setDisk(index, StringUtils.EMPTY);
                                 songController.setTotalDisks(index, StringUtils.EMPTY);
-                            } else if (disk.matches("\\d*/\\d*")) {
+                            } else if (disk.matches("\\d+/\\d+")) {
                                 String[] arr = disk.split("/");
                                 songController.setDisk(index, arr[0]);
                                 songController.setTotalDisks(index, arr[1]);
-                            } else if (disk.matches("/\\d*")) {
+                            } else if (disk.matches("/\\d+")) {
                                 songController.setDisk(index, StringUtils.EMPTY);
                                 songController.setTotalDisks(index, disk);
-                            } else if (disk.matches("\\d*/")) {
+                            } else if (disk.matches("\\d+/")) {
                                 songController.setTrack(index, disk);
                                 songController.setTotalDisks(index, StringUtils.EMPTY);
                             } else {
@@ -347,6 +350,142 @@ public class ViewUtils {
     }
 
     /**
+     * Returns the import albums swing worker, so I can use it multiple times
+     * @param files the array of files to import
+     * @return an import albums swing worker
+     */
+    public static SwingWorker<Void, Void> getImportFilesSwingWorker(File[] files) {
+        Moose.getFrame().setLoading(true);
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // create an arraylist of files and traverse it
+                java.util.List<File> fileList = new ArrayList<>();
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        FileUtils.listFiles(file, fileList);
+                    } else {
+                        fileList.add(file);
+                    }
+                }
+
+                // sort the file list
+                fileList.sort(Comparator.comparing(File::getName));
+
+                // import them all
+                List<File> successfullyAddedFiles = Moose.getFrame().importFiles(fileList);
+
+                // check to see if the actions can be enabled
+                Moose.getFrame().setActionsEnabled(!successfullyAddedFiles.isEmpty());
+
+                // check for new genres
+                if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
+                    Moose.getSongController().checkForNewGenres(successfullyAddedFiles);
+                }
+
+                // update graphics
+                Moose.getFrame().setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the autotag swing worker, so I can use it multiple times
+     * @param selectedRows the rows currently selected on the table
+     * @return an autotag swing worker
+     */
+    public static SwingWorker<Void, Void> getAutotagSwingWorker(int[] selectedRows) {
+        Moose.getFrame().setLoading(true);
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // do the autotagging
+                if (Moose.getFrame().getTable().isEditing()) {
+                    Moose.getFrame().getTable().getCellEditor().stopCellEditing();
+                }
+                Moose.getSongController().autoTagFiles(selectedRows);
+                Moose.getFrame().updateMultiplePanelFields();
+
+                // update graphics
+                Moose.getFrame().setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the save tracks swing worker, so I can use it multiple times
+     * @param selectedRows the rows currently selected on the table
+     * @return a save tracks swing worker
+     */
+    public static SwingWorker<Void, Void> getSaveTracksSwingWorker(int[] selectedRows) {
+        Moose.getFrame().setLoading(true);
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // do the save
+                Moose.getSongController().saveTracks(selectedRows);
+
+                // update graphics
+                Moose.getFrame().setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the open tracks swing worker, so I can use it multiple times
+     * @param selectedRows the rows currently selected on the table
+     * @return an open tracks swing worker
+     */
+    public static SwingWorker<Void, Void> getOpenTracksSwingWorker(int[] selectedRows) {
+        Moose.getFrame().setLoading(true);
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // do the open/play
+                Moose.getSongController().playFiles(selectedRows);
+
+                // update graphics
+                Moose.getFrame().setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
+     * Returns the track/disk number swing worker, so I can use it multiple times
+     * @param selectedRows the rows currently selected on the table
+     * @return a track/disk number swing worker
+     */
+    public static SwingWorker<Void, Void> getTrackDiskNumberSwingWorker(int[] selectedRows) {
+        Moose.getFrame().setLoading(true);
+        // make a swing worker do the file import in a separate thread, so I can update the GUI
+        return new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // add track numbers and disk numbers
+                Moose.getSongController().autoAddTrackAndDiskNumbers(selectedRows);
+                Moose.getFrame().updateMultiplePanelFields();
+
+                // update graphics
+                Moose.getFrame().setLoading(false);
+
+                return null;    // don't return anything since we're just playing with threads
+            }
+        };
+    }
+
+    /**
      * Shows an error dialog
      * @param message the message to show
      * @param ex the exception that occurred
@@ -382,6 +521,10 @@ public class ViewUtils {
         })).start();
     }
 
+    /**
+     * Utility method that returns a custom sorter for the track and disk number columns
+     * @return a custom sorter
+     */
     public static Comparator<String> getTrackDiskNumberSorter() {
         return (o1, o2) -> {
             if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2)

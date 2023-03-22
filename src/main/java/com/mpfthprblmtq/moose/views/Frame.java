@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,16 +247,16 @@ public class Frame extends javax.swing.JFrame {
                     removeRows(selectedRows);
                     break;
                 case PLAY:
-                    getOpenTracksSwingWorker(selectedRows).execute();
+                    ViewUtils.getOpenTracksSwingWorker(selectedRows).execute();
                     break;
                 case SAVE:
-                    getSaveTracksSwingWorker(selectedRows).execute();
+                    ViewUtils.getSaveTracksSwingWorker(selectedRows).execute();
                     break;
                 case AUTO_TAG:
-                    getAutotagSwingWorker().execute();
+                    ViewUtils.getAutotagSwingWorker(selectedRows).execute();
                     break;
                 case AUTO_TRACK_DISK_NUMBERS:
-                    getTrackDiskNumberSwingWorker().execute();
+                    ViewUtils.getTrackDiskNumberSwingWorker(selectedRows).execute();
                     break;
                 case AUTO_ARTWORK:
                     autoAddCoverArt(selectedRows);
@@ -306,7 +305,7 @@ public class Frame extends javax.swing.JFrame {
 
         // taken from the FileDrop example
         new FileDrop(System.out, tableSP, (File[] files) ->
-            getImportFilesSwingWorker(files).execute()
+                ViewUtils.getImportFilesSwingWorker(files).execute()
         );
 
         // create a custom row sorter for track number and disk number
@@ -314,133 +313,6 @@ public class Frame extends javax.swing.JFrame {
         tableRowSorter.setComparator(TABLE_COLUMN_TRACK, ViewUtils.getTrackDiskNumberSorter());
         tableRowSorter.setComparator(TABLE_COLUMN_DISK, ViewUtils.getTrackDiskNumberSorter());
         table.setRowSorter(tableRowSorter);
-    }
-
-    /**
-     * Returns the import albums swing worker, so I can use it multiple times
-     * @return an import albums swing worker
-     */
-    private SwingWorker<Void, Void> getImportFilesSwingWorker(File[] files) {
-        setLoading(true);
-        // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                // create an arraylist of files and traverse it
-                List<File> fileList = new ArrayList<>();
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        FileUtils.listFiles(file, fileList);
-                    } else {
-                        fileList.add(file);
-                    }
-                }
-
-                // sort the file list
-                fileList.sort(Comparator.comparing(File::getName));
-
-                // import them all
-                List<File> successfullyAddedFiles = importFiles(fileList);
-
-                // check to see if the actions can be enabled
-                setActionsEnabled(!successfullyAddedFiles.isEmpty());
-
-                // check for new genres
-                if (Moose.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES)) {
-                    songController.checkForNewGenres(successfullyAddedFiles);
-                }
-
-                // update graphics
-                setLoading(false);
-
-                return null;    // don't return anything since we're just playing with threads
-            }
-        };
-    }
-
-    /**
-     * Returns the autotag swing worker, so I can use it multiple times
-     * @return an autotag swing worker
-     */
-    private SwingWorker<Void, Void> getAutotagSwingWorker() {
-        setLoading(true);
-        // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                // do the autotagging
-                autoTag(table.getSelectedRows());
-
-                // update graphics
-                setLoading(false);
-
-                return null;    // don't return anything since we're just playing with threads
-            }
-        };
-    }
-
-    /**
-     * Returns the save tracks swing worker, so I can use it multiple times
-     * @return a save tracks swing worker
-     */
-    private SwingWorker<Void, Void> getSaveTracksSwingWorker(int[] selectedRows) {
-        setLoading(true);
-        // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                // do the save
-                songController.saveTracks(selectedRows);
-
-                // update graphics
-                setLoading(false);
-
-                return null;    // don't return anything since we're just playing with threads
-            }
-        };
-    }
-
-    /**
-     * Returns the open tracks swing worker, so I can use it multiple times
-     * @return an open tracks swing worker
-     */
-    private SwingWorker<Void, Void> getOpenTracksSwingWorker(int[] selectedRows) {
-        setLoading(true);
-        // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                // do the open/play
-                songController.playFiles(selectedRows);
-
-                // update graphics
-                setLoading(false);
-
-                return null;    // don't return anything since we're just playing with threads
-            }
-        };
-    }
-
-    /**
-     * Returns the track/disk number swing worker, so I can use it multiple times
-     * @return a track/disk number swing worker
-     */
-    private SwingWorker<Void, Void> getTrackDiskNumberSwingWorker() {
-        setLoading(true);
-        // make a swing worker do the file import in a separate thread, so I can update the GUI
-        return new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() {
-                // add track numbers and disk numbers
-                songController.autoAddTrackAndDiskNumbers(table.getSelectedRows());
-                updateMultiplePanelFields();
-
-                // update graphics
-                setLoading(false);
-
-                return null;    // don't return anything since we're just playing with threads
-            }
-        };
     }
 
     /**
@@ -1322,7 +1194,7 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("unused") // for the evt
     private void saveTrackMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTrackMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
-            getSaveTracksSwingWorker(table.getSelectedRows()).execute();
+            ViewUtils.getSaveTracksSwingWorker(table.getSelectedRows()).execute();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -1334,7 +1206,7 @@ public class Frame extends javax.swing.JFrame {
      */
     @SuppressWarnings("unused") // for the evt
     private void saveAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllMenuItemActionPerformed
-        getSaveTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
+        ViewUtils.getSaveTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
     }//GEN-LAST:event_saveAllMenuItemActionPerformed
 
     /**
@@ -1394,23 +1266,11 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("unused") // for the evt
     private void autoTagMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTagMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
-            getAutotagSwingWorker().execute();
+            ViewUtils.getAutotagSwingWorker(table.getSelectedRows()).execute();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_autoTagMenuItemActionPerformed
-
-    /**
-     * Actually does the auto tag call
-     * @param selectedRows the rows to auto tag
-     */
-    public void autoTag(int[] selectedRows) {
-        if (table.isEditing()) {
-            table.getCellEditor().stopCellEditing();
-        }
-        songController.autoTagFiles(selectedRows);
-        updateMultiplePanelFields();
-    }
 
     /**
      * Action for the Add Covers menu item, auto adds the covers
@@ -1481,7 +1341,7 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("unused") // for the evt
     private void addTrackNumbersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrackNumbersMenuItemActionPerformed
         if (table.getSelectedRows().length > 0) {
-            getTrackDiskNumberSwingWorker().execute();
+            ViewUtils.getTrackDiskNumberSwingWorker(table.getSelectedRows()).execute();
         } else {
             JOptionPane.showMessageDialog(this, "No rows selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
@@ -1590,7 +1450,7 @@ public class Frame extends javax.swing.JFrame {
      */
     @SuppressWarnings("unused") // for the evt
     private void saveAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAllButtonActionPerformed
-        getSaveTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
+        ViewUtils.getSaveTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
     }//GEN-LAST:event_saveAllButtonActionPerformed
 
     /**
@@ -1634,7 +1494,7 @@ public class Frame extends javax.swing.JFrame {
      */
     @SuppressWarnings("unused") // for the evt
     private void openAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAllButtonActionPerformed
-        getOpenTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
+        ViewUtils.getOpenTracksSwingWorker(IntStream.range(0, table.getRowCount()).toArray()).execute();
     }//GEN-LAST:event_openAllButtonActionPerformed
     // </editor-fold>
 
@@ -2321,7 +2181,7 @@ public class Frame extends javax.swing.JFrame {
      * Enables/Disables the actions based on the row selection
      * @param enabled, the boolean to set the fields enabled
      */
-    private void setActionsEnabled(boolean enabled) {
+    public void setActionsEnabled(boolean enabled) {
         autoTagMenuItem.setEnabled(Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING) && enabled);
         addCoversMenuItem.setEnabled(enabled);
         findAndReplaceMenuItem.setEnabled(enabled);
