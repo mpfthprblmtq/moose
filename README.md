@@ -6,9 +6,9 @@ A music management system capable of reading and modifying dynamic id3 tags.
 
 [View project on GitHub](https://www.github.com/mpfthprblmtq/moose)
 
-[View Backlog (GitHub Project)](https://github.com/mpfthprblmtq/moose/projects/1)
+[View Backlog (GitHub Project)](https://github.com/users/mpfthprblmtq/projects/2/views/1)
 
-[Download pkg file (OSX)](https://www.prblmtq.com/projects/moose/download)
+[Download pkg file (OSX)](https://www.prblmtq.com/portfolio/app/moose/)
 
 Compatible with:
 * OS X (Mac)
