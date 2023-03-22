@@ -1,16 +1,15 @@
 /*
-   Proj:   Moose
-   File:   Main.java
-   Desc:   Class that controls everything
-
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   Main.java
+ *  Desc:   Entry point for the application, controls all the frames throughout the app and serves as the host
+ *          for most of the application support objects (settings, logger, etc.).
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose;
 
-import java.io.File;
-
+// imports
 import com.mpfthprblmtq.commons.logger.Logger;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.controllers.SongController;
@@ -18,22 +17,29 @@ import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.views.modals.AuditFrame;
 import com.mpfthprblmtq.moose.views.Frame;
 import com.mpfthprblmtq.moose.views.modals.SettingsFrame;
+import lombok.Getter;
 
-import javax.swing.*;
+import java.io.File;
 
-// class Main
+// class Moose
 public class Moose {
     
     // create and instantiate the frames
+    @Getter
     public static Frame frame;
+    @Getter
     public static SettingsFrame settingsFrame;
+    @Getter
     public static AuditFrame auditFrame;
 
     // logger object
+    @Getter
     public static Logger logger;
 
     // controllers
+    @Getter
     public static SongController songController;
+    @Getter
     public static SettingsController settingsController;
 
     /**
@@ -41,36 +47,36 @@ public class Moose {
      * @param args, the entry arguments
      */
     public static void main(String[] args) {
-        // instantiate the settings object so we can have some log/settings files
-        settingsController = new SettingsController();
-        settingsFrame = new SettingsFrame(settingsController);
-        
-        // instantiate the logger object so we can have some logging
-        // TODO make sure this works
-        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
-        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
 
-        // instantiate the main song controller object
-        songController = new SongController();
-        
+        // initialize settings
+        initSettings();
+
         // go
         launchFrame();
-//        launchFrame(new File("/Users/mpfthprblmtq/Music/Library - For Testing/bitbirb/Singles/Future Bass"));
     }
 
     /**
-     * @return the songController
+     * Helper method that initializes settings for the application. Sets up the logger, sets up the support directory,
+     * and loads up the application settings.
      */
-    public static SongController getSongController() {
-        return songController;
-    }
+    private static void initSettings() {
+        // instantiate the logger object, so we can have some logging
+//        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
+//        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
+        // uncomment this line below and comment the two lines above to keep logging in the console for development
+        logger = new Logger();
 
-    /**
-     * Returns the logger object
-     * @return the logger object
-     */
-    public static Logger getLogger() {
-        return logger;
+        // instantiate the settings object, so we can have some log/settings files
+        settingsController = new SettingsController();
+
+        // set up support directory if it's not set up already
+        settingsController.setUpSupportDirectory();
+
+        // initially load the settings
+        settingsController.readSettingsFile();
+
+        // create the frame now that we have our settings
+        settingsFrame = new SettingsFrame();
     }
     
     /**
@@ -82,15 +88,7 @@ public class Moose {
     }
 
     /**
-     * Returns the settings controller
-     * @return the settings controller
-     */
-    public static SettingsController getSettingsController() {
-        return settingsController;
-    }
-
-    /**
-     * Sends a command to update the settings file with the settings object
+     * Sends a command to update the settings file with the settings object we pass in
      * @param settings the new settings to write
      */
     public static boolean updateSettings(Settings settings) {
@@ -98,15 +96,14 @@ public class Moose {
     }
 
     /**
-     * Sends a command to update the seetings file with the settings we already have
+     * Sends a command to update the settings file with the settings object in the SettingsController
      */
     public static void updateSettings() {
         settingsController.writeSettingsFile(getSettings());
     }
 
     /**
-     * MainUI
-     * Controls the Frame opening
+     * Launches a new blank Frame
      */
     public static void launchFrame() {
         songController = new SongController();
@@ -116,8 +113,8 @@ public class Moose {
     }
     
     /**
-     * Controls the Frame opening
-     * @param dir, the directory to launch with pre-populated in the table
+     * Launches a new Frame with an album preloaded
+     * @param dir the directory to launch with pre-populated in the table
      */
     public static void launchFrame(File dir) {
         songController = new SongController();
@@ -127,22 +124,7 @@ public class Moose {
     }
 
     /**
-     * Returns the main frame
-     */
-    public static Frame getFrame() {
-        return frame;
-    }
-
-    /**
-     * Returns the main frame table
-     * @return the JTable on the Frame
-     */
-    public static JTable getTable() {
-        return frame.table;
-    }
-
-    /**
-     * Controls the SettingsFrame opening and closing
+     * Launches a new SettingsFrame
      */
     public static void launchSettingsFrame() {
         settingsFrame.setLocationRelativeTo(null);
@@ -150,19 +132,11 @@ public class Moose {
     }
     
     /**
-     * Controls the AuditFrame opening and closing
+     * Launches a new AuditFrame
      */
     public static void launchAuditFrame() {
-        auditFrame = new AuditFrame(frame, frame.songController);
+        auditFrame = new AuditFrame();
         auditFrame.setLocation(frame.getX() + frame.getWidth() + 20, frame.getY());
         auditFrame.setVisible(true);
     }
-
-    /**
-     * Returns the auditFrame
-     */
-    public static AuditFrame getAuditFrame() {
-        return auditFrame;
-    }
-
 }

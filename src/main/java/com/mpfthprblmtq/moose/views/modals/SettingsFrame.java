@@ -1,13 +1,12 @@
 /*
-   Proj:   Moose
-   File:   SettingsFrame.java
-   Desc:   Main UI class for the JFrame containing the settings and options.
-           Works with the SettingsController to load and update settings, this class just handles all the UI.
-
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   SettingsFrame.java
+ *  Desc:   Main UI class for the JFrame containing the settings and options.
+ *          Works with the SettingsController to load and update settings, this class just handles all the UI.
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.views.modals;
 
 // imports
@@ -32,6 +31,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 // class SettingsFrame
+@SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
 public class SettingsFrame extends javax.swing.JFrame {
 
     // controller
@@ -64,18 +64,12 @@ public class SettingsFrame extends javax.swing.JFrame {
     /**
      * Creates new form SettingsFrame
      */
-    public SettingsFrame(SettingsController sc) {
+    public SettingsFrame() {
         // set field
-        this.settingsController = sc;
-
-        // set up support directory if it's not set up already
-        settingsController.setUpSupportDirectory();
-
-        // initially load the settings
-        settingsController.readSettingsFile();
+        this.settingsController = Moose.getSettingsController();
 
         // set the temp settings with the actual settings
-        settings = settingsController.getSettings();
+        settings = this.settingsController.getSettings();
 
         // init the components
         initComponents();
@@ -785,430 +779,13 @@ public class SettingsFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * Event for addButton
-     * Checks if you're adding a new value or editing an existing value
-     *
-     * @param evt
+     * Event for the Restore Defaults button
+     * @param evt the ActionEvent (not used, but here because Netbeans)
      */
-    private void addGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGenreButtonActionPerformed
-        if (addGenreButton.getText().equals("Add")) {
-            addGenreToList(genreTextField.getText());
-        } else if (addGenreButton.getText().equals("Submit")) {
-            submitGenreChange(genreList.getSelectedValue(), genreTextField.getText());
-            genreList.clearSelection();
-            addGenreButton.setText("Add");
-            deleteGenreButton.setEnabled(false);
-            cancelButton.setEnabled(false);
-            genreTextField.setText(StringUtils.EMPTY);
-        }
-    }//GEN-LAST:event_addGenreButtonActionPerformed
-
-    /**
-     * Event for deleteButton
-     *
-     * @param evt, the event
-     */
-    private void deleteGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteGenreButtonActionPerformed
-        removeGenreFromList(genreTextField.getText());
-    }//GEN-LAST:event_deleteGenreButtonActionPerformed
-
-    private void genreTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_genreTextFieldKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            addGenreToList(genreTextField.getText());
-        }
-    }//GEN-LAST:event_genreTextFieldKeyPressed
-
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        genreList.clearSelection();
-        addGenreButton.setText("Add");
-        deleteGenreButton.setEnabled(false);
-        cancelButton.setEnabled(false);
-        genreTextField.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_cancelButtonActionPerformed
-
-    /**
-     * Event for the JList click
-     * Sets the value of the text field and changes the button text to reflect the current action
-     *
-     * @param evt, the event
-     */
-    private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
-        addGenreButton.setText("Submit");
-        deleteGenreButton.setEnabled(true);
-        cancelButton.setEnabled(true);
-        genreTextField.setText(genreList.getSelectedValue()
-                .replace(HTML_PREFIX, StringUtils.EMPTY)
-                .replace(HTML_SUFFIX, StringUtils.EMPTY));
-    }//GEN-LAST:event_genreListMouseClicked
-
-    /**
-     * Event for the debuggingMode checkbox
-     *
-     * @param evt, the event
-     */
-    private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
-        if (!debugEdited) {
-            debugCheckBox.setForeground(Constants.GREEN);
-        } else {
-            debugCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.setInDebugMode(debugCheckBox.isSelected());
-        debugEdited = !debugEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_debugCheckBoxActionPerformed
-
-    /**
-     * Event for the developerMode checkbox
-     *
-     * @param evt, the event
-     */
-    private void developerModeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_developerModeCheckBoxActionPerformed
-        if (!developerModeEdited) {
-            developerModeCheckBox.setForeground(Constants.GREEN);
-        } else {
-            developerModeCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.setInDeveloperMode(developerModeCheckBox.isSelected());
-        developerModeEdited = !developerModeEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_developerModeCheckBoxActionPerformed
-
-    /**
-     * Event for the open eventlog button
-     *
-     * @param evt, the event
-     */
-    private void openEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openEventLogButtonActionPerformed
-        settingsController.openEventLog();
-    }//GEN-LAST:event_openEventLogButtonActionPerformed
-
-    /**
-     * Event for the open errorlog button
-     *
-     * @param evt, the event
-     */
-    private void openErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openErrorLogButtonActionPerformed
-        settingsController.openErrorLog();
-    }//GEN-LAST:event_openErrorLogButtonActionPerformed
-
-    /**
-     * Event for the clear eventlog button
-     *
-     * @param evt, the event
-     */
-    private void clearEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearEventLogButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to clear the event log?",
-                "Confirm Clear",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (returnVal == 0) {
-            settingsController.clearEventLog();
-        }
-    }//GEN-LAST:event_clearEventLogButtonActionPerformed
-
-    /**
-     * Event for the clear errorlog button
-     *
-     * @param evt, the event
-     */
-    private void clearErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearErrorLogButtonActionPerformed
-        int returnVal = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to clear the error log?",
-                "Confirm Clear",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-        if (returnVal == 0) {
-            settingsController.clearErrorLog();
-        }
-    }//GEN-LAST:event_clearErrorLogButtonActionPerformed
-
-    /**
-     * Event for the browse button on the files tab
-     *
-     * @param evt, the event
-     */
-    private void libraryBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_libraryBrowseButtonActionPerformed
-        // get the folder through a JFileChooser
-        File dir = Objects.requireNonNull(FileUtils.launchJFileChooser(
-                "Choose the directory you want to store music in...",
-                "Select",
-                JFileChooser.DIRECTORIES_ONLY,
-                false,
-                null,
-                null))[0];
-        if (dir != null) {
-            String originalLibraryLocation = settings.getLibraryLocation();
-            settings.setLibraryLocation(dir.getAbsolutePath() + "/");
-            if (!originalLibraryLocation.equals(settings.getLibraryLocation())) {
-                libraryLocationField.setForeground(Constants.GREEN);
-                libraryLocationField.setText(settings.getLibraryLocation());
-            }
-            statusLabel.setText(StringUtils.EMPTY);
-        }
-    }//GEN-LAST:event_libraryBrowseButtonActionPerformed
-
-    private void appSupportOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appSupportOpenButtonActionPerformed
-        try {
-            FileUtils.openFile(new File(settingsController.getSettings().getApplicationSupportLocation()));
-        } catch (Exception e) {
-            logger.logError("Couldn't open file!", e);
-        }
-
-    }//GEN-LAST:event_appSupportOpenButtonActionPerformed
-
-    private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
-        int originalValue = Moose.getSettings().getPreferredCoverArtSize();
-        if (!preferredCoverArtSizeSpinner.getValue().equals(originalValue)) {
-            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
-            c.setForeground(Constants.GREEN);
-            settings.setPreferredCoverArtSize((Integer) preferredCoverArtSizeSpinner.getValue());
-        } else {
-            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
-            c.setForeground(Constants.BLACK);
-        }
-    }//GEN-LAST:event_preferredCoverArtSizeSpinnerStateChanged
-
-    /**
-     * Event for the default button
-     *
-     * @param evt, the event
-     */
+    @SuppressWarnings("unused") // for the evt
     private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
         defaultSettings();
     }//GEN-LAST:event_defaultButtonActionPerformed
-
-    /**
-     * Event for the save button
-     *
-     * @param evt, the event
-     */
-    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        if (Moose.updateSettings(settings)) {
-            statusLabel.setForeground(Constants.GREEN);
-            statusLabel.setText("Settings saved!");
-            resetUI();
-            settings = Moose.getSettings();
-        } else {
-            statusLabel.setForeground(Constants.RED);
-            statusLabel.setText("Problem updating Settings...");
-        }
-    }//GEN-LAST:event_saveButtonActionPerformed
-
-    private void autoTaggingCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTaggingCheckBoxActionPerformed
-        if (!autoTaggingEdited) {
-            autoTaggingCheckBox.setForeground(Constants.GREEN);
-        } else {
-            autoTaggingCheckBox.setForeground(Constants.BLACK);
-        }
-        // set the other autotagging fields based on the current value of the auto tagging checkbox
-        if (autoTaggingCheckBox.isSelected()) {
-            removeCommentCheckBox.setEnabled(true);
-            autoCoverArtSpotifyCheckBox.setEnabled(true);
-        } else {
-            settings.getFeatures().put(Settings.REMOVE_COMMENT_ON_AUTOTAGGING, false);
-            settings.getFeatures().put(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY, false);
-            removeCommentCheckBox.setEnabled(false);
-            autoCoverArtSpotifyCheckBox.setEnabled(false);
-        }
-        settings.getFeatures().put(Settings.AUTOTAGGING, autoTaggingCheckBox.isSelected());
-        autoTaggingEdited = !autoTaggingEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_autoTaggingCheckBoxActionPerformed
-
-    private void removeCommentCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeCommentCheckBoxActionPerformed
-        if (!removeCommentEdited) {
-            removeCommentCheckBox.setForeground(Constants.GREEN);
-        } else {
-            removeCommentCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.REMOVE_COMMENT_ON_AUTOTAGGING, removeCommentCheckBox.isSelected());
-        removeCommentEdited = !removeCommentEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_removeCommentCheckBoxActionPerformed
-
-    private void autoCoverArtSpotifyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoCoverArtSpotifyCheckBoxActionPerformed
-        if (!autoCoverArtSpotifyEdited) {
-            autoCoverArtSpotifyCheckBox.setForeground(Constants.GREEN);
-        } else {
-            autoCoverArtSpotifyCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY, autoCoverArtSpotifyCheckBox.isSelected());
-        autoCoverArtSpotifyEdited = !autoCoverArtSpotifyEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_autoCoverArtSpotifyCheckBoxActionPerformed
-
-    private void formatFilenamesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesCheckBoxActionPerformed
-        if (!formatFilenamesEdited) {
-            formatFilenamesCheckBox.setForeground(Constants.GREEN);
-        } else {
-            formatFilenamesCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.FORMAT_FILENAMES, formatFilenamesCheckBox.isSelected());
-        formatFilenamesEdited = !formatFilenamesEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_formatFilenamesCheckBoxActionPerformed
-
-    private void genreCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genreCheckBoxActionPerformed
-        if (!checkForNewGenresEdited) {
-            genreCheckBox.setForeground(Constants.GREEN);
-        } else {
-            genreCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.CHECK_FOR_NEW_GENRES, genreCheckBox.isSelected());
-        checkForNewGenresEdited = !checkForNewGenresEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_genreCheckBoxActionPerformed
-
-    private void albumArtFinderCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_albumArtFinderCheckBoxActionPerformed
-        if (!albumArtFinderEdited) {
-            albumArtFinderCheckBox.setForeground(Constants.GREEN);
-        } else {
-            albumArtFinderCheckBox.setForeground(Constants.BLACK);
-        }
-        settings.getFeatures().put(Settings.ALBUM_ART_FINDER, albumArtFinderCheckBox.isSelected());
-        albumArtFinderEdited = !albumArtFinderEdited;
-        statusLabel.setText(StringUtils.EMPTY);
-    }//GEN-LAST:event_albumArtFinderCheckBoxActionPerformed
-
-    private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyReleased
-        String originalValue = settingsController.getSettings().getAlbumArtFinderCseId();
-        if (!originalValue.equals(cseTextField.getText())) {
-            cseTextField.setForeground(Constants.GREEN);
-            settings.setAlbumArtFinderCseId(cseTextField.getText());
-        }
-    }//GEN-LAST:event_cseTextFieldKeyReleased
-
-    private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyReleased
-        String originalValue = settingsController.getSettings().getAlbumArtFinderApiKey();
-        if (!originalValue.equals(apiKeyTextField.getText())) {
-            apiKeyTextField.setForeground(Constants.GREEN);
-            settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
-        }
-    }//GEN-LAST:event_apiKeyTextFieldKeyReleased
-
-    private void spotifyClientIdTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyClientIdTextFieldKeyReleased
-        String originalValue = settingsController.getSettings().getSpotifyClientId();
-        if (!originalValue.equals(spotifyClientIdTextField.getText())) {
-            spotifyClientIdTextField.setForeground(Constants.GREEN);
-            settings.setSpotifyClientId(spotifyClientIdTextField.getText());
-        }
-    }//GEN-LAST:event_spotifyClientIdTextFieldKeyReleased
-
-    private void spotifyClientSecretTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyClientSecretTextFieldKeyReleased
-        String originalValue = settingsController.getSettings().getSpotifyClientSecret();
-        if (!originalValue.equals(spotifyClientSecretTextField.getText())) {
-            spotifyClientSecretTextField.setForeground(Constants.GREEN);
-            settings.setSpotifyClientSecret(spotifyClientSecretTextField.getText());
-        }
-    }//GEN-LAST:event_spotifyClientSecretTextFieldKeyReleased
-
-    /**
-     * Gets the list of genres and fill a DefaultListModel for the view
-     *
-     * @return the listModel for the JList
-     */
-    public DefaultListModel<String> getGenreListModel() {
-        genreListModel.removeAllElements();
-        if (settingsController.getSettings().getGenres() != null) {
-            for (int i = 0; i < settingsController.getSettings().getGenres().size(); i++) {
-                genreListModel.add(i, settingsController.getSettings().getGenres().get(i));
-            }
-            return genreListModel;
-        } else {
-            return new DefaultListModel<>();
-        }
-    }
-
-    /**
-     * Populates the times used today field
-     * Checks to see if the date matches today, to set the counter back to 0
-     *
-     * @return the times used today
-     */
-    public String populateTimesUsedTodayField() {
-        try {
-            Date lastUsed = DateUtils.getSimpleDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
-            lastUsed = lastUsed == null ? new Date() : lastUsed;
-
-            // check to see if date in settings is today
-            if (!DateUtils.isDateSameAsToday(lastUsed)) {
-                // date was not today, set the times used today to 0
-                this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
-                this.settingsController.writeSettingsFile(settings);
-            }
-
-            return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
-                    .concat("/")
-                    .concat(String.valueOf(Constants.IMAGE_LIMIT));
-        } catch (ParseException e) {
-            logger.logError("Couldn't parse date: " + this.settingsController.getSettings().getAlbumArtFinderSearchCountDate(), e);
-            return null;
-        }
-    }
-
-    /**
-     * Adds the genre to the ivar list and the JList model
-     *
-     * @param genre the genre to add
-     */
-    public void addGenreToList(String genre) {
-        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY)) {
-            settings.getGenres().add(genre);
-            genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
-            genreTextField.setText(StringUtils.EMPTY);
-            statusLabel.setText(StringUtils.EMPTY);
-        }
-    }
-
-    /**
-     * Removes the genre from the ivar list and the JList model
-     *
-     * @param genre, the genre to remove
-     */
-    public void removeGenreFromList(String genre) {
-        if (!genreListModel.removeElement(genre)) {
-            JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            settings.getGenres().remove(genre);
-            genreTextField.setText(StringUtils.EMPTY);
-            addGenreButton.setText("Add");
-            deleteGenreButton.setEnabled(false);
-            cancelButton.setEnabled(false);
-            statusLabel.setText(StringUtils.EMPTY);
-            genreStatusLabel.setForeground(Constants.GREEN);
-            genresDeleted++;
-            genreStatusLabel.setText(genresDeleted + " genre(s) deleted!");
-        }
-    }
-
-    /**
-     * Submits the change in the list and in the arraylist
-     *
-     * @param oldGenre, the old genre to update
-     * @param newGenre, the new value of the genre
-     */
-    public void submitGenreChange(String oldGenre, String newGenre) {
-
-        // the alreadyEdited mess is to check if the list entry was edited already, so I need to worry about the
-        // html tags showing up or not, since I need to index the array based on the value
-        // just don't worry about it, it works lol
-        boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
-        if (alreadyEdited) {
-            String oldGenre_withoutHtml = oldGenre
-                    .replace(HTML_PREFIX, StringUtils.EMPTY)
-                    .replace(HTML_SUFFIX, StringUtils.EMPTY);
-            genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
-            oldGenre = oldGenre_withoutHtml;
-        }
-
-        settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
-        newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
-        genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
-        statusLabel.setText(StringUtils.EMPTY);
-    }
 
     /**
      * Method that runs the default action on the settings based on what the user wants to do
@@ -1299,6 +876,532 @@ public class SettingsFrame extends javax.swing.JFrame {
             resetUI();
         }
     }
+
+    /**
+     * Event for the Save Settings button
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        if (Moose.updateSettings(settings)) {
+            statusLabel.setForeground(Constants.GREEN);
+            statusLabel.setText("Settings saved!");
+            resetUI();
+            settings = Moose.getSettings();
+        } else {
+            statusLabel.setForeground(Constants.RED);
+            statusLabel.setText("Problem updating Settings...");
+        }
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  GENRE TAB
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="GENRE TAB">
+
+    /**
+     * Event for addButton
+     * Checks if you're adding a new value or editing an existing value
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void addGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGenreButtonActionPerformed
+        if (addGenreButton.getText().equals("Add")) {
+            addGenreToList(genreTextField.getText());
+        } else if (addGenreButton.getText().equals("Submit")) {
+            submitGenreChange(genreList.getSelectedValue(), genreTextField.getText());
+            genreList.clearSelection();
+            addGenreButton.setText("Add");
+            deleteGenreButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            genreTextField.setText(StringUtils.EMPTY);
+        }
+    }//GEN-LAST:event_addGenreButtonActionPerformed
+
+    /**
+     * Handles event for deleting a genre
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void deleteGenreButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteGenreButtonActionPerformed
+        removeGenreFromList(genreTextField.getText());
+    }//GEN-LAST:event_deleteGenreButtonActionPerformed
+
+    /**
+     * Handles the event for when a key is pressed in the genre text field
+     * @param evt the event to check
+     */
+    private void genreTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_genreTextFieldKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            addGenreToList(genreTextField.getText());
+        }
+    }//GEN-LAST:event_genreTextFieldKeyPressed
+
+    /**
+     * Handles the event for when cancel button is pressed on the genre tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        genreList.clearSelection();
+        addGenreButton.setText("Add");
+        deleteGenreButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        genreTextField.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    /**
+     * Event for the genre JList click
+     * Sets the value of the text field and changes the button text to reflect the current action
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void genreListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_genreListMouseClicked
+        addGenreButton.setText("Submit");
+        deleteGenreButton.setEnabled(true);
+        cancelButton.setEnabled(true);
+        genreTextField.setText(genreList.getSelectedValue()
+                .replace(HTML_PREFIX, StringUtils.EMPTY)
+                .replace(HTML_SUFFIX, StringUtils.EMPTY));
+    }//GEN-LAST:event_genreListMouseClicked
+
+    /**
+     * Gets the list of genres and fill a DefaultListModel for the view
+     * @return the listModel for the JList
+     */
+    public DefaultListModel<String> getGenreListModel() {
+        genreListModel.removeAllElements();
+        if (settingsController.getSettings().getGenres() != null) {
+            for (int i = 0; i < settingsController.getSettings().getGenres().size(); i++) {
+                genreListModel.add(i, settingsController.getSettings().getGenres().get(i));
+            }
+            return genreListModel;
+        } else {
+            return new DefaultListModel<>();
+        }
+    }
+
+    /**
+     * Adds the genre to the ivar list and the JList model
+     * @param genre the genre to add
+     */
+    public void addGenreToList(String genre) {
+        if (!settings.getGenres().contains(genre) && !genreTextField.getText().equals(StringUtils.EMPTY)) {
+            settings.getGenres().add(genre);
+            genreListModel.add(genreListModel.size(), "<html><b><i>" + genre + "</i></b></html>");
+            genreTextField.setText(StringUtils.EMPTY);
+            statusLabel.setText(StringUtils.EMPTY);
+        }
+    }
+
+    /**
+     * Removes the genre from the field list and the JList model
+     * @param genre the genre to remove
+     */
+    public void removeGenreFromList(String genre) {
+        if (!genreListModel.removeElement(genre)) {
+            JOptionPane.showMessageDialog(null, "Element was not in list!", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            settings.getGenres().remove(genre);
+            genreTextField.setText(StringUtils.EMPTY);
+            addGenreButton.setText("Add");
+            deleteGenreButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            statusLabel.setText(StringUtils.EMPTY);
+            genreStatusLabel.setForeground(Constants.GREEN);
+            genresDeleted++;
+            genreStatusLabel.setText(genresDeleted + " genre(s) deleted!");
+        }
+    }
+
+    /**
+     * Submits the change in the list and in the arraylist
+     * @param oldGenre the old genre to update
+     * @param newGenre the new value of the genre
+     */
+    public void submitGenreChange(String oldGenre, String newGenre) {
+
+        // the alreadyEdited mess is to check if the list entry was edited already, so I need to worry about the
+        // html tags showing up or not, since I need to index the array based on the value
+        // just don't worry about it, it works lol
+        boolean alreadyEdited = oldGenre.contains(HTML_PREFIX) && oldGenre.contains(HTML_SUFFIX);
+        if (alreadyEdited) {
+            String oldGenre_withoutHtml = oldGenre
+                    .replace(HTML_PREFIX, StringUtils.EMPTY)
+                    .replace(HTML_SUFFIX, StringUtils.EMPTY);
+            genreListModel.set(genreListModel.indexOf(oldGenre), oldGenre_withoutHtml);
+            oldGenre = oldGenre_withoutHtml;
+        }
+
+        settings.getGenres().set(settings.getGenres().indexOf(oldGenre), newGenre);
+        newGenre = HTML_PREFIX.concat(newGenre).concat(HTML_SUFFIX);
+        genreListModel.set(genreListModel.indexOf(oldGenre), newGenre);
+        statusLabel.setText(StringUtils.EMPTY);
+    }
+
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  LOGGING TAB
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="LOGGING TAB">
+
+    /**
+     * Event for the debuggingMode checkbox on the logging tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void debugCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugCheckBoxActionPerformed
+        if (!debugEdited) {
+            debugCheckBox.setForeground(Constants.GREEN);
+        } else {
+            debugCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.setInDebugMode(debugCheckBox.isSelected());
+        debugEdited = !debugEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_debugCheckBoxActionPerformed
+
+    /**
+     * Event for the developerMode checkbox
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void developerModeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_developerModeCheckBoxActionPerformed
+        if (!developerModeEdited) {
+            developerModeCheckBox.setForeground(Constants.GREEN);
+        } else {
+            developerModeCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.setInDeveloperMode(developerModeCheckBox.isSelected());
+        developerModeEdited = !developerModeEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_developerModeCheckBoxActionPerformed
+
+    /**
+     * Event for the open eventLog button on the logging tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void openEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openEventLogButtonActionPerformed
+        settingsController.openEventLog();
+    }//GEN-LAST:event_openEventLogButtonActionPerformed
+
+    /**
+     * Event for the open errorLog button on the logging tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void openErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openErrorLogButtonActionPerformed
+        settingsController.openErrorLog();
+    }//GEN-LAST:event_openErrorLogButtonActionPerformed
+
+    /**
+     * Event for the clear eventLog button on the logging tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void clearEventLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearEventLogButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to clear the event log?",
+                "Confirm Clear",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (returnVal == 0) {
+            settingsController.clearEventLog();
+        }
+    }//GEN-LAST:event_clearEventLogButtonActionPerformed
+
+    /**
+     * Event for the clear errorLog button on the logging tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void clearErrorLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearErrorLogButtonActionPerformed
+        int returnVal = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to clear the error log?",
+                "Confirm Clear",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (returnVal == 0) {
+            settingsController.clearErrorLog();
+        }
+    }//GEN-LAST:event_clearErrorLogButtonActionPerformed
+
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  FILES TAB
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="FILES TAB">
+
+    /**
+     * Event for the browse button on the files tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void libraryBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_libraryBrowseButtonActionPerformed
+        // get the folder through a JFileChooser
+        File dir = Objects.requireNonNull(FileUtils.launchJFileChooser(
+                "Choose the directory you want to store music in...",
+                "Select",
+                JFileChooser.DIRECTORIES_ONLY,
+                false,
+                null,
+                null))[0];
+        if (dir != null) {
+            String originalLibraryLocation = settings.getLibraryLocation();
+            settings.setLibraryLocation(dir.getAbsolutePath() + "/");
+            if (!originalLibraryLocation.equals(settings.getLibraryLocation())) {
+                libraryLocationField.setForeground(Constants.GREEN);
+                libraryLocationField.setText(settings.getLibraryLocation());
+            }
+            statusLabel.setText(StringUtils.EMPTY);
+        }
+    }//GEN-LAST:event_libraryBrowseButtonActionPerformed
+
+    /**
+     * Handles the open support directory button on the files tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void appSupportOpenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_appSupportOpenButtonActionPerformed
+        try {
+            FileUtils.openFile(new File(settingsController.getSettings().getApplicationSupportLocation()));
+        } catch (Exception e) {
+            logger.logError("Couldn't open file!", e);
+        }
+
+    }//GEN-LAST:event_appSupportOpenButtonActionPerformed
+
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  API CONFIG TAB
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="API CONFIG TAB">
+
+    /**
+     * Handles the preferred image size spinner change on the API Config tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void preferredCoverArtSizeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_preferredCoverArtSizeSpinnerStateChanged
+        int originalValue = Moose.getSettings().getPreferredCoverArtSize();
+        if (!preferredCoverArtSizeSpinner.getValue().equals(originalValue)) {
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.GREEN);
+            settings.setPreferredCoverArtSize((Integer) preferredCoverArtSizeSpinner.getValue());
+        } else {
+            Component c = preferredCoverArtSizeSpinner.getEditor().getComponent(0);
+            c.setForeground(Constants.BLACK);
+        }
+    }//GEN-LAST:event_preferredCoverArtSizeSpinnerStateChanged
+
+    /**
+     * Handles the key event change for the CSE ID text field on the API config tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void cseTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cseTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getAlbumArtFinderCseId();
+        if (!originalValue.equals(cseTextField.getText())) {
+            cseTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderCseId(cseTextField.getText());
+        }
+    }//GEN-LAST:event_cseTextFieldKeyReleased
+
+    /**
+     * Handles the key event change for the CSE API key text field on the API config tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void apiKeyTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_apiKeyTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getAlbumArtFinderApiKey();
+        if (!originalValue.equals(apiKeyTextField.getText())) {
+            apiKeyTextField.setForeground(Constants.GREEN);
+            settings.setAlbumArtFinderApiKey(apiKeyTextField.getText());
+        }
+    }//GEN-LAST:event_apiKeyTextFieldKeyReleased
+
+    /**
+     * Handles the key event change for the Spotify Client ID text field on the API config tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void spotifyClientIdTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyClientIdTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getSpotifyClientId();
+        if (!originalValue.equals(spotifyClientIdTextField.getText())) {
+            spotifyClientIdTextField.setForeground(Constants.GREEN);
+            settings.setSpotifyClientId(spotifyClientIdTextField.getText());
+        }
+    }//GEN-LAST:event_spotifyClientIdTextFieldKeyReleased
+
+    /**
+     * Handles the key event change for the Spotify Client Secret text field on the API config tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void spotifyClientSecretTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spotifyClientSecretTextFieldKeyReleased
+        String originalValue = settingsController.getSettings().getSpotifyClientSecret();
+        if (!originalValue.equals(spotifyClientSecretTextField.getText())) {
+            spotifyClientSecretTextField.setForeground(Constants.GREEN);
+            settings.setSpotifyClientSecret(spotifyClientSecretTextField.getText());
+        }
+    }//GEN-LAST:event_spotifyClientSecretTextFieldKeyReleased
+
+    /**
+     * Populates the times used today field. Checks to see if the date matches today, to set the counter back to 0
+     * @return the times used today
+     */
+    public String populateTimesUsedTodayField() {
+        try {
+            Date lastUsed = DateUtils.getSimpleDate(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
+            lastUsed = lastUsed == null ? new Date() : lastUsed;
+
+            // check to see if date in settings is today
+            if (!DateUtils.isDateSameAsToday(lastUsed)) {
+                // date was not today, set the times used today to 0
+                this.settingsController.getSettings().setAlbumArtFinderSearchCount(0);
+                this.settingsController.writeSettingsFile(settings);
+            }
+
+            return String.valueOf(this.settingsController.getSettings().getAlbumArtFinderSearchCount())
+                    .concat("/")
+                    .concat(String.valueOf(Constants.IMAGE_LIMIT));
+        } catch (ParseException e) {
+            logger.logError("Couldn't parse date: " + this.settingsController.getSettings().getAlbumArtFinderSearchCountDate(), e);
+            return null;
+        }
+    }
+
+    // </editor-fold>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //  FEATURES TAB
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // <editor-fold defaultstate="collapsed" desc="FEATURES TAB">
+
+    /**
+     * Handles the autotagging checkbox event change on the features tab.  Sets other checkboxes based on if this
+     * checkbox is checked or not.
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void autoTaggingCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoTaggingCheckBoxActionPerformed
+        if (!autoTaggingEdited) {
+            autoTaggingCheckBox.setForeground(Constants.GREEN);
+        } else {
+            autoTaggingCheckBox.setForeground(Constants.BLACK);
+        }
+        // set the other autotagging fields based on the current value of the auto tagging checkbox
+        if (autoTaggingCheckBox.isSelected()) {
+            removeCommentCheckBox.setEnabled(true);
+            autoCoverArtSpotifyCheckBox.setEnabled(true);
+        } else {
+            settings.getFeatures().put(Settings.REMOVE_COMMENT_ON_AUTOTAGGING, false);
+            settings.getFeatures().put(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY, false);
+            removeCommentCheckBox.setEnabled(false);
+            autoCoverArtSpotifyCheckBox.setEnabled(false);
+        }
+        settings.getFeatures().put(Settings.AUTOTAGGING, autoTaggingCheckBox.isSelected());
+        autoTaggingEdited = !autoTaggingEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_autoTaggingCheckBoxActionPerformed
+
+    /**
+     * Handles the remove comment on autotagging checkbox event change on the features tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void removeCommentCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeCommentCheckBoxActionPerformed
+        if (!removeCommentEdited) {
+            removeCommentCheckBox.setForeground(Constants.GREEN);
+        } else {
+            removeCommentCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.getFeatures().put(Settings.REMOVE_COMMENT_ON_AUTOTAGGING, removeCommentCheckBox.isSelected());
+        removeCommentEdited = !removeCommentEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_removeCommentCheckBoxActionPerformed
+
+    /**
+     * Handles the auto add cover art through spotify checkbox event change on the features tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void autoCoverArtSpotifyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoCoverArtSpotifyCheckBoxActionPerformed
+        if (!autoCoverArtSpotifyEdited) {
+            autoCoverArtSpotifyCheckBox.setForeground(Constants.GREEN);
+        } else {
+            autoCoverArtSpotifyCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.getFeatures().put(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY, autoCoverArtSpotifyCheckBox.isSelected());
+        autoCoverArtSpotifyEdited = !autoCoverArtSpotifyEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_autoCoverArtSpotifyCheckBoxActionPerformed
+
+    /**
+     * Handles the format filenames checkbox event change on the features tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void formatFilenamesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatFilenamesCheckBoxActionPerformed
+        if (!formatFilenamesEdited) {
+            formatFilenamesCheckBox.setForeground(Constants.GREEN);
+        } else {
+            formatFilenamesCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.getFeatures().put(Settings.FORMAT_FILENAMES, formatFilenamesCheckBox.isSelected());
+        formatFilenamesEdited = !formatFilenamesEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_formatFilenamesCheckBoxActionPerformed
+
+    /**
+     * Handles the check for new genre checkbox event change on the features tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void genreCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genreCheckBoxActionPerformed
+        if (!checkForNewGenresEdited) {
+            genreCheckBox.setForeground(Constants.GREEN);
+        } else {
+            genreCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.getFeatures().put(Settings.CHECK_FOR_NEW_GENRES, genreCheckBox.isSelected());
+        checkForNewGenresEdited = !checkForNewGenresEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_genreCheckBoxActionPerformed
+
+    /**
+     * Handles the album art finder checkbox event change on the features tab
+     * @param evt the ActionEvent (not used, but here because Netbeans)
+     */
+    @SuppressWarnings("unused") // for the evt
+    private void albumArtFinderCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_albumArtFinderCheckBoxActionPerformed
+        if (!albumArtFinderEdited) {
+            albumArtFinderCheckBox.setForeground(Constants.GREEN);
+        } else {
+            albumArtFinderCheckBox.setForeground(Constants.BLACK);
+        }
+        settings.getFeatures().put(Settings.ALBUM_ART_FINDER, albumArtFinderCheckBox.isSelected());
+        albumArtFinderEdited = !albumArtFinderEdited;
+        statusLabel.setText(StringUtils.EMPTY);
+    }//GEN-LAST:event_albumArtFinderCheckBoxActionPerformed
+
+    // </editor-fold>
 
     /**
      * Resets the UI on a successful settings save

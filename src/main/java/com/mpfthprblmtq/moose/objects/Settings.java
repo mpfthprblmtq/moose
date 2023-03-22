@@ -1,12 +1,11 @@
 /*
-   Proj:   Moose
-   File:   Settings.java
-   Desc:   Pojo for the Settings information
-
-   Copyright Pat Ripley 2018
+ *  Proj:   Moose
+ *  File:   Settings.java
+ *  Desc:   Pojo for the Settings information
+ *
+ *  Copyright Pat Ripley (mpfthprblmtq) 2018-2023
  */
 
-// package
 package com.mpfthprblmtq.moose.objects;
 
 // imports
@@ -14,7 +13,11 @@ import com.mpfthprblmtq.commons.utils.DateUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // class Settings
 @Data
@@ -24,6 +27,7 @@ public class Settings {
     private boolean inDebugMode;
     private boolean inDeveloperMode;
     private boolean askBeforeClearAll;
+    private boolean warnBeforeStartingAudit;
     private List<String> genres;
     private String libraryLocation;
     private String applicationSupportLocation;
@@ -51,6 +55,7 @@ public class Settings {
         setInDebugMode(false);
         setInDeveloperMode(false);
         setAskBeforeClearAll(true);
+        setWarnBeforeStartingAudit(true);
         setGenres(new ArrayList<>());
         setLibraryLocation(StringUtils.EMPTY);
         setPreferredCoverArtSize(640);
@@ -73,6 +78,11 @@ public class Settings {
         setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/moose/");
     }
 
+    /**
+     * Builder pattern method to append a version to a settings object while getting it
+     * @param version the version to set on the Settings object
+     * @return the Settings object with the version
+     */
     public Settings withVersionNumber(String version) {
         this.setVersion(version);
         return this;

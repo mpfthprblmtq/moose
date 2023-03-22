@@ -34,8 +34,8 @@ echo "###############################################################"
 echo "# APP VERSION                                                 #"
 echo "###############################################################"
 echo
-# get the old version using grep from SettingsController.java
-version=$(grep -Eoi '[0-9]+.[0-9]+.[0-9]+' src/main/java/com/mpfthprblmtq/moose/controllers/SettingsController.java)
+# get the version using a grep from SettingsController.java
+version=$(grep -Eoi '[0-9]+\.[0-9]+\.[0-9]+' src/main/java/com/mpfthprblmtq/moose/controllers/SettingsController.java)
 echo "New version number:   ${version}"
 echo
 echo
