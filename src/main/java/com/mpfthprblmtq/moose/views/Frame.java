@@ -490,16 +490,18 @@ public class Frame extends javax.swing.JFrame {
         files.removeAll(toRemove);
 
         // sorts the table on the filename, then the album by default
-        DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
-        ArrayList<RowSorter.SortKey> list = new ArrayList<>();
+        SwingUtilities.invokeLater(() -> {
+            DefaultRowSorter sorter = ((DefaultRowSorter) table.getRowSorter());
+            ArrayList<RowSorter.SortKey> list = new ArrayList<>();
 
-        list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
-        sorter.setSortKeys(list);
-        sorter.sort();
+            list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+            sorter.setSortKeys(list);
+            sorter.sort();
 
-        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
-        sorter.setSortKeys(list);
-        sorter.sort();
+            list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
+            sorter.setSortKeys(list);
+            sorter.sort();
+        });
 
         // update the console with some valid messaging
         if (CollectionUtils.isNotEmpty(files) && CollectionUtils.isEmpty(toRemove) && duplicates == 0) {
@@ -548,21 +550,22 @@ public class Frame extends javax.swing.JFrame {
             Icon thumbnail_icon = ImageUtils.getScaledImage(s.getArtwork_bytes(), 100);
 
             // add the row to the table
-            getModel().addRow(new Object[]{
-                    IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
-                    s.getFile(), // hidden file object
-                    cleanedFileName, // actual editable file name
-                    s.getTitle(),
-                    s.getArtist(),
-                    s.getAlbum(),
-                    s.getAlbumArtist(),
-                    s.getYear(),
-                    s.getGenre(),
-                    s.getFullTrackString(),
-                    s.getFullDiskString(),
-                    thumbnail_icon,
-                    s.getIndex() // hidden index for the song object
-            });
+            SwingUtilities.invokeLater(() ->
+                    getModel().addRow(new Object[]{
+                        IconUtils.get(IconUtils.DEFAULT), // adds the default status icon
+                        s.getFile(), // hidden file object
+                        cleanedFileName, // actual editable file name
+                        s.getTitle(),
+                        s.getArtist(),
+                        s.getAlbum(),
+                        s.getAlbumArtist(),
+                        s.getYear(),
+                        s.getGenre(),
+                        s.getFullTrackString(),
+                        s.getFullDiskString(),
+                        thumbnail_icon,
+                        s.getIndex() // hidden index for the song object
+            }));
 
             // all is well in the world
             return true;
@@ -1978,60 +1981,53 @@ public class Frame extends javax.swing.JFrame {
 
         // get the selected rows
         int[] selectedRows;
-        int rows;
-
-        // REFACTORED
         if (table.getSelectedRows().length != 0) {
             selectedRows = table.getSelectedRows();
-            rows = table.getSelectedRowCount();
         } else {
             enableMultPanel(false);
             return;
         }
 
-        // make the arrays of values
-        String[] titles = new String[rows];
-        String[] artists = new String[rows];
-        String[] albums = new String[rows];
-        String[] albumArtists = new String[rows];
-        String[] genres = new String[rows];
-        String[] years = new String[rows];
-        String[] tracks = new String[rows];
-        String[] disks = new String[rows];
-        byte[][] images = new byte[rows][];
+        // make lists of values
+        List<String> titles = new ArrayList<>();
+        List<String> artists = new ArrayList<>();
+        List<String> albums = new ArrayList<>();
+        List<String> albumArtists = new ArrayList<>();
+        List<String> genres = new ArrayList<>();
+        List<String> years = new ArrayList<>();
+        List<String> tracks = new ArrayList<>();
+        List<String> disks = new ArrayList<>();
+        List<byte[]> images = new ArrayList<>();
 
-        // fill the arrays
-        for (int i = 0; i < selectedRows.length; i++) {
-
-            int row = selectedRows[i];
-
-            titles[i] = table.getValueAt(selectedRows[i], 2).toString();
-            artists[i] = table.getValueAt(selectedRows[i], 3).toString();
-            albums[i] = table.getValueAt(selectedRows[i], 4).toString();
-            albumArtists[i] = table.getValueAt(selectedRows[i], 5).toString();
-            years[i] = table.getValueAt(selectedRows[i], 6).toString();
-            genres[i] = table.getValueAt(selectedRows[i], 7).toString();
-            tracks[i] = table.getValueAt(selectedRows[i], 8).toString();
-            disks[i] = table.getValueAt(selectedRows[i], 9).toString();
-            images[i] = songController.getSongs().get(songController.getIndex(row)).getArtwork_bytes();
+        // fill the lists
+        for (int row : selectedRows) {
+            titles.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_TITLE)));
+            artists.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_ARTIST)));
+            albums.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_ALBUM)));
+            albumArtists.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_ALBUM_ARTIST)));
+            years.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_YEAR)));
+            genres.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_GENRE)));
+            tracks.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_TRACK)));
+            disks.add(StringUtils.validateString(table.getValueAt(row, TABLE_COLUMN_DISK)));
+            images.add(songController.getSongs().get(songController.getIndex(row)).getArtwork_bytes());
         }
 
         // fill the fields
-        multTitle.setText(StringUtils.checkIfSame(titles[0], Arrays.asList(titles)) ? titles[0] : Constants.DASH);
-        multArtist.setText(StringUtils.checkIfSame(artists[0], Arrays.asList(artists)) ? artists[0] : Constants.DASH);
-        multAlbum.setText(StringUtils.checkIfSame(albums[0], Arrays.asList(albums)) ? albums[0] : Constants.DASH);
-        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists[0], Arrays.asList(albumArtists)) ? albumArtists[0] : Constants.DASH);
-        multGenre.setText(StringUtils.checkIfSame(genres[0], Arrays.asList(genres)) ? genres[0] : Constants.DASH);
-        multYear.setText(StringUtils.checkIfSame(years[0], Arrays.asList(years)) ? years[0] : Constants.DASH);
-        multTrack.setText(StringUtils.checkIfSame(tracks[0], Arrays.asList(tracks)) ? tracks[0] : Constants.DASH);
-        multDisk.setText(StringUtils.checkIfSame(disks[0], Arrays.asList(disks)) ? disks[0] : Constants.DASH);
+        multTitle.setText(StringUtils.checkIfSame(titles.get(0), titles) ? titles.get(0) : Constants.DASH);
+        multArtist.setText(StringUtils.checkIfSame(artists.get(0), artists) ? artists.get(0) : Constants.DASH);
+        multAlbum.setText(StringUtils.checkIfSame(albums.get(0), albums) ? albums.get(0) : Constants.DASH);
+        multAlbumArtist.setText(StringUtils.checkIfSame(albumArtists.get(0), albumArtists) ? albumArtists.get(0) : Constants.DASH);
+        multGenre.setText(StringUtils.checkIfSame(genres.get(0), genres) ? genres.get(0) : Constants.DASH);
+        multYear.setText(StringUtils.checkIfSame(years.get(0), years) ? years.get(0) : Constants.DASH);
+        multTrack.setText(StringUtils.checkIfSame(tracks.get(0), tracks) ? tracks.get(0) : Constants.DASH);
+        multDisk.setText(StringUtils.checkIfSame(disks.get(0), disks) ? disks.get(0) : Constants.DASH);
 
-        if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
-            multImage.setIcon(ImageUtils.getScaledImage(images[0], 150));
-            originalMultPanelArtwork = newMultPanelArtwork = images[0];
+        if (ImageUtils.checkIfSame(images.get(0), images) && images.get(0) != null) {
+            multImage.setIcon(ImageUtils.getScaledImage(images.get(0), 150));
+            originalMultPanelArtwork = newMultPanelArtwork = images.get(0);
             multipleArtworks = false;
         } else {
-            List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
+            List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(images);
             multImage.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 150)));
             multipleArtworks = true;
         }

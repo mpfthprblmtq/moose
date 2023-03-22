@@ -218,7 +218,7 @@ public class MP3FileUtils {
         for (Song song : songs) {
             bytesList.add(song.getArtwork_bytes());
         }
-        if (ImageUtils.checkIfSame(bytesList.get(0), bytesList.toArray(new byte[0][]))) {
+        if (ImageUtils.checkIfSame(bytesList.get(0), bytesList)) {
             byte[] bytes = bytesList.get(0);
             BufferedImage image = ImageUtils.getBufferedImageFromBytes(bytes);
             // check if it meets the size requirement first (both size wise, and dimension wise, shouldn't take a cover

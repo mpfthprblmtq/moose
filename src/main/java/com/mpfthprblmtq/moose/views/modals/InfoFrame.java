@@ -914,67 +914,65 @@ public class InfoFrame extends javax.swing.JFrame {
 
         } else {
 
-            // make the arrays of values
-            int size = songs.size();
-            String[] titles = new String[size];
-            String[] artists = new String[size];
-            String[] albums = new String[size];
-            String[] albumArtists = new String[size];
-            String[] genres = new String[size];
-            String[] years = new String[size];
-            String[] tracks = new String[size];
-            String[] trackTotals = new String[size];
-            String[] disks = new String[size];
-            String[] diskTotals = new String[size];
-            String[] lengths = new String[size];
-            String[] bitRates = new String[size];
-            String[] sampleRates = new String[size];
-            String[] comments = new String[size];
-            byte[][] images = new byte[size][];
+            // make the lists of values
+            List<String> titles = new ArrayList<>();
+            List<String> artists = new ArrayList<>();
+            List<String> albums = new ArrayList<>();
+            List<String> albumArtists = new ArrayList<>();
+            List<String> genres = new ArrayList<>();
+            List<String> years = new ArrayList<>();
+            List<String> tracks = new ArrayList<>();
+            List<String> trackTotals = new ArrayList<>();
+            List<String> disks = new ArrayList<>();
+            List<String> diskTotals = new ArrayList<>();
+            List<String> lengths = new ArrayList<>();
+            List<String> bitRates = new ArrayList<>();
+            List<String> sampleRates = new ArrayList<>();
+            List<String> comments = new ArrayList<>();
+            List<byte[]> images = new ArrayList<>();
 
-            // fill the arrays
-            for (int i = 0; i < songs.size(); i++) {
-                Song s = songs.get(i);
-                titles[i] = s.getTitle();
-                artists[i] = s.getArtist();
-                albums[i] = s.getAlbum();
-                albumArtists[i] = s.getAlbumArtist();
-                genres[i] = s.getGenre();
-                years[i] = s.getYear();
-                tracks[i] = s.getTrack();
-                trackTotals[i] = s.getTotalTracks();
-                disks[i] = s.getDisk();
-                diskTotals[i] = s.getTotalDisks();
-                lengths[i] = s.getLength();
-                bitRates[i] = s.getBitrate();
-                sampleRates[i] = s.getSampleRate();
-                comments[i] = s.getComment();
-                images[i] = s.getArtwork_bytes();
+            // fill the lists
+            for (Song s : songs) {
+                titles.add(s.getTitle());
+                artists.add(s.getArtist());
+                albums.add(s.getAlbum());
+                albumArtists.add(s.getAlbumArtist());
+                years.add(s.getYear());
+                tracks.add(s.getTrack());
+                trackTotals.add(s.getTotalTracks());
+                disks.add(s.getDisk());
+                diskTotals.add(s.getTotalDisks());
+                genres.add(s.getGenre());
+                lengths.add(s.getLength());
+                bitRates.add(s.getBitrate());
+                sampleRates.add(s.getSampleRate());
+                comments.add(s.getComment());
+                images.add(s.getArtwork_bytes());
             }
 
             // set the fields
             filenameField.setText(Constants.DASH);
             filenameField.setEnabled(false);
-            titleField.setText(StringUtils.checkIfSame(titles[0], Arrays.asList(tracks)) ? titles[0] : Constants.DASH);
-            artistField.setText(StringUtils.checkIfSame(artists[0], Arrays.asList(artists)) ? artists[0] : Constants.DASH);
-            albumField.setText(StringUtils.checkIfSame(albums[0], Arrays.asList(albums)) ? albums[0] : Constants.DASH);
-            albumArtistField.setText(StringUtils.checkIfSame(albumArtists[0], Arrays.asList(albumArtists)) ? albumArtists[0] : Constants.DASH);
-            yearField.setText(StringUtils.checkIfSame(years[0], Arrays.asList(years)) ? years[0] : Constants.DASH);
-            genreField.setText(StringUtils.checkIfSame(genres[0], Arrays.asList(genres)) ? genres[0] : Constants.DASH);
-            track1Field.setText(StringUtils.checkIfSame(tracks[0], Arrays.asList(tracks)) ? tracks[0] : Constants.DASH);
-            track2Field.setText(StringUtils.checkIfSame(trackTotals[0], Arrays.asList(trackTotals)) ? trackTotals[0] : Constants.DASH);
-            disk1Field.setText(StringUtils.checkIfSame(disks[0], Arrays.asList(disks)) ? disks[0] : Constants.DASH);
-            disk2Field.setText(StringUtils.checkIfSame(diskTotals[0], Arrays.asList(diskTotals)) ? diskTotals[0] : Constants.DASH);
-            lengthField.setText(StringUtils.checkIfSame(lengths[0], Arrays.asList(lengths)) ? lengths[0] : Constants.DASH);
-            bitrateField.setText(StringUtils.checkIfSame(bitRates[0], Arrays.asList(bitRates)) ? bitRates[0] : Constants.DASH);
-            sampleRateField.setText(StringUtils.checkIfSame(sampleRates[0], Arrays.asList(sampleRates)) ? sampleRates[0] : Constants.DASH);
-            commentField.setText(StringUtils.checkIfSame(comments[0], Arrays.asList(comments)) ? comments[0] : Constants.DASH);
+            titleField.setText(StringUtils.checkIfSame(titles.get(0), tracks) ? titles.get(0) : Constants.DASH);
+            artistField.setText(StringUtils.checkIfSame(artists.get(0), artists) ? artists.get(0) : Constants.DASH);
+            albumField.setText(StringUtils.checkIfSame(albums.get(0), albums) ? albums.get(0) : Constants.DASH);
+            albumArtistField.setText(StringUtils.checkIfSame(albumArtists.get(0), albumArtists) ? albumArtists.get(0) : Constants.DASH);
+            yearField.setText(StringUtils.checkIfSame(years.get(0), years) ? years.get(0) : Constants.DASH);
+            genreField.setText(StringUtils.checkIfSame(genres.get(0), genres) ? genres.get(0) : Constants.DASH);
+            track1Field.setText(StringUtils.checkIfSame(tracks.get(0), tracks) ? tracks.get(0) : Constants.DASH);
+            track2Field.setText(StringUtils.checkIfSame(trackTotals.get(0), trackTotals) ? trackTotals.get(0) : Constants.DASH);
+            disk1Field.setText(StringUtils.checkIfSame(disks.get(0), disks) ? disks.get(0) : Constants.DASH);
+            disk2Field.setText(StringUtils.checkIfSame(diskTotals.get(0), diskTotals) ? diskTotals.get(0) : Constants.DASH);
+            lengthField.setText(StringUtils.checkIfSame(lengths.get(0), lengths) ? lengths.get(0) : Constants.DASH);
+            bitrateField.setText(StringUtils.checkIfSame(bitRates.get(0), bitRates) ? bitRates.get(0) : Constants.DASH);
+            sampleRateField.setText(StringUtils.checkIfSame(sampleRates.get(0), sampleRates) ? sampleRates.get(0) : Constants.DASH);
+            commentField.setText(StringUtils.checkIfSame(comments.get(0), comments) ? comments.get(0) : Constants.DASH);
 
-            if (ImageUtils.checkIfSame(images[0], images) && images[0] != null) {
-                coverLabel.setIcon(ImageUtils.getScaledImage(images[0], 290));
-                originalArtwork = newArtwork = images[0];
+            if (ImageUtils.checkIfSame(images.get(0), images) && images.get(0) != null) {
+                coverLabel.setIcon(ImageUtils.getScaledImage(images.get(0), 290));
+                originalArtwork = newArtwork = images.get(0);
             } else {
-                List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(Arrays.asList(images));
+                List<byte[]> bytesList = ImageUtils.getUniqueByteArrays(images);
                 coverLabel.setIcon(new ImageIcon(ImageUtils.combineImages(bytesList, 290)));
             }
         }

@@ -333,14 +333,14 @@ public class ImageUtils {
     }
 
     /**
-     * Checks if a byte array is the same throughout an array
+     * Checks if a byte array is the same throughout a list
      * @param bytes the byte array to check
-     * @param arr the array of byte arrays
+     * @param list the list of byte arrays
      * @return the result of the check
      */
-    public static boolean checkIfSame(byte[] bytes, byte[][] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (!Arrays.equals(arr[i], bytes)) {
+    public static boolean checkIfSame(byte[] bytes, List<byte[]> list) {
+        for (byte[] bytesInList : list) {
+            if (!Arrays.equals(bytes, bytesInList)) {
                 return false;
             }
         }
