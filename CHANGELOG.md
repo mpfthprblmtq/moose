@@ -1,14 +1,44 @@
 # Changelog
 
-### 1.3.0 (The "Hey Look, Even More Features and Better Autotagging" Update)
+## LATEST: 1.4.0 (The "Refactor + A Few Feature Improvements" Update)
+
+**Release Date:** 23 March 2023 🍰
+
+### Summary:
+
+Probably the longest time between updates.  This update is mostly a refactor, since the code I wrote 5 years ago was mostly garbage. Now it's less garbage.  Here's what changed:
+
+### Changelog:
+
+**Features:**
+- Added feature enabling in settings, where you can choose what features you want to disable/enable
+- Made the Autotagging smarter for genres.  Now, when you autotag a track without a genre, Moose will try to infer the genre based on the genres of other songs by the same artist.  If it infers a genre for a track, the genre will be preceded with an info sign (ⓘ) with a tooltip that explains why it's there
+- Added a loading icon on the main UI and Audit/Cleanup modal so you know it's doing stuff
+
+**Bug Fixes:**
+- Fixed the track number and disk number sorting, now instead of sorting like 1/12, 11/12, 12/12, 2/12, etc, it will sort as it should, 1/12, 2/12, 3/12, etc.
+- Fixed an AlbumArtFinder bug where when you search for artists, sometimes the artist doesn't have a profile image, which results in weird UI behavior.  Figured I would just ignore those, since any artist I would be searching for would have an image.
+- Fixed a couple random NullPointerException cases that would happen because of changes to the UI outside of the Event Dispatch Thread
+
+**Code Enhancements:**
+- Pretty much everything, lots of code cleanup, refactoring, reformatting, reformatting, redoing, rethinking my life choices
+
+**The Moose kingdom has some unwelcome guests:**
+- As the Elk battalion approaches the great Moose kingdom, the Moose realize one key flaw to any Elk strategy: the difference in antlers.
+- While Elk antlers are more sharp and pointy for stabby stabby, Moose antlers are wider and rounder for slappy slappy.
+- The Moose kingdom must use this information to their advantage if victory is expected on the battlefield.
+
+---
+
+## 1.3.0 (The "Hey Look, Even More Features and Better Autotagging" Update)
 
 **Release Date:** 25 April 2021
 
-#### Summary:
+### Summary:
 
 Per the usual pattern, I decided to take a break from my other project to focus on yet another project.  So here's another release, which will probably be followed by another indeterminate amount of time until I decide to work on it again.  Here's what changed:
 
-#### Changelog:
+### Changelog:
 
 **Features:**
 - Filename Formatter
@@ -46,7 +76,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
 - With the time of prosper after the great moose war, a new challenger approaches:  The Elk.
 - The Moose kingdom must ready its defenses after seeing such a bountiful time of peace.
 
-### 1.2.1 (The "Too many Bugfixes and Documentation" Update) (AKA The Halloween Update)
+---
+
+## 1.2.1 (The "Too many Bugfixes and Documentation" Update) (AKA The Halloween Update)
 
 **Release Date:** 31 October 2020 🎃
 
@@ -88,7 +120,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
 - With the success in the great war, the kingdom has seen a new age of flourishing wealth and happiness
 - This can only mean one thing...
 
-### 1.2.0 (The "Holy moly there's new functionality" update)
+---
+
+## 1.2.0 (The "Holy moly there's new functionality" update)
 
 **Release Date:** 27 September 2020
 
@@ -104,7 +138,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
     - On the "Save Settings" button being pressed, user gets instant feedback and it resets the gui
 - Some smaller bug fixes/improvements
 
-### 1.1.3 (The Random bugfixes/features update)
+---
+
+## 1.1.3 (The Random bugfixes/features update)
 
 **Release Date:** 1 March 2019
 
@@ -120,7 +156,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
     - THE FIGHT FOR CANADIA WILL BE GLORIOUS
     - HAIL MOOSE
 
-### 1.1.2 (The "Random features" update)
+---
+
+## 1.1.2 (The "Random features" update)
 
 **Release Date:** 20 December 2018
 
@@ -138,7 +176,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
     - He was the only moose :(
     - He placed 2nd for training but 1st for lovability
 
-### 1.1.1 (The Refactoring update and/or the "All 1's update" and/or the Cleanup update)
+---
+
+## 1.1.1 (The Refactoring update and/or the "All 1's update" and/or the Cleanup update)
 
 **Release Date:** 3 December 2018
 
@@ -149,7 +189,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
 - Tamed moose
     - Taught it sit, stay, roll over, and attack
 
-### 1.1.0 (The Auditing update)
+---
+
+## 1.1.0 (The Auditing update)
 
 **Release Date:** 11 November 2018
 
@@ -168,7 +210,9 @@ Per the usual pattern, I decided to take a break from my other project to focus 
         4. Any other file
 - Capturing moose, it got out of its pen and bit people - A Møøse once bit my sister... No realli!
 
-### 1.0.2 (The Settings update)
+---
+
+## 1.0.2 (The Settings update)
 
 **Release Date:** 19 September 2018
 
@@ -181,6 +225,8 @@ Per the usual pattern, I decided to take a break from my other project to focus 
 - Gave moose legs to walk with
     - Frolicking optional
 
+---
+
 ## 1.0.1
 
 **Release Date:** 3 September 2018
@@ -189,6 +235,7 @@ Per the usual pattern, I decided to take a break from my other project to focus 
     - Created custom Logger class
 - Added antlers to moose
 
+---
 
 ## 1.0.0
 

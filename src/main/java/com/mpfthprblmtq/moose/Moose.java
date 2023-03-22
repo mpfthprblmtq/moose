@@ -61,10 +61,10 @@ public class Moose {
      */
     private static void initSettings() {
         // instantiate the logger object, so we can have some logging
-//        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
-//        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
+        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
+        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
         // uncomment this line below and comment the two lines above to keep logging in the console for development
-        logger = new Logger();
+//        logger = new Logger();
 
         // instantiate the settings object, so we can have some log/settings files
         settingsController = new SettingsController();

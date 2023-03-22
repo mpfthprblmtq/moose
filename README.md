@@ -4,9 +4,9 @@ A music management system capable of reading and modifying dynamic id3 tags.
 ![Generic badge](https://img.shields.io/badge/version-1.3.0-brightgreen.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
-[View project on Github](https://www.github.com/mpfthprblmtq/moose)
+[View project on GitHub](https://www.github.com/mpfthprblmtq/moose)
 
-[View Backlog (Github Project)](https://github.com/mpfthprblmtq/moose/projects/1)
+[View Backlog (GitHub Project)](https://github.com/mpfthprblmtq/moose/projects/1)
 
 [Download pkg file (OSX)](https://www.prblmtq.com/projects/moose/download)
 
@@ -32,7 +32,7 @@ But that doesn't really have anything to do with this project, does it?  The bet
 
 Moose is my pet project from college that turned out to be more useful than I anticipated.  It's basically just a mp3 information editor, where you can edit the Title, Artist, Album, Year, Genre, etc. for mp3 files.  There are a few different apps out there that do this same thing, but I've found that:
 * I have to pay for them *(gross)*
-* If they're free, they usually have features stripped away and they'll ask you 17 times while using it over the course of 5 minutes if you want to try the paid version, usually followed by "If you don't pay for it, my kids can't eat!" or something like that.
+* If they're free, they usually have features stripped away, and they'll ask you 17 times while using it over the course of 5 minutes if you want to try the paid version, usually followed by "If you don't pay for it, my kids can't eat!" or something like that.
 * Most apps out there are very simple.  They only provide the ability to edit files one at a time, or just simply changing information about those files, with no automatic functionality.
 
 I solved a lot of these problems I've seen with other applications by creating my own application!
