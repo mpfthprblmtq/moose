@@ -34,6 +34,6 @@ public class IconUtils {
      * @return an Icon of the image resource
      */
     public static Icon get(String type) {
-        return new ImageIcon(Objects.requireNonNull(IconUtils.class.getResource("/" + type)));
+        return new ImageIcon(Objects.requireNonNull(IconUtils.class.getResource("/img/" + type)));
     }
 }

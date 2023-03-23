@@ -83,17 +83,16 @@ echo "Done."
 # create resource directory for jpackage
 printf "Creating resource directory..."
 mkdir resources
-cp "$APP_PATH"/src/main/resources/build-resources/moose-app-icon.icns "$APP_PATH"/deploy/resources
-cp "$APP_PATH"/src/main/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background.png
-cp "$APP_PATH"/src/main/resources/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background-darkAqua.png
-# TODO cp "$APP_PATH"/src/main/resources/build/moose-volume.icns "$APP_PATH"/deploy/resources
-# TODO cp "$APP_PATH"/src/main/resources/build/moose-background.tiff "$APP_PATH"/deploy/resources/
+cp "$APP_PATH"/src/main/resources/img/build-resources/moose-app-icon.icns "$APP_PATH"/deploy/resources/moose-app-icon.icns
+cp "$APP_PATH"/src/main/resources/img/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background.png
+cp "$APP_PATH"/src/main/resources/img/build-resources/moose180-spaced.png "$APP_PATH"/deploy/resources/moose-background-darkAqua.png
+cp "$APP_PATH"/src/main/resources/img/build-resources/moose-volume.icns "$APP_PATH"/deploy/resources/moose-volume.icns
 echo "Done."
 # create file association properties files
 printf "Creating file extension properties files..."
 mkdir properties
-echo "mime-type=audio/mpeg\nextension=mp3" > properties/FAmp3.properties
-echo "arguments=fileToOpen locationOfFileToOpen" > properties/FAmp3Launcher.properties
+echo "mime-type=audio/mpeg\nextension=mp3\ndescription=MP3 Files" > properties/FAmp3.properties
+echo "arguments=fileToOpen" > properties/FAmp3Launcher.properties
 echo "Done."
 
 ###################################################################################################
@@ -101,18 +100,18 @@ echo "Done."
 ###################################################################################################
 printf "Building installation package..."
 $jdk/jpackage \
+  --resource-dir "$APP_PATH"/deploy/resources \
   --type "$packageType" \
   --input . \
   --main-jar moose.jar \
   --name Moose \
   --app-version "$version" \
   --icon resources/moose-app-icon.icns \
-  --description "Test description" \
+  --description "Moose" \
   --vendor "PRBLMTQ" \
-  --copyright "Copyright 2018-2022 PRBLMTQ - Pat Ripley" \
+  --copyright "Copyright 2018-2023 PRBLMTQ - Pat Ripley" \
   --file-associations properties/FAmp3.properties \
   --add-launcher MP3Launcher=properties/FAmp3Launcher.properties \
-  --resource-dir resources \
   --verbose
 echo "Done."
 sleep 1
