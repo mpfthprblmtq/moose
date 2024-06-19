@@ -33,7 +33,9 @@ import java.util.Comparator;
 import java.util.EventObject;
 import java.util.List;
 
+import static com.mpfthprblmtq.commons.translation.Translation.t;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
+import static com.mpfthprblmtq.moose.utilities.TranslationConstants.*;
 
 // class ViewUtils
 public class ViewUtils {
@@ -271,68 +273,71 @@ public class ViewUtils {
             MouseEvent evt, ActionListener menuListener, boolean base, boolean file, boolean artwork, boolean artworkMultPanel, String[] customItems) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem item;
+
+        // TODO see if I can add objects to the dropdown like I'm doing for LanguageComboBoxItem
+
         if (base) {
-            popup.add(item = new JMenuItem(MORE_INFO));
+            popup.add(item = new JMenuItem(t(MORE_INFO) + "..."));
             item.addActionListener(menuListener);
 
             popup.addSeparator();
 
-            popup.add(item = new JMenuItem(REMOVE_FROM_LIST));
+            popup.add(item = new JMenuItem(t(REMOVE_FROM_LIST)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(PLAY));
+            popup.add(item = new JMenuItem(t(OPEN)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(SAVE));
+            popup.add(item = new JMenuItem(t(SAVE)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(SHOW_IN_FINDER));
+            popup.add(item = new JMenuItem(t(SHOW_IN_FINDER) + "..."));
             item.addActionListener(menuListener);
 
             popup.addSeparator();
 
-            popup.add(item = new JMenuItem(AUTO_TAG));
+            popup.add(item = new JMenuItem(t(AUTOTAG)));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.AUTOTAGGING));
 
-            popup.add(item = new JMenuItem(FORMAT_FILENAME));
+            popup.add(item = new JMenuItem(t(FORMAT_FILENAMES)));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
 
-            popup.add(item = new JMenuItem(AUTO_TRACK_DISK_NUMBERS));
+            popup.add(item = new JMenuItem(t(ADD_TRACK_NUMBERS)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(AUTO_ARTWORK));
+            popup.add(item = new JMenuItem(t(AUTO_ADD_ARTWORK)));
             item.addActionListener(menuListener);
         }
         if (file) {
             popup.addSeparator();
-            popup.add(item = new JMenuItem(MOVE_FILE));
+            popup.add(item = new JMenuItem(t(MOVE_FILES) + "..."));
             item.addActionListener(menuListener);
         }
         if (artwork) {
             popup.addSeparator();
 
-            popup.add(item = new JMenuItem(ADD_ARTWORK));
+            popup.add(item = new JMenuItem(t(ADD_ARTWORK) + "..."));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(REMOVE_ARTWORK));
+            popup.add(item = new JMenuItem(t(REMOVE_ARTWORK)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(USE_ALBUM_ART_FINDER));
+            popup.add(item = new JMenuItem(t(USE_ALBUM_ART_FINDER) + "..."));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER));
         } else if (artworkMultPanel) {
-            popup.add(item = new JMenuItem(ADD_ARTWORK_SELECTED));
+            popup.add(item = new JMenuItem(t(ADD_ARTWORK_FOR_SELECTED) + "..."));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(REMOVE_ARTWORK_SELECTED));
+            popup.add(item = new JMenuItem(t(REMOVE_ARTWORK_FOR_SELECTED)));
             item.addActionListener(menuListener);
 
-            popup.add(item = new JMenuItem(USE_ALBUM_ART_FINDER));
+            popup.add(item = new JMenuItem(t(USE_ALBUM_ART_FINDER) + "..."));
             item.addActionListener(menuListener);
             // only enable it if the feature is enabled
             item.setEnabled(Moose.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER));

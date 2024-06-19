@@ -11,6 +11,8 @@ package com.mpfthprblmtq.moose;
 
 // imports
 import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.translation.Translation;
+import com.mpfthprblmtq.commons.translation.TranslationInstance;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.controllers.SongController;
 import com.mpfthprblmtq.moose.objects.Settings;
@@ -20,6 +22,10 @@ import com.mpfthprblmtq.moose.views.modals.SettingsFrame;
 import lombok.Getter;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Locale;
+
+import static com.mpfthprblmtq.moose.utilities.Constants.LANGUAGE_TAB;
 
 // class Moose
 public class Moose {
@@ -36,6 +42,10 @@ public class Moose {
     @Getter
     public static Logger logger;
 
+    // translation object
+    @Getter
+    public static TranslationInstance translation;
+
     // controllers
     @Getter
     public static SongController songController;
@@ -51,6 +61,9 @@ public class Moose {
         // initialize settings
         initSettings();
 
+        // initialize translations
+        initTranslation();
+
         // go
         launchFrame();
     }
@@ -61,10 +74,10 @@ public class Moose {
      */
     private static void initSettings() {
         // instantiate the logger object, so we can have some logging
-        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
-        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
+//        boolean developerMode = System.getProperty("java.class.path").contains("idea_rt.jar");
+//        logger = new Logger(System.getProperty("user.home") + "/Library/Application Support/Moose/", developerMode);
         // uncomment this line below and comment the two lines above to keep logging in the console for development
-//        logger = new Logger();
+        logger = new Logger();
 
         // instantiate the settings object, so we can have some log/settings files
         settingsController = new SettingsController();
@@ -74,11 +87,30 @@ public class Moose {
 
         // initially load the settings
         settingsController.readSettingsFile();
-
-        // create the frame now that we have our settings
-        settingsFrame = new SettingsFrame();
     }
-    
+
+    /**
+     * Initializes the translation library with the supported locales
+     */
+    private static void initTranslation() {
+        Translation.initializeTranslationFiles(Arrays.asList(
+                "/translations/en-US.yaml", "/translations/de-DE.yaml"));
+        Translation.setCurrentLocale(Locale.forLanguageTag(getSettings().getLocale()));
+    }
+
+    /**
+     * Changes language across the app and resets to the SettingsFrame
+     */
+    public static void changeLanguage(String locale) {
+        Moose.getSettings().setLocale(locale);
+        updateSettings(Moose.getSettings());
+        Translation.setCurrentLocale(Locale.forLanguageTag(locale));
+
+        launchFrame();
+        launchSettingsFrame();
+        settingsFrame.setFocusedTab(LANGUAGE_TAB);
+    }
+
     /**
      * Returns the settings object
      * @return the settings object
@@ -127,6 +159,7 @@ public class Moose {
      * Launches a new SettingsFrame
      */
     public static void launchSettingsFrame() {
+        settingsFrame = new SettingsFrame();
         settingsFrame.setLocationRelativeTo(null);
         settingsFrame.setVisible(true);
     }

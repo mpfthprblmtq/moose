@@ -115,12 +115,8 @@ public class GoogleSearchService {
                     .build();
 
             // make the request
-            String response = WebUtils.get(url, requestProperties.getProperties());
-
-            // map response to object
-            ObjectMapper mapper = new ObjectMapper();
-            ImageSearchResponse imageSearchResponse = mapper.readValue(response, ImageSearchResponse.class);
-            return imageSearchResponse.getItems();
+            ImageSearchResponse response = WebUtils.get(url, requestProperties, ImageSearchResponse.class);
+            return response.getItems();
 
         } catch (MalformedURLException ex) {
             logger.logError("MalformedURLException when trying to create url to search!", ex);

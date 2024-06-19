@@ -53,7 +53,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableRowSorter;
 
+import static com.mpfthprblmtq.commons.translation.Translation.t;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
+import static com.mpfthprblmtq.moose.utilities.TranslationConstants.*;
 
 // class Frame
 @SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
@@ -173,19 +175,19 @@ public class Frame extends javax.swing.JFrame {
         table.setModel(ViewUtils.getTableModel());
 
         // create the columns
-        getModel().addColumn("");
-        getModel().addColumn("File");
-        getModel().addColumn("Filename");
-        getModel().addColumn("Title");
-        getModel().addColumn("Artist");
-        getModel().addColumn("Album");
-        getModel().addColumn("Album Artist");
-        getModel().addColumn("Year");
-        getModel().addColumn("Genre");
-        getModel().addColumn("Track");
-        getModel().addColumn("Disk");
-        getModel().addColumn("Artwork");
-        getModel().addColumn("I");
+        getModel().addColumn(StringUtils.EMPTY);
+        getModel().addColumn(StringUtils.EMPTY);
+        getModel().addColumn(t(FILENAME));
+        getModel().addColumn(t(TITLE));
+        getModel().addColumn(t(ARTIST));
+        getModel().addColumn(t(ALBUM));
+        getModel().addColumn(t(ALBUM_ARTIST));
+        getModel().addColumn(t(YEAR));
+        getModel().addColumn(t(GENRE));
+        getModel().addColumn(t(TRACK));
+        getModel().addColumn(t(DISK));
+        getModel().addColumn(t(ARTWORK));
+        getModel().addColumn(StringUtils.EMPTY);
 
         // remove the File and Index columns
         table.removeColumn(table.getColumnModel().getColumn(1));
@@ -235,57 +237,69 @@ public class Frame extends javax.swing.JFrame {
             // get all the rows selected
             int[] selectedRows = table.getSelectedRows();
 
+            // translate the action commands, so we know what we're working with
+            final String moreInfoTranslated = t(MORE_INFO);
+            final String showInFinderTranslated = t(SHOW_IN_FINDER);
+            final String removeFromListTranslated = t(REMOVE_FROM_LIST);
+            final String openTranslated = t(OPEN);
+            final String saveTranslated = t(SAVE);
+            final String autotagTranslated = t(AUTOTAG);
+            final String addTrackDiskNumbersTranslated = t(ADD_TRACK_NUMBERS);
+            final String autoAddArtworkTranslated = t(AUTO_ADD_ARTWORK);
+            final String moveFilesTranslated = t(MOVE_FILES);
+            final String formatFilenamesTranslated = t(FORMAT_FILENAMES);
+            final String addArtworkTranslated = t(ADD_ARTWORK);
+            final String addArtworkForSelectedTranslated = t(ADD_ARTWORK_FOR_SELECTED);
+            final String removeArtworkForSelectedTranslated = t(REMOVE_ARTWORK_FOR_SELECTED);
+            final String removeArtworkTranslated = t(REMOVE_ARTWORK);
+            final String useAlbumArtFinderTranslated = t(USE_ALBUM_ART_FINDER);
+
             // switch based on the option selected
-            switch (event.getActionCommand()) {
-                case MORE_INFO:
-                    openMoreInfo(false, null, selectedRows);
-                    break;
-                case SHOW_IN_FINDER:
-                    showInFolder(selectedRows);
-                    break;
-                case REMOVE_FROM_LIST:
-                    removeRows(selectedRows);
-                    break;
-                case PLAY:
-                    ViewUtils.getOpenTracksSwingWorker(selectedRows).execute();
-                    break;
-                case SAVE:
-                    ViewUtils.getSaveTracksSwingWorker(selectedRows).execute();
-                    break;
-                case AUTO_TAG:
-                    ViewUtils.getAutotagSwingWorker(selectedRows).execute();
-                    break;
-                case AUTO_TRACK_DISK_NUMBERS:
-                    ViewUtils.getTrackDiskNumberSwingWorker(selectedRows).execute();
-                    break;
-                case AUTO_ARTWORK:
-                    autoAddCoverArt(selectedRows);
-                    break;
-                case MOVE_FILE:
-                    songController.moveFiles(selectedRows);
-                    break;
-                case FORMAT_FILENAME:
-                    formatFilenames(selectedRows);
-                    break;
-                case ADD_ARTWORK:
-                    songController.addAlbumArtFromFileChooser(selectedRows);
-                    updateMultiplePanelFields();
-                    break;
-                case ADD_ARTWORK_SELECTED:
-                    getCoverArtForMultPanel(selectedRows);
-                    break;
-                case REMOVE_ARTWORK:
-                    songController.removeAlbumArt(selectedRows);
-                    break;
-                case REMOVE_ARTWORK_SELECTED:
-                    newMultPanelArtwork = null;
-                    multImage.setIcon(null);
-                    break;
-                case USE_ALBUM_ART_FINDER:
-                    songController.addArtworkFromAlbumArtFinder(selectedRows);
-                    break;
-                default:
-                    break;
+            if (event.getActionCommand().equals(moreInfoTranslated)) {
+                openMoreInfo(false, null, selectedRows);
+
+            } else if (event.getActionCommand().equals(showInFinderTranslated)) {
+                showInFolder(selectedRows);
+
+            } else if (event.getActionCommand().equals(removeFromListTranslated)) {
+                removeRows(selectedRows);
+
+            } else if (event.getActionCommand().equals(openTranslated)) {
+                ViewUtils.getOpenTracksSwingWorker(selectedRows).execute();
+
+            } else if (event.getActionCommand().equals(saveTranslated)) {
+                ViewUtils.getSaveTracksSwingWorker(selectedRows).execute();
+
+            } else if (event.getActionCommand().equals(moveFilesTranslated)) {
+                songController.moveFiles(selectedRows);
+
+            } else if (event.getActionCommand().equals(autotagTranslated)) {
+                ViewUtils.getAutotagSwingWorker(selectedRows).execute();
+
+            } else if (event.getActionCommand().equals(addTrackDiskNumbersTranslated)) {
+                ViewUtils.getTrackDiskNumberSwingWorker(selectedRows).execute();
+
+            } else if (event.getActionCommand().equals(autoAddArtworkTranslated)) {
+                autoAddCoverArt(selectedRows);
+
+            } else if (event.getActionCommand().equals(formatFilenamesTranslated)) {
+                formatFilenames(selectedRows);
+
+            } else if (event.getActionCommand().equals(addArtworkTranslated)) {
+                getCoverArtForMultPanel(selectedRows);
+
+            } else if (event.getActionCommand().equals(addArtworkForSelectedTranslated)) {
+                getCoverArtForMultPanel(selectedRows);
+
+            } else if (event.getActionCommand().equals(removeArtworkForSelectedTranslated)) {
+                newMultPanelArtwork = null;
+                multImage.setIcon(null);
+
+            } else if (event.getActionCommand().equals(removeArtworkTranslated)) {
+                songController.removeAlbumArt(selectedRows);
+
+            } else if (event.getActionCommand().equals(useAlbumArtFinderTranslated)) {
+                songController.addArtworkFromAlbumArtFinder(selectedRows);
             }
         }; // end menuListener
 
@@ -521,21 +535,7 @@ public class Frame extends javax.swing.JFrame {
                 }
                 return result;
             }
-
-            public String getToolTipText(MouseEvent e) {
-                String tip = null;
-                int row = rowAtPoint(e.getPoint());
-                int col = columnAtPoint(e.getPoint());
-                if (col == TABLE_COLUMN_GENRE) {
-                    if (table.getValueAt(row, col).toString().startsWith(INFO)) {
-                        String genre = table.getValueAt(row, col).toString().replace(INFO, StringUtils.EMPTY);
-                        tip = "Genre \"" + genre + "\" was inferred from other genres from same artist.";
-                    }
-                }
-                return tip;
-            }
         };
-
         consoleSP = new javax.swing.JScrollPane();
         console = new javax.swing.JTextArea();
         multPanel = new javax.swing.JPanel();
@@ -592,7 +592,7 @@ public class Frame extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel1.setText("Moose");
 
-        saveAllButton.setText("Save All");
+        saveAllButton.setText(t(SAVE_ALL));
         saveAllButton.setFocusable(false);
         saveAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
         saveAllButton.setMinimumSize(new java.awt.Dimension(100, 68));
@@ -636,23 +636,23 @@ public class Frame extends javax.swing.JFrame {
         multPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         L1.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
-        L1.setText("Edit Multiple Items:");
+        L1.setText(t(EDIT_MULTIPLE_ITEMS));
 
-        L2.setText("Title:");
+        L2.setText(t(TITLE) + ":");
 
-        L3.setText("Artist:");
+        L3.setText(t(ARTIST) + ":");
 
-        L4.setText("Album:");
+        L4.setText(t(ALBUM) + ":");
 
-        L5.setText("Album Artist:");
+        L5.setText(t(ALBUM_ARTIST) + ":");
 
-        L6.setText("Genre:");
+        L6.setText(t(GENRE) + ":");
 
-        L7.setText("Year:");
+        L7.setText(t(YEAR) + ":");
 
-        L8.setText("Track:");
+        L8.setText(t(TRACK) + ":");
 
-        L9.setText("Disk:");
+        L9.setText(t(DISK) + ":");
 
         multTitle.setEnabled(false);
         multTitle.setMaximumSize(new java.awt.Dimension(250, 26));
@@ -796,7 +796,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        multUpdateButton.setText("Update Fields");
+        multUpdateButton.setText(t(UPDATE_FIELDS));
         multUpdateButton.setEnabled(false);
         multUpdateButton.setFocusable(false);
         multUpdateButton.addActionListener(new java.awt.event.ActionListener() {
@@ -829,7 +829,7 @@ public class Frame extends javax.swing.JFrame {
                             .addComponent(L8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(L6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(L7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(L9, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(L9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(multGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -842,8 +842,8 @@ public class Frame extends javax.swing.JFrame {
                         .addComponent(L1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
-                    .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(multUpdateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(multImage, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE))
                 .addContainerGap())
         );
         multPanelLayout.setVerticalGroup(
@@ -856,9 +856,9 @@ public class Frame extends javax.swing.JFrame {
                         .addGap(9, 9, 9)
                         .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(multPanelLayout.createSequentialGroup()
-                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(L2)
-                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(multTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(L2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(multPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(L3)
@@ -893,7 +893,7 @@ public class Frame extends javax.swing.JFrame {
 
         jLabel3.setIcon(IconUtils.get(IconUtils.MOOSE_64));
 
-        clearAllButton.setText("Clear All");
+        clearAllButton.setText(t(CLEAR_ALL));
         clearAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
         clearAllButton.setMinimumSize(new java.awt.Dimension(100, 68));
         clearAllButton.setPreferredSize(new java.awt.Dimension(100, 68));
@@ -903,7 +903,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        openAllButton.setText("Open All");
+        openAllButton.setText(t(OPEN_ALL));
         openAllButton.setMaximumSize(new java.awt.Dimension(100, 68));
         openAllButton.setMinimumSize(new java.awt.Dimension(100, 68));
         openAllButton.setPreferredSize(new java.awt.Dimension(100, 68));
@@ -968,10 +968,10 @@ public class Frame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        fileMenu.setText("File");
+        fileMenu.setText(t(FILE));
 
         openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_DOWN_MASK));
-        openMenuItem.setText("Open...");
+        openMenuItem.setText(t(OPEN) + "...");
         openMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openMenuItemActionPerformed(evt);
@@ -980,7 +980,7 @@ public class Frame extends javax.swing.JFrame {
         fileMenu.add(openMenuItem);
 
         saveTrackMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_DOWN_MASK));
-        saveTrackMenuItem.setText("Save Track");
+        saveTrackMenuItem.setText(t(SAVE_TRACK));
         saveTrackMenuItem.setEnabled(false);
         saveTrackMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -990,7 +990,7 @@ public class Frame extends javax.swing.JFrame {
         fileMenu.add(saveTrackMenuItem);
 
         saveAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        saveAllMenuItem.setText("Save All");
+        saveAllMenuItem.setText(t(SAVE_ALL));
         saveAllMenuItem.setEnabled(false);
         saveAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1000,7 +1000,7 @@ public class Frame extends javax.swing.JFrame {
         fileMenu.add(saveAllMenuItem);
 
         exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.META_DOWN_MASK));
-        exitMenuItem.setText("Exit");
+        exitMenuItem.setText(t(EXIT));
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitMenuItemActionPerformed(evt);
@@ -1010,10 +1010,10 @@ public class Frame extends javax.swing.JFrame {
 
         jMenuBar1.add(fileMenu);
 
-        viewMenu.setText("View");
+        viewMenu.setText(t(VIEW));
 
         selectAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.META_DOWN_MASK));
-        selectAllMenuItem.setText("Select All");
+        selectAllMenuItem.setText(t(SELECT_ALL));
         selectAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectAllMenuItemActionPerformed(evt);
@@ -1023,10 +1023,10 @@ public class Frame extends javax.swing.JFrame {
 
         jMenuBar1.add(viewMenu);
 
-        macroMenu.setText("Macros");
+        macroMenu.setText(t(MACROS));
 
         autoTagMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        autoTagMenuItem.setText("AutoTag");
+        autoTagMenuItem.setText(t(AUTOTAG));
         autoTagMenuItem.setEnabled(false);
         autoTagMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1036,7 +1036,7 @@ public class Frame extends javax.swing.JFrame {
         macroMenu.add(autoTagMenuItem);
 
         addCoversMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        addCoversMenuItem.setText("Add Covers");
+        addCoversMenuItem.setText(t(AUTO_ADD_ARTWORK));
         addCoversMenuItem.setEnabled(false);
         addCoversMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1046,7 +1046,7 @@ public class Frame extends javax.swing.JFrame {
         macroMenu.add(addCoversMenuItem);
 
         findAndReplaceMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        findAndReplaceMenuItem.setText("Find and Replace");
+        findAndReplaceMenuItem.setText(t(FIND_AND_REPLACE));
         findAndReplaceMenuItem.setEnabled(false);
         findAndReplaceMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1055,7 +1055,7 @@ public class Frame extends javax.swing.JFrame {
         });
         macroMenu.add(findAndReplaceMenuItem);
 
-        addTrackNumbersMenuItem.setText("Add Track Numbers");
+        addTrackNumbersMenuItem.setText(t(ADD_TRACK_NUMBERS));
         addTrackNumbersMenuItem.setEnabled(false);
         addTrackNumbersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1065,7 +1065,7 @@ public class Frame extends javax.swing.JFrame {
         macroMenu.add(addTrackNumbersMenuItem);
 
         formatFilenamesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        formatFilenamesMenuItem.setText("Format Filenames");
+        formatFilenamesMenuItem.setText(t(FORMAT_FILENAMES));
         formatFilenamesMenuItem.setEnabled(false);
         formatFilenamesMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1076,9 +1076,9 @@ public class Frame extends javax.swing.JFrame {
 
         jMenuBar1.add(macroMenu);
 
-        toolsMenu.setText("Tools");
+        toolsMenu.setText(t(TOOLS));
 
-        auditMenuItem.setText("Audit/Cleanup...");
+        auditMenuItem.setText(t(AUDIT_CLEANUP) + "...");
         auditMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 auditMenuItemActionPerformed(evt);
@@ -1086,14 +1086,14 @@ public class Frame extends javax.swing.JFrame {
         });
         toolsMenu.add(auditMenuItem);
 
-        analyticsMenuItem.setText("Analytics...");
+        analyticsMenuItem.setText(t(ANALYTICS) + "...");
         toolsMenu.add(analyticsMenuItem);
 
         jMenuBar1.add(toolsMenu);
 
-        helpMenu.setText("Help");
+        helpMenu.setText(t(HELP));
 
-        aboutMenuItem.setText("About");
+        aboutMenuItem.setText(t(ABOUT));
         aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 aboutMenuItemActionPerformed(evt);
@@ -1101,7 +1101,7 @@ public class Frame extends javax.swing.JFrame {
         });
         helpMenu.add(aboutMenuItem);
 
-        wikiMenuItem.setText("Open Wiki...");
+        wikiMenuItem.setText(t(OPEN_WIKI) + "...");
         wikiMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 wikiMenuItemActionPerformed(evt);
@@ -1110,7 +1110,7 @@ public class Frame extends javax.swing.JFrame {
         helpMenu.add(wikiMenuItem);
 
         commandMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.META_DOWN_MASK));
-        commandMenuItem.setText("Command Prompt");
+        commandMenuItem.setText(t(COMMAND_PROMPT));
         commandMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 commandMenuItemActionPerformed(evt);
@@ -1119,7 +1119,7 @@ public class Frame extends javax.swing.JFrame {
         helpMenu.add(commandMenuItem);
 
         settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.META_DOWN_MASK));
-        settingsMenuItem.setText("Settings");
+        settingsMenuItem.setText(t(SETTINGS) + "...");
         settingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 settingsMenuItemActionPerformed(evt);

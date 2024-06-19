@@ -22,6 +22,7 @@ import com.mpfthprblmtq.commons.utils.WebUtils;
 import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.objects.api.spotify.*;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import lombok.Data;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 // class SpotifyApiService
+@Data
 public class SpotifyApiService {
 
     // logger
@@ -167,20 +169,17 @@ public class SpotifyApiService {
         try {
             // set up request
             URL url = new RequestURL(Constants.SPOTIFY_AUTH_URL).buildUrl();
-            RequestProperties requestProperties = new RequestProperties()
-                    .withProperty("Content-Type", "application/x-www-form-urlencoded")
-                    .build();
             String body = "grant_type=client_credentials" +
                     "&client_id=" + Moose.getSettings().getSpotifyClientId() +
                     "&client_secret=" + Moose.getSettings().getSpotifyClientSecret();
+            RequestProperties requestProperties = new RequestProperties()
+                    .withProperty("Content-Type", "application/x-www-form-urlencoded")
+                    .withBody(body)
+                    .build();
 
             // make the request
-            String response = WebUtils.post(url, true, requestProperties.getProperties(), body);
-
-            // map response to object
-            ObjectMapper mapper = new ObjectMapper();
-            token = mapper.readValue(response, SpotifyToken.class);
-            token.setTimestamp(new Date().getTime());
+            setToken(WebUtils.post(url, true, requestProperties, SpotifyToken.class));
+            getToken().setTimestamp(new Date().getTime());
 
         } catch (IOException e) {
             // bad things
@@ -211,7 +210,8 @@ public class SpotifyApiService {
                 .build();
 
         // make the request
-        String response = WebUtils.get(url, requestProperties.getProperties());
+        // TODO ensure this works
+        String response = WebUtils.get(url, requestProperties, String.class);
 
         // map the response to an object
         ObjectMapper mapper = new ObjectMapper();
@@ -262,11 +262,7 @@ public class SpotifyApiService {
                 .build();
 
         // make the request
-        String response = WebUtils.get(url, requestProperties.getProperties());
-
-        // map the response to an object
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(response, AlbumSearchResponse.class);
+        return WebUtils.get(url, requestProperties, AlbumSearchResponse.class);
     }
 
     /**
@@ -289,10 +285,6 @@ public class SpotifyApiService {
                 .build();
 
         // make the request
-        String response = WebUtils.get(url, requestProperties.getProperties());
-
-        // map the response to an object
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(response, Artist.class);
+        return WebUtils.get(url, requestProperties, Artist.class);
     }
 }

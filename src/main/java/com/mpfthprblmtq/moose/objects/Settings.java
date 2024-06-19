@@ -19,11 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.mpfthprblmtq.moose.utilities.Constants.APPLICATION_SUPPORT_DIRECTORY;
+
 // class Settings
 @Data
 public class Settings {
 
     private String version;
+    private String locale;
     private boolean inDebugMode;
     private boolean inDeveloperMode;
     private boolean askBeforeClearAll;
@@ -52,6 +55,7 @@ public class Settings {
      * Creates a default settings object
      */
     public Settings() {
+        setLocale("en-US");
         setInDebugMode(false);
         setInDeveloperMode(false);
         setAskBeforeClearAll(true);
@@ -75,7 +79,7 @@ public class Settings {
         setSpotifyArtists(new HashMap<>());
 
         // set the support location since we always know where that'll be
-        setApplicationSupportLocation(System.getProperty("user.home") + "/Library/Application Support/moose/");
+        setApplicationSupportLocation(APPLICATION_SUPPORT_DIRECTORY);
     }
 
     /**

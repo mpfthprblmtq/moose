@@ -1,0 +1,123 @@
+dictionaryValues:
+  FILENAME: Filename
+  TITLE: Title
+  ARTIST: Artist
+  ALBUM: Album
+  ALBUM_ARTIST: Album Artist
+  GENRE: Genre
+  YEAR: Year
+  TRACK: Track
+  DISK: Disk
+  ARTWORK: Artwork
+
+  CLEAR_ALL: Clear All
+  SAVE_ALL: Save All
+  OPEN_ALL: Open All
+  EDIT_MULTIPLE_ITEMS: Edit Multiple Items
+  UPDATE_FIELDS: Update Fields
+
+  FILE: File
+  VIEW: View
+  MACROS: Macros
+  TOOLS: Tools
+  HELP: Help
+  OPEN: Open
+  SAVE_TRACK: Save Track
+  EXIT: Exit
+  SELECT_ALL: Select All
+  AUTOTAG: Autotag
+  AUTO_ADD_ARTWORK: Add Artwork
+  FIND_AND_REPLACE: Find and Replace
+  ADD_TRACK_NUMBERS: Add Track Numbers
+  FORMAT_FILENAMES: Format Filename(s)
+  AUDIT_CLEANUP: Audit/Cleanup
+  ANALYTICS: Analytics
+  ABOUT: About
+  OPEN_WIKI: Open Wiki
+  COMMAND_PROMPT: Command Prompt
+  SETTINGS: Settings
+
+  MORE_INFO: More Info
+  REMOVE_FROM_LIST: Remove from list
+  SAVE: Save
+  SHOW_IN_FINDER: Show in Finder
+  REMOVE_ARTWORK: Remove Artwork
+  ADD_ARTWORK: Add Artwork
+  USE_ALBUM_ART_FINDER: Use Album Art Finder
+  MOVE_FILES: Move File(s)
+  ADD_ARTWORK_FOR_SELECTED: Add artwork for selected
+  REMOVE_ARTWORK_FOR_SELECTED: Remove artwork for selected
+
+  AUDIT_CLEANUP_FOLDER: Audit/Cleanup Folder
+  CHOOSE_FOLDER: Choose Folder
+  AUDIT: Audit
+  CLEANUP: Cleanup
+  PERFORM_ANALYSIS: Perform Analysis
+  VIEW_RESULTS: View Results
+  START_AUDIT: Start Audit
+  CURRENT_FOLDER: Current Folder
+  AUDIT_ID3_CHECK: Every file has necessary ID3Tag information
+  AUDIT_FILENAME_CHECK: File names and directories all match standard
+  AUDIT_COVER_ART_CHECK: Has cover art associated with the album
+  ADVANCE_ON_SUCCESSFUL_AUTOFIX: Advance on successful autofix
+  ATTEMPT_AUTO_FIX: Attempt Autofix
+  PREVIOUS: Previous
+  SAVE_AND_NEXT: Save & Next
+  CLEANUP_IMAGES_CHECKBOX: Images (Excludes cover art images, e.g. cover.*)
+  CUSTOM_FILE_EXTENSION: Custom file extension
+  DELETE_SELECTED: Delete Selected
+  DELETE_ALL: Delete All
+  AUDIT_CLEANUP_FILE_CHOOSER_HEADER: Select a folder to Audit/Cleanup
+  WINDOWS_FILES: Windows files
+  OTHER_FILES: Other files
+
+  ABOUT_MOOSE: About Moose
+  VERSION: Version
+  ENTER_COMMAND: Enter command
+  GENRES: Genres
+  GENRE_TO_ADD: Genre to add
+  ADD: Add
+  DELETE: Delete
+  CANCEL: Cancel
+  RESTORE_DEFAULTS: Restore Defaults
+  SAVE_SETTINGS: Save Settings
+  LOGGING: Logging
+  FILES: Files
+  API_CONFIG: API Config
+  FEATURES: Features
+  LANGUAGE: Language
+  DEBUGGING: Debugging
+  ENHANCED_DEBUGGING: Enhanced Debugging
+  DEVELOPER_MODE: Developer Mode
+  OPEN_EVENT_LOG: Open Event Log
+  CLEAR_EVENT_LOG: Clear Event Log
+  OPEN_ERROR_LOG: Open Error Log
+  CLEAR_ERROR_LOG: Clear Error Log
+  MUSIC_LIBRARY_LOCATION: Music Library Location
+  BROWSE: Browse
+  APPLICATION_SUPPORT_DIRECTORY: Application Support Directory
+  GOOGLE_CUSTOM_SEARCH_ENGINE: Google Custom Search Engine
+  CSE_ID: CSE ID
+  API_KEY: API Key
+  DATE_LAST_USED: Date last used
+  TIMES_USED_TODAY: Times used today
+  SPOTIFY_API: Spotify API
+  CLIENT_ID: Client ID
+  CLIENT_SECRET: Client Secret
+  PREFERRED_COVER_ART_SIZE: Preferred cover art size
+  AUTOTAGGING: Autotagging
+  REMOVE_COMMENT_ON_AUTOTAGGING: Remove comment on autotagging
+  AUTO_FIND_COVER_ART: Auto find cover art with Spotify API
+  OTHER: Other
+  CHECK_FOR_NEW_GENRES: Check for new genres
+  ALBUM_ART_FINDER: Album Art Finder
+
+  en-US: English
+  de-DE: German
+  es-MX: Spanish
+  es-ES: Spanish
+  fr-FR: French
+  CURRENT_LANGUAGE: Current Language
+  UPDATE_LANGUAGE: Update Language
+  LANGUAGE_SWITCH: Switching your language will reset Moose, any unsaved changes will be lost. Are you sure you want to continue?
+  CONFIRM_LANGUAGE_SWITCH: Confirm Language Switch

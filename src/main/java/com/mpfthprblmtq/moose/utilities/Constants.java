@@ -14,6 +14,11 @@ import java.awt.Color;
 // class Constants
 public class Constants {
 
+    // application support directory
+    public static final String APPLICATION_SUPPORT_DIRECTORY =
+            System.getProperty("user.home") + "/Library/Application Support/moose/";
+
+    // string constants
     public static final String DASH = "-";
     public static final String INFO = "ⓘ ";
 
@@ -74,23 +79,6 @@ public class Constants {
     public static final String TITLE_FEATURING_AND_REMIX_ARTIST =
             "(?<title>.+)(?<featuredArtist>\\s\\(ft\\..+\\))(?<remixArtist>\\s\\(.+\\))";
 
-    // menu options
-    public static final String MORE_INFO = "More info...";
-    public static final String SHOW_IN_FINDER = "Show in Finder...";
-    public static final String REMOVE_FROM_LIST = "Remove from list";
-    public static final String PLAY = "Play";
-    public static final String SAVE = "Save";
-    public static final String AUTO_TAG = "Autotag";
-    public static final String AUTO_TRACK_DISK_NUMBERS = "Auto-add track/disk numbers";
-    public static final String AUTO_ARTWORK = "Auto-add artwork";
-    public static final String MOVE_FILE = "Move file(s)";
-    public static final String FORMAT_FILENAME = "Format filename(s)";
-    public static final String ADD_ARTWORK = "Add artwork...";
-    public static final String ADD_ARTWORK_SELECTED = "Add artwork for selected...";
-    public static final String REMOVE_ARTWORK = "Remove artwork";
-    public static final String REMOVE_ARTWORK_SELECTED = "Remove artwork for selected";
-    public static final String USE_ALBUM_ART_FINDER = "Use Album Art Finder";
-
     // row icon constants
     public static final int DEFAULT = 0;
     public static final int EDITED = 1;
@@ -110,8 +98,8 @@ public class Constants {
     public static final int TABLE_COLUMN_ALBUM_ART = 10;
 
     // audit constants
-    public static final int AUDIT = 0;
-    public static final int CLEANUP = 1;
+    public static final int AUDIT_TAB = 0;
+    public static final int CLEANUP_TAB = 1;
 
     public static final int ID3 = 0;
     public static final int FILENAMES = 1;
@@ -126,9 +114,10 @@ public class Constants {
     public static final int OTHER = 6;
 
     // settings tabs
-    public static final int GENRE = 0;
-    public static final int LOGGING = 1;
-    public static final int FILES = 2;
-    public static final int API = 3;
-    public static final int FEATURES = 4;
+    public static final int GENRE_TAB = 0;
+    public static final int LOGGING_TAB = 1;
+    public static final int FILES_TAB = 2;
+    public static final int API_TAB = 3;
+    public static final int FEATURES_TAB = 4;
+    public static final int LANGUAGE_TAB = 5;
 }

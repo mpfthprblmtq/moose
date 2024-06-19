@@ -1,0 +1,123 @@
+dictionaryValues:
+  FILENAME: Dateinamen
+  TITLE: Titel
+  ARTIST: Künstler
+  ALBUM: Album
+  ALBUM_ARTIST: Album Künstler
+  GENRE: Genre
+  YEAR: Jahr
+  TRACK: Stück
+  DISK: Scheibe
+  ARTWORK: Kunstwerk
+
+  CLEAR_ALL: Alles Löschen
+  SAVE_ALL: Rette Alle
+  OPEN_ALL: Öffne Alle
+  EDIT_MULTIPLE_ITEMS: Mehrere Elemente Bearbeiten
+  UPDATE_FIELDS: Felder Aktualisieren
+
+  FILE: Enreichen
+  VIEW: Ansehen
+  MACROS: Makros
+  TOOLS: Werkzeug
+  HELP: Hilfe
+  OPEN: Offen
+  SAVE_TRACK: Stück Speichern
+  EXIT: Ausfahrt
+  SELECT_ALL: Wählen Sie Alle
+  AUTOTAG: Auto-Etikettieren
+  AUTO_ADD_ARTWORK: Kunstwerk Autohinzufügen
+  FIND_AND_REPLACE: Suchen und Ersetzen
+  ADD_TRACK_NUMBERS: Titelnummern Hinzufügen
+  FORMAT_FILENAMES: Dateiname Formatieren
+  AUDIT_CLEANUP: Prüfen/Aufrämen
+  ANALYTICS: Analytiks
+  ABOUT: Über Diese App
+  OPEN_WIKI: Wiki Öffnen
+  COMMAND_PROMPT: Eingabeaufforderung
+  SETTINGS: Einstellungen
+
+  MORE_INFO: Mehr Info
+  REMOVE_FROM_LIST: Aus Liste Entfernen
+  SAVE: Speichern
+  SHOW_IN_FINDER: Im Finder Anzeigen
+  REMOVE_ARTWORK: Kunstwerk Entfernen
+  ADD_ARTWORK: Kunstwerk Hinzufügen
+  USE_ALBUM_ART_FINDER: Verwenden Sie den Kunstwerk-Finder
+  MOVE_FILES: Dateien Verschieben
+  ADD_ARTWORK_FOR_SELECTED: Kunstwerk für Ausgewählte hinzufügen
+  REMOVE_ARTWORK_FOR_SELECTED: Kunstwerk für Ausgewählte entfernen
+
+  AUDIT_CLEANUP_FOLDER: Prüfen/Aufrämen Ordner
+  CHOOSE_FOLDER: Wähle Einen Ordner
+  AUDIT: Prüfen
+  CLEANUP: Aufrämen
+  PERFORM_ANALYSIS: Analyse Durchführen
+  VIEW_RESULTS: Ergebnisse Anzeigen
+  START_AUDIT: Prüfung Starten
+  CURRENT_FOLDER: Aktueller Ordner
+  AUDIT_ID3_CHECK: Jede Datei hat die notwendigen ID3Tag-Informationen
+  AUDIT_FILENAME_CHECK: Dateinamen und Verzeichnisse alle gut
+  AUDIT_COVER_ART_CHECK: Verfügt über Kunstwerk, das mit dem Album verknüpft ist
+  ADVANCE_ON_SUCCESSFUL_AUTOFIX: Fortschritt bei erfolgreicher Autokorrektur
+  ATTEMPT_AUTO_FIX: Autokorrektur versuchen
+  PREVIOUS: Vorherige
+  SAVE_AND_NEXT: Speichern & Weiter
+  CLEANUP_IMAGES_CHECKBOX: Bilder (ausgenommen Kunstwerkbilder, z. B. cover.*)
+  CUSTOM_FILE_EXTENSION: Benutzerdefinierte Dateierweiterung
+  DELETE_SELECTED: Ausgewählte Löschen
+  DELETE_ALL: Alles Löschen
+  AUDIT_CLEANUP_FILE_CHOOSER_HEADER: Wählen Sie einen zu Prüfenden/Aufrämen Ordner aus
+  WINDOWS_FILES: Windows-Dateien
+  OTHER_FILES: Andere Dateien
+
+  ABOUT_MOOSE: Über Moose
+  VERSION: Ausführung
+  ENTER_COMMAND: Befehl Eingeben
+  GENRES: Genres
+  GENRE_TO_ADD: Genre zum Hinzufügen
+  ADD: Hinzufügen
+  DELETE: Löschen
+  CANCEL: Stornieren
+  RESTORE_DEFAULTS: Wiederherstellen
+  SAVE_SETTINGS: Einstellungen Speichern
+  LOGGING: Protokollierung
+  FILES: Dateien
+  API_CONFIG: API-Konfig
+  FEATURES: Merkmale
+  LANGUAGE: Sprache
+  DEBUGGING: Debuggen
+  ENHANCED_DEBUGGING: Erweitertes Debugging
+  DEVELOPER_MODE: Entwicklermodus
+  OPEN_EVENT_LOG: Ereignisprotokoll öff
+  CLEAR_EVENT_LOG: Ereignisprotokoll lösch
+  OPEN_ERROR_LOG: Fehlerprotokoll öff
+  CLEAR_ERROR_LOG: Fehlerprotokoll lösch
+  MUSIC_LIBRARY_LOCATION: Standort der Musikbibliothek
+  BROWSE: Durchsuche
+  APPLICATION_SUPPORT_DIRECTORY: Anwendungsunterstützung Verzeichnis
+  GOOGLE_CUSTOM_SEARCH_ENGINE: Benutzerdefinierte Google-Suchmaschine
+  CSE_ID: BS ID
+  API_KEY: API-Schlüssel
+  DATE_LAST_USED: Datum der letzten Verwendung
+  TIMES_USED_TODAY: Heute verwendete Zeiten
+  SPOTIFY_API: Spotify-API
+  CLIENT_ID: Kunden ID
+  CLIENT_SECRET: Client-Geheimnis
+  PREFERRED_COVER_ART_SIZE: Bevorzugte Coverart-Größe
+  AUTOTAGGING: Auto-Etikettieren
+  REMOVE_COMMENT_ON_AUTOTAGGING: Kommentar zum Auto-Etikettieren entfernen
+  AUTO_FIND_COVER_ART: Finden Sie Kunstwerk automatisch mit der Spotify-API
+  OTHER: Andere
+  CHECK_FOR_NEW_GENRES: Suchen Sie nach neuen Genres
+  ALBUM_ART_FINDER: Kunstwerk-Finder
+
+  en-US: Englisch
+  de-DE: Deutsch
+  es-MX: Spanisch
+  es-ES: Spanisch
+  fr-FR: Französisch
+  CURRENT_LANGUAGE: Aktuelle Sprache
+  UPDATE_LANGUAGE: Sprache Aktualisieren
+  LANGUAGE_SWITCH: Wenn Sie Ihre Sprache ändern, wird Moose zurückgesetzt und alle nicht gespeicherten Änderungen gehen verloren. Bist du dir sicher, dass du weitermachen willst?
+  CONFIRM_LANGUAGE_SWITCH: Sprachumschaltung bestätigen

@@ -30,9 +30,12 @@ import com.mpfthprblmtq.moose.utilities.Constants;
 import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.ImageUtils;
 import com.mpfthprblmtq.moose.utilities.MP3FileUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.ViewUtils;
 
+import static com.mpfthprblmtq.commons.translation.Translation.t;
 import static com.mpfthprblmtq.moose.utilities.Constants.*;
+import static com.mpfthprblmtq.moose.utilities.TranslationConstants.*;
 
 // class InfoFrame
 @SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
@@ -108,19 +111,20 @@ public class InfoFrame extends javax.swing.JFrame {
         songController = Moose.getFrame().songController;
 
         this.menuListener = (ActionEvent event) -> {
+            // get the translations, so we know what we're working with
+            String addArtworkTranslated = t(ADD_ARTWORK);
+            String removeArtworkTranslated = t(REMOVE_ARTWORK);
+            String autoAddArtworkTranslated = t(AUTO_ADD_ARTWORK);
+
             // switch based on the option selected
-            switch (event.getActionCommand()) {
-                case ADD_ARTWORK:
-                    addAlbumArt();
-                    break;
-                case REMOVE_ARTWORK:
-                    removeAlbumArt();
-                    break;
-                case AUTO_ARTWORK:
-                    // TODO
-                    break;
-                default:
-                    break;
+            if (event.getActionCommand().equals(addArtworkTranslated)) {
+                addAlbumArt();
+            } else if (event.getActionCommand().equals(removeArtworkTranslated)) {
+                removeAlbumArt();
+            } else if (event.getActionCommand().equals(autoAddArtworkTranslated)) {
+                // TODO
+                DialogUtils.showMessageDialog(
+                        this, "Not implemented yet!", "Not implemented yet!", JOptionPane.WARNING_MESSAGE);
             }
         };  // end menuListener
     }
@@ -828,7 +832,7 @@ public class InfoFrame extends javax.swing.JFrame {
 
     private void coverLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_coverLabelMouseClicked
         if (this.editModeEnabled) {
-            ViewUtils.showPopUpContextMenu(evt, menuListener,  false, false, true, false, new String[] {AUTO_ARTWORK});
+            ViewUtils.showPopUpContextMenu(evt, menuListener,  false, false, true, false, new String[] {t(AUTO_ADD_ARTWORK)});
         }
     }//GEN-LAST:event_coverLabelMouseClicked
 

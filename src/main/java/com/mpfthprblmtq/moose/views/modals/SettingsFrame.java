@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 import com.mpfthprblmtq.commons.logger.Logger;
+import com.mpfthprblmtq.commons.translation.Translation;
 import com.mpfthprblmtq.commons.utils.DateUtils;
 import com.mpfthprblmtq.commons.utils.FileUtils;
 import com.mpfthprblmtq.commons.utils.StringUtils;
@@ -21,14 +22,18 @@ import com.mpfthprblmtq.moose.Moose;
 import com.mpfthprblmtq.moose.controllers.SettingsController;
 import com.mpfthprblmtq.moose.objects.Settings;
 import com.mpfthprblmtq.moose.utilities.Constants;
+import com.mpfthprblmtq.moose.utilities.IconUtils;
 import com.mpfthprblmtq.moose.utilities.viewUtils.DialogUtils;
+import com.mpfthprblmtq.moose.utilities.viewUtils.model.LanguageComboBoxItem;
 
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import java.util.List;
+import javax.swing.*;
+
+import static com.mpfthprblmtq.commons.translation.Translation.t;
+import static com.mpfthprblmtq.moose.utilities.TranslationConstants.*;
 
 // class SettingsFrame
 @SuppressWarnings("FieldCanBeLocal")    // for NetBeans' field declaration at bottom of class
@@ -73,6 +78,39 @@ public class SettingsFrame extends javax.swing.JFrame {
 
         // init the components
         initComponents();
+
+        // populate the languages combobox and set initial value
+        initLanguageComboBox();
+    }
+
+    /**
+     * Populates the supported Locales dropdown
+     */
+    private void initLanguageComboBox() {
+        List<Locale> supportedLocales = Translation.getSupportedLocales();
+        DefaultComboBoxModel<LanguageComboBoxItem> comboBoxModel = new DefaultComboBoxModel<>();
+
+        int currentLocale = -1;
+        for (int i = 0; i < supportedLocales.size(); i++) {
+            Locale locale = supportedLocales.get(i);
+            comboBoxModel.addElement(
+                    new LanguageComboBoxItem(locale.toLanguageTag(), t(supportedLocales.get(i).toLanguageTag())));
+            if (Moose.getSettings().getLocale().equals(locale.toLanguageTag())) {
+                currentLocale = i;
+            }
+        }
+        languageComboBox.setModel(comboBoxModel);
+        languageComboBox.setSelectedIndex(currentLocale);
+        flagLabel.setIcon(IconUtils.get("translations/" + Moose.getSettings().getLocale() + ".png"));
+        currentLanguageLabelValue.setText(t(Moose.getSettings().getLocale()));
+    }
+
+    /**
+     * Sets the active tab to the one we pass in
+     * @param tab the index of the tab to focus on
+     */
+    public void setFocusedTab(int tab) {
+        tabbedPane.setSelectedIndex(tab);
     }
 
     /**
@@ -144,6 +182,13 @@ public class SettingsFrame extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         formatFilenamesCheckBox = new javax.swing.JCheckBox();
+        languagePanel = new javax.swing.JPanel();
+        languageLabel = new javax.swing.JLabel();
+        languageComboBox = new javax.swing.JComboBox<>();
+        flagLabel = new javax.swing.JLabel();
+        currentLanguageLabel = new javax.swing.JLabel();
+        currentLanguageLabelValue = new javax.swing.JLabel();
+        updateLanguageButton = new javax.swing.JButton();
         statusLabel = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         defaultButton = new javax.swing.JButton();
@@ -157,7 +202,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         genrePanel.setEnabled(false);
 
         genresHeaderLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        genresHeaderLabel.setText("Genres:");
+        genresHeaderLabel.setText(t(GENRES) + ":");
 
         genreList.setModel(getGenreListModel());
         genreList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -170,7 +215,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
         genresScrollPane.setViewportView(genreList);
 
-        genreToAddLabel.setText("Genre to add:");
+        genreToAddLabel.setText(t(GENRE_TO_ADD) + ":");
 
         genreTextField.setMaximumSize(new java.awt.Dimension(167, 26));
         genreTextField.setMinimumSize(new java.awt.Dimension(167, 26));
@@ -181,14 +226,14 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
-        addGenreButton.setText("Add");
+        addGenreButton.setText(t(ADD));
         addGenreButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addGenreButtonActionPerformed(evt);
             }
         });
 
-        deleteGenreButton.setText("Delete");
+        deleteGenreButton.setText(t(DELETE));
         deleteGenreButton.setEnabled(false);
         deleteGenreButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -196,7 +241,7 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText(t(CANCEL));
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -223,7 +268,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(genrePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(addGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(deleteGenreButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cancelButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(genrePanelLayout.createSequentialGroup()
                         .addContainerGap()
@@ -252,18 +297,18 @@ public class SettingsFrame extends javax.swing.JFrame {
                         .addComponent(deleteGenreButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
                         .addComponent(genreStatusLabel)))
                 .addContainerGap())
         );
 
-        tabbedPane.addTab("Genres", genrePanel);
+        tabbedPane.addTab(t(GENRES), genrePanel);
 
         debuggingHeaderLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        debuggingHeaderLabel.setText("Debugging");
+        debuggingHeaderLabel.setText(t(DEBUGGING));
 
         debugCheckBox.setSelected(settingsController.getSettings().isInDebugMode());
-        debugCheckBox.setText("Enhanced Debugging");
+        debugCheckBox.setText(t(ENHANCED_DEBUGGING));
         debugCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 debugCheckBoxActionPerformed(evt);
@@ -271,7 +316,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         developerModeCheckBox.setSelected(this.settingsController.getSettings().isInDeveloperMode());
-        developerModeCheckBox.setText("Developer Mode");
+        developerModeCheckBox.setText(t(DEVELOPER_MODE));
         developerModeCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 developerModeCheckBoxActionPerformed(evt);
@@ -279,16 +324,17 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         loggingHeaderLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        loggingHeaderLabel.setText("Logging");
+        loggingHeaderLabel.setText(t(LOGGING));
 
-        openEventLogButton.setText("Open Event Log");
+        openEventLogButton.setText(t(OPEN_EVENT_LOG));
+        openEventLogButton.setSize(new java.awt.Dimension(128, 29));
         openEventLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openEventLogButtonActionPerformed(evt);
             }
         });
 
-        clearEventLogButton.setText("Clear Event Log");
+        clearEventLogButton.setText(t(CLEAR_EVENT_LOG));
         clearEventLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearEventLogButtonActionPerformed(evt);
@@ -302,14 +348,14 @@ public class SettingsFrame extends javax.swing.JFrame {
         eventLogFileLocationLabel.setMinimumSize(new java.awt.Dimension(66, 40));
         eventLogFileLocationLabel.setPreferredSize(new java.awt.Dimension(66, 40));
 
-        openErrorLogButton.setText("Open Error Log");
+        openErrorLogButton.setText(t(OPEN_ERROR_LOG));
         openErrorLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openErrorLogButtonActionPerformed(evt);
             }
         });
 
-        clearErrorLogButton.setText("Clear Error Log");
+        clearErrorLogButton.setText(t(CLEAR_ERROR_LOG));
         clearErrorLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearErrorLogButtonActionPerformed(evt);
@@ -330,24 +376,21 @@ public class SettingsFrame extends javax.swing.JFrame {
             .addGroup(loggingPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(loggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(eventLogFileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(loggingPanelLayout.createSequentialGroup()
                         .addComponent(openEventLogButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
                         .addComponent(clearEventLogButton))
                     .addGroup(loggingPanelLayout.createSequentialGroup()
-                        .addComponent(openErrorLogButton, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(openErrorLogButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(clearErrorLogButton))
-                    .addGroup(loggingPanelLayout.createSequentialGroup()
-                        .addGroup(loggingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(loggingHeaderLabel)
-                            .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(developerModeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(debugCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(debuggingHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         loggingPanelLayout.setVerticalGroup(
@@ -375,13 +418,13 @@ public class SettingsFrame extends javax.swing.JFrame {
                     .addComponent(clearErrorLogButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(errorLogFileLocationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
-        tabbedPane.addTab("Logging", loggingPanel);
+        tabbedPane.addTab(t(LOGGING), loggingPanel);
 
         libraryLocationHeaderLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        libraryLocationHeaderLabel.setText("Music Library Location:");
+        libraryLocationHeaderLabel.setText(t(MUSIC_LIBRARY_LOCATION));
 
         libraryLocationField.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
         libraryLocationField.setText(settingsController.getSettings().getLibraryLocation());
@@ -392,7 +435,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         libraryLocationField.setPreferredSize(new java.awt.Dimension(66, 40));
         libraryLocationField.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
-        libraryBrowseButton.setText("Browse...");
+        libraryBrowseButton.setText(t(BROWSE) + "...");
         libraryBrowseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 libraryBrowseButtonActionPerformed(evt);
@@ -400,7 +443,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         libraryLocationHeaderLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        libraryLocationHeaderLabel1.setText("Application Support Directory:");
+        libraryLocationHeaderLabel1.setText(t(APPLICATION_SUPPORT_DIRECTORY) + ":");
 
         libraryLocationField1.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
         libraryLocationField1.setText(settingsController.getSettings().getApplicationSupportLocation());
@@ -411,10 +454,8 @@ public class SettingsFrame extends javax.swing.JFrame {
         libraryLocationField1.setPreferredSize(new java.awt.Dimension(66, 40));
         libraryLocationField1.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
-        appSupportOpenButton.setText("Open...");
-        appSupportOpenButton.setMaximumSize(new java.awt.Dimension(100, 29));
-        appSupportOpenButton.setMinimumSize(new java.awt.Dimension(100, 29));
-        appSupportOpenButton.setPreferredSize(new java.awt.Dimension(100, 29));
+        appSupportOpenButton.setText(t(OPEN) + "...");
+        appSupportOpenButton.setSize(new java.awt.Dimension(128, 29));
         appSupportOpenButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 appSupportOpenButtonActionPerformed(evt);
@@ -428,80 +469,82 @@ public class SettingsFrame extends javax.swing.JFrame {
             .addGroup(filesPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(filesPanelLayout.createSequentialGroup()
-                        .addComponent(libraryLocationHeaderLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(libraryBrowseButton))
-                    .addGroup(filesPanelLayout.createSequentialGroup()
+                    .addComponent(libraryLocationHeaderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSeparator1)
+                    .addComponent(libraryLocationField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(libraryLocationField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(libraryLocationHeaderLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, filesPanelLayout.createSequentialGroup()
+                        .addGap(0, 239, Short.MAX_VALUE)
                         .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(filesPanelLayout.createSequentialGroup()
-                                .addComponent(libraryLocationHeaderLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                                .addComponent(appSupportOpenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jSeparator1)
-                            .addComponent(libraryLocationField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(libraryLocationField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())))
+                            .addComponent(libraryBrowseButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(appSupportOpenButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         filesPanelLayout.setVerticalGroup(
             filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(filesPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(libraryLocationHeaderLabel)
-                    .addComponent(libraryBrowseButton))
+                .addComponent(libraryLocationHeaderLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(libraryBrowseButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(libraryLocationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(filesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(libraryLocationHeaderLabel1)
-                    .addComponent(appSupportOpenButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(libraryLocationHeaderLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(appSupportOpenButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(libraryLocationField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(134, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
-        tabbedPane.addTab("Files", filesPanel);
+        tabbedPane.addTab(t(FILES), filesPanel);
 
         apiPanel.setToolTipText("");
 
         googleSearchEngineLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        googleSearchEngineLabel.setText("Google Custom Search Engine");
+        googleSearchEngineLabel.setText(t(GOOGLE_CUSTOM_SEARCH_ENGINE));
 
         cseTextField.setText(this.settingsController.getSettings().getAlbumArtFinderCseId());
         cseTextField.setMaximumSize(new java.awt.Dimension(367, 26));
         cseTextField.setMinimumSize(new java.awt.Dimension(367, 26));
         cseTextField.setPreferredSize(new java.awt.Dimension(367, 26));
+        cseTextField.setSize(new java.awt.Dimension(367, 26));
         cseTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 cseTextFieldKeyReleased(evt);
             }
         });
 
-        apiKeyLabel.setText("API Key");
+        apiKeyLabel.setText(t(API_KEY) + ":");
+        apiKeyLabel.setSize(new java.awt.Dimension(84, 16));
 
         apiKeyTextField.setText(this.settingsController.getSettings().getAlbumArtFinderApiKey());
         apiKeyTextField.setMaximumSize(new java.awt.Dimension(367, 26));
         apiKeyTextField.setMinimumSize(new java.awt.Dimension(367, 26));
         apiKeyTextField.setPreferredSize(new java.awt.Dimension(367, 26));
+        apiKeyTextField.setSize(new java.awt.Dimension(367, 26));
         apiKeyTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 apiKeyTextFieldKeyReleased(evt);
             }
         });
 
-        dateLastUsedLabel.setText("Date last used:");
+        dateLastUsedLabel.setText(t(DATE_LAST_USED) + ":");
+        dateLastUsedLabel.setSize(new java.awt.Dimension(84, 16));
 
         dateLastUsedField.setText(this.settingsController.getSettings().getAlbumArtFinderSearchCountDate());
         dateLastUsedField.setToolTipText("");
 
-        timesUsedTodayLabel.setText("Times used today:");
+        timesUsedTodayLabel.setText(t(TIMES_USED_TODAY) + ":");
+        timesUsedTodayLabel.setSize(new java.awt.Dimension(84, 16));
 
         timesUsedTodayField.setText(populateTimesUsedTodayField());
 
-        preferredCoverArtSizeLabel.setText("Preferred cover art size:");
+        preferredCoverArtSizeLabel.setText(t(PREFERRED_COVER_ART_SIZE) + ":");
 
         preferredCoverArtSizeSpinner.setValue(this.settingsController.getSettings().getPreferredCoverArtSize());
         preferredCoverArtSizeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -510,16 +553,21 @@ public class SettingsFrame extends javax.swing.JFrame {
             }
         });
 
-        cseLabel.setText("CSE ID:");
+        cseLabel.setText(t(CSE_ID) + ":");
+        cseLabel.setSize(new java.awt.Dimension(84, 16));
 
         spotifyLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        spotifyLabel.setText("Spotify API");
+        spotifyLabel.setText(t(SPOTIFY_API));
 
-        spotifyClientIdLabel.setText("Client ID:");
+        spotifyClientIdLabel.setText(t(CLIENT_ID) + ":");
 
-        spotifyClientSecretLabel.setText("Client Secret:");
+        spotifyClientSecretLabel.setText(t(CLIENT_SECRET) + ":");
 
         spotifyClientIdTextField.setText(this.settingsController.getSettings().getSpotifyClientId());
+        spotifyClientIdTextField.setMaximumSize(new java.awt.Dimension(367, 26));
+        spotifyClientIdTextField.setMinimumSize(new java.awt.Dimension(367, 26));
+        spotifyClientIdTextField.setPreferredSize(new java.awt.Dimension(367, 26));
+        spotifyClientIdTextField.setSize(new java.awt.Dimension(367, 26));
         spotifyClientIdTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 spotifyClientIdTextFieldKeyReleased(evt);
@@ -527,6 +575,9 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         spotifyClientSecretTextField.setText(this.settingsController.getSettings().getSpotifyClientSecret());
+        spotifyClientSecretTextField.setMaximumSize(new java.awt.Dimension(367, 26));
+        spotifyClientSecretTextField.setMinimumSize(new java.awt.Dimension(367, 26));
+        spotifyClientSecretTextField.setPreferredSize(new java.awt.Dimension(367, 26));
         spotifyClientSecretTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 spotifyClientSecretTextFieldKeyReleased(evt);
@@ -540,42 +591,44 @@ public class SettingsFrame extends javax.swing.JFrame {
             .addGroup(apiPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(separator2)
-                    .addComponent(googleSearchEngineLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
                     .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(timesUsedTodayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(separator3)
-                    .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addComponent(cseLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                    .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addComponent(apiKeyLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                    .addGroup(apiPanelLayout.createSequentialGroup()
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(apiPanelLayout.createSequentialGroup()
-                                .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, apiPanelLayout.createSequentialGroup()
+                                .addComponent(preferredCoverArtSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(spotifyLabel))
+                            .addComponent(separator3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(apiPanelLayout.createSequentialGroup()
                         .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(spotifyClientIdLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(spotifyClientSecretLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(spotifyClientIdTextField)
-                            .addComponent(spotifyClientSecretTextField))))
-                .addContainerGap())
+                            .addComponent(googleSearchEngineLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(separator2, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, apiPanelLayout.createSequentialGroup()
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(dateLastUsedLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                                    .addComponent(timesUsedTodayLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(dateLastUsedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(timesUsedTodayField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, apiPanelLayout.createSequentialGroup()
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cseLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(apiKeyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cseTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(apiKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                            .addComponent(spotifyLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, apiPanelLayout.createSequentialGroup()
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(spotifyClientSecretLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                                    .addComponent(spotifyClientIdLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(spotifyClientIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(spotifyClientSecretTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         apiPanelLayout.setVerticalGroup(
             apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -610,21 +663,22 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(spotifyClientSecretLabel)
                     .addComponent(spotifyClientSecretTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(separator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(apiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(preferredCoverArtSizeLabel)
                     .addComponent(preferredCoverArtSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
-        tabbedPane.addTab("API Config", apiPanel);
+        tabbedPane.addTab(t(API_CONFIG), apiPanel);
 
-        jLabel1.setText("AutoTagging:");
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        jLabel1.setText(t(AUTOTAGGING));
 
         removeCommentCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.REMOVE_COMMENT_ON_AUTOTAGGING));
-        removeCommentCheckBox.setText("Remove comments on AutoTagging");
+        removeCommentCheckBox.setText(t(REMOVE_COMMENT_ON_AUTOTAGGING));
         removeCommentCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeCommentCheckBoxActionPerformed(evt);
@@ -632,7 +686,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         autoCoverArtSpotifyCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.AUTO_FIND_COVER_ART_WITH_SPOTIFY));
-        autoCoverArtSpotifyCheckBox.setText("Auto find and add cover art with Spotify API");
+        autoCoverArtSpotifyCheckBox.setText(t(AUTO_FIND_COVER_ART));
         autoCoverArtSpotifyCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 autoCoverArtSpotifyCheckBoxActionPerformed(evt);
@@ -640,7 +694,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         genreCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.CHECK_FOR_NEW_GENRES));
-        genreCheckBox.setText("Check for new genres");
+        genreCheckBox.setText(t(CHECK_FOR_NEW_GENRES));
         genreCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 genreCheckBoxActionPerformed(evt);
@@ -648,7 +702,7 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         autoTaggingCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.AUTOTAGGING));
-        autoTaggingCheckBox.setText("AutoTagging");
+        autoTaggingCheckBox.setText(t(AUTOTAGGING));
         autoTaggingCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 autoTaggingCheckBoxActionPerformed(evt);
@@ -656,17 +710,18 @@ public class SettingsFrame extends javax.swing.JFrame {
         });
 
         albumArtFinderCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.ALBUM_ART_FINDER));
-        albumArtFinderCheckBox.setText("Album Art Finder");
+        albumArtFinderCheckBox.setText(t(ALBUM_ART_FINDER));
         albumArtFinderCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 albumArtFinderCheckBoxActionPerformed(evt);
             }
         });
 
-        jLabel2.setText("Other:");
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        jLabel2.setText(t(OTHER));
 
         formatFilenamesCheckBox.setSelected(settingsController.getSettings().getFeatures().get(Settings.FORMAT_FILENAMES));
-        formatFilenamesCheckBox.setText("Format Filenames");
+        formatFilenamesCheckBox.setText(t(FORMAT_FILENAMES));
         formatFilenamesCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 formatFilenamesCheckBoxActionPerformed(evt);
@@ -714,24 +769,88 @@ public class SettingsFrame extends javax.swing.JFrame {
                 .addComponent(genreCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(albumArtFinderCheckBox)
-                .addContainerGap(72, Short.MAX_VALUE))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
-        tabbedPane.addTab("Features", featuresPanel);
+        tabbedPane.addTab(t(FEATURES), featuresPanel);
+
+        languageLabel.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        languageLabel.setText(t(LANGUAGE) + ":");
+
+        languageComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                languageComboBoxActionPerformed(evt);
+            }
+        });
+
+        flagLabel.setMaximumSize(new java.awt.Dimension(42, 25));
+        flagLabel.setMinimumSize(new java.awt.Dimension(42, 25));
+        flagLabel.setPreferredSize(new java.awt.Dimension(42, 25));
+        flagLabel.setSize(new java.awt.Dimension(42, 25));
+
+        currentLanguageLabel.setText(t(CURRENT_LANGUAGE) + ":");
+
+        updateLanguageButton.setText(t(UPDATE_LANGUAGE));
+        updateLanguageButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateLanguageButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout languagePanelLayout = new javax.swing.GroupLayout(languagePanel);
+        languagePanel.setLayout(languagePanelLayout);
+        languagePanelLayout.setHorizontalGroup(
+            languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(languagePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(languageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(languagePanelLayout.createSequentialGroup()
+                        .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(languageComboBox, 0, 211, Short.MAX_VALUE)
+                            .addComponent(currentLanguageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(updateLanguageButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                            .addGroup(languagePanelLayout.createSequentialGroup()
+                                .addComponent(flagLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(currentLanguageLabelValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
+        );
+        languagePanelLayout.setVerticalGroup(
+            languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(languagePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(languageLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 19, Short.MAX_VALUE)
+                .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(flagLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(currentLanguageLabel)
+                    .addComponent(currentLanguageLabelValue, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(updateLanguageButton)
+                .addContainerGap(171, Short.MAX_VALUE))
+        );
+
+        tabbedPane.addTab(t(LANGUAGE), languagePanel);
 
         statusLabel.setForeground(new java.awt.Color(0, 130, 47));
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         statusLabel.setText(" ");
         statusLabel.setToolTipText("");
 
-        saveButton.setText("Save Settings");
+        saveButton.setText(t(SAVE_SETTINGS));
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
             }
         });
 
-        defaultButton.setText("Restore Defaults");
+        defaultButton.setText(t(RESTORE_DEFAULTS));
         defaultButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 defaultButtonActionPerformed(evt);
@@ -755,8 +874,7 @@ public class SettingsFrame extends javax.swing.JFrame {
                                 .addComponent(defaultButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(saveButton))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
@@ -797,60 +915,60 @@ public class SettingsFrame extends javax.swing.JFrame {
         // go through the map we get back and reset those settings
         if (settingsToReset != null) {
 
-            if (!settingsToReset.get(Constants.GENRE)
-                    && !settingsToReset.get(Constants.LOGGING)
-                    && !settingsToReset.get(Constants.FILES)
-                    && !settingsToReset.get(Constants.API)
-                    && !settingsToReset.get(Constants.FEATURES)) {
+            if (!settingsToReset.get(Constants.GENRE_TAB)
+                    && !settingsToReset.get(Constants.LOGGING_TAB)
+                    && !settingsToReset.get(Constants.FILES_TAB)
+                    && !settingsToReset.get(Constants.API_TAB)
+                    && !settingsToReset.get(Constants.FEATURES_TAB)) {
                 statusLabel.setForeground(Constants.BLACK);
                 statusLabel.setText("No settings to reset!");
                 return;
             }
 
             Map<Integer, Boolean> success = new HashMap<>();
-            if (settingsToReset.containsKey(Constants.GENRE) && settingsToReset.get(Constants.GENRE)) {
-                success.put(Constants.GENRE, this.settingsController.defaultGenres());
+            if (settingsToReset.containsKey(Constants.GENRE_TAB) && settingsToReset.get(Constants.GENRE_TAB)) {
+                success.put(Constants.GENRE_TAB, this.settingsController.defaultGenres());
             }
-            if (settingsToReset.containsKey(Constants.LOGGING) && settingsToReset.get(Constants.LOGGING)) {
-                success.put(Constants.LOGGING, this.settingsController.defaultLogging());
+            if (settingsToReset.containsKey(Constants.LOGGING_TAB) && settingsToReset.get(Constants.LOGGING_TAB)) {
+                success.put(Constants.LOGGING_TAB, this.settingsController.defaultLogging());
             }
-            if (settingsToReset.containsKey(Constants.FILES) && settingsToReset.get(Constants.FILES)) {
-                success.put(Constants.FILES, this.settingsController.defaultFiles());
+            if (settingsToReset.containsKey(Constants.FILES_TAB) && settingsToReset.get(Constants.FILES_TAB)) {
+                success.put(Constants.FILES_TAB, this.settingsController.defaultFiles());
             }
-            if (settingsToReset.containsKey(Constants.API) && settingsToReset.get(Constants.API)) {
-                success.put(Constants.API, this.settingsController.defaultApi());
+            if (settingsToReset.containsKey(Constants.API_TAB) && settingsToReset.get(Constants.API_TAB)) {
+                success.put(Constants.API_TAB, this.settingsController.defaultApi());
             }
-            if (settingsToReset.containsKey(Constants.FEATURES) && settingsToReset.get(Constants.FEATURES)) {
-                success.put(Constants.FEATURES, this.settingsController.defaultFeatures());
+            if (settingsToReset.containsKey(Constants.FEATURES_TAB) && settingsToReset.get(Constants.FEATURES_TAB)) {
+                success.put(Constants.FEATURES_TAB, this.settingsController.defaultFeatures());
             }
 
             // build the message to show to the user based on the success map
             String message = StringUtils.EMPTY;
-            if (success.containsKey(Constants.GENRE)) {
+            if (success.containsKey(Constants.GENRE_TAB)) {
                 message = "Genres";
             }
-            if (success.containsKey(Constants.LOGGING)) {
+            if (success.containsKey(Constants.LOGGING_TAB)) {
                 if (StringUtils.isEmpty(message)) {
                     message = "Logging";
                 } else {
                     message = message.concat(", Logging");
                 }
             }
-            if (success.containsKey(Constants.FILES)) {
+            if (success.containsKey(Constants.FILES_TAB)) {
                 if (StringUtils.isEmpty(message)) {
                     message = "Files";
                 } else {
                     message = message.concat(", Files");
                 }
             }
-            if (success.containsKey(Constants.API)) {
+            if (success.containsKey(Constants.API_TAB)) {
                 if (StringUtils.isEmpty(message)) {
                     message = "API Config";
                 } else {
                     message = message.concat(", API Config");
                 }
             }
-            if (success.containsKey(Constants.FEATURES)) {
+            if (success.containsKey(Constants.FEATURES_TAB)) {
                 if (StringUtils.isEmpty(message)) {
                     message = "Features";
                 } else {
@@ -1403,6 +1521,21 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // </editor-fold>
 
+    private void languageComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_languageComboBoxActionPerformed
+        String selectedKey =
+                ((LanguageComboBoxItem) Objects.requireNonNull(languageComboBox.getSelectedItem())).getKey();
+        flagLabel.setIcon(IconUtils.get("translations/" + selectedKey + ".png"));
+    }//GEN-LAST:event_languageComboBoxActionPerformed
+
+    private void updateLanguageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateLanguageButtonActionPerformed
+        if (JOptionPane.showConfirmDialog(this, t(LANGUAGE_SWITCH), t(CONFIRM_LANGUAGE_SWITCH),
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+            LanguageComboBoxItem item = (LanguageComboBoxItem) languageComboBox.getSelectedItem();
+            assert item != null;
+            Moose.changeLanguage(item.getKey());
+        }
+    }//GEN-LAST:event_updateLanguageButtonActionPerformed
+
     /**
      * Resets the UI on a successful settings save
      */
@@ -1459,6 +1592,8 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JButton clearEventLogButton;
     private javax.swing.JLabel cseLabel;
     private javax.swing.JTextField cseTextField;
+    private javax.swing.JLabel currentLanguageLabel;
+    private javax.swing.JLabel currentLanguageLabelValue;
     private javax.swing.JLabel dateLastUsedField;
     private javax.swing.JLabel dateLastUsedLabel;
     private javax.swing.JCheckBox debugCheckBox;
@@ -1470,6 +1605,7 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel eventLogFileLocationLabel;
     private javax.swing.JPanel featuresPanel;
     private javax.swing.JPanel filesPanel;
+    private javax.swing.JLabel flagLabel;
     private javax.swing.JCheckBox formatFilenamesCheckBox;
     private javax.swing.JCheckBox genreCheckBox;
     private javax.swing.JList<String> genreList;
@@ -1484,6 +1620,9 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JComboBox<LanguageComboBoxItem> languageComboBox;
+    private javax.swing.JLabel languageLabel;
+    private javax.swing.JPanel languagePanel;
     private javax.swing.JButton libraryBrowseButton;
     private javax.swing.JLabel libraryLocationField;
     private javax.swing.JLabel libraryLocationField1;
@@ -1509,5 +1648,6 @@ public class SettingsFrame extends javax.swing.JFrame {
     private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JLabel timesUsedTodayField;
     private javax.swing.JLabel timesUsedTodayLabel;
+    private javax.swing.JButton updateLanguageButton;
     // End of variables declaration//GEN-END:variables
 }

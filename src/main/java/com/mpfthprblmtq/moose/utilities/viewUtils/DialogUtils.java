@@ -108,19 +108,19 @@ public class DialogUtils {
         JCheckBox apiBox = new JCheckBox("API Configuration");
         JCheckBox featuresBox = new JCheckBox("Features");
         switch (selectedTab) {
-            case Constants.GENRE:
+            case Constants.GENRE_TAB:
                 genreBox.setSelected(true);
                 break;
-            case Constants.LOGGING:
+            case Constants.LOGGING_TAB:
                 loggingBox.setSelected(true);
                 break;
-            case Constants.FILES:
+            case Constants.FILES_TAB:
                 filesBox.setSelected(true);
                 break;
-            case Constants.API:
+            case Constants.API_TAB:
                 apiBox.setSelected(true);
                 break;
-            case Constants.FEATURES:
+            case Constants.FEATURES_TAB:
                 featuresBox.setSelected(true);
                 break;
         }
@@ -135,11 +135,11 @@ public class DialogUtils {
 
         if (option == JOptionPane.OK_OPTION) {
             Map<Integer, Boolean> boxes = new HashMap<>();
-            boxes.put(Constants.GENRE, genreBox.isSelected());
-            boxes.put(Constants.LOGGING, loggingBox.isSelected());
-            boxes.put(Constants.FILES, filesBox.isSelected());
-            boxes.put(Constants.API, apiBox.isSelected());
-            boxes.put(Constants.FEATURES, featuresBox.isSelected());
+            boxes.put(Constants.GENRE_TAB, genreBox.isSelected());
+            boxes.put(Constants.LOGGING_TAB, loggingBox.isSelected());
+            boxes.put(Constants.FILES_TAB, filesBox.isSelected());
+            boxes.put(Constants.API_TAB, apiBox.isSelected());
+            boxes.put(Constants.FEATURES_TAB, featuresBox.isSelected());
             return boxes;
         }
         return null;
