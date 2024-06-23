@@ -1124,13 +1124,16 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="updateLanguageButton" alignment="1" pref="150" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="flagLabel" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="108" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="currentLanguageLabelValue" max="32767" attributes="0"/>
                               </Group>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="updateLanguageButton" min="-2" pref="170" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>

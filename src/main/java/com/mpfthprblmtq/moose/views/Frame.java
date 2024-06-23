@@ -139,12 +139,13 @@ public class Frame extends javax.swing.JFrame {
         }
     }
 
-    public DefaultTableModel getModel() {
-        return (DefaultTableModel) table.getModel();
+    @SuppressWarnings("lombok")
+    public JTable getTable() {
+        return this.table;
     }
 
-    public JTable getTable() {
-        return table;
+    public DefaultTableModel getModel() {
+        return (DefaultTableModel) table.getModel();
     }
 
     /**
@@ -1637,13 +1638,13 @@ public class Frame extends javax.swing.JFrame {
             }
             editCell();
 
-        } else if (evt.getKeyCode() == KeyEvent.VK_ENTER && evt.isShiftDown()) {
+        } else if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             // if on first row, go to the last row
             rowDelta = currentRow - 1;
             currentRow = rowDelta < 0 ? table.getRowCount() - 1 : currentRow - 1;
             editCell();
 
-        } else if (evt.getKeyCode() == KeyEvent.VK_TAB && evt.isShiftDown()) {
+        } else if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             // if on first column, go to the last column and the previous row
             // also check if we're on the first row, go to last row too if we are
             columnDelta = currentColumn - 1;

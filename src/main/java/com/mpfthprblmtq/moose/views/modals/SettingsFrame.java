@@ -811,11 +811,13 @@ public class SettingsFrame extends javax.swing.JFrame {
                             .addComponent(currentLanguageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(languagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(updateLanguageButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                             .addGroup(languagePanelLayout.createSequentialGroup()
                                 .addComponent(flagLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(currentLanguageLabelValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGap(0, 108, Short.MAX_VALUE))
+                            .addComponent(currentLanguageLabelValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, languagePanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(updateLanguageButton, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         languagePanelLayout.setVerticalGroup(
@@ -1521,12 +1523,14 @@ public class SettingsFrame extends javax.swing.JFrame {
 
     // </editor-fold>
 
+    @SuppressWarnings("unused") // for the evt
     private void languageComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_languageComboBoxActionPerformed
         String selectedKey =
                 ((LanguageComboBoxItem) Objects.requireNonNull(languageComboBox.getSelectedItem())).getKey();
         flagLabel.setIcon(IconUtils.get("translations/" + selectedKey + ".png"));
     }//GEN-LAST:event_languageComboBoxActionPerformed
 
+    @SuppressWarnings("unused") // for the evt
     private void updateLanguageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateLanguageButtonActionPerformed
         if (JOptionPane.showConfirmDialog(this, t(LANGUAGE_SWITCH), t(CONFIRM_LANGUAGE_SWITCH),
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {

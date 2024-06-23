@@ -106,6 +106,7 @@ public class Moose {
         updateSettings(Moose.getSettings());
         Translation.setCurrentLocale(Locale.forLanguageTag(locale));
 
+        frame.dispose();
         launchFrame();
         launchSettingsFrame();
         settingsFrame.setFocusedTab(LANGUAGE_TAB);
